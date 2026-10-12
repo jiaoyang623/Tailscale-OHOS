@@ -106,6 +106,7 @@ this file tells you how to build and run, those tell you what the behaviour must
 | Criteria: journeys, seams, points | `docs/oracles/90-journeys/`, `91-seams/`, `points/` |
 | Criteria relationship index (generated — do not hand-edit) | `docs/oracles/_ref-index.md` |
 | Review pages a human reads and signs | `docs/review/<layer>/index.html` |
+| What the reviewer actually decided (one entry per item) | `docs/review/<layer>/review-decisions.json` |
 
 **Run everything before you push:**
 
@@ -113,6 +114,27 @@ this file tells you how to build and run, those tell you what the behaviour must
 scripts/run-checks.sh            # unit + integration tests, then the three oracle checks
 scripts/run-checks.sh --strict   # same, but exits non-zero on a P0 criterion finding
 ```
+
+**Re-generate the review pages after changing a design document or a criterion:**
+
+```bash
+scripts/a01-review-pages.sh      # runs the gate first, then rebuilds all four snapshots and pages
+```
+
+It runs `scripts/run-checks.sh` and only then writes the snapshots, so a page never claims a
+test passed on a baseline where it did not run; if the gate fails it writes nothing. It also
+refuses to run on a dirty tree, because then the baseline hash would not describe the code.
+Read back what a decision file is worth with the a01 review tool:
+
+```bash
+python3 <a01>/scripts/review.py docs/review/<layer>/snapshot.json \
+  --decisions docs/review/<layer>/review-decisions.json --require-reviewed
+```
+
+Exit 1 means some item is not accepted — either it is `changes_requested`/`pending`, or its
+fingerprint changed since the decision was recorded (a stale decision is not a valid one).
+The real record lives in `review-decisions.json`; a page you clicked in and did not export
+is not evidence.
 
 The criteria declare this repo's own conventions to the a01 checkers, because the project has
 no ArkTS `.ets` tests: anchors are `scripts/test-<name>.mjs::<case name>`, the test-entry

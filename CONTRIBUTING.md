@@ -31,10 +31,15 @@ For setup and device checks, see the [Windows development guide](docs/developmen
 - Reproduce and narrow down network-transition, transfer or layout issues.
 
 Run `scripts/run-checks.sh` before submitting: it runs the unit and integration tests and the
-criteria checks. If you change behaviour, update the criteria that describe it — see the
+oracle checks. If you change behaviour, update the criteria that describe it — see the
 [design records and criteria](docs/development.md#design-records-criteria-and-review-the-a01-chain)
 section of the development guide. A criterion whose anchor names a test that does not exist
 fails the gate.
+
+If you changed a design document or a criterion, also run `scripts/a01-review-pages.sh`. It runs
+the gate first and then rebuilds the four review pages, because a page generated without a green
+run on that baseline would claim a result nobody observed. Any reviewer conclusion on an item
+you touched goes stale until it is re-signed — that is the mechanism working, not a bug.
 
 Check your diff before submitting. Exclude unrelated changes, generated build output, dependency directories and signing credentials. Application releases follow the versioning, changelog and signing process in the development guide.
 

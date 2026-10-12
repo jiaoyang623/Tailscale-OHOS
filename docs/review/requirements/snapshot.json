@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "cc7ab88",
+  "baseline": "7ed18db",
   "stage": "requirements",
   "design": [
     {
@@ -1034,6 +1034,126 @@
       ],
       "sources": [
         "`scripts/test-macos-build.mjs`（5 条）"
+      ]
+    },
+    {
+      "id": "QG-01",
+      "layer": "requirements",
+      "title": "锁屏静置后台存活",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：≥ 720 s（12 min），全程心跳龄 ≤ 15 s、进程 ID 不变",
+        "观测环境与测量方法：真机 + `scripts/device-background-vpn-probe.ps1 -DurationSeconds 720 -LockScreen`，逐样本记录",
+        "现状：已实测 721 s（M-01）；蜂窝版**未完成**（M-11）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-02",
+      "layer": "requirements",
+      "title": "连接期保活覆盖",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：从扩展建 TUN 到隧道可用，全程持有长时任务",
+        "观测环境与测量方法：真机诊断文件中的 `background_started` 与 `vpn_connected` 先后顺序",
+        "现状：逻辑已闭环（单元）；真机**未复跑**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-03",
+      "layer": "requirements",
+      "title": "网络切换恢复",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：同会话内自动恢复直连，无需重连",
+        "观测环境与测量方法：真机切换承载，测 discovery 响应时间与 TUN 双向包数",
+        "现状：已实测 11 ms / +142 包（M-03）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-04",
+      "layer": "requirements",
+      "title": "掉线自动恢复",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：不重建 VPN 会话即回到可用路径",
+        "观测环境与测量方法：真机短 down/up，记录恢复路径与耗时",
+        "现状：已实测 436 ms（M-04）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-05",
+      "layer": "requirements",
+      "title": "传输完整性",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：双向双向计数都增长，不丢方向",
+        "观测环境与测量方法：`scripts/device-vpn-data-probe.ps1`",
+        "现状：已实测 +13/+18、+16/+20（M-02）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-06",
+      "layer": "requirements",
+      "title": "诊断脱敏",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：报告 zip 中不含 token、认证 URL、账号、tailnet 地址",
+        "观测环境与测量方法：人工审查导出报告 + 单元测试",
+        "现状：实现存在，**无端到端验证**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-07",
+      "layer": "requirements",
+      "title": "双语完整",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：`base` 与 `zh_CN` 的 key 集合一致",
+        "观测环境与测量方法：程序比对两份 `string.json` 的 key",
+        "现状：**未验证**（未决 Q5）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-08",
+      "layer": "requirements",
+      "title": "启动到可用",
+      "status": "draft",
+      "depends_on": [],
+      "content": [
+        "目标值：未定",
+        "观测环境与测量方法：—",
+        "现状：**未定**（见未决 Q6）"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
       ]
     }
   ],
