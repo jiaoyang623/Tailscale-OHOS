@@ -6,7 +6,7 @@
 > 为什么需要它：判据之间是有关系的（父子、同需求、同用例、同承载件、互相引用）。
 > 改一条判据前，先在这里查它牵动哪些判据；改完再查一次，确认没有漏改。
 
-判据 117 条 · 关系边：父判据 128 · 正文引用 150 · 共用锚点 22 · 共用承载件 3120 · 同批次 894
+判据 117 条 · 关系边：父判据 128 · 正文引用 150 · 共用锚点 22 · 共用承载件 3120 · 同批次 890
 
 ## 关系检查
 
@@ -486,7 +486,7 @@
 - 本判据引用: O-SEAM-09 O-SEAM-04
 - 引用了本判据: O-PEER-06 O-PEER-10
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-16 O-SEAM-17 O-SETUP-01 O-SETUP-02 O-SETUP-03 O-SETUP-04 O-UI-01 …(+6)
-- 同接收批次(a01-单元): 2 条
+- 同接收批次(a01-单元): 1 条
 
 ### O-PRIV-01 应用锁：开启、回前台锁定、认证失败不放行
 - 位置: `docs/oracles/90-journeys/08-privacy.md:5` · 层: 旅程 · 状态: pending-test
@@ -559,12 +559,11 @@
 - 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-09
 
 ### O-RECONN-09 连接稳定 60 s 才清零重试计数
-- 位置: `docs/oracles/points/P2-network-reconnect.md:315` · 层: 单点 · 状态: pending-test
+- 位置: `docs/oracles/points/P2-network-reconnect.md:315` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-10
 - 上游需求: R-CONN-05
 - 本判据引用: O-SEAM-10
 - 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08
-- 同接收批次(a01-单元): 2 条
 
 ### O-SEAM-01 应用进程 ↔ VPN 扩展：生命周期命令通道
 - 位置: `docs/oracles/91-seams/S1-ipc-core.md:9` · 层: 接缝 · 状态: pending-test
@@ -772,7 +771,7 @@
 - 上游需求: R-CONN-03 R-CONN-08
 - 本判据引用: O-SEAM-02 O-SEAM-10
 - 共用承载件: O-CARD-01 O-CONN-03 O-CONN-07 O-SEAM-01 O-SEAM-02 O-SEAM-10 O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-04 O-SESSION-05 O-SESSION-06
-- 同接收批次(a01-单元): 2 条
+- 同接收批次(a01-单元): 1 条
 
 ### O-SETUP-01 首次启动：欢迎与更新日志
 - 位置: `docs/oracles/90-journeys/01-setup.md:3` · 层: 旅程 · 状态: pending-test

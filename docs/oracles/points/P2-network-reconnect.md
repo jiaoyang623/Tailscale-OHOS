@@ -323,8 +323,8 @@
 - 失败信息：期望「稳定 60 s 才清零重试计数」，实际「每次短暂连上就清零，抖动隧道无限重连」
 - 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:91 poll 的稳定性判据；:20 STABLE_MS；scripts/test-vpn-reconnect-supervisor.mjs
 - 上游：R-CONN-05
-- 待建测试：[单元] scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder
-- 状态：pending-test
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder
+- 状态：closed
 - 不确定特征：none
-- 归属：owner=项目维护者 接收批次=a01-单元
+- 归属：—
 - 复核：待复核

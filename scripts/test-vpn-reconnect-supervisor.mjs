@@ -184,3 +184,46 @@ test('returning to the foreground clears the retry ladder', async () => {
   await f.push();
   assert.equal(f.connects, 2);
 });
+
+test('a connection held past the stability window clears the retry ladder', async () => {
+  // The attempt counter is only cleared once a connection has held for
+  // STABLE_MS. Without that, a flapping tunnel would reset the count on every
+  // cycle and retry forever; with it too short, the same thing happens. This
+  // pins the window itself, which the give-up test never reaches because its
+  // connect and drop happen at the same instant.
+  const f = fixture();
+  f.connected();
+  await f.push();
+  f.supervisor.onBackground(f.now);
+
+  // One real drop well after backgrounding: burns attempt 1.
+  f.now += 20000;
+  f.dropped();
+  await f.push();
+  assert.equal(f.connects, 1);
+
+  // Back up, but not yet stable: the counter must survive.
+  f.now += 1000;
+  f.connected();
+  await f.push();
+  assert.ok(!f.events.includes('vpn_reconnect_succeeded'),
+    'connection had not held long enough to count as recovered');
+
+  // Held past STABLE_MS: the ladder clears.
+  f.now += 60000;
+  f.connected();
+  await f.push();
+  assert.ok(f.events.includes('vpn_reconnect_succeeded'),
+    `stability window did not clear the ladder: ${f.events.join(', ')}`);
+
+  // And because it cleared, the full budget is available again: three more.
+  for (let round = 0; round < 4; round++) {
+    f.now += 600000;
+    f.connected();
+    await f.push();
+    f.dropped();
+    await f.push();
+  }
+  assert.equal(f.connects, 4, 'the ladder was not re-armed after a stable connection');
+  assert.equal(f.events.filter((e) => e === 'vpn_reconnect_exhausted').length, 1);
+});
