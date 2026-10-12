@@ -6,7 +6,7 @@
 > 为什么需要它：判据之间是有关系的（父子、同需求、同用例、同承载件、互相引用）。
 > 改一条判据前，先在这里查它牵动哪些判据；改完再查一次，确认没有漏改。
 
-判据 98 条 · 关系边：父判据 106 · 正文引用 127 · 共用锚点 16 · 共用承载件 2900 · 同批次 868
+判据 117 条 · 关系边：父判据 128 · 正文引用 150 · 共用锚点 22 · 共用承载件 3120 · 同批次 872
 
 ## 关系检查
 
@@ -207,7 +207,7 @@
 ### O-CONN-04 后台掉线自动恢复（非用户主动）
 - 位置: `docs/oracles/90-journeys/02-connection.md:54` · 层: 旅程 · 状态: pending-test
 - 上游需求: R-CONN-05 R-CONN-06
-- 共用承载件: O-CARD-01 O-CONN-07 O-SEAM-10 O-SEAM-17
+- 共用承载件: O-CARD-01 O-CONN-07 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09 O-SEAM-10 O-SEAM-17
 - 同接收批次(a01-E2E): 27 条
 
 ### O-CONN-05 另一个系统 VPN 占用时的冲突处理
@@ -321,8 +321,83 @@
 - 位置: `docs/oracles/90-journeys/03-network.md:37` · 层: 旅程 · 状态: closed
 - 子判据: O-SEAM-12
 - 上游需求: R-NET-03
-- 引用了本判据: O-SEAM-12
-- 共用承载件: O-SEAM-12
+- 引用了本判据: O-NETMON-01 O-SEAM-12
+- 共用承载件: O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-01 用系统默认网络取样并合并重复回调
+- 位置: `docs/oracles/points/P2-network-reconnect.md:7` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12 O-NET-03
+- 共用锚点: O-NETMON-02
+- 共用承载件: O-NET-03 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-02 网络地址与 DNS 不进入诊断或日志
+- 位置: `docs/oracles/points/P2-network-reconnect.md:24` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12 O-SEAM-15
+- 上游需求: R-NET-04
+- 本判据引用: O-SEAM-12 O-SEAM-15
+- 共用锚点: O-NETMON-01
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-03 取样期间默认网络变化则丢弃该次读
+- 位置: `docs/oracles/points/P2-network-reconnect.md:41` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-04 同一接口落在新网络或地址续期也算变化
+- 位置: `docs/oracles/points/P2-network-reconnect.md:58` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-05 离线清空路由提示，恢复时按新承载重绑
+- 位置: `docs/oracles/points/P2-network-reconnect.md:75` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-06 原生重绑失败后自愈重试，不依赖新的平台回调
+- 位置: `docs/oracles/points/P2-network-reconnect.md:92` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-07 重绑在途时到达的新修订在完成后被重放
+- 位置: `docs/oracles/points/P2-network-reconnect.md:109` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-08 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-08 平台回调注册失败按退避重试
+- 位置: `docs/oracles/points/P2-network-reconnect.md:126` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用锚点: O-NETMON-09
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-09 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-09 停止后注销监听，平台回调不再触发任何工作
+- 位置: `docs/oracles/points/P2-network-reconnect.md:143` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用锚点: O-NETMON-08 O-NETMON-10
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-10 O-SEAM-12
+
+### O-NETMON-10 停止取消进行中的重放并清空定时器
+- 位置: `docs/oracles/points/P2-network-reconnect.md:161` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-12
+- 上游需求: R-NET-03
+- 本判据引用: O-SEAM-12
+- 共用锚点: O-NETMON-09
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-SEAM-12
 
 ### O-PEER-01 瞬态（非直连）探测结果按短 TTL 过期，允许被后来的直连结果替换
 - 位置: `docs/oracles/points/P4-peers.md:23` · 层: 单点 · 状态: closed
@@ -411,7 +486,7 @@
 - 本判据引用: O-SEAM-09 O-SEAM-04
 - 引用了本判据: O-PEER-06 O-PEER-10
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-16 O-SEAM-17 O-SETUP-01 O-SETUP-02 O-SETUP-03 O-SETUP-04 O-UI-01 …(+6)
-- 同接收批次(a01-单元): 1 条
+- 同接收批次(a01-单元): 2 条
 
 ### O-PRIV-01 应用锁：开启、回前台锁定、认证失败不放行
 - 位置: `docs/oracles/90-journeys/08-privacy.md:5` · 层: 旅程 · 状态: pending-test
@@ -426,6 +501,70 @@
 - 上游需求: R-PRIV-03 R-PRIV-04
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 O-SEAM-17 O-SETUP-01 O-SETUP-02 O-SETUP-03 O-SETUP-04 …(+7)
 - 同接收批次(a01-E2E): 27 条
+
+### O-RECONN-01 后台静置足够久后的掉线触发一次恢复
+- 位置: `docs/oracles/points/P2-network-reconnect.md:178` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10 O-SEAM-11
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10 O-SEAM-11
+- 共用承载件: O-CONN-04 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-02 前台可见或刚进入后台的掉线视为用户主动
+- 位置: `docs/oracles/points/P2-network-reconnect.md:195` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-06
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-03 用户已请求停止后的掉线不被恢复撤销
+- 位置: `docs/oracles/points/P2-network-reconnect.md:213` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-06
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-04 显式重新连接重置停止意图并重新武装恢复
+- 位置: `docs/oracles/points/P2-network-reconnect.md:230` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-05 恢复尝试有上限，耗尽后放弃
+- 位置: `docs/oracles/points/P2-network-reconnect.md:247` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-06 重试按指数退避，不按每次采样触发
+- 位置: `docs/oracles/points/P2-network-reconnect.md:264` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-07 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-07 未知状态不当作掉线
+- 位置: `docs/oracles/points/P2-network-reconnect.md:281` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-03 O-SEAM-10
+- 上游需求: R-CONN-09
+- 本判据引用: O-SEAM-03 O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-08 O-RECONN-09
+
+### O-RECONN-08 回到前台清零重试阶梯
+- 位置: `docs/oracles/points/P2-network-reconnect.md:298` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-09
+
+### O-RECONN-09 连接稳定 60 s 才清零重试计数
+- 位置: `docs/oracles/points/P2-network-reconnect.md:315` · 层: 单点 · 状态: pending-test
+- 父判据: O-SEAM-10
+- 上游需求: R-CONN-05
+- 本判据引用: O-SEAM-10
+- 共用承载件: O-CONN-04 O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08
+- 同接收批次(a01-单元): 2 条
 
 ### O-SEAM-01 应用进程 ↔ VPN 扩展：生命周期命令通道
 - 位置: `docs/oracles/91-seams/S1-ipc-core.md:9` · 层: 接缝 · 状态: closed
@@ -448,10 +587,10 @@
 ### O-SEAM-03 VPN 扩展 → 应用进程：状态与心跳
 - 位置: `docs/oracles/91-seams/S1-ipc-core.md:43` · 层: 接缝 · 状态: closed
 - 父判据: O-CONN-06 O-CONN-03 O-DEV-01
-- 子判据: O-BGTASK-02 O-BGTASK-03 O-BGTASK-05 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08
+- 子判据: O-BGTASK-02 O-BGTASK-03 O-BGTASK-05 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-RECONN-07 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08
 - 上游需求: R-CONN-04 R-CONN-09
 - 本判据引用: O-CONN-06 O-CONN-03 O-DEV-01
-- 引用了本判据: O-BGTASK-02 O-BGTASK-03 O-BGTASK-05 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08
+- 引用了本判据: O-BGTASK-02 O-BGTASK-03 O-BGTASK-05 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-RECONN-07 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-CONN-06 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 …(+35)
 
 ### O-SEAM-04 VPN 扩展 → 应用进程：对端快照
@@ -510,28 +649,30 @@
 ### O-SEAM-10 编排分叉：UI 路径 ↔ 无 UI 路径
 - 位置: `docs/oracles/91-seams/S3-orchestration-system.md:7` · 层: 接缝 · 状态: pending-test
 - 父判据: O-CONN-01 O-CONN-07 O-CARD-01
-- 子判据: O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-07
+- 子判据: O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09 O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-07
 - 上游需求: R-CONN-08
 - 本判据引用: O-CONN-01 O-CONN-07 O-CARD-01
-- 引用了本判据: O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-07
+- 引用了本判据: O-RECONN-01 O-RECONN-02 O-RECONN-03 O-RECONN-04 O-RECONN-05 O-RECONN-06 O-RECONN-07 O-RECONN-08 O-RECONN-09 O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-07
 - 共用承载件: O-CARD-01 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-04 O-CONN-05 O-CONN-07 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-13 O-SEAM-16 O-SEAM-17 O-SESSION-01 O-SESSION-02 …(+16)
 - 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-11 应用进程 ↔ 系统：长时任务与实况窗
 - 位置: `docs/oracles/91-seams/S3-orchestration-system.md:24` · 层: 接缝 · 状态: closed
 - 父判据: O-CONN-06 O-CONN-03
-- 子判据: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-15
+- 子判据: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-15 O-RECONN-01
 - 上游需求: R-CONN-04 R-CONN-10
 - 本判据引用: O-CONN-06 O-CONN-03
-- 引用了本判据: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-15
+- 引用了本判据: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-15 O-RECONN-01
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03
 
 ### O-SEAM-12 应用进程 ↔ 系统：网络变化回调与重绑
 - 位置: `docs/oracles/91-seams/S3-orchestration-system.md:42` · 层: 接缝 · 状态: closed
 - 父判据: O-NET-03
+- 子判据: O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10
 - 上游需求: R-NET-03 R-NET-04
 - 本判据引用: O-NET-03
-- 共用承载件: O-NET-03
+- 引用了本判据: O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10
+- 共用承载件: O-NET-03 O-NETMON-01 O-NETMON-02 O-NETMON-03 O-NETMON-04 O-NETMON-05 O-NETMON-06 O-NETMON-07 O-NETMON-08 O-NETMON-09 O-NETMON-10
 
 ### O-SEAM-13 应用 ↔ 外部应用与系统认证
 - 位置: `docs/oracles/91-seams/S4-persistence-entry.md:7` · 层: 接缝 · 状态: pending-test
@@ -552,8 +693,10 @@
 ### O-SEAM-15 诊断：记录、脱敏与报告导出
 - 位置: `docs/oracles/91-seams/S5-diagnostics-replace.md:8` · 层: 接缝 · 状态: pending-test
 - 父判据: O-DIAG-01
+- 子判据: O-NETMON-02
 - 上游需求: R-DIAG-02 R-DIAG-03 R-DIAG-04
 - 本判据引用: O-DIAG-01
+- 引用了本判据: O-NETMON-02
 - 共用承载件: O-DIAG-01 O-SEAM-14
 - 同接收批次(a01-集成): 10 条
 
@@ -628,7 +771,7 @@
 - 上游需求: R-CONN-03 R-CONN-08
 - 本判据引用: O-SEAM-02 O-SEAM-10
 - 共用承载件: O-CARD-01 O-CONN-03 O-CONN-07 O-SEAM-01 O-SEAM-02 O-SEAM-10 O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-04 O-SESSION-05 O-SESSION-06
-- 同接收批次(a01-单元): 1 条
+- 同接收批次(a01-单元): 2 条
 
 ### O-SETUP-01 首次启动：欢迎与更新日志
 - 位置: `docs/oracles/90-journeys/01-setup.md:3` · 层: 旅程 · 状态: pending-test
