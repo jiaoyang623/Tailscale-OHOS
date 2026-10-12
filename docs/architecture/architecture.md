@@ -155,6 +155,20 @@
 **关键一致性事实**：`filesDir` 对三进程是同一份目录，**没有锁、没有租约**。一致性靠
 （a）单一写者约定（每类文件只有一个写方）、（b）原子写、（c）新鲜度阈值。三者任一被打破即产生脏读。
 
+**已核出的两处与「单一写者」「单一词汇表」不符的事实（本层收尾修订）**：
+
+1. `vpn-connect-config.json` **有两个写方**：应用进程的 `VpnCommandGateway.stageConnectConfig`
+   （`services/VpnCommandGateway.ets:127`）与扩展在断线后做快速重连时的 `stageVpnReconnectConfig`
+   （`vpnextensionability/TailscaleVpnExtensionAbility.ets:1116-1127`）。该文件还是**一次性的**：
+   `consumeVpnConnectConfig` 读完即 `unlink`（同文件 `:780-798`）。所以「每类文件只有一个写方」
+   对本文件不成立；它靠的是 TTL 15 s 加一次性消费，不是单一写者。
+2. 状态文件的**新鲜度阈值有两套**：`BridgeStatus` 用 5000 ms（`:142`、`:3313`），
+   `VpnBackgroundTaskManager`（`:14`）与 `VpnStatusReader`（`:9`）用 15000 ms。同一份
+   `vpn-probe-status.txt` 在两个读者眼里「新鲜」的窗口不一样。§2.3 声称的「同一个共享词汇表」
+   也只在部分成立：`vpn interface established` 在 `VpnBackgroundTaskManager` 里是 `connecting`，
+   在 `VpnStatusReader` 里仍是 `unknown`（卡片侧靠把 `unknown` 显示成连接中来兜）。
+   这两条已记入流程记录的 Q9、Q10、Q11，需在架构层通过前定论。
+
 ### 2.5 横切策略
 
 | 横切关注 | 落点 | 约束形式 |

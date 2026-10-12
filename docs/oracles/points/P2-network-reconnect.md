@@ -8,7 +8,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「网络在蜂窝/Wi-Fi 之间变化时，同一次 VPN 会话内自动重绑并恢复直连」；架构 §3.2(d) 与 §五 O-NET-03 行
+- 设计依据：需求 R-NET-03「网络在蜂窝/Wi-Fi 之间变化时，同一次 VPN 会话内自动重绑并恢复直连」；架构 §3.2(d) 与 §五 O-NET-03 行；HLD 契约 C-12
 - 触发与前置条件：start() 后的首个采样；以及 netAvailable / netLost / netCapabilitiesChange / netConnectionPropertiesChange 回调在 SETTLE_MS=750 内重复到达
 - 可观测点：nativeBridge.backendNetworkChangedAsync 的调用次数与实参（接口名）
 - 期望：正常：以 connection.getDefaultNet 取样（排除 VPN 网络），首次以接口名 wlan0 重绑一次；边界：同一默认网络的重复回调在 SETTLE 窗口内被合并成一次重绑（调用仍为 ['wlan0']）；失败与恢复：—；安全与质量：不按接口名优先级、也不按「最近一次回调是哪个承载」选接口。判定在宿主侧桩边界（connection、nativeBridge 为桩）下成立，通过不等于真机网络切换一定重绑成功
@@ -25,7 +25,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12、O-SEAM-15
 - 强度：强
-- 设计依据：需求 R-NET-04「网络变化的地址数据不得写入日志或诊断」；架构 §2.5 脱敏、O-SEAM-12「未记录地址数据」
+- 设计依据：需求 R-NET-04「网络变化的地址数据不得写入日志或诊断」；架构 §2.5 脱敏、O-SEAM-12「未记录地址数据」；HLD 契约 C-12
 - 触发与前置条件：任何一次采样或重绑产生的诊断事件
 - 可观测点：诊断事件文本（事件名与错误码）；fingerprint 是否只留在内存
 - 期望：正常：重绑事件只带承载类别（vpn_network_rebound_wifi / vpn_network_rebound_cellular / vpn_network_offline）与数字错误码；边界：事件文本中不得出现接口名或 IP 地址（addresses 与 DNS 只参与内存中的 fingerprint）；失败与恢复：—；安全与质量：地址数据不得跨越这条接缝落盘。判定在桩边界下成立
@@ -42,7 +42,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「同一次 VPN 会话内自动重绑」；架构 §2.5 异步陈旧「迟到结果不得覆盖新结果」
+- 设计依据：需求 R-NET-03「同一次 VPN 会话内自动重绑」；架构 §2.5 异步陈旧「迟到结果不得覆盖新结果」；HLD 契约 C-12
 - 触发与前置条件：getConnectionProperties 在途未返回时，默认网络从 netId 11 变为 netId 20
 - 可观测点：backendNetworkChangedAsync 的调用序列
 - 期望：正常：—；边界：properties 返回后再次 getDefaultNet，netId 不一致即抛错弃读，被丢弃的旧读不得先发一次（序列恰为 ['wlan0','rmnet0']）；失败与恢复：弃读引发的新一轮采样以新网络重绑一次；安全与质量：revision 与 generation 守卫保证迟到结果不覆盖新结果。判定在桩边界（properties 用 deferred 门控）下成立
@@ -59,7 +59,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「网络变化后同会话内自动重绑」；架构 §3.2(d)
+- 设计依据：需求 R-NET-03「网络变化后同会话内自动重绑」；架构 §3.2(d)；HLD 契约 C-12
 - 触发与前置条件：接口仍为 wlan0 但默认网络 netId 由 10 变为 11；以及 netConnectionPropertiesChange 回调带来地址由 192.0.2.2 变为 192.0.2.3
 - 可观测点：backendNetworkChangedAsync 的调用次数
 - 期望：正常：fingerprint 由 `netId|接口|地址列表|DNS` 组成，任一项不同即视为变化并重绑；边界：两次变化各触发一次刷新（累计 3 次调用）；失败与恢复：—；安全与质量：—。判定在桩边界下成立
@@ -76,7 +76,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「同一次会话内自动重绑并恢复直连」；O-SEAM-12「interfaceName 为空时记 vpn_network_offline」
+- 设计依据：需求 R-NET-03「同一次会话内自动重绑并恢复直连」；O-SEAM-12「interfaceName 为空时记 vpn_network_offline」；HLD 契约 C-12
 - 触发与前置条件：netLost 后 getDefaultNet 的 netId 为 0；随后 netAvailable 到 rmnet0
 - 可观测点：backendNetworkChangedAsync 的序列与实参；vpn_network_offline / vpn_network_rebound_cellular 事件
 - 期望：正常：离线时以空接口名重绑一次以清空路由提示，记 vpn_network_offline；边界：恢复时以新接口 rmnet0 重绑并记 vpn_network_rebound_cellular；失败与恢复：—；安全与质量：离线的判定来自系统默认网络 netId=0，不靠猜。判定在桩边界下成立
@@ -93,7 +93,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「不要求用户重连」；O-SEAM-12「重绑失败在 RETRY_MS 5000 后重试」
+- 设计依据：需求 R-NET-03「不要求用户重连」；O-SEAM-12「重绑失败在 RETRY_MS 5000 后重试」；HLD 契约 C-12
 - 触发与前置条件：backendNetworkChangedAsync 返回非 OK（'FAILED | refresh'）
 - 可观测点：vpn_network_refresh_failed 事件；随后 RETRY_MS 内的再次调用
 - 期望：正常：—；边界：失败不更新 fingerprint、记 vpn_network_refresh_failed 并置重试标志；失败与恢复：RETRY_MS=5000 后自动重试成功（调用序列 ['wlan0','wlan0']），期间不需要任何平台回调再次触发；安全与质量：不以「等下个回调再说」为由放弃重绑。判定在桩边界（nativeBridge 为桩、Date.now 为桩）下成立
@@ -110,7 +110,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「蜂窝/Wi-Fi 变化时同会话内重绑」；O-SEAM-12「revision/appliedRevision 保证等待重绑期间到达的最新变化不被丢弃」
+- 设计依据：需求 R-NET-03「蜂窝/Wi-Fi 变化时同会话内重绑」；O-SEAM-12「revision/appliedRevision 保证等待重绑期间到达的最新变化不被丢弃」；HLD 契约 C-12
 - 触发与前置条件：Wi-Fi 重绑在途（nativeBridge 未返回）时，蜂窝 netAvailable 到达
 - 可观测点：在途期间的调用序列；原生返回后的调用序列
 - 期望：正常：—；边界：在途期间到达的变化不并发重绑（此时序列仍为 ['wlan0']）；失败与恢复：原生返回后按最新修订重放一次（序列变为 ['wlan0','rmnet0']），Wi-Fi→蜂窝的最终过渡不被丢掉；安全与质量：只有重绑完成后才标记 appliedRevision。判定在桩边界（nativeBridge 用 deferred 门控）下成立
@@ -127,7 +127,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「同会话自动重绑」；O-SEAM-12「程序注册失败在 RETRY_MS 后重试」
+- 设计依据：需求 R-NET-03「同会话自动重绑」；O-SEAM-12「程序注册失败在 RETRY_MS 后重试」；HLD 契约 C-12
 - 触发与前置条件：monitor.register 的回调收到错误（{ code: 201 }）
 - 可观测点：vpn_network_monitor_failed 事件；registered 计数；vpn_network_monitor_started 事件
 - 期望：正常：—；边界：注册失败记 vpn_network_monitor_failed 并按 RETRY_MS 重试注册；失败与恢复：下一次重试成功（registered 变 2）后进入正常刷新；安全与质量：—。判定在桩边界下成立
@@ -144,7 +144,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「同会话重绑」；架构 §3.1「VpnNetworkMonitor 随扩展进程存活」
+- 设计依据：需求 R-NET-03「同会话重绑」；架构 §3.1「VpnNetworkMonitor 随扩展进程存活」；HLD 契约 C-12
 - 触发与前置条件：stop() 之后平台回调（netAvailable）到达
 - 可观测点：unregister 调用次数；停止后 backendNetworkChangedAsync 的调用次数
 - 期望：正常：stop 注销监听（unregistered 为 1）；边界：停止后到达的平台回调不产生任何重绑（调用数不增）；失败与恢复：—；安全与质量：不泄漏 NetConnection 监听，避免进程被回收后仍被系统唤起。判定在桩边界下成立
@@ -162,7 +162,7 @@
 - 层级：单点
 - 父判据：O-SEAM-12
 - 强度：强
-- 设计依据：需求 R-NET-03「同会话重绑」；架构 §2.5 异步陈旧守卫
+- 设计依据：需求 R-NET-03「同会话重绑」；架构 §2.5 异步陈旧守卫；HLD 契约 C-12
 - 触发与前置条件：backendNetworkChangedAsync 在途时调用 stop()
 - 可观测点：停止后的调用序列；未触发的定时器数量
 - 期望：正常：—；边界：停止后在途结果不再重放（序列仍为 ['wlan0']）；失败与恢复：定时器被清空（timers.size 为 0），不遗留待触发的重绑；安全与质量：世代失配的在途结果直接丢弃，不产生游离工作。判定在桩边界（nativeBridge 用 deferred 门控）下成立
@@ -179,7 +179,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10、O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）
+- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）；HLD 契约 C-10
 - 触发与前置条件：上一次采样为 connected；onBackground 之后已过 BACKGROUND_SETTLE_MS=10000（测试取 60000）；本次采样为 disconnected
 - 可观测点：VpnSessionController.connect 的调用次数；vpn_reconnect_attempt 诊断事件
 - 期望：正常：调用 connect 一次并记 vpn_reconnect_attempt；边界：只有 connected→disconnected 的边沿才算掉线（同日两次采样都是 disconnected 不重复触发）；失败与恢复：—；安全与质量：恢复责任落在 P1，而 P1 在后台无长时任务时可能已被冻结——这正是 O-SEAM-11 登记的空洞，本判据只保证「能跑时判定正确」，不承诺冻结期间一定恢复。判定在宿主侧桩边界（VpnStatusReader、VpnSessionController 为桩）下成立
@@ -196,7 +196,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §2.5 重试「重试必须能被用户意图打断」
+- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §2.5 重试「重试必须能被用户意图打断」；HLD 契约 C-10
 - 触发与前置条件：掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）
 - 可观测点：connect 调用次数；vpn_drop_ignored_foreground 诊断事件
 - 期望：正常：—；边界：两种情形都不 connect，并记 vpn_drop_ignored_foreground；失败与恢复：—；安全与质量：用户刚看过应用时的掉线更可能是他自己按的，宁可不重试。判定在桩边界下成立
@@ -214,7 +214,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §3.2 S2 无 UI 控制面的意图记忆
+- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §3.2 S2 无 UI 控制面的意图记忆；HLD 契约 C-10
 - 触发与前置条件：noteRequestedStop() 之后，后台静置足够久，再读到掉线
 - 可观测点：connect 调用次数；vpn_drop_after_requested_stop 诊断事件
 - 期望：正常：—；边界：stopRequested 优先于「已后台足够久」的判据，不 connect，并记 vpn_drop_after_requested_stop；失败与恢复：—；安全与质量：这条是整套守卫里最重要的一条——与刚点了断开的用户抢夺比漏掉一次重试更糟。判定在桩边界下成立
@@ -231,7 +231,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复」；O-SEAM-10 两条入口共享同一意图记忆
+- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复」；O-SEAM-10 两条入口共享同一意图记忆；HLD 契约 C-10
 - 触发与前置条件：noteRequestedStop() 之后调用 noteRequestedStart()
 - 可观测点：stopRequested 的效果（后续掉线是否 connect）；connect 调用次数
 - 期望：正常：—；边界：停止意图清零、尝试计数与退避归零，之后的合法后台掉线重新触发一次恢复（connects 变 1）；失败与恢复：—；安全与质量：—。判定在桩边界下成立
@@ -248,7 +248,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-05「最多 3 次」；架构 §2.5 重试
+- 设计依据：需求 R-CONN-05「最多 3 次」；架构 §2.5 重试；HLD 契约 C-10
 - 触发与前置条件：连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed
 - 可观测点：connect 调用次数；vpn_reconnect_exhausted 诊断事件
 - 期望：正常：—；边界：尝试数达到 MAX_ATTEMPTS=3 后不再 connect（connects 恰为 3），并记 vpn_reconnect_exhausted；失败与恢复：—；安全与质量：不无限重试，也不把失败静默吞掉。判定在桩边界下成立
@@ -265,7 +265,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-05「指数退避」；架构 §2.5 重试「三处指数退避」
+- 设计依据：需求 R-CONN-05「指数退避」；架构 §2.5 重试「三处指数退避」；HLD 契约 C-10
 - 触发与前置条件：后台掉线后，反复 connected↔disconnected 采样五轮（时间几乎不推进）
 - 可观测点：connect 调用次数
 - 期望：正常：首次掉线后 connect 一次；边界：退避窗口（RETRY_BASE_MS=30000 起，上限 RETRY_MAX_MS=300000）内再次掉线不再 connect（connects 仍为 1）；失败与恢复：—；安全与质量：网络抖动不得变成每秒重连。判定在桩边界（Date.now 为桩）下成立
@@ -282,7 +282,7 @@
 - 层级：单点
 - 父判据：O-SEAM-03、O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-09「状态缺失/陈旧按不确定处理」；O-SEAM-03「陈旧或缺失一律是不确定，而不是已断开」
+- 设计依据：需求 R-CONN-09「状态缺失/陈旧按不确定处理」；O-SEAM-03「陈旧或缺失一律是不确定，而不是已断开」；HLD 契约 C-03
 - 触发与前置条件：后台静置之后，采样状态为 unknown（心跳陈旧或状态文件不可读）
 - 可观测点：connect 调用次数；诊断事件条数
 - 期望：正常：—；边界：unknown 既不算 connected 也不算 disconnected，不触发恢复，也不产生任何诊断事件（events 为空）；失败与恢复：—；安全与质量：不确定不得被当成断线，否则会在状态抖动时反复重连。判定在桩边界下成立
@@ -299,7 +299,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」与 R-CONN-06「用户意图优先」；架构 §2.5 重试
+- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」与 R-CONN-06「用户意图优先」；架构 §2.5 重试；HLD 契约 C-10
 - 触发与前置条件：一次恢复尝试失败后，onForeground() 再 onBackground()
 - 可观测点：connect 调用次数
 - 期望：正常：—；边界：onForeground 清 attempts 与 nextAttemptAtMs，用户回到应用再离开后的合法掉线重新触发一次恢复（connects 由 1 变 2）；失败与恢复：—；安全与质量：用户在场时可以自行处理，回前台即重置阶梯，不把过期退避背到下一次后台。判定在桩边界下成立
@@ -316,7 +316,7 @@
 - 层级：单点
 - 父判据：O-SEAM-10
 - 强度：弱
-- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」；架构 §2.5 重试
+- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」；架构 §2.5 重试；HLD 契约 C-10
 - 触发与前置条件：一次恢复成功使状态回到 connected，并保持超过 STABLE_MS=60000
 - 可观测点：attempts 与 nextAttemptAtMs 的归零；vpn_reconnect_succeeded 诊断事件
 - 期望：正常：连接持续 ≥60 s 才记 vpn_reconnect_succeeded 并把重试阶梯归零；边界：短于 60 s 的短暂连接不清零，避免「连一下又断」的抖动隧道把计数反复归零而无限重试；失败与恢复：—；安全与质量：—。判定在桩边界（Date.now 为桩）下成立

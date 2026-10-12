@@ -17,10 +17,10 @@
 - 失败信息：期望「配置以原子写落在同一文件名上、扩展在 TTL 内据此建 TUN，停止请求只被本次 requestId 的应答解除」，实际「半写配置被读走、过期配置仍驱动建 TUN，或停止请求等不到匹配应答而把扩展留在半停状态」
 - 来源：entry/src/main/ets/services/VpnCommandGateway.ets:119 startVpnExtension；entry/src/main/ets/services/VpnCommandGateway.ets:127 stageConnectConfig 的原子写；entry/src/main/ets/services/VpnSessionController.ets:126-135 停止请求与应答；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:62 VPN_CONNECT_CONFIG_TTL_MS；entry/src/main/ets/components/BridgeStatus.ets:2502 stopVpnProbe
 - 上游：R-CONN-01、R-CONN-02
-- 测试：真机走查 a01-baseline/manual-checks.md#M-05
-- 状态：closed
-- 不确定特征：none
-- 归属：—
+- 待建测试：[集成] scripts/integration/vpn-lifecycle-channel.mjs::停止请求带 requestId 且迟到的应答不被采信
+- 状态：pending-test
+- 不确定特征：NOT-EVALUATED
+- 归属：owner=项目维护者 接收批次=a01-集成
 - 复核：待复核
 
 ### O-SEAM-02 应用进程 ↔ VPN 扩展：后端交接
@@ -34,10 +34,10 @@
 - 失败信息：期望「扩展写请求后 15 s 内拿到 requestId 匹配的应答并继续建隧道，无 UI 路径也必答」，实际「无人应答、扩展记 vpn_backend_handoff_timeout 并销毁 VPN，或陈旧应答被当作本次答案」
 - 来源：entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:645 requestUiBackendHandoff；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:31-32 交接轮询常量；entry/src/main/ets/components/BridgeStatus.ets:3407 processVpnBackendHandoffRequest；entry/src/main/ets/services/VpnSessionController.ets:150 answerBackendHandoff
 - 上游：R-CONN-03、R-CONN-08
-- 测试：真机走查 a01-baseline/manual-checks.md#M-05
-- 状态：closed
+- 待建测试：[集成] scripts/integration/vpn-backend-handoff.mjs::应答方在预算内回写响应否则扩展销毁隧道
+- 状态：pending-test
 - 不确定特征：UNCERTAIN-PLATFORM
-- 归属：—
+- 归属：owner=项目维护者 接收批次=a01-集成
 - 复核：待复核
 
 ### O-SEAM-03 VPN 扩展 → 应用进程：状态与心跳

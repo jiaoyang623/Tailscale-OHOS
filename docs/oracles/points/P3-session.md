@@ -16,7 +16,7 @@
 - 层级：单点
 - 父判据：O-SEAM-03、O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-08「无 UI 的入口（桌面卡片、后台恢复）也能独立完成连接」；架构 §五 O-CONN-07 行（无 UI 连接与 O-CONN-01 同一预算）、§七 SEAM-03 对照行
+- 设计依据：需求 R-CONN-08「无 UI 的入口（桌面卡片、后台恢复）也能独立完成连接」；架构 §五 O-CONN-07 行（无 UI 连接与 O-CONN-01 同一预算）、§七 SEAM-03 对照行；HLD 契约 C-03
 - 触发与前置条件：`VpnSessionController.connect(filesDir)` 被调用，`VpnStatusReader.read` 读到 state=connected
 - 可观测点：connect 的返回值、`VpnCommandGateway.startVpnExtension` 的调用次数、后端 stop 次数、应答循环是否入队了 sleep 句柄
 - 期望：正常：状态已是 connected 时立即返回 `VpnActionResult.UNCHANGED`；边界：不得调用 `startVpnExtension`，也不得启动交接应答轮询（sleep 队列为空）——「已经连上」不是一次新连接；失败与恢复：状态文件读不到或缺心跳时 `VpnStatusReader` 报 unknown 而不是 connected，由此走的是正常连接流程（O-SESSION-02）而不是这条早退
@@ -33,7 +33,7 @@
 - 层级：单点
 - 父判据：O-SEAM-01、O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-08、R-CONN-01；架构 §五 O-CONN-07 行与责任空洞检查第 1 条（headless 是第二个应答方）；`VpnSessionController.ets:106-107` 明写「刻意不 await」
+- 设计依据：需求 R-CONN-08、R-CONN-01；架构 §五 O-CONN-07 行与责任空洞检查第 1 条（headless 是第二个应答方）；`VpnSessionController.ets:106-107` 明写「刻意不 await」；HLD 契约 C-01
 - 触发与前置条件：未连接、控制服务器已确认、后端已就绪且 `requestVpnConfig` 返回不含 PENDING 的配置
 - 可观测点：connect 的返回值与返回时机、`startVpnExtension` 次数、应答循环是否已挂起等待下一次 sleep、写下的文件名
 - 期望：正常：投递连接配置到 `vpn-connect-config.json`、清空 `vpn-backend-handoff-request.json` 与 `vpn-backend-handoff-response.json`，再请求系统拉起扩展，然后立即返回 `STARTED`——不等待交接完成；边界：一次 connect 只拉起扩展一次，扩展已在跑也不重复拉起；失败与恢复：投递或拉起失败返回 `FAILED`，不进入应答循环；安全与质量：用的文件名必须与 UI 路径逐字相同（`VpnSessionController.ets:12-18` 声明镜像），否则扩展读不到请求
@@ -51,7 +51,7 @@
 - 层级：单点
 - 父判据：O-SEAM-02、O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-08；架构 §五 O-CONN-07 行、责任空洞检查第 1 条（250 ms × 60 与扩展 100 ms × 150 只是恰好相等）
+- 设计依据：需求 R-CONN-08；架构 §五 O-CONN-07 行、责任空洞检查第 1 条（250 ms × 60 与扩展 100 ms × 150 只是恰好相等）；HLD 契约 C-02
 - 触发与前置条件：headless connect 已返回 STARTED，扩展尚未写下它的交接请求
 - 可观测点：`vpn-backend-handoff-response.json` 是否被写、stop 次数、应答循环是否仍有一个待放行的 sleep 句柄
 - 期望：正常：请求文件为空或不存在时不写应答、不调 `stopBackend`，而是继续排下一次轮询；边界：空字符串与「文件不存在」都算「还没有请求」，不得把空文件当成一个 requestId 为 0 的请求去应答；失败与恢复：请求随后到达时仍能应答（由 O-SESSION-04 守）
@@ -68,7 +68,7 @@
 - 层级：单点
 - 父判据：O-SEAM-02
 - 强度：强
-- 设计依据：需求 R-CONN-03「连接窗口期内…应答扩展的后端交接请求」、R-CONN-08；架构 §五 责任空洞检查第 1 条（无人应答即扩展自毁）
+- 设计依据：需求 R-CONN-03「连接窗口期内…应答扩展的后端交接请求」、R-CONN-08；架构 §五 责任空洞检查第 1 条（无人应答即扩展自毁）；HLD 契约 C-02
 - 触发与前置条件：应答循环读到含正整数 requestId 的 `vpn-backend-handoff-request.json`
 - 可观测点：`vpn-backend-handoff-response.json` 的内容（requestId 与 status）、请求文件被清空、`stopBackend` 次数、诊断事件 `ui:vpn_backend_handoff_stopped`
 - 期望：正常：先清空请求文件（使同一次请求不可能被应答第二次），再调 `stopBackend`，然后把 `{requestId, status}` 写进应答文件——requestId 与请求逐字相同，status 是后端返回的字符串；边界：请求文件必须在应答之前被清掉，否则下一次轮询会重复应答；失败与恢复：`stopBackend` 抛异常时仍走 O-SESSION-05 的失败应答分支；安全与质量：只应答本进程发起的请求，requestId 不匹配的一律不认（见 O-SESSION-06）
@@ -85,7 +85,7 @@
 - 层级：单点
 - 父判据：O-SEAM-02
 - 强度：强
-- 设计依据：需求 R-CONN-03；架构 §五 O-CONN-07 行「应答但停不下来 ⇒ P1」、责任空洞检查第 1 条
+- 设计依据：需求 R-CONN-03；架构 §五 O-CONN-07 行「应答但停不下来 ⇒ P1」、责任空洞检查第 1 条；HLD 契约 C-02
 - 触发与前置条件：应答循环读到有效 requestId，但 `VpnCommandGateway.stopBackend()` 抛异常（例如后端已死）
 - 可观测点：应答文件的 status、requestId、诊断事件 `ui:vpn_backend_handoff_stop_failed`
 - 期望：正常：捕获停止失败后仍写应答，requestId 照抄请求，status 说明停止不可用（`FAILED | backend handoff | stop unavailable`）；边界：停止失败不得吞掉应答——扩展要的是「有人认领了这次交接」，不是后端确实停了；失败与恢复：记 `vpn_backend_handoff_stop_failed` 供诊断；安全与质量：失败路径不得把未停止的后端谎报为已停止（status 不以 OK 开头）
@@ -102,7 +102,7 @@
 - 层级：单点
 - 父判据：O-SEAM-02
 - 强度：强
-- 设计依据：需求 R-CONN-08；`VpnSessionController.ets:156-160`（无法取得正整数 requestId 即拒）；架构 §五 责任空洞检查第 1 条
+- 设计依据：需求 R-CONN-08；`VpnSessionController.ets:156-160`（无法取得正整数 requestId 即拒）；架构 §五 责任空洞检查第 1 条；HLD 契约 C-02
 - 触发与前置条件：请求文件的内容既可能是非法 JSON（如 `not json`），也可能是合法 JSON 但 requestId ≤ 0（如 `{"requestId":0}`）
 - 可观测点：`stopBackend` 次数（必须为 0）、应答文件（必须未被写出）、请求文件被清空、诊断事件 `ui:vpn_backend_handoff_request_invalid`
 - 期望：正常：两种情形都归入同一分支——先清空请求文件，记 `vpn_backend_handoff_request_invalid`，然后返回，不再轮询；边界：requestId 恰为 0、负数或缺失时都不得当成有效请求；畸形 JSON 与 requestId 非法在实现上是同一条路径，本判据按行为合并、按两条用例分别取证；失败与恢复：清空是关键——不清就会在同一轮循环里反复读同一条坏请求；安全与质量：**不得**因为一个无法辨认的请求就停止后端或写入应答，否则等于替扩展确认了一次并不存在的交接
@@ -120,7 +120,7 @@
 - 层级：单点
 - 父判据：O-SEAM-02、O-SEAM-10
 - 强度：强
-- 设计依据：需求 R-CONN-03；架构 §五 责任空洞检查第 1 条——「250 ms × 60 = 15 s 与扩展 100 ms × 150 = 15 s 只是恰好相等而无耦合，任何一侧单独调整都会静默失去应答」
+- 设计依据：需求 R-CONN-03；架构 §五 责任空洞检查第 1 条——「250 ms × 60 = 15 s 与扩展 100 ms × 150 = 15 s 只是恰好相等而无耦合，任何一侧单独调整都会静默失去应答」；HLD 契约 C-02
 - 触发与前置条件：headless 连接已拉起扩展，扩展开始它自己的 15 s 等待
 - 可观测点：`BACKEND_HANDOFF_POLL_INTERVAL_MS × BACKEND_HANDOFF_MAX_ATTEMPTS` 与扩展侧等待常量的关系；把任一常量改小（例如 10 s）后应答仍不丢失
 - 期望：正常：本侧的应答窗口不短于扩展的等待预算，使扩展不会在应答到达前销毁 VPN；边界：改小任一侧常量都应使这条判据失败，而不是静默失效；失败与恢复：若窗口短于预算，扩展记 `vpn_backend_handoff_timeout` 并销毁 VPN（`docs/background-vpn-reliability.md` Milestone 3 的第二次真实故障）；安全与质量：两个常量分处两进程、没有共享定义，判据要求以断言把关系钉死
