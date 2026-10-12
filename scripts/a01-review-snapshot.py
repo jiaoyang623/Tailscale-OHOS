@@ -210,6 +210,21 @@ def load_architecture():
     }]
     drivers = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])", text[:text.find("## 二")])))
     design[0]["depends_on"] = drivers
+    # 文档自己声明了「3 个视图」，但早期版本只投影了 §四 的决策与 §五 的接缝表，
+    # §二（子系统、数据归属、通信方式）与 §三 的三个视图全都没进快照——审核人看不到
+    # 它们，也就无从签收。这里按小节标题投影，编号沿用文档里的小节号，便于对上原文。
+    for m in re.finditer(r"(?m)^###\s+(\d+\.\d+)\s+(.+)$", text):
+        sec, title = m.group(1), m.group(2).strip()
+        start = m.end()
+        nxt = re.search(r"(?m)^###\s|^##\s", text[start:])
+        body = text[start:start + (nxt.start() if nxt else 1200)]
+        reqs = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])", body)))
+        design.append({
+            "id": "A-" + sec, "layer": "architecture", "title": f"§{sec} {title}",
+            "status": "ready", "depends_on": reqs or drivers,
+            "content": [re.sub(r"\s+", " ", body).strip()[:400]],
+            "sources": [f"docs/architecture/architecture.md §{sec}"] + reqs,
+        })
     for m in re.finditer(r"(?m)^###\s+(D\d+)\s*·\s*(.+)$", text):
         did, title = m.group(1), m.group(2).strip()
         start = m.end()
