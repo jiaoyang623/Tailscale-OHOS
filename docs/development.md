@@ -92,6 +92,43 @@ Before building, signing, promoting or publishing a Release:
 
 Keep `versionName` in numeric `X.Y.Z` form. A new uploaded package uses exactly one more than the highest `versionCode` already used across production and test tracks. Local-only rebuilds do not consume a code. Major-version changes require explicit maintainer confirmation.
 
+## Design records, criteria and review (the a01 chain)
+
+This repo keeps a design chain, a criteria (oracle) chain and a review chain under `docs/`.
+They are the record of *what counts as correct*, and they are separate from this guide:
+this file tells you how to build and run, those tell you what the behaviour must be.
+
+| What | Where |
+| --- | --- |
+| Process record for the current increment (conventions, open items, iteration log) | `docs/changes/a01-baseline/record.md` |
+| Device-walkthrough register (what was measured on a phone, and what was not) | `docs/changes/a01-baseline/manual-checks.md` |
+| Requirements / architecture / HLD / LLD | `docs/requirements/`, `docs/architecture/`, `docs/hld/`, `docs/lld/` |
+| Criteria: journeys, seams, points | `docs/oracles/90-journeys/`, `91-seams/`, `points/` |
+| Criteria relationship index (generated — do not hand-edit) | `docs/oracles/_ref-index.md` |
+| Review pages a human reads and signs | `docs/review/<layer>/index.html` |
+
+**Run everything before you push:**
+
+```bash
+scripts/run-checks.sh            # unit + integration tests, then the three oracle checks
+scripts/run-checks.sh --strict   # same, but exits non-zero on a P0 criterion finding
+```
+
+The criteria declare this repo's own conventions to the a01 checkers, because the project has
+no ArkTS `.ets` tests: anchors are `scripts/test-<name>.mjs::<case name>`, the test-entry
+pattern is `scripts/test-*.mjs,scripts/integration/*.mjs`, and device evidence is anchored as
+`真机走查 a01-baseline/manual-checks.md#M-nn`. See the process record for the full convention
+table and for what each open item means.
+
+Three rules worth knowing before you touch a criterion:
+
+1. An anchor must name a real case **verbatim**. A criterion claiming a test that does not
+   exist is worse than an honest gap — say `状态：pending-test` and give an owner instead.
+2. `closed` means a real run backs it. Device walkthroughs count, but only when the register
+   entry records a pass; a register entry that records a failure is not evidence of success.
+3. Changing an upstream requirement or a parent criterion invalidates the review conclusions
+   that depend on it. Re-generate the snapshot and re-review the affected items.
+
 ## Further reading
 
 - [Taildrop implementation and data flow](taildrop-technical-plan.md)
