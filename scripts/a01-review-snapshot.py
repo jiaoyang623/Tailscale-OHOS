@@ -61,7 +61,9 @@ def load_oracles(stage):
             oid, title = head.group(1), head.group(2).strip()
             f = parse_fields(chunk.split("\n")[1:])
             design_ids = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])",
-                                               f.get("上游", "") + " " + f.get("设计依据", ""))))
+                                               f.get("上游", "") + " " + f.get("设计依据", "")))
+                                  | set(re.findall(r"\bA-(?:D\d+|SEAMS)\b",
+                                                   f.get("设计依据", ""))))
             uncertain = (f.get("不确定特征", "") or "none").split("\n")[0].strip()
             sources = split_values(f.get("来源", "")) + [f"{rel}"]
             oracles.append({
@@ -139,6 +141,8 @@ def load_architecture():
         "content": ["每条接缝判据的设计依据：谁交什么、谁接收、失败归谁。"],
         "sources": ["docs/architecture/architecture.md §五"],
     }]
+    drivers = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])", text[:text.find("## 二")])))
+    design[0]["depends_on"] = drivers
     for m in re.finditer(r"(?m)^###\s+(D\d+)\s*·\s*(.+)$", text):
         did, title = m.group(1), m.group(2).strip()
         start = m.end()
@@ -147,7 +151,7 @@ def load_architecture():
         reqs = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])", body)))
         design.append({
             "id": "A-" + did, "layer": "architecture", "title": title,
-            "status": "ready", "depends_on": [],
+            "status": "ready", "depends_on": reqs or drivers,
             "content": [re.sub(r"\s+", " ", body).strip()[:400]],
             "sources": [f"docs/architecture/architecture.md 关键决策 {did}"] + reqs,
         })
@@ -165,25 +169,27 @@ def main():
     if LAYERS.index(args.stage) >= LAYERS.index("architecture"):
         arch = load_architecture()
         # 架构条目按需求引用挂到需求条目上：需求是上一层，父子关系必须真实存在。
-        for item in arch:
-            item["depends_on"] = [src for src in item["sources"]
-                                  if re.fullmatch(r"R-[A-Z]+-\d+[A-Z]?", src)]
-            item["sources"] = [src for src in item["sources"] if not re.fullmatch(r"R-[A-Z]+-\d+[A-Z]?", src)]
-            if not item["sources"]:
-                item["sources"] = ["docs/architecture/architecture.md"]
-            if item["layer"] == "architecture" and not item["depends_on"]:
-                # 没有点名需求就整体挂在需求层上，避免悬空层引用。
-                item["depends_on"] = sorted(design[0]["id"] for design in [design])[:0] or []
         design = design + arch
     oracles, tests = load_oracles(args.stage)
+
+    if LAYERS.index(args.stage) >= LAYERS.index("architecture"):
+        # 架构层自己的未决项：取 §六 表格里以 Q-nn 开头的行，逐条进快照。
+        arch = (ROOT / "docs/architecture/architecture.md")
+        if arch.exists():
+            for line in arch.read_text(encoding="utf-8").split("\n"):
+                m = re.match(r"^\|\s*\*{0,2}(Q-\d+)\*{0,2}\s*\|\s*(.+?)\s*\|", line)
+                if m:
+                    body = re.sub(r"\*\*", "", m.group(2))
+                    open_questions.append(f"架构 {m.group(1)}：{body[:200]}")
 
     open_questions += [
         "三条旅程判据（O-CONN-06、O-NET-03、O-MEDIA-01）的走查证据来自当前基线之前的构建，"
         "本批未复跑；请确认是接受该证据，还是把它们降为 not-evaluated。",
         "73 条宿主侧用例当前没有 CI 门禁（仓库无 .github/ 或任何流水线），"
         "判据的「可达」目前只能证明「可判定」，不能证明「每次提交都会跑」。",
-        "本层没有任何已执行的旅程级测试：E2E 按流程在实现阶段最后编写。"
-        "本基线上实际执行过的只有宿主侧单元套件（73/73），它守的是单点层，尚未建立。",
+        "本快照停在设计阶段：旅程 E2E 按流程在实现阶段最后才写，所以本层的测试条目基本是 not_evaluated，"
+        "这不代表行为没做，而是没有本基线上的执行记录。本基线实际执行过的是宿主侧 73 条用例，"
+        "它们守的是单点层（docs/oracles/points/，按流程随 LLD 层进快照）。",
     ]
 
     snapshot = {
