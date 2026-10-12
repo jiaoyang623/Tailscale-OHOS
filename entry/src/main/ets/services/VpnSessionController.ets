@@ -2,6 +2,7 @@ import { Want } from '@kit.AbilityKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { ControlServerConfig, ControlServerSettings } from './ControlServerConfig';
 import { DeviceNameService } from './DeviceNameService';
+import { DiagnosticEventStore } from './DiagnosticEventStore';
 import { VpnCommandGateway } from './VpnCommandGateway';
 import { VpnLinkSnapshot, VpnLinkState, VpnStatusReader } from './VpnStatusReader';
 
@@ -23,6 +24,19 @@ const BACKEND_READY_MAX_ATTEMPTS: number = 40;
 const CONFIG_RETRY_INTERVAL_MS: number = 500;
 const CONFIG_MAX_ATTEMPTS: number = 20;
 const CONFIG_PENDING_MARKER: string = 'PENDING';
+// The extension polls its handoff request for 15s before it destroys the VPN,
+// so this side has to keep watching for at least that long.
+const BACKEND_HANDOFF_POLL_INTERVAL_MS: number = 250;
+const BACKEND_HANDOFF_MAX_ATTEMPTS: number = 60;
+
+interface VpnBackendHandoffRequest {
+  requestId: number;
+}
+
+interface VpnBackendHandoffResponse {
+  requestId: number;
+  status: string;
+}
 
 export enum VpnActionResult {
   /** The extension was asked to start. */
@@ -88,6 +102,12 @@ export class VpnSessionController {
       }
       this.clearHandoffFiles(filesDir);
       await this.gateway.startVpnExtension(VpnSessionController.vpnWant());
+      this.record(filesDir, 'vpn_start_requested', 'system');
+      // Deliberately not awaited: the extension asks for the handoff a moment
+      // later, and the card's call event must not block for that long.
+      this.answerBackendHandoff(filesDir).catch(() => {
+        // A failure here is already recorded inside the loop.
+      });
       return VpnActionResult.STARTED;
     } catch (_error) {
       // The UI can explain a failure; the card cannot.
@@ -112,10 +132,60 @@ export class VpnSessionController {
     }
     try {
       await this.gateway.stopVpnExtension(VpnSessionController.vpnWant());
+      this.record(filesDir, 'vpn_stop_requested', 'system');
       return VpnActionResult.STOPPED;
     } catch (_error) {
       return VpnActionResult.FAILED;
     }
+  }
+
+  /**
+   * Stops this process's native backend when the extension asks for it, and
+   * confirms with the response file the extension is polling.
+   *
+   * The extension only needs the confirmation - it does not inspect what the
+   * backend was doing - but the request and the answer carry a requestId so a
+   * stale reply cannot be mistaken for this one's.
+   */
+  private async answerBackendHandoff(filesDir: string): Promise<void> {
+    for (let attempt: number = 0; attempt < BACKEND_HANDOFF_MAX_ATTEMPTS; attempt++) {
+      const requestText: string | undefined =
+        this.gateway.readCommandFile(filesDir, VPN_BACKEND_HANDOFF_REQUEST_FILE_NAME);
+      if (requestText !== undefined && requestText.trim().length > 0) {
+        this.gateway.writeCommandFile(filesDir, VPN_BACKEND_HANDOFF_REQUEST_FILE_NAME, '');
+        const requestId: number = VpnSessionController.requestIdOf(requestText);
+        if (requestId <= 0) {
+          this.record(filesDir, 'vpn_backend_handoff_request_invalid', 'vpn_handoff');
+          return;
+        }
+        let status: string = 'FAILED | backend handoff | stop unavailable';
+        try {
+          status = await this.gateway.stopBackend();
+        } catch (_error) {
+          // Answering still releases the extension; the tunnel is the goal.
+        }
+        const response: VpnBackendHandoffResponse = { requestId: requestId, status: status };
+        this.gateway.writeCommandFile(filesDir, VPN_BACKEND_HANDOFF_RESPONSE_FILE_NAME,
+          JSON.stringify(response));
+        this.record(filesDir, status.startsWith('OK') ?
+          'vpn_backend_handoff_stopped' : 'vpn_backend_handoff_stop_failed', 'vpn_handoff');
+        return;
+      }
+      await VpnSessionController.sleep(BACKEND_HANDOFF_POLL_INTERVAL_MS);
+    }
+  }
+
+  private static requestIdOf(requestText: string): number {
+    try {
+      const request: VpnBackendHandoffRequest = JSON.parse(requestText) as VpnBackendHandoffRequest;
+      return request.requestId;
+    } catch (_error) {
+      return 0;
+    }
+  }
+
+  private record(filesDir: string, event: string, phase: string): void {
+    DiagnosticEventStore.record(filesDir, 'ui', event, phase);
   }
 
   private async ensureBackendReady(filesDir: string, controlURL: string): Promise<boolean> {

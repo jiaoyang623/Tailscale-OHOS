@@ -49,6 +49,9 @@ function fixture() {
   vm.runInNewContext(javascript + '\nglobalThis.Manager = VpnBackgroundTaskManager;', sandbox);
   f.manager = new sandbox.Manager();
   f.live = () => { f.status = `OK | state=Running | tun=true | txBytes=2048 | rxBytes=1048576 | heartbeatMs=${f.now}`; };
+  f.connecting = () => {
+    f.status = `VPN interface established | backend handoff pending | heartbeatMs=${f.now}`;
+  };
   f.disconnected = () => { f.status = `VPN extension destroyed | heartbeatMs=${f.now}`; };
   f.tick = async () => { await f.manager.reconcile(context); await flush(); };
   f.start = async () => { f.live(); f.manager.register(context); await flush(); };
@@ -162,4 +165,45 @@ test('reconnect waits for in-flight stop before starting the next task', async (
   const stopping = f.tick(); await flush(); f.live(); await f.tick();
   assert.equal(f.starts.length, 1);
   f.stopGate.resolve(); await stopping; await f.tick(); assert.equal(f.starts.length, 2);
+});
+
+test('holds protection through the connect window so the handoff can be answered', async () => {
+  // The extension asks this process to hand the backend over while the tunnel
+  // is still coming up. A backgrounded process with no continuous task is
+  // frozen before it can answer, so the task has to be held before the tunnel
+  // reports state=Running.
+  const f = fixture(); f.connecting(); f.manager.register(f.context); await flush();
+  assert.equal(f.starts.length, 1);
+  assert.equal(f.starts[0][0], 'dataTransfer');
+  f.manager.onBackground(f.context); await flush();
+  assert.equal(f.stops, 0);
+  f.live(); await f.tick();
+  assert.equal(f.starts.length, 1, 'connecting must roll into connected without a second task');
+  assert.equal(f.stops, 0);
+});
+
+test('the connect window needs interface evidence, not just an unrecognised status', async () => {
+  for (const status of ['VPN extension lifecycle entered',
+    'VPN probe TUN creation pending',
+    'OK | state=Running | tun=false']) {
+    const f = fixture();
+    f.status = `${status} | heartbeatMs=${f.now}`;
+    f.manager.register(f.context); await flush();
+    assert.equal(f.starts.length, 0, status);
+  }
+});
+
+test('a stalled connect window still releases protection', async () => {
+  const f = fixture(); f.connecting(); f.manager.register(f.context); await flush();
+  assert.equal(f.starts.length, 1);
+  // The extension stops writing heartbeats: uncertain, not live.
+  f.now += 20000; await f.tick(); assert.equal(f.stops, 0);
+  f.now += 50000; await f.tick(); assert.equal(f.stops, 1);
+});
+
+test('an explicit disconnect during the connect window releases promptly', async () => {
+  const f = fixture(); f.connecting(); f.manager.register(f.context); await flush();
+  assert.equal(f.starts.length, 1);
+  f.disconnected(); await f.tick();
+  assert.equal(f.stops, 1);
 });

@@ -168,7 +168,8 @@ export class VpnBackgroundTaskManager {
         await this.stop(context);
         return;
       }
-      if (status.state !== 'connected') {
+      const live: boolean = status.state === 'connected' || status.state === 'connecting';
+      if (!live) {
         // Missing telemetry is uncertain. Retain an acquired task briefly,
         // but never acquire a new task based on stale connection evidence.
         if (this.task !== undefined && Date.now() - this.lastLiveAtMs > VPN_STATUS_GRACE_MS) {
@@ -196,6 +197,11 @@ export class VpnBackgroundTaskManager {
     }
   }
 
+  /** States in which the tunnel is coming up or running, so it must be held. */
+  private static isLiveState(state: string): boolean {
+    return state === 'connected' || state === 'connecting';
+  }
+
   private async start(context: common.UIAbilityContext, generation: number): Promise<void> {
     const revision: number = this.cancellationRevision;
     const info: wantAgent.WantAgentInfo = {
@@ -206,7 +212,8 @@ export class VpnBackgroundTaskManager {
     };
     const agent: WantAgent = await wantAgent.getWantAgent(info);
     if (!this.monitoring || generation !== this.lifecycleGeneration ||
-      revision !== this.cancellationRevision || this.readStatus(context.filesDir).state !== 'connected') {
+      revision !== this.cancellationRevision ||
+      !VpnBackgroundTaskManager.isLiveState(this.readStatus(context.filesDir).state)) {
       return;
     }
     if (await this.startSpecialScenario(context, agent, generation, revision)) {
@@ -352,6 +359,13 @@ export class VpnBackgroundTaskManager {
         result.state = 'connected';
         result.txBytes = this.statusNumber(status, 'txBytes');
         result.rxBytes = this.statusNumber(status, 'rxBytes');
+      } else if (normalized.includes('vpn interface established')) {
+        // The interface exists and the backend is still starting. This is the
+        // connect window, and it needs protection as much as the steady state:
+        // the extension asks this process to hand the backend over, and a
+        // backgrounded process with no continuous task is frozen before it can
+        // answer, so the extension times out and destroys the VPN.
+        result.state = 'connecting';
       }
     } catch (_error) {
       // Atomic file replacement or temporary I/O failure is uncertain state.

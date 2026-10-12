@@ -129,3 +129,84 @@ the permission, or while testing under a five-day trial debug profile.
 **The recovery path has not been exercised against a real drop**, and the
 special-scenario path has never run at all, since it needs a permission this
 build does not declare. Reproduce per the Milestone 1 procedure.
+
+## Milestone 3 — the connect window, and the path nothing answered
+
+Milestones 1 and 2 are unchanged. This milestone fixes the drop the user
+actually reported: *"it cuts off by itself while I am using another app."*
+
+### What the device showed
+
+Two recordings on `56T0225330000021` (Pura X, HarmonyOS 7.0.0.105), both in the
+existing redacted diagnostics.
+
+**A frozen process.** `backend_restart_deferred` was recorded at 13:38:14 and
+its own timeout callback, `backend_restart_deferred_completed`, only ran at
+14:10:00 - thirty-two minutes late, at the moment the app was next brought
+forward. A `setTimeout` that fires thirty-two minutes late is a process that was
+not running. The app had released its continuous task at 13:38:09 (correct: the
+user had disconnected), and while backgrounded with no task the platform froze
+it: after `background_entered` at 13:38:17 the process wrote no diagnostic at
+all, including from timers that run every five seconds.
+
+**A connect window with no protection.** At 14:10:18.781 the extension was
+created, created its TUN at 14:10:18.864 and wrote `VPN interface established |
+backend handoff pending`. The user backgrounded the app at 14:10:23.973. The
+extension asks the app's process to hand its native backend over and waits
+fifteen seconds for the answer; nothing answered, so at 14:10:34.468 it recorded
+`vpn_backend_handoff_timeout` and tore the VPN down.
+
+The task was not held because Milestone 1 acquires it only once the tunnel
+reports `state=Running | tun=true`. During the connect window - TUN created,
+backend coming up - there was no task, so the process was freezable exactly when
+the handoff had to be answered. That is the "cut off by itself" the user saw.
+
+### The fix
+
+`services/VpnBackgroundTaskManager` recognizes the connect window as a live
+state. A fresh heartbeat whose status contains `vpn interface established`
+resolves to `connecting`, and `connecting` holds the continuous task exactly as
+`connected` does - same early foreground acquisition, same prompt release on an
+explicit disconnect, same bounded grace period when the heartbeat goes stale.
+
+The guard that Milestone 1 set is deliberately not weakened: an unrecognised or
+weak status (`state=Running | tun=false`, a bare lifecycle line, a stale or
+missing heartbeat) still acquires nothing. Only the extension saying its
+interface exists counts, because that is the state in which it is asking for the
+handoff.
+
+### The second failure: a headless connect could never complete
+
+The extension's handoff request was only answered by `BridgeStatus`, and only
+while its own connect flow was running. The home-screen card and the Milestone 2
+reconnect supervisor both start a connect through `VpnSessionController`, which
+had no such loop - so *every* headless connect created a TUN, waited fifteen
+seconds and died. The 14:10 recording is exactly that: the extension was created
+and read the staged config, but no `connect_requested`, `vpn_config_handoff_staged`
+or `vpn_start_requested` was recorded, which is the signature of the card path
+rather than the app's button.
+
+`VpnSessionController` now answers the handoff itself, with the same requestId
+handshake and the same fifteen-second budget, and records `vpn_start_requested`,
+`vpn_stop_requested` and the handoff outcome in the existing UI diagnostics so
+this path is no longer invisible.
+
+### Validation
+
+- `node --test scripts/test-vpn-session-controller.mjs`: 6 new tests over the
+  headless handoff (answered, still polling when the request arrives late, a
+  backend that refuses to stop, a malformed request, a request with no id, an
+  unchanged connect).
+- `node --test scripts/test-vpn-background-task.mjs`: 18 tests, 4 new, pinning
+  the connect window: it is held and rolls into `connected` without a second
+  task, it still needs interface evidence, a stalled connect window is released
+  on the same grace period, and an explicit disconnect during it releases
+  promptly. Milestone 1's "never starts from ... missing TUN evidence" test is
+  unchanged and still passes.
+- Whole suite: 73 tests pass. Repository debug build and device install verified.
+
+**The end-to-end reproduction has not been re-run.** Confirming it needs the
+phone: the competing `com.xbt.project` (shadowsocks) VPN has to be disconnected
+or its replacement approved, and the repro is connect-then-switch-apps within
+the connect window. Until that runs, this milestone rests on the recordings
+above and on the tests.
