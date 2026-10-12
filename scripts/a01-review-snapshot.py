@@ -164,6 +164,34 @@ def load_requirements():
         m = re.match(r"^\|\s*(Q\d+)\s*\|\s*(.+?)\s*\|", line)
         if m:
             doubts.append(f"{m.group(1)}：{m.group(2)}")
+
+    # 质量目标表：与需求条目同属需求层，却没有 R-nn 编号。早期版本漏了这一段投影，
+    # 于是审核网页上看不到目标值与测量方法——恰恰是最需要人签的部分。按表内顺序
+    # 给稳定的 QG-nn 编号；目标值写「未定」的行记为 draft，等目标值定下来才 ready。
+    in_goals = False
+    index = 0
+    for line in path.read_text(encoding="utf-8").split("\n"):
+        if re.match(r"^#{2,3}\s*质量目标", line):
+            in_goals = True
+            continue
+        if in_goals and re.match(r"^#{2,3}\s", line):
+            break
+        if not in_goals or not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 4 or set(cells[0]) <= set("-: ") or cells[0] == "目标":
+            continue
+        index += 1
+        goal, target, method, state = cells[0], cells[1], cells[2], cells[3]
+        design.append({
+            "id": f"QG-{index:02d}",
+            "layer": "requirements",
+            "title": goal[:60],
+            "status": "draft" if target == "未定" else "ready",
+            "depends_on": [],
+            "content": [f"目标值：{target}", f"观测环境与测量方法：{method}", f"现状：{state}"],
+            "sources": ["docs/requirements/requirements.md#质量目标"],
+        })
     return design, doubts
 
 
