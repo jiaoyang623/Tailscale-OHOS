@@ -1,0 +1,116 @@
+# 真机走查登记册 · a01-baseline
+
+判据的走查锚点写成 `真机走查 a01-baseline/manual-checks.md#M-nn`。
+
+**这份登记册是转抄，不是本次复跑。** 每条的「来源」指向仓库里已有的实测记录，
+本批没有重新执行任何一项。哪些是实测数值、哪些只是待执行的规程，逐条写明。
+
+设备：`Pura 80 Pro` / `HarmonyOS 7.0.0.105`（M-01～M-04、M-06～M-09）；
+`Pura X` / `56T0225330000021` / `HarmonyOS 7.0.0.105`（M-05、M-10）。
+所有设备工作均在 USB/HDC 连接且充电的条件下完成——这会改变电源管理行为，
+通过一次不代表电池深度休眠、拔线、强杀或重启场景。
+
+| 锚点 | 检查项 | 结论 |
+| --- | --- | --- |
+| M-01 | 锁屏静置下的后台存活 | 通过（实测） |
+| M-02 | 数据面在锁屏前后的双向流量 | 通过（实测） |
+| M-03 | 网络切换后的路径恢复 | 通过（实测） |
+| M-04 | 短暂 down/up 后的自动恢复 | 通过（实测） |
+| M-05 | 连接期的长时任务与握手时序 | 通过（诊断实测） |
+| M-06 | 引擎自检 | 通过（实测） |
+| M-07 | 后端启动与登录态 | 通过（实测） |
+| M-08 | 应用外壳 Want 生命周期 | 通过（实测） |
+| M-09 | 媒体服务识别与 HosPlayer 参数 | 通过（实测） |
+| M-10 | 竞争 VPN 冲突与替换 | 部分（未闭环） |
+| M-11 | 720 秒连续蜂窝锁屏 | 未完成（不计入通过） |
+| M-12 | 桌面卡片渲染与点击 | 未执行 |
+
+---
+
+## M-01 锁屏静置下的后台存活
+
+- 阈值：时长 ≥ 720 s；全部样本 `state=Running`；心跳龄 ≤ 15000 ms；进程数 ≥ 2；首末 pid 相同；
+  锁屏下除基线外全部样本电源态落在 `INACTIVE/STAND_BY/DOZE/SLEEP/HIBERNATE`。
+- 实测：721 秒、25 个样本（含基线）、24 个后基线样本**全部 `SLEEP`**、
+  UI/VPN 进程 ID 全程不变、最大心跳龄 **1104 ms**。
+- 前置：已登录并连上；**未**同时运行其它系统 VPN。
+- 命令：`powershell -File scripts/device-background-vpn-probe.ps1 -DurationSeconds 720 -LockScreen`
+- 失败记录：第一次运行因亮屏使用被打断，**不计入**连续锁屏通过。
+- 来源：`docs/background-vpn-reliability.md` Milestone 1 results（转抄）。
+
+## M-02 数据面在锁屏前后的双向流量
+
+- 阈值：浏览器产生的 TUN 流量读、写计数**双向都增长**；对端探针以 `OK` 或 `SKIPPED` 开头。
+- 实测：锁屏前 +13 reads / +18 writes；解锁后 +16 reads / +20 writes。
+- 命令：`powershell -File scripts/device-vpn-data-probe.ps1`
+- 来源：`docs/background-vpn-reliability.md` Milestone 1 results（转抄）。
+
+## M-03 网络切换后的路径恢复
+
+- 阈值：同一次 VPN 会话内完成 cellular → Wi-Fi → cellular 重绑；回到 Wi-Fi 后无需重连即恢复直连；
+  两种承载下浏览器 TUN 流量都通过。
+- 实测：基线（修复前）直连 IPv6 discovery 响应 85 ms；修复后回到 Wi-Fi 为 **11 ms**；
+  Wi-Fi +142/+142 包，cellular +12/+20 包。六次 discovery 均走 DERP 时记录
+  `MappingVaries=true`、`localPort=41641`。
+- 来源：`docs/vpn-network-recovery.md`（转抄）。
+
+## M-04 短暂 down/up 后的自动恢复
+
+- 阈值：不重建 VPN 会话，界面显示恢复中并自动回到可用路径。
+- 实测：短 `tailscale down`/`up` 后手机显示 `connection recovering`，
+  自动恢复 **436 ms 的中继路径**，VPN session 不变。
+- 来源：`docs/vpn-network-recovery.md` Peer reconnect follow-up，2026-09-23（转抄）。
+
+## M-05 连接期的长时任务与握手时序
+
+- 阈值：扩展建 TUN 后请求后端交接，应用进程必须在 15 s 内应答；否则扩展销毁 VPN。
+- 实测（诊断文件 `diagnostic-ui-events.ndjson` / `diagnostic-vpn-events.ndjson`，Pura X）：
+  - 失败样本：14:10:18.864 建 TUN → 14:10:23.973 用户切后台 → 14:10:34.468
+    `vpn_backend_handoff_timeout`，VPN 被销毁。
+  - 冻结证据：13:38:14 设置的延迟重启定时器，回调直到 **14:10:00** 才执行（迟 32 分钟），
+    后台期间进程未写任何诊断。
+- 本批的修复**未经真机端到端复跑**：需要先断开竞争的 `com.xbt.project`（shadowsocks）VPN，
+  再复现「连接后 5 秒内切到别的应用」。
+- 来源：`docs/background-vpn-reliability.md` Milestone 3（转抄）+ 本批代码改动（未复跑）。
+
+## M-06 引擎自检
+
+- 阈值：布局出现 `Go go1.24.5`、`openharmony/arm64`、`Tailscale 1.86.5`、`userspace engine initialized`。
+- 命令：`powershell -File scripts/device-engine-probe.ps1`
+- 来源：`scripts/device-engine-probe.ps1` 的判定分支 + `docs/development.md`（转抄；本次未执行）。
+
+## M-07 后端启动与登录态
+
+- 阈值：点击后端启动后，状态进入 `state=NeedsLogin` 或 `state=Running`。
+- 命令：`powershell -File scripts/device-backend-probe.ps1 -ArtifactDir <dir>`
+- 来源：`scripts/device-backend-probe.ps1` 的判定分支（转抄；本次未执行）。
+
+## M-08 应用外壳 Want 生命周期
+
+- 阈值：冷启动经通知 Want 打开；重复 Want 不重启进程且仍停在目标页；非法 Want 被拒且停在首页。
+- 命令：`powershell -File scripts/device-app-shell-probe.ps1`
+- 来源：`scripts/device-app-shell-probe.ps1` 的判定分支（转抄；本次未执行）。
+
+## M-09 媒体服务识别与 HosPlayer 参数
+
+- 阈值：自检输出 `PASS · 媒体服务识别 4/4 · HosPlayer 参数协议通过`。
+- 入口：设置 > 关于 > 连点版本号 5 次解锁诊断 > 媒体服务离线自检。
+- 来源：`docs/hosplayer-integration-prototype.md`（转抄；本次未执行）。
+
+## M-10 竞争 VPN 冲突与替换
+
+- 阈值：另一个系统 VPN 已连接时，连接本应用要给出可理解的冲突提示，并经用户批准后才能替换。
+- 实测：**未闭环**。Pura X 上 `com.xbt.project:vpn` 长期占用 VPN 通道，
+  本批探针无法在不拆掉该隧道的前提下完成连接复现。
+- 来源：本批观察（`hdc shell pidof com.xbt.project:vpn` → 11861）+ `README.md` 的兼容性说明。
+
+## M-11 720 秒连续蜂窝锁屏
+
+- 状态：**未完成**。两次运行分别记录到 279 s、309 s 后被亮屏打断（第二次系统报 `PICKUP`）。
+- 结论：不计入连续锁屏通过。不得据此宣称蜂窝下的长时间后台存活。
+- 来源：`docs/vpn-network-recovery.md`（转抄）。
+
+## M-12 桌面卡片渲染与点击
+
+- 状态：**未执行**。需要在桌面手工添加卡片后逐项验证。
+- 来源：`docs/home-screen-card.md` 的 Validation status（转抄）。
