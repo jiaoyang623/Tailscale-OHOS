@@ -147,6 +147,9 @@ const FAST_RECONNECT_TTL_MS: number = 15000;
 const FAST_REFRESH_INTERVAL_MS: number = 2000;
 const OFFLINE_PEER_STATUS_REFRESH_INTERVAL_MS: number = 10000;
 const NORMAL_SERVICE_REFRESH_INTERVAL_MS: number = 30000;
+// Native refresh has a 15-second budget; allow its following peer snapshot
+// to finish before a later UI refresh can replace the command/response files.
+const LOCAL_SEND_REFRESH_TIMEOUT_MS: number = 25000;
 const STATUS_CROSS_FADE_MS: number = 180;
 const LOCAL_SEND_APP_TARGETS: LocalSendAppTarget[] = [
   {
@@ -867,24 +870,34 @@ export struct BridgeStatus {
       return;
     }
     const mergedPeers: PeerSummary[] = this.mergePeers(peers);
+    this.peers.forEach((previous: PeerSummary) => {
+      const current: PeerSummary | undefined = mergedPeers.find((peer: PeerSummary) => peer.key === previous.key);
+      if (current !== undefined && current.online === previous.online) {
+        return;
+      }
+      // A peer reconnects independently of our VPN session. Discard results
+      // and service-discovery markers belonging to its previous connection.
+      this.sunshineProbeService?.cancel(previous.key);
+      this.peerPathService?.cancel(previous.key);
+      this.mediaServiceProbeService?.cancel(previous.key);
+      this.sunshineProbeService?.clearCache(previous.key);
+      this.peerPathService?.clearCache(previous.key);
+      this.mediaServiceProbeService?.clearCache(previous.key);
+      this.streamingRequestIds.delete(previous.key);
+      this.mediaRequestIds.delete(previous.key);
+      this.autoProbedPeerSessions.delete(previous.key);
+      this.autoSunshineFailureCounts.delete(previous.key);
+      this.autoMediaFailureCounts.delete(previous.key);
+    });
     this.peers = mergedPeers;
     this.peerDataSource.replaceAll(mergedPeers);
     this.streamingStates = this.streamingStates.filter((state: DeviceStreamingState) => {
       const peer: PeerSummary | undefined = mergedPeers.find((item: PeerSummary) => item.key === state.peerKey);
-      if (peer === undefined || !peer.online) {
-        this.sunshineProbeService?.cancel(state.peerKey);
-        this.peerPathService?.cancel(state.peerKey);
-        return false;
-      }
-      return true;
+      return peer !== undefined && peer.online;
     });
     this.mediaStates = this.mediaStates.filter((state: DeviceMediaState) => {
       const peer: PeerSummary | undefined = mergedPeers.find((item: PeerSummary) => item.key === state.peerKey);
-      if (peer === undefined || !peer.online) {
-        this.mediaServiceProbeService?.cancel(state.peerKey);
-        return false;
-      }
-      return true;
+      return peer !== undefined && peer.online;
     });
     if (this.selectedPeerKey.length > 0) {
       const selectedPeer: PeerSummary | undefined = mergedPeers.find((peer: PeerSummary) =>
@@ -4031,9 +4044,14 @@ export struct BridgeStatus {
       return;
     }
     this.homeLatencyRefreshInFlight = true;
+    const generation: number = this.lifecycleGeneration;
+    const session: number = this.trafficSession;
     Promise.all(onlinePeers.map((peer: PeerSummary) =>
       this.peerPathService!.probe(peer.key, true, true).then((path: PeerPathResult) => {
-        if (!this.appShellReady || !this.isConnected()) {
+        const currentPeer: PeerSummary | undefined = this.peers.find((item: PeerSummary) => item.key === peer.key);
+        if (!this.appShellReady || !this.isConnected() || generation !== this.lifecycleGeneration ||
+          session !== this.trafficSession || currentPeer === undefined || !currentPeer.online ||
+          path.errorMessage === 'cancelled') {
           return;
         }
         this.updateStreamingState(peer.key,
@@ -4145,7 +4163,7 @@ export struct BridgeStatus {
     this.vpnCommandGateway.writeCommandFile(context.filesDir, LOCAL_SEND_REFRESH_REQUEST_FILE_NAME,
       JSON.stringify({ requestId: requestId }));
     const startedAt: number = Date.now();
-    while (Date.now() - startedAt < 6500 && this.appShellReady && this.isConnected()) {
+    while (Date.now() - startedAt < LOCAL_SEND_REFRESH_TIMEOUT_MS && this.appShellReady && this.isConnected()) {
       await new Promise<void>((resolve: () => void) => setTimeout(resolve, 150));
       try {
         if (!fileIo.accessSync(responsePath)) {
@@ -4517,7 +4535,15 @@ export struct BridgeStatus {
   }
 
   private localSendAvailableForPeer(peer: PeerSummary): boolean {
-    return this.isConnected() && this.peerEffectivelyOnline(peer) && peer.localSend?.state === 'available';
+    const current: PeerSummary | undefined = this.peers.find((item: PeerSummary) => item.key === peer.key);
+    return this.isConnected() && current !== undefined && this.peerEffectivelyOnline(current) &&
+      current.localSend?.state === 'available';
+  }
+
+  private localSendStatusForPeer(peerKey: string): LocalSendStatus | undefined {
+    // A stable ForEach key keeps the detail sheet and its original peer
+    // closure mounted. Read the observed directory to receive later probes.
+    return this.peers.find((peer: PeerSummary) => peer.key === peerKey)?.localSend;
   }
 
   private deviceDetailRenderKey(peer: PeerSummary): string {
@@ -5258,15 +5284,10 @@ export struct BridgeStatus {
   }
 
   private peerEffectivelyOnline(peer: PeerSummary): boolean {
-    if (!peer.online) {
-      return false;
-    }
-    const path: PeerPathResult = this.streamingState(peer.key).path;
-    if (path.type === 'unreachable') {
-      return false;
-    }
-    return path.errorMessage !== 'peer_offline' && path.errorMessage !== 'peer_not_found' &&
-      path.errorMessage !== 'no_response';
+    // Presence comes from the current control-plane snapshot. A failed path
+    // probe describes temporary reachability; it must not move an online peer
+    // into the offline group or prevent the probes needed for recovery.
+    return peer.online;
   }
 
   private peerPathLabel(peer: PeerSummary): ResourceStr {
@@ -5944,6 +5965,9 @@ export struct BridgeStatus {
     const session: number = Math.max(1, this.trafficSession);
     this.peers.filter((peer: PeerSummary) => peer.online && peer.addresses.length > 0)
       .forEach((peer: PeerSummary) => {
+        if (this.peerServiceRefreshInFlight.has(peer.key)) {
+          return;
+        }
         if (!force && this.autoProbedPeerSessions.get(peer.key) === session) {
           return;
         }
@@ -5995,7 +6019,11 @@ export struct BridgeStatus {
       return;
     }
     const next: DeviceStreamingState[] = this.streamingStates.slice();
-    next[index] = update;
+    // Service discovery may finish after a newer home path probe. Preserve
+    // that newer path while still accepting the completed service result.
+    next[index] = update.path.checkedAt < next[index].path.checkedAt
+      ? this.copyStreamingState(update, undefined, next[index].path)
+      : update;
     this.streamingStates = next;
     this.logServiceStatusIfChanged();
   }
@@ -9935,7 +9963,7 @@ export struct BridgeStatus {
       ForEach(this.selectedPeerDetails,
         (peer: PeerSummary) => {
           DeviceDetailSheet({
-            online: this.peerEffectivelyOnline(peer),
+            online: this.peers.some((current: PeerSummary) => current.key === peer.key && current.online),
             meshConnected: this.isConnected(),
             path: this.streamingState(peer.key).path,
             tailscaleAddress: this.primaryTailscaleAddress(peer.addresses),
@@ -9949,7 +9977,7 @@ export struct BridgeStatus {
             mediaServiceNames: this.mediaServiceNames(peer.key),
             mediaLaunching: this.mediaState(peer.key).launching,
             serviceRefreshVisible: this.deviceDetailServiceRefreshInFlight,
-            localSendState: peer.localSend?.state ?? 'unknown',
+            localSendState: this.localSendStatusForPeer(peer.key)?.state ?? 'unknown',
             localSendRefreshing: this.transferProtocolRefreshing,
             localSendAvailable: this.localSendAvailableForPeer(peer),
             taildropAvailable: this.taildropTargetAvailableForPeer(peer),
