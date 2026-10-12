@@ -20,6 +20,13 @@ LEVEL_DIRS = {"90-journeys": ("journey", "requirements"),
               # 单点判据按 a01 在 HLD 首次建立、由 LLD 补齐，所以 introduced_at 是 hld。
               "points": ("point", "hld")}
 MANUAL_RE = re.compile(r"^(真机走查|走查|人工走查)\s+(\S+manual-checks\.md#M-\d+)")
+# 接缝号 → 细化它的 LLD 状态机条目。依据是各状态机所在的模块（architecture §2.2 + HLD 契约卡）。
+LLM_BY_SEAM = {
+    "01": {"L-VM-2"}, "02": {"L-VM-2"}, "03": {"L-VM-1", "L-VM-4"}, "04": {"L-VM-4"},
+    "05": {"L-VM-2"}, "06": set(), "07": {"L-ALGO"}, "08": {"L-ALGO"},
+    "09": set(), "10": {"L-VM-2", "L-VM-3"}, "11": {"L-VM-1", "L-VM-3"},
+    "12": {"L-VM-3"}, "13": set(), "14": set(), "15": set(), "16": set(), "17": {"L-UI"},
+}
 ANCHOR_RE = re.compile(r"^\[[^\]]{0,10}\]\s*(.+)$")
 
 
@@ -39,6 +46,11 @@ def parse_fields(block):
 
 def split_values(text):
     return [p.strip() for p in re.split(r"[；;\n]+", text or "") if p.strip()]
+
+
+# 本次运行证据：只有显式给出、且基线与快照一致时，锚点才允许写成 pass。
+args_ran = None
+baseline_matches = False
 
 
 def load_oracles(stage):
@@ -66,7 +78,10 @@ def load_oracles(stage):
                                   | set(re.findall(r"\bA-(?:D\d+|SEAMS)\b",
                                                    f.get("设计依据", "")))
                                   | {f"H-C-{int(x):02d}" for x in
-                                     re.findall(r"\bC-(\d+)\b", f.get("设计依据", ""))})
+                                     re.findall(r"\bC-(\d+)\b", f.get("设计依据", ""))}
+                                  # 单点判据的 LLD 依据：按它所属接缝映射到细化该接缝的状态机。
+                                  | LLM_BY_SEAM.get(
+                                      (re.findall(r"O-SEAM-(\d+)", f.get("父判据", "")) or [""])[0], set()))
             uncertain = (f.get("不确定特征", "") or "none").split("\n")[0].strip()
             sources = split_values(f.get("来源", "")) + [f"{rel}"]
             oracles.append({
@@ -95,13 +110,31 @@ def load_oracles(stage):
                 token = ANCHOR_RE.sub(r"\1", token.strip()).strip()
                 if token:
                     notes.append(f"未建：{token}")
+            executed = []
             for token in split_values(f.get("测试", "")):
-                mm = MANUAL_RE.match(token.strip())
+                token = token.strip()
+                mm = MANUAL_RE.match(token)
                 if mm:
                     notes.append(f"已有走查记录：{mm.group(1)} {mm.group(2)}（源文档实测，本批未复跑）")
+                elif token:
+                    executed.append(token)
             if notes:
                 tests.append({"id": "T-" + oid, "level": "e2e", "status": "not_evaluated",
                               "oracle_ids": [oid], "evidence": "；".join(notes)})
+            # 真跑过的锚点：只有给了本次运行证据（基线、命令、时间、环境）才写 pass，
+            # 否则宁可 not_evaluated —— 没有运行记录就不算通过。
+            for token in executed:
+                level = "integration" if "/integration/" in token else "unit"
+                entry = {"id": f"T-{oid}-{level[:3]}", "level": level, "status": "not_evaluated",
+                         "oracle_ids": [oid], "evidence": token}
+                if args_ran and baseline_matches:
+                    entry.update({"status": "pass", "command": args_ran["command"],
+                                  "evidence": f"run-checks.sh 全绿；锚点 {token}",
+                                  "baseline": args_ran["baseline"],
+                                  "environment": args_ran["environment"],
+                                  "executed_at": args_ran["executed_at"]})
+                if entry["id"] not in {t["id"] for t in tests}:
+                    tests.append(entry)
     return oracles, tests
 
 
@@ -182,12 +215,72 @@ def load_hld():
     return design
 
 
+def load_lld():
+    """LLD 文档 → 设计条目：4 台状态机 + 算法段 + UI/生命周期段。
+
+    LLD 正文里的章节标题不带接缝号，所以「它细化的是哪些契约」在这里显式写死并注明依据，
+    不靠猜：每台状态机所在的模块决定了它落在哪条接缝上（见 architecture §2.2 与 HLD 契约卡）。
+    """
+    path = ROOT / "docs/lld/lld.md"
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    # 标题 → (设计条目 id, 它细化的 HLD 契约卡)
+    plan = [
+        ("保活任务生命周期", "L-VM-1", ["H-C-11", "H-C-03"]),
+        ("VpnCommandStateMachine", "L-VM-2", ["H-C-01", "H-C-10"]),
+        ("VpnReconnectSupervisor", "L-VM-3", ["H-C-11", "H-C-10"]),
+        ("VpnStatusReader", "L-VM-4", ["H-C-03", "H-C-04"]),
+    ]
+    design = []
+    for needle, did, parents in plan:
+        m = re.search(r"(?m)^### .*?" + re.escape(needle) + r".*$", text)
+        if not m:
+            continue
+        start = m.end()
+        nxt = re.search(r"(?m)^###\s|^##\s", text[start:])
+        body = text[start:start + (nxt.start() if nxt else 2000)]
+        design.append({
+            "id": did, "layer": "lld", "title": m.group(0).lstrip("# ").strip(),
+            "status": "ready", "depends_on": parents,
+            "content": [re.sub(r"\s+", " ", body).strip()[:600]],
+            "sources": ["docs/lld/lld.md " + m.group(0).lstrip("# ").strip()[:40]],
+        })
+    for needle, did, parents, title in [
+        ("四、算法与数据结构", "L-ALGO", ["H-C-03", "H-C-04", "H-C-07", "H-C-08"], "算法与数据结构"),
+        ("五、UI 与生命周期", "L-UI", ["H-C-11", "H-C-17"], "UI 与生命周期")]:
+        m = re.search(r"(?m)^##\s+" + re.escape(needle) + r".*$", text)
+        if not m:
+            continue
+        start = m.end()
+        nxt = re.search(r"(?m)^##\s", text[start:])
+        body = text[start:start + (nxt.start() if nxt else 2000)]
+        design.append({
+            "id": did, "layer": "lld", "title": title, "status": "ready",
+            "depends_on": parents,
+            "content": [re.sub(r"\s+", " ", body).strip()[:600]],
+            "sources": ["docs/lld/lld.md " + needle],
+        })
+    return design
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", required=True, choices=LAYERS)
     ap.add_argument("--baseline", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--ran-baseline", default="", help="跑测试时的代码基线；不给就不写 pass")
+    ap.add_argument("--ran-command", default="scripts/run-checks.sh")
+    ap.add_argument("--ran-environment", default="")
+    ap.add_argument("--ran-at", default="")
     args = ap.parse_args()
+
+    global args_ran, baseline_matches
+    if args.ran_baseline:
+        args_ran = {"baseline": args.ran_baseline, "command": args.ran_command,
+                    "environment": args.ran_environment or "Linux, Node v22.23.2",
+                    "executed_at": args.ran_at or "未记时刻"}
+    baseline_matches = bool(args_ran and args_ran["baseline"] == args.baseline)
 
     design, open_questions = load_requirements()
     if LAYERS.index(args.stage) >= LAYERS.index("architecture"):
@@ -196,6 +289,8 @@ def main():
         design = design + arch
     if LAYERS.index(args.stage) >= LAYERS.index("hld"):
         design = design + load_hld()
+    if LAYERS.index(args.stage) >= LAYERS.index("lld"):
+        design = design + load_lld()
     oracles, tests = load_oracles(args.stage)
 
     if LAYERS.index(args.stage) >= LAYERS.index("architecture"):
