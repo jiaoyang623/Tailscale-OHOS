@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "7ecf03f",
+  "baseline": "cc7ab88",
   "stage": "hld",
   "design": [
     {
@@ -3184,13 +3184,13 @@
         "docs/architecture/architecture.md §2.4 与第六节 Q-03",
         "docs/oracles/91-seams/S4-persistence-entry.md"
       ],
-      "oracle_state": "pending-test",
+      "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "—"
     },
     {
       "id": "O-SEAM-17",
-      "level": "seam",
+      "level": "integration",
       "introduced_at": "architecture",
       "title": "入口分发：Want / 通知 / 卡片 call → 应用外壳",
       "status": "ready",
@@ -3276,13 +3276,13 @@
         "docs/architecture/architecture.md 第五节责任空洞检查第 5 条、第六节 Q-06",
         "docs/oracles/91-seams/S5-diagnostics-replace.md"
       ],
-      "oracle_state": "pending-test",
+      "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "—"
     },
     {
       "id": "O-SEAM-16",
-      "level": "seam",
+      "level": "integration",
       "introduced_at": "architecture",
       "title": "VPN 替换批准通道",
       "status": "draft",
@@ -3329,6 +3329,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-04"
       ],
       "trigger": "前台运行，status 文件新鲜且含 state=Running|tun=true，reconcile 首次判为 connected",
@@ -3354,7 +3356,7 @@
     },
     {
       "id": "O-BGTASK-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "状态陈旧或读取失败时把已持有的任务保留到有界宽限期",
       "status": "ready",
@@ -3364,6 +3366,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "已持有任务，status 心跳龄超过 VPN_STATUS_FRESH_MS=15000，或 fileIo.readTextSync 抛临时 I/O",
@@ -3387,7 +3391,7 @@
     },
     {
       "id": "O-BGTASK-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "不以陈旧、未来、缺失的心跳或缺 TUN 的证据启动任务",
       "status": "ready",
@@ -3397,6 +3401,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "register 或 reconcile 时，status 缺 heartbeatMs、heartbeatMs=1、heartbeatMs=2000000（未来），或含 tun=false",
@@ -3420,7 +3426,7 @@
     },
     {
       "id": "O-BGTASK-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "读到显式断开即刻释放长时任务",
       "status": "ready",
@@ -3429,6 +3435,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-02"
       ],
       "trigger": "status 含 extension destroyed / vpn disconnected / state=stopped / 非 status unavailable 的 FAILED",
@@ -3452,7 +3460,7 @@
     },
     {
       "id": "O-BGTASK-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "快照读取失败按不确定处理，不立即撤销保护",
       "status": "ready",
@@ -3462,6 +3470,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "status 为 `FAILED | VPN backend | status unavailable | heartbeatMs=…`",
@@ -3484,7 +3494,7 @@
     },
     {
       "id": "O-BGTASK-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "用户取消保活后在同一会话内保持抑制，直到确认断开",
       "status": "ready",
@@ -3493,6 +3503,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-10"
       ],
       "trigger": "continuousTaskCancel 的 reason 为 USER_CANCEL(1) 或 USER_CANCEL_REMOVE_NOTIFICATION(3)",
@@ -3517,7 +3529,7 @@
     },
     {
       "id": "O-BGTASK-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "系统取消后按指数退避重试启动",
       "status": "ready",
@@ -3526,6 +3538,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-04"
       ],
       "trigger": "continuousTaskCancel 的 reason 非用户取消（系统取消）",
@@ -3550,7 +3564,7 @@
     },
     {
       "id": "O-BGTASK-08",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "非本任务的取消事件被忽略",
       "status": "ready",
@@ -3559,6 +3573,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-04"
       ],
       "trigger": "continuousTaskCancel 的 info.id 不等于当前 task.continuousTaskId（例如 99 对 7）",
@@ -3581,7 +3597,7 @@
     },
     {
       "id": "O-BGTASK-09",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "启动失败被节流，不按每次巡检重试",
       "status": "ready",
@@ -3590,6 +3606,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-04"
       ],
       "trigger": "startBackgroundRunning 抛 { code: 9800005 }",
@@ -3613,7 +3631,7 @@
     },
     {
       "id": "O-BGTASK-10",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "启动期间收到的取消、断开或销毁不被迟到的启动结果覆盖",
       "status": "ready",
@@ -3622,6 +3640,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-10"
       ],
       "trigger": "startBackgroundRunning 尚未 resolve 时，收到 USER_CANCEL、读到断开、或调用 unregister",
@@ -3646,7 +3666,7 @@
     },
     {
       "id": "O-BGTASK-11",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "通知发布在途时销毁，清理排在发布之后",
       "status": "ready",
@@ -3655,6 +3675,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-02"
       ],
       "trigger": "updateNotification 的 publish 尚未 resolve 时调用 unregister",
@@ -3679,7 +3701,7 @@
     },
     {
       "id": "O-BGTASK-12",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "重新连接等待进行中的停止完成后再启动下一任务",
       "status": "ready",
@@ -3688,6 +3710,8 @@
       ],
       "design_ids": [
         "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
         "R-CONN-04"
       ],
       "trigger": "stop 在途（stopBackgroundRunning 未返回）时读到 live 状态",
@@ -3712,7 +3736,7 @@
     },
     {
       "id": "O-BGTASK-13",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "连接窗口按 live 处理并提前持有任务",
       "status": "ready",
@@ -3722,6 +3746,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-03"
       ],
       "trigger": "status 含 vpn interface established 且心跳新鲜（扩展已建 TUN、backend handoff pending）",
@@ -3746,7 +3772,7 @@
     },
     {
       "id": "O-BGTASK-14",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "连接窗口需要接口建立的证据，不接受任意无法识别的状态",
       "status": "ready",
@@ -3755,6 +3781,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-03"
       ],
       "trigger": "status 为 `VPN extension lifecycle entered`、`VPN probe TUN creation pending`，或 `state=Running | tun=false`",
@@ -3778,7 +3806,7 @@
     },
     {
       "id": "O-BGTASK-15",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "停滞的连接窗口超过宽限期仍释放保护",
       "status": "ready",
@@ -3788,6 +3816,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "进入 connecting 后扩展停止写心跳（status 不再更新）",
@@ -3811,7 +3841,7 @@
     },
     {
       "id": "O-STATUS-01",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "状态文件缺失或不可读时报告 unknown",
       "status": "ready",
@@ -3820,6 +3850,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "VpnStatusReader.read 时 fileIo.accessSync 返回 false，或 readTextSync 抛错",
@@ -3844,7 +3876,7 @@
     },
     {
       "id": "O-STATUS-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "运行且有 TUN 时报 connected 并带真实流量",
       "status": "ready",
@@ -3853,6 +3885,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-04"
       ],
       "trigger": "status 含 state=Running 且 tun=true，心跳新鲜",
@@ -3876,7 +3910,7 @@
     },
     {
       "id": "O-STATUS-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "心跳新鲜度的三条边界都判 unknown",
       "status": "ready",
@@ -3885,6 +3919,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "heartbeatMs 缺失或 ≤0、ageMs<0（心跳在未来）、或 ageMs>VPN_STATUS_FRESH_MS=15000",
@@ -3908,7 +3944,7 @@
     },
     {
       "id": "O-STATUS-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "终态标记报 disconnected",
       "status": "ready",
@@ -3917,6 +3953,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-02"
       ],
       "trigger": "status 含 extension destroyed、vpn disconnected、state=stopped / stopped 开头，或非 status unavailable 的 FAILED 行",
@@ -3940,7 +3978,7 @@
     },
     {
       "id": "O-STATUS-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "快照读取失败不当作已停止的隧道",
       "status": "ready",
@@ -3949,6 +3987,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "status 为 `FAILED | VPN backend | status unavailable | heartbeatMs=…`",
@@ -3971,7 +4011,7 @@
     },
     {
       "id": "O-STATUS-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "待登录报 needs_login",
       "status": "ready",
@@ -3980,6 +4020,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-SETUP-06"
       ],
       "trigger": "status 含 needslogin 或 loginurlready=true，心跳新鲜",
@@ -4002,7 +4044,7 @@
     },
     {
       "id": "O-STATUS-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "可用的隧道优先于陈旧的登录标记",
       "status": "ready",
@@ -4011,6 +4053,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-04"
       ],
       "trigger": "status 同时含 NeedsLogin 与 state=Running|tun=true",
@@ -4033,7 +4077,7 @@
     },
     {
       "id": "O-STATUS-08",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "只有 Running 而没有 TUN 不算连接",
       "status": "ready",
@@ -4042,6 +4086,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "status 含 state=Running 但 tun=false",
@@ -4073,6 +4119,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "start() 后的首个采样；以及 netAvailable / netLost / netCapabilitiesChange / netConnectionPropertiesChange 回调在 SETTLE_MS=750 内重复到达",
@@ -4098,7 +4145,7 @@
     },
     {
       "id": "O-NETMON-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "网络地址与 DNS 不进入诊断或日志",
       "status": "ready",
@@ -4108,6 +4155,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-04"
       ],
       "trigger": "任何一次采样或重绑产生的诊断事件",
@@ -4131,7 +4179,7 @@
     },
     {
       "id": "O-NETMON-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "取样期间默认网络变化则丢弃该次读",
       "status": "ready",
@@ -4140,6 +4188,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "getConnectionProperties 在途未返回时，默认网络从 netId 11 变为 netId 20",
@@ -4163,7 +4212,7 @@
     },
     {
       "id": "O-NETMON-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "同一接口落在新网络或地址续期也算变化",
       "status": "ready",
@@ -4172,6 +4221,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "接口仍为 wlan0 但默认网络 netId 由 10 变为 11；以及 netConnectionPropertiesChange 回调带来地址由 192.0.2.2 变为 192.0.2.3",
@@ -4195,7 +4245,7 @@
     },
     {
       "id": "O-NETMON-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "离线清空路由提示，恢复时按新承载重绑",
       "status": "ready",
@@ -4204,6 +4254,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "netLost 后 getDefaultNet 的 netId 为 0；随后 netAvailable 到 rmnet0",
@@ -4227,7 +4278,7 @@
     },
     {
       "id": "O-NETMON-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "原生重绑失败后自愈重试，不依赖新的平台回调",
       "status": "ready",
@@ -4236,6 +4287,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "backendNetworkChangedAsync 返回非 OK（'FAILED | refresh'）",
@@ -4260,7 +4312,7 @@
     },
     {
       "id": "O-NETMON-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "重绑在途时到达的新修订在完成后被重放",
       "status": "ready",
@@ -4269,6 +4321,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "Wi-Fi 重绑在途（nativeBridge 未返回）时，蜂窝 netAvailable 到达",
@@ -4294,7 +4347,7 @@
     },
     {
       "id": "O-NETMON-08",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "平台回调注册失败按退避重试",
       "status": "ready",
@@ -4303,6 +4356,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "monitor.register 的回调收到错误（{ code: 201 }）",
@@ -4326,7 +4380,7 @@
     },
     {
       "id": "O-NETMON-09",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "停止后注销监听，平台回调不再触发任何工作",
       "status": "ready",
@@ -4335,6 +4389,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "stop() 之后平台回调（netAvailable）到达",
@@ -4360,7 +4415,7 @@
     },
     {
       "id": "O-NETMON-10",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "停止取消进行中的重放并清空定时器",
       "status": "ready",
@@ -4369,6 +4424,7 @@
       ],
       "design_ids": [
         "H-C-12",
+        "L-VM-3",
         "R-NET-03"
       ],
       "trigger": "backendNetworkChangedAsync 在途时调用 stop()",
@@ -4393,7 +4449,7 @@
     },
     {
       "id": "O-RECONN-01",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "后台静置足够久后的掉线触发一次恢复",
       "status": "ready",
@@ -4403,6 +4459,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05"
       ],
       "trigger": "上一次采样为 connected；onBackground 之后已过 BACKGROUND_SETTLE_MS=10000（测试取 60000）；本次采样为 disconnected",
@@ -4427,7 +4485,7 @@
     },
     {
       "id": "O-RECONN-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "前台可见或刚进入后台的掉线视为用户主动",
       "status": "ready",
@@ -4436,6 +4494,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-06"
       ],
       "trigger": "掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）",
@@ -4458,7 +4518,7 @@
     },
     {
       "id": "O-RECONN-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "用户已请求停止后的掉线不被恢复撤销",
       "status": "ready",
@@ -4467,6 +4527,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-06"
       ],
       "trigger": "noteRequestedStop() 之后，后台静置足够久，再读到掉线",
@@ -4490,7 +4552,7 @@
     },
     {
       "id": "O-RECONN-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "显式重新连接重置停止意图并重新武装恢复",
       "status": "ready",
@@ -4499,6 +4561,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05"
       ],
       "trigger": "noteRequestedStop() 之后调用 noteRequestedStart()",
@@ -4521,7 +4585,7 @@
     },
     {
       "id": "O-RECONN-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "恢复尝试有上限，耗尽后放弃",
       "status": "ready",
@@ -4530,6 +4594,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05"
       ],
       "trigger": "连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed",
@@ -4553,7 +4619,7 @@
     },
     {
       "id": "O-RECONN-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "重试按指数退避，不按每次采样触发",
       "status": "ready",
@@ -4562,6 +4628,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05"
       ],
       "trigger": "后台掉线后，反复 connected↔disconnected 采样五轮（时间几乎不推进）",
@@ -4585,7 +4653,7 @@
     },
     {
       "id": "O-RECONN-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "未知状态不当作掉线",
       "status": "ready",
@@ -4595,6 +4663,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-09"
       ],
       "trigger": "后台静置之后，采样状态为 unknown（心跳陈旧或状态文件不可读）",
@@ -4617,7 +4687,7 @@
     },
     {
       "id": "O-RECONN-08",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "回到前台清零重试阶梯",
       "status": "ready",
@@ -4626,6 +4696,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05",
         "R-CONN-06"
       ],
@@ -4649,7 +4721,7 @@
     },
     {
       "id": "O-RECONN-09",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "连接稳定 60 s 才清零重试计数",
       "status": "ready",
@@ -4658,6 +4730,8 @@
       ],
       "design_ids": [
         "H-C-10",
+        "L-VM-2",
+        "L-VM-3",
         "R-CONN-05"
       ],
       "trigger": "一次恢复成功使状态回到 connected，并保持超过 STABLE_MS=60000",
@@ -4675,9 +4749,9 @@
         "scripts/test-vpn-reconnect-supervisor.mjs",
         "docs/oracles/points/P2-network-reconnect.md"
       ],
-      "oracle_state": "pending-test",
+      "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-单元"
+      "owner": "—"
     },
     {
       "id": "O-SESSION-01",
@@ -4691,6 +4765,8 @@
       ],
       "design_ids": [
         "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
         "R-CONN-08"
       ],
       "trigger": "`VpnSessionController.connect(filesDir)` 被调用，`VpnStatusReader.read` 读到 state=connected",
@@ -4716,7 +4792,7 @@
     },
     {
       "id": "O-SESSION-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "无 UI 连接只拉起扩展一次并立即返回，交接在后台进行",
       "status": "ready",
@@ -4726,6 +4802,7 @@
       ],
       "design_ids": [
         "H-C-01",
+        "L-VM-2",
         "R-CONN-01",
         "R-CONN-08"
       ],
@@ -4753,7 +4830,7 @@
     },
     {
       "id": "O-SESSION-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "交接应答循环在请求到达前保持轮询而不是空答",
       "status": "ready",
@@ -4763,6 +4840,7 @@
       ],
       "design_ids": [
         "H-C-02",
+        "L-VM-2",
         "R-CONN-08"
       ],
       "trigger": "headless connect 已返回 STARTED，扩展尚未写下它的交接请求",
@@ -4788,7 +4866,7 @@
     },
     {
       "id": "O-SESSION-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "有效交接请求先清请求文件再一次应答，回写同一 requestId 与后端状态",
       "status": "ready",
@@ -4797,6 +4875,7 @@
       ],
       "design_ids": [
         "H-C-02",
+        "L-VM-2",
         "R-CONN-03",
         "R-CONN-08"
       ],
@@ -4825,7 +4904,7 @@
     },
     {
       "id": "O-SESSION-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "后端停不下来时仍写出应答以释放扩展",
       "status": "ready",
@@ -4834,6 +4913,7 @@
       ],
       "design_ids": [
         "H-C-02",
+        "L-VM-2",
         "R-CONN-03",
         "R-CONN-08"
       ],
@@ -4858,7 +4938,7 @@
     },
     {
       "id": "O-SESSION-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "无效的交接请求被清除但既不停后端也不作答",
       "status": "ready",
@@ -4867,6 +4947,7 @@
       ],
       "design_ids": [
         "H-C-02",
+        "L-VM-2",
         "R-CONN-08"
       ],
       "trigger": "请求文件的内容既可能是非法 JSON（如 `not json`），也可能是合法 JSON 但 requestId ≤ 0（如 `{\"requestId\":0}`）",
@@ -4893,7 +4974,7 @@
     },
     {
       "id": "O-SESSION-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "交接应答的轮询预算必须覆盖扩展的等待预算",
       "status": "draft",
@@ -4903,6 +4984,7 @@
       ],
       "design_ids": [
         "H-C-02",
+        "L-VM-2",
         "R-CONN-03",
         "R-CONN-08"
       ],
@@ -4962,7 +5044,7 @@
     },
     {
       "id": "O-PEER-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "直连结果的缓存 TTL 更长，同一会话内的重复探测复用缓存",
       "status": "ready",
@@ -4995,7 +5077,7 @@
     },
     {
       "id": "O-PEER-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "未连接优先于缓存：探测返回 unknown/mesh_disconnected 并删除缓存",
       "status": "ready",
@@ -5027,7 +5109,7 @@
     },
     {
       "id": "O-PEER-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "在线性只看当前控制面快照，失败的旧探测不得把在线对端移出在线组",
       "status": "ready",
@@ -5036,6 +5118,7 @@
       ],
       "design_ids": [
         "H-C-04",
+        "L-VM-4",
         "R-DEV-02",
         "R-DEV-05"
       ],
@@ -5059,7 +5142,7 @@
     },
     {
       "id": "O-PEER-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "卡片状态文案：在线对端带失败的旧探测时是「恢复中」，离线对端是「离线」",
       "status": "ready",
@@ -5068,6 +5151,7 @@
       ],
       "design_ids": [
         "H-C-04",
+        "L-VM-4",
         "R-DEV-03"
       ],
       "trigger": "`peerCardStatus(peer)` 在两种输入下被调用——在线对端且路径 unreachable/带 errorMessage；对端快照 online=false",
@@ -5094,7 +5178,7 @@
     },
     {
       "id": "O-PEER-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "对端在线性翻转时作废在途请求与探测缓存",
       "status": "ready",
@@ -5104,6 +5188,7 @@
       ],
       "design_ids": [
         "H-C-04",
+        "L-VM-4",
         "R-DEV-05"
       ],
       "trigger": "`applyPeers` 收到的新快照里某个对端的 online 值与上一次不同（离线→在线或在线→离线），且该对端有在途的 streaming/media 请求号与缓存",
@@ -5129,7 +5214,7 @@
     },
     {
       "id": "O-PEER-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "同一次 VPN 会话内对端重新上线后重新发现服务",
       "status": "ready",
@@ -5164,7 +5249,7 @@
     },
     {
       "id": "O-PEER-08",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "在途的服务刷新不消耗本会话的发现名额",
       "status": "ready",
@@ -5199,7 +5284,7 @@
     },
     {
       "id": "O-PEER-09",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "迟到的服务结果不得覆盖更新的路径，但服务结果本身仍被接受",
       "status": "ready",
@@ -5209,6 +5294,7 @@
       ],
       "design_ids": [
         "H-C-04",
+        "L-VM-4",
         "R-DEV-05"
       ],
       "trigger": "`updateStreamingState` 先写入一条 checkedAt 较新的 direct 路径，随后用一条 checkedAt 更早的 unreachable 路径（但带一个 checkedAt 更新的 sunshine 结果）再次更新同一对端",
@@ -5233,7 +5319,7 @@
     },
     {
       "id": "O-PEER-10",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "首页轮询对在线对端强制重探，旧的 unreachable 结果不阻止刷新",
       "status": "ready",
@@ -5270,7 +5356,7 @@
     },
     {
       "id": "O-PEER-11",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "过期的首页探测不得重新引入路径（离线 / 新会话 / 新生命周期 / 已取消 / 已移除）",
       "status": "draft",
@@ -5305,7 +5391,7 @@
     },
     {
       "id": "O-LOCALSEND-01",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "挂起中的详情页按 peerKey 读当前对端，而不是打开时捕获的旧对端",
       "status": "ready",
@@ -5315,6 +5401,7 @@
       ],
       "design_ids": [
         "H-C-04",
+        "L-VM-4",
         "R-DEV-06"
       ],
       "trigger": "详情面板用稳定的 ForEach key 保持挂载，其闭包里捕获的对端对象已经过时；`localSendAvailableForPeer(capturedPeer)` / `localSendStatusForPeer(peerKey)` 被调用，而 `this.peers` 已换成新的快照",
@@ -5338,7 +5425,7 @@
     },
     {
       "id": "O-LOCALSEND-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "LocalSend 可用性要求当前对端在线且 VPN 已连接",
       "status": "ready",
@@ -5382,6 +5469,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-01",
         "R-BUILD-02"
       ],
@@ -5406,7 +5494,7 @@
     },
     {
       "id": "O-BUILD-02",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "构建产物被复制进 HAP 的库目录",
       "status": "draft",
@@ -5415,6 +5503,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-01"
       ],
       "trigger": "`build-go.sh` 走完补丁与 `go build` 步骤",
@@ -5439,7 +5528,7 @@
     },
     {
       "id": "O-BUILD-03",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "引擎版本戳经 ldflags 注入且与依赖声明一致",
       "status": "draft",
@@ -5448,6 +5537,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-01"
       ],
       "trigger": "`build-go.sh` 调用 `go build`",
@@ -5471,7 +5561,7 @@
     },
     {
       "id": "O-BUILD-04",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "无关的本地改动不阻止必需补丁，也不被覆盖",
       "status": "draft",
@@ -5480,6 +5570,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-02"
       ],
       "trigger": "`third_party/tailscale` 里有一个与补丁无关的文件被本地修改（如 `notes.txt`），补丁本身尚未应用",
@@ -5502,7 +5593,7 @@
     },
     {
       "id": "O-BUILD-05",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "补丁冲突在编译前失败并保留源码原状",
       "status": "draft",
@@ -5511,6 +5602,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-02"
       ],
       "trigger": "补丁触及的文件已被改成与上下文冲突的内容（`source.txt` 为 `conflict`），补丁既不能应用也不能被 reverse-check",
@@ -5535,7 +5627,7 @@
     },
     {
       "id": "O-BUILD-06",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "Release 与未知产品在构建或签名前被拒绝",
       "status": "draft",
@@ -5544,6 +5636,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-02"
       ],
       "trigger": "以非 default 的产品名调用 `build.sh`——用例覆盖 `release` 与 `unknown`（含多于一个参数时同样走这条门）",
@@ -5566,7 +5659,7 @@
     },
     {
       "id": "O-BUILD-07",
-      "level": "point",
+      "level": "unit",
       "introduced_at": "hld",
       "title": "Debug 装配用项目目录与 hvigor wrapper，并传显式 debug 参数",
       "status": "draft",
@@ -5575,6 +5668,7 @@
       ],
       "design_ids": [
         "H-C-05",
+        "L-VM-2",
         "R-BUILD-02"
       ],
       "trigger": "default 产品、`build-profile.json5` 存在、DevEco 下同时有 `hvigor/bin/hvigorw.js` 与两个 hvigor 包的 package.json；从**工程目录之外**的目录调用 `build.sh`",
@@ -5997,13 +6091,17 @@
       "evidence": "未建：scripts/integration/external-app-handoff.mjs::深链不含凭据且非法地址在拼装前被拒"
     },
     {
-      "id": "T-O-SEAM-14",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-SEAM-14-int",
+      "level": "integration",
+      "status": "pass",
       "oracle_ids": [
         "O-SEAM-14"
       ],
-      "evidence": "未建：scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -6015,13 +6113,17 @@
       "evidence": "未建：scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃"
     },
     {
-      "id": "T-O-SEAM-15",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-SEAM-15-int",
+      "level": "integration",
+      "status": "pass",
       "oracle_ids": [
         "O-SEAM-15"
       ],
-      "evidence": "未建：scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -6033,13 +6135,628 @@
       "evidence": "未建：scripts/integration/vpn-replace-approval.mjs::无批准标记时不替换且无静默销毁"
     },
     {
-      "id": "T-O-RECONN-09",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-BGTASK-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::stale heartbeat and read errors retain acquired protection for a bounded grace period",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::never starts from stale, future, missing heartbeat or missing TUN evidence",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::explicit disconnect promptly releases the task",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::snapshot failure is uncertain and does not immediately revoke protection",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::system cancellation retries with exponential backoff",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-08-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-08"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::unrelated cancellation does not discard the VPN task",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-09-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-09"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a failed start is throttled instead of retried every second",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-10-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-10"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-11-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-11"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::destroy during notification update serializes cleanup after publish",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-12-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-12"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::reconnect waits for in-flight stop before starting the next task",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-13-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-13"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-14-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-14"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::the connect window needs interface evidence, not just an unrecognised status",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BGTASK-15-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BGTASK-15"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a stalled connect window still releases protection",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-STATUS-08-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-STATUS-08"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::running without a TUN is not connected",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::discards a stale read when default net changes before properties return",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::same interface on a new Wi-Fi network and address renewal both trigger refresh",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::clears the route hint when offline and applies the restored bearer",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::failed native refresh retries without another platform callback",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-08-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-08"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-09-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-09"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-NETMON-10-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-NETMON-10"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::stop during native work cancels replay and releases the registered listener",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop moments after backgrounding is left alone",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a deliberate reconnect re-arms recovery",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::recovery gives up instead of retrying forever",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::retries back off instead of firing on every sample",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::an unknown state is not treated as a drop",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-08-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-RECONN-08"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::returning to the foreground clears the retry ladder",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-RECONN-09-uni",
+      "level": "unit",
+      "status": "pass",
       "oracle_ids": [
         "O-RECONN-09"
       ],
-      "evidence": "未建：scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer keeps polling while no request has arrived",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a backend that cannot be stopped still releases the extension",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-SESSION-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SESSION-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a malformed handoff request is cleared, not answered",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     },
     {
       "id": "T-O-SESSION-07",
@@ -6051,6 +6768,136 @@
       "evidence": "未建：scripts/test-vpn-session-controller.mjs::交接应答窗口覆盖扩展十五秒等待（常量关系断言）"
     },
     {
+      "id": "T-O-PEER-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::disconnect overrides a previously cached direct path",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-08-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-08"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a busy old service request does not consume the reconnect discovery attempt",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-09-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-09"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a slow service response cannot overwrite a more recent recovered path",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-PEER-10-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-PEER-10"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::home polling retries an online peer despite an old unreachable path",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
       "id": "T-O-PEER-11",
       "level": "e2e",
       "status": "not_evaluated",
@@ -6058,6 +6905,123 @@
         "O-PEER-11"
       ],
       "evidence": "未建：scripts/test-peer-reconnect.mjs::过期的首页探测结果在离线、新会话、新生命周期、取消、移除五种情形下都不重新引入路径"
+    },
+    {
+      "id": "T-O-LOCALSEND-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-LOCALSEND-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::a mounted detail sheet reads a fresh LocalSend result despite its captured old peer",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-LOCALSEND-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-LOCALSEND-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::current peer presence and VPN connection override an old available service",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-01-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-01"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-02-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-02"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-03-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-04-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-04"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::unrelated dirty files do not suppress the required Tailscale patch",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-05-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-05"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::conflicting patch stops before compiling and preserves the source",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-06-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-06"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Release and unknown products are rejected before any build or signing",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
+    },
+    {
+      "id": "T-O-BUILD-07-uni",
+      "level": "unit",
+      "status": "pass",
+      "oracle_ids": [
+        "O-BUILD-07"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Debug uses the project directory, wrapper, and explicit debug flags",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     }
   ],
   "open_questions": [

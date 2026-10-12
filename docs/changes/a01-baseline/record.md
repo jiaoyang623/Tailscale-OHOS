@@ -161,6 +161,19 @@ P0 合计 0 条 ✅
 | 审核网页 | `docs/review/hld/index.html`（208 个条目：91 设计 + 117 判据） |
 | 人工结论 | **待审核** |
 
+### 第 6 轮 · LLD 层（完成待审）
+
+| 项 | 结果 |
+| --- | --- |
+| 设计增量 | `docs/lld/lld.md`：4 台状态机共 43 条转换、34 条**非法组合**、算法边界、责任分配、判据→测试计划表（覆盖全部 69 条单点判据）、旅程复核 |
+| 判据增量 | 无新增 |
+| 审核网页 | `docs/review/lld/index.html`（214 个条目：97 设计 + 117 判据，其中 69 条测试带本次运行证据） |
+| 人工结论 | **待审核** |
+
+LLD 推导非法组合时又挖出三条真缺陷，逐条记进未决项 Q13–Q15（见下表）。另有两条接缝归属
+问题（Q16）：`O-RECONN-01…09` 的父接缝在架构、HLD、单点三处有三种不同说法；
+`O-BUILD-*` 的父接缝是自知占位的临时值。
+
 ### 审核链自己抓到的第一个错误
 
 **我在接缝规范里把 M-05 列进了「可用走查」，这是错的。** M-05 在登记册里被记为
@@ -210,7 +223,13 @@ subagent 按我的错误指引，把 O-SEAM-01、O-SEAM-02 判成了 `closed`；
 | 接缝判据补齐 | 2026-10-12T18:0x | 工作树 | 同上 | 98 | 57 | 0 / 0 / 0 | 0 |
 | 单点判据补齐 | 2026-10-12T18:1x | `f742597` | 同上 | 117 | 75 | 0 / 0 / 0 | 0 |
 | **M-05 过度声明改正后** | 2026-10-12T18:1x | `41282d6`+ | 同上 | 117 | 73 | 0 / 0 / 0 | 0 |
-| 集成测试试跑后（当前） | 2026-10-12T18:14 | 工作树 | `--entries='scripts/test-*.mjs,scripts/integration/*.mjs'` | 117 | 74 | 0 / 0 / 0 | 0 |
+| 集成测试试跑后 | 2026-10-12T18:14 | 工作树 | `--entries='scripts/test-*.mjs,scripts/integration/*.mjs'` | 117 | 74 | 0 / 0 / 0 | 0 |
+| **四层收尾（当前）** | 2026-10-12T18:18 | **`cc7ab88`** | `scripts/run-checks.sh`（同一命令内含判据三组检查） | 117 | **76** | 0 / 0 / 0 | 0 |
+
+四层收尾这次是**在提交后的基线上跑的**：先提交（`cc7ab88`），再在该基线上跑
+`scripts/run-checks.sh`（**76 通过 / 0 失败 / 0 跳过** = 73 单元 + 3 集成），
+然后用同一个基线号重新生成四份审核快照。快照里 69 条测试因此带 `pass` 与运行证据
+（命令、环境、时刻、基线）；其余保持 `not_evaluated`——**没有该基线上的运行记录就不写通过**。
 
 当前分布：旅程 31 / 接缝 17 / 单点 69；状态 `closed` 74、`pending-test` 43。
 三组检查（形式 F1–F14、关系 G1–G5、闭环 S1–S7）**全部 0 命中，P0 为 0**，索引 `--check` 为最新。
@@ -235,6 +254,10 @@ subagent 按我的错误指引，把 O-SEAM-01、O-SEAM-02 判成了 `closed`；
 | Q9 | **同一个状态文件有两套新鲜度窗口**：`BridgeStatus` 用 5000 ms，`VpnBackgroundTaskManager` 与 `VpnStatusReader` 用 15000 ms。同一份 `vpn-probe-status.txt`，两处判定不一致 | O-SEAM-03、O-CONN-06、O-DEV-01 | 用户 | 接缝判据要定「新鲜」的口径时 |
 | Q10 | **两套读状态词汇表不一致**：`vpn interface established` 在 `VpnBackgroundTaskManager` 里是新增的 `connecting` 态，在 `VpnStatusReader` 里仍返回 `unknown`。架构 §2.3 声称「同一个共享词汇表」，这句话与代码不符 | 架构 §2.3、O-SEAM-03、卡片显示 | 用户 | 架构层通过前要改正或改代码 |
 | Q11 | **`vpn-connect-config.json` 有两个写方**：应用进程的 `stageConnectConfig` 与扩展断线后的快速重连 `stageVpnReconnectConfig`；架构「每类文件只有一个写方」的说法对这个文件不成立。该文件还是一次性的（读完即 unlink） | 架构 §2.4 数据归属、O-SEAM-01 | 用户 | 架构层通过前要改正 |
+| Q13 | **同一个状态文件的两套读法优先级相反**：`VpnBackgroundTaskManager` 先判 disconnected 再判 connected（`:354`/`:358`），`VpnStatusReader` 先判 connected 再判 disconnected（`:49`/`:56`）。一行同时含 `state=Running\|tun=true` 与 `stopped` 标记时，两个读者给出**相反**的状态且没有护栏 | O-SEAM-03、O-SEAM-04、卡片与应用状态一致性 | 用户 | 两条接缝定「同一份状态只有一个判读」时 |
+| Q14 | **`VpnCommandStateMachine.invalidateLifecycle()` 不重置 `state`**，销毁后 `currentState()` 仍返回陈旧值 | O-SEAM-01、O-SEAM-10 | 用户 | 该接缝要闭环时 |
+| Q15 | **重连的 `connect()` 是发射即忘**（`VpnReconnectSupervisor.ets:129`，没有取消句柄），用户主动断开无法中止在途重连，最坏窗口约 20 s | O-SEAM-11、O-CONN-06（用户主动断开不被撤销） | 用户 | 该判据要闭环时 |
+| Q16 | **接缝归属有三种说法**：`O-RECONN-01…09` 的父接缝，架构说 `O-SEAM-03 + O-SEAM-01`、HLD §3.3 说 `O-SEAM-11/03/01/02`、判据写的是 `O-SEAM-10`；另 `O-BUILD-*` 挂的 `O-SEAM-05` 是自知占位的临时值（上面「构建接缝要不要单立」那条） | 16 条判据的父子关系 | 用户 | 相应层通过前 |
 | Q12 | 两条真缺口（不是形式缺口）：`O-PEER-11`（`test-peer-reconnect.mjs` 的 5 个用例名运行时生成，静态无字面名）与 `O-SESSION-07`（交接应答预算 250 ms×60 与扩展等待 100 ms×150 只是恰好相等，无任何耦合）；另有 `O-RECONN-09`（稳定 60 s 才清零重试计数）**有实现无测试** | O-SEAM-02、O-SEAM-03 | 用户 | 相应判据要闭环时 |
 
 ## 本轮程序与人工的分工

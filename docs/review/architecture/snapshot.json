@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "7ecf03f",
+  "baseline": "cc7ab88",
   "stage": "architecture",
   "design": [
     {
@@ -2349,7 +2349,7 @@
       "level": "seam",
       "introduced_at": "architecture",
       "title": "应用进程 ↔ VPN 扩展：生命周期命令通道",
-      "status": "ready",
+      "status": "draft",
       "parent_ids": [
         "O-CONN-01",
         "O-CONN-02"
@@ -2382,9 +2382,9 @@
         "entry/src/main/ets/components/BridgeStatus.ets:2502 stopVpnProbe",
         "docs/oracles/91-seams/S1-ipc-core.md"
       ],
-      "oracle_state": "closed",
-      "uncertainty": "none",
-      "owner": "—"
+      "oracle_state": "pending-test",
+      "uncertainty": "NOT-EVALUATED",
+      "owner": "owner=项目维护者 接收批次=a01-集成"
     },
     {
       "id": "O-SEAM-02",
@@ -2423,9 +2423,9 @@
         "entry/src/main/ets/services/VpnSessionController.ets:150 answerBackendHandoff",
         "docs/oracles/91-seams/S1-ipc-core.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "—"
+      "owner": "owner=项目维护者 接收批次=a01-集成"
     },
     {
       "id": "O-SEAM-03",
@@ -2929,13 +2929,13 @@
         "docs/architecture/architecture.md §2.4 与第六节 Q-03",
         "docs/oracles/91-seams/S4-persistence-entry.md"
       ],
-      "oracle_state": "pending-test",
+      "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "—"
     },
     {
       "id": "O-SEAM-17",
-      "level": "seam",
+      "level": "integration",
       "introduced_at": "architecture",
       "title": "入口分发：Want / 通知 / 卡片 call → 应用外壳",
       "status": "ready",
@@ -3021,13 +3021,13 @@
         "docs/architecture/architecture.md 第五节责任空洞检查第 5 条、第六节 Q-06",
         "docs/oracles/91-seams/S5-diagnostics-replace.md"
       ],
-      "oracle_state": "pending-test",
+      "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "—"
     },
     {
       "id": "O-SEAM-16",
-      "level": "seam",
+      "level": "integration",
       "introduced_at": "architecture",
       "title": "VPN 替换批准通道",
       "status": "draft",
@@ -3351,7 +3351,7 @@
       "oracle_ids": [
         "O-SEAM-01"
       ],
-      "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-05（源文档实测，本批未复跑）"
+      "evidence": "未建：scripts/integration/vpn-lifecycle-channel.mjs::停止请求带 requestId 且迟到的应答不被采信"
     },
     {
       "id": "T-O-SEAM-02",
@@ -3360,7 +3360,7 @@
       "oracle_ids": [
         "O-SEAM-02"
       ],
-      "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-05（源文档实测，本批未复跑）"
+      "evidence": "未建：scripts/integration/vpn-backend-handoff.mjs::应答方在预算内回写响应否则扩展销毁隧道"
     },
     {
       "id": "T-O-SEAM-03",
@@ -3462,13 +3462,17 @@
       "evidence": "未建：scripts/integration/external-app-handoff.mjs::深链不含凭据且非法地址在拼装前被拒"
     },
     {
-      "id": "T-O-SEAM-14",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-SEAM-14-int",
+      "level": "integration",
+      "status": "pass",
       "oracle_ids": [
         "O-SEAM-14"
       ],
-      "evidence": "未建：scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3480,13 +3484,17 @@
       "evidence": "未建：scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃"
     },
     {
-      "id": "T-O-SEAM-15",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-SEAM-15-int",
+      "level": "integration",
+      "status": "pass",
       "oracle_ids": [
         "O-SEAM-15"
       ],
-      "evidence": "未建：scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
+      "command": "scripts/run-checks.sh",
+      "baseline": "cc7ab88",
+      "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
+      "executed_at": "2026-10-12T18:18:08+11:00"
     },
     {
       "id": "T-O-SEAM-16",
