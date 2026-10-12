@@ -32,10 +32,10 @@
 - 失败信息：期望「配置原子落盘、缺键取默认、损坏回落未配置」，实际「半写文件被当成有效配置，或偏好缺键导致界面异常，或重置后残留旧引擎状态被读成已连接」
 - 来源：entry/src/main/ets/services/ControlServerConfig.ets:22 normalize；:46-63 load 回落；:67-86 save 的 .tmp+rename；:105-120 reset 连删 filesDir/tailscale；entry/src/main/ets/services/StoragePaths.ets:8-15 filesDir 透传与不选加密区；entry/src/main/ets/services/RecoverableCachePaths.ets:10 cacheDir 暂存；:14 遗留 compat 路径；entry/src/main/ets/services/NavigationPreferences.ets:34-36；entry/src/main/ets/services/AnimationPreferences.ets:56-59；entry/src/main/ets/services/AppSecurityPreferences.ets:21-24；entry/src/main/ets/services/FileTransferPreferences.ets:20；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:56 7 天；entry/src/main/ets/services/DiagnosticReportService.ets:10 24 h；entry/src/main/ets/components/TaildriveBrowser.ets:1891 显示分组而非清理；docs/architecture/architecture.md §2.4 与第六节 Q-03
 - 上游：R-SETUP-05、R-UI-02
-- 待建测试：[集成] scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认
-- 状态：pending-test
+- 测试：scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认
+- 状态：closed
 - 不确定特征：UNCERTAIN-CONFLICT
-- 归属：owner=项目维护者 接收批次=a01-集成
+- 归属：—
 - 复核：待复核
 
 ### O-SEAM-17 入口分发：Want / 通知 / 卡片 call → 应用外壳
