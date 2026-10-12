@@ -18,6 +18,18 @@ const NOTIFICATION_UPDATE_INTERVAL_MS: number = 30000;
 const START_RETRY_BASE_MS: number = 30000;
 const START_RETRY_MAX_MS: number = 300000;
 
+/**
+ * Sub-mode for the special-scenario continuous task.
+ *
+ * MODE_SPECIAL_SCENARIO_PROCESSING accepts only three sub-modes - media
+ * processing, video broadcast and workout - and none of them describes a VPN.
+ * Choosing one is a statement to Huawei about what this app does, so the value
+ * is deliberately left unset: 0 keeps the whole path inert until whoever owns
+ * the AppGallery Connect submission sets it to the scenario the restricted
+ * permission was granted for.
+ */
+const SPECIAL_SCENARIO_SUBMODE: number = 0;
+
 interface VpnRuntimeStatus {
   state: string;
   txBytes: number;
@@ -40,6 +52,7 @@ export class VpnBackgroundTaskManager {
   private retryCount: number = 0;
   private lastLiveAtMs: number = 0;
   private nextNotificationAtMs: number = 0;
+  private specialScenarioTask: boolean = false;
 
   private readonly cancelCallback =
     (info: backgroundTaskManager.ContinuousTaskCancelInfo): void => {
@@ -196,6 +209,9 @@ export class VpnBackgroundTaskManager {
       revision !== this.cancellationRevision || this.readStatus(context.filesDir).state !== 'connected') {
       return;
     }
+    if (await this.startSpecialScenario(context, agent, generation, revision)) {
+      return;
+    }
     // The numeric overload returns void and cannot supply the system-owned
     // notification ID needed for DATA_TRANSFER live-view updates.
     const task: backgroundTaskManager.ContinuousTaskNotification =
@@ -215,6 +231,57 @@ export class VpnBackgroundTaskManager {
       task.continuousTaskId ?? -1);
   }
 
+  /**
+   * Tries the special-scenario continuous task: the system's user-consented
+   * "run in the background for a long time" mode. requestAuthFromUser asks the
+   * user through a banner ("allow once" / "always allow") and
+   * checkSpecialScenarioAuth reports the stored answer.
+   *
+   * Unlike the data-transfer task this one is not tied to a progress update
+   * every ten minutes, which is what makes it a better fit for a tunnel. It is
+   * unavailable by default: it needs a restricted permission granted through
+   * AppGallery Connect, and declaring that permission without a matching
+   * profile makes the app impossible to install. Every failure below - not
+   * configured, unsupported device, no permission, refused by the user -
+   * simply returns false so the documented DATA_TRANSFER task is used instead.
+   */
+  private async startSpecialScenario(context: common.UIAbilityContext, agent: WantAgent,
+    generation: number, revision: number): Promise<boolean> {
+    if (SPECIAL_SCENARIO_SUBMODE === 0) {
+      return false;
+    }
+    try {
+      const request: backgroundTaskManager.ContinuousTaskRequest =
+        new backgroundTaskManager.ContinuousTaskRequest();
+      request.backgroundTaskModes = [backgroundTaskManager.BackgroundTaskMode.MODE_SPECIAL_SCENARIO_PROCESSING];
+      request.backgroundTaskSubmodes = [SPECIAL_SCENARIO_SUBMODE];
+      request.wantAgent = agent;
+      // Special-scenario tasks must stand alone; notification merging is rejected.
+      request.combinedTaskNotification = false;
+      if (!request.isModeSupported()) {
+        return false;
+      }
+      const auth: backgroundTaskManager.UserAuthResult = await request.checkSpecialScenarioAuth(context);
+      if (auth !== backgroundTaskManager.UserAuthResult.GRANTED_ONCE &&
+        auth !== backgroundTaskManager.UserAuthResult.GRANTED_ALWAYS) {
+        return false;
+      }
+      const task: backgroundTaskManager.ContinuousTaskNotification =
+        await backgroundTaskManager.startBackgroundRunning(context, request);
+      if (!this.monitoring || generation !== this.lifecycleGeneration ||
+        revision !== this.cancellationRevision) {
+        await backgroundTaskManager.stopBackgroundRunning(context);
+        return false;
+      }
+      this.task = task;
+      this.specialScenarioTask = true;
+      this.record('background_started_special_scenario');
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
+
   private async stop(context: common.UIAbilityContext): Promise<void> {
     if (this.task === undefined) {
       return;
@@ -223,6 +290,7 @@ export class VpnBackgroundTaskManager {
     try {
       await backgroundTaskManager.stopBackgroundRunning(context);
       this.task = undefined;
+      this.specialScenarioTask = false;
       this.record('background_stopped');
     } catch (error) {
       this.record('background_stop_failed', (error as BusinessError).code ?? -1);
@@ -232,6 +300,11 @@ export class VpnBackgroundTaskManager {
   }
 
   private async updateNotification(context: common.UIAbilityContext, status: VpnRuntimeStatus): Promise<void> {
+    if (this.specialScenarioTask) {
+      // A special-scenario task carries a plain notification and must not be
+      // rewritten as a data-transfer live view.
+      return;
+    }
     const task: backgroundTaskManager.ContinuousTaskNotification | undefined = this.task;
     if (task === undefined || Date.now() < this.nextNotificationAtMs) {
       return;

@@ -2583,6 +2583,50 @@
     {
       "name": "notification_vpn_background_title",
       "value": "VPN connected"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "MeshArc connection"
+    },
+    {
+      "name": "EntryFormAbility_desc",
+      "value": "Start or stop the MeshArc VPN from the home screen."
+    },
+    {
+      "name": "widget_vpn_display_name",
+      "value": "MeshArc connection"
+    },
+    {
+      "name": "widget_vpn_desc",
+      "value": "Start or stop the MeshArc VPN and see the current state."
+    },
+    {
+      "name": "widget_vpn_state_connected",
+      "value": "Connected"
+    },
+    {
+      "name": "widget_vpn_state_disconnected",
+      "value": "Not connected"
+    },
+    {
+      "name": "widget_vpn_state_connecting",
+      "value": "Connecting…"
+    },
+    {
+      "name": "widget_vpn_state_needs_login",
+      "value": "Sign-in required"
+    },
+    {
+      "name": "widget_vpn_state_needs_setup",
+      "value": "Setup required"
+    },
+    {
+      "name": "widget_vpn_state_working",
+      "value": "Working…"
+    },
+    {
+      "name": "widget_vpn_action_setup",
+      "value": "Set up"
     }
   ]
 }

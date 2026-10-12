@@ -25,7 +25,7 @@ heartbeat and peer reachability evidence. No Release build or upload in this mil
 An attached HDC cable/charging changes power-management conditions; a passing run
 does not establish indefinite survival on battery, force-stop or task removal.
 
-## Results
+### Milestone 1 results
 
 - `node --test scripts/test-vpn-background-task.mjs`: 14 tests passed, including cancellation during start, destruction during start/publish, reconnect during stop, system retry backoff, user dismissal, stale/future/missing telemetry and live-view identity/traffic.
 - Repository Debug build and Go/N-API artifact checks passed using the complete DevEco SDK `26.0.0.105`. The installed package is Debug `1.1.0` / `100000004` (the existing pending iteration's version).
@@ -52,3 +52,80 @@ After the lock test, wake/unlock the device and rerun `device-vpn-data-probe.ps1
 to verify actual browser traffic while the VPN app remains in the background.
 Redacted per-sample results are written under the ignored `.codex/background-vpn/`
 directory. Do not upload app sandbox files, account state or signing materials.
+
+## Milestone 2 — recovery after a drop, and the long-running modes that do not fit
+
+Milestone 1 is unchanged. This milestone addresses what happens *after* a
+tunnel is lost.
+
+The reported symptom was the app being killed while in use. Device logs from
+`56T0225330000021` (Pura X, HarmonyOS 7.0.0.105) say otherwise: the app process
+was never killed. The only `onProcessDied` in the whole log buffer belonged to
+the **VPN extension**, and it followed the system broadcast
+`VPN_CONNECTION_STATUS_CHANGED, state: 0` by about two seconds, itself right
+after a network change. The app then released its continuous task - which is
+what Milestone 1 decided it should do - and stayed disconnected until the user
+noticed. The gap was recovery, not survival.
+
+### Drop recovery
+
+`services/VpnReconnectSupervisor.ets` watches the same status file and, when a
+connection that was up has gone, asks `VpnSessionController` to bring it back.
+The trigger is deliberately narrow, because reconnecting fights the user when
+it guesses wrong:
+
+- only on `connected → disconnected`, never from `unknown`;
+- only once this process has been in the background for ten seconds. A user
+  disconnect requires the user to have just been looking at the app, so a drop
+  that arrives after the app has been away is a real failure;
+- never after a disconnect requested through an entry point we control (the
+  card) - the supervisor is told directly;
+- at most three attempts, backing off 30s → 60s → 120s, and only after the
+  connection has held for 60 seconds is the attempt count cleared. A tunnel
+  that flaps must not be able to reset the count every cycle and retry forever;
+  a test pins this.
+
+Every decision is recorded in the existing redacted diagnostics
+(`vpn_reconnect_attempt`, `vpn_reconnect_succeeded`, `vpn_reconnect_exhausted`,
+`vpn_drop_ignored_foreground`, `vpn_drop_after_requested_stop`), so the next
+reproduction says why recovery did or did not happen. No new instrumentation was
+added for the tunnel itself: `vpn_extension_created`/`_destroyed`,
+`vpn_network_offline` and `vpn_conflict` already covered it.
+
+### Long-running background modes, and why none of them fit a VPN
+
+The platform does have first-class long-running background modes. Neither is
+usable here.
+
+| Mode | What it needs | Why not |
+| --- | --- | --- |
+| `MODE_TASK_KEEPING` (compute, e.g. antivirus) | Restricted permission `ohos.permission.KEEP_BACKGROUND_RUNNING_SYSTEM` on phones | The documented scenario is antivirus-like compute, not a tunnel |
+| `MODE_SPECIAL_SCENARIO_PROCESSING` (API 22+) | Restricted permission, plus a sub-mode | Its only sub-modes are media processing, video broadcast and workout. There is no VPN scenario, and the docs require the scenario to match the sub-mode |
+
+`MODE_SPECIAL_SCENARIO_PROCESSING` is the closest thing the platform has to an
+Android foreground service: `requestAuthFromUser` asks the user through a
+banner ("allow once" / "always allow"), `checkSpecialScenarioAuth` reads the
+answer, and unlike `DATA_TRANSFER` it is not tied to a progress update every ten
+minutes. The code path for it is implemented in `VpnBackgroundTaskManager`
+(`startSpecialScenario`) and falls back to `DATA_TRANSFER` on any failure. It is
+**inert by default**: `SPECIAL_SCENARIO_SUBMODE` is `0`, and the restricted
+permission is not declared.
+
+Declaring a restricted permission without a matching provisioning profile makes
+the app **fail to install**, which is why the declaration is a switch rather
+than a checked-in line: `scripts/toggle-special-scenario-acl.mjs` adds or
+removes it and is idempotent. Turn it on only after AppGallery Connect approves
+the permission, or while testing under a five-day trial debug profile.
+
+### Validation
+
+- `node --test scripts/test-vpn-reconnect-supervisor.mjs`: 9 tests, covering
+  each guard above. Writing them found a real defect - the attempt counter was
+  cleared on every `connected` sample, so a flapping tunnel retried forever.
+- `node --test scripts/test-vpn-background-task.mjs`: 14 tests, unchanged;
+  the special-scenario path is inert, so Milestone 1 behaviour is untouched.
+- Repository debug build and device install verified.
+
+**The recovery path has not been exercised against a real drop**, and the
+special-scenario path has never run at all, since it needs a permission this
+build does not declare. Reproduce per the Milestone 1 procedure.

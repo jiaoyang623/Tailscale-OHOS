@@ -5,6 +5,7 @@ oh_modules/
 .tooling/
 .hvigor-user/
 .tools/
+.build/
 third_party/ohos-go/
 third_party/tailscale/
 native/go_bridge/dist/

@@ -22,6 +22,10 @@
         "startWindowIcon": "$media:start_window_icon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        // The card's `call` action only reaches a singleton UIAbility. Relying
+        // on the default here would make the card silently stop working if the
+        // default ever changed.
+        "launchType": "singleton",
         "backgroundModes": [
           "dataTransfer"
         ],
@@ -46,6 +50,21 @@
         "label": "$string:entryability_label",
         "type": "vpn",
         "exported": false
+      },
+      {
+        "name": "EntryFormAbility",
+        "srcEntry": "./ets/entryformability/EntryFormAbility.ets",
+        "description": "$string:EntryFormAbility_desc",
+        "icon": "$media:app_icon",
+        "label": "$string:EntryFormAbility_label",
+        "type": "form",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
       }
     ],
     "requestPermissions": [

@@ -1,0 +1,20 @@
+{
+  "forms": [
+    {
+      "name": "vpn_toggle",
+      "displayName": "$string:widget_vpn_display_name",
+      "description": "$string:widget_vpn_desc",
+      "src": "./ets/widget/pages/VpnToggleCard.ets",
+      "uiSyntax": "arkts",
+      "isDefault": true,
+      "isDynamic": true,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ],
+      "updateEnabled": true,
+      "updateDuration": 1,
+      "formConfigAbility": "ability://EntryAbility"
+    }
+  ]
+}
