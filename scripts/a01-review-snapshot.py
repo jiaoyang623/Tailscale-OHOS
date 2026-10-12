@@ -17,7 +17,8 @@ LAYERS = ["requirements", "architecture", "hld", "lld"]
 # 判据目录 → 该层判据在第几层首次建立
 LEVEL_DIRS = {"90-journeys": ("journey", "requirements"),
               "91-seams": ("seam", "architecture"),
-              "points": ("point", "lld")}
+              # 单点判据按 a01 在 HLD 首次建立、由 LLD 补齐，所以 introduced_at 是 hld。
+              "points": ("point", "hld")}
 MANUAL_RE = re.compile(r"^(真机走查|走查|人工走查)\s+(\S+manual-checks\.md#M-\d+)")
 ANCHOR_RE = re.compile(r"^\[[^\]]{0,10}\]\s*(.+)$")
 
@@ -63,7 +64,9 @@ def load_oracles(stage):
             design_ids = sorted(set(re.findall(r"\bR-[A-Z]+-\d+[A-Z]?(?![0-9A-Za-z-])",
                                                f.get("上游", "") + " " + f.get("设计依据", "")))
                                   | set(re.findall(r"\bA-(?:D\d+|SEAMS)\b",
-                                                   f.get("设计依据", ""))))
+                                                   f.get("设计依据", "")))
+                                  | {f"H-C-{int(x):02d}" for x in
+                                     re.findall(r"\bC-(\d+)\b", f.get("设计依据", ""))})
             uncertain = (f.get("不确定特征", "") or "none").split("\n")[0].strip()
             sources = split_values(f.get("来源", "")) + [f"{rel}"]
             oracles.append({
@@ -158,6 +161,27 @@ def load_architecture():
     return design
 
 
+def load_hld():
+    """HLD 文档 → 设计条目：每张契约卡一条（### C-nn · O-SEAM-nn …）。"""
+    path = ROOT / "docs/hld/hld.md"
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    design = []
+    for m in re.finditer(r"(?m)^###\s+(C-\d+)\s*·\s*(.+)$", text):
+        cid, title = m.group(1), m.group(2).strip()
+        start = m.end()
+        nxt = re.search(r"(?m)^###\s|^##\s", text[start:])
+        body = text[start:start + (nxt.start() if nxt else 1200)]
+        design.append({
+            "id": "H-" + cid, "layer": "hld", "title": title, "status": "ready",
+            "depends_on": ["A-SEAMS"],
+            "content": [re.sub(r"\s+", " ", body).strip()[:500]],
+            "sources": [f"docs/hld/hld.md 契约 {cid}"],
+        })
+    return design
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", required=True, choices=LAYERS)
@@ -170,6 +194,8 @@ def main():
         arch = load_architecture()
         # 架构条目按需求引用挂到需求条目上：需求是上一层，父子关系必须真实存在。
         design = design + arch
+    if LAYERS.index(args.stage) >= LAYERS.index("hld"):
+        design = design + load_hld()
     oracles, tests = load_oracles(args.stage)
 
     if LAYERS.index(args.stage) >= LAYERS.index("architecture"):

@@ -6,6 +6,9 @@
 #
 # 用法：
 #   scripts/run-checks.sh              # 报告模式，总是退出 0（除用例失败）
+#
+# 测试通道两层：scripts/test-*.mjs 是单元层（被测类 + 桩边界），
+# scripts/integration/*.mjs 是接缝层（两个真实模块经同一个桩边界交接）。
 #   scripts/run-checks.sh --strict     # 判据命中 P0 时退出 1
 set -uo pipefail
 
@@ -23,8 +26,8 @@ done
 
 rc=0
 
-echo "== 宿主侧用例 =="
-if ! node --test scripts/test-*.mjs; then
+echo "== 宿主侧用例（单元 + 集成）=="
+if ! node --test scripts/test-*.mjs scripts/integration/*.mjs; then
   echo "用例失败" >&2
   rc=1
 fi
@@ -38,7 +41,7 @@ node "$A01/scripts/check-oracles.cjs" \
   --tests=scripts \
   --anchor-exts=.mjs \
   --test-exts=.mjs \
-  --entries='scripts/test-*.mjs' \
+  --entries='scripts/test-*.mjs,scripts/integration/*.mjs' \
   $STRICT || rc=1
 
 exit "$rc"

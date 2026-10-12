@@ -16,10 +16,10 @@
 - 失败信息：期望「两进程各写自己的文件、共用同一脱敏边界、超限淘汰最旧、报告过期清理」，实际「报告或日志里出现 token 或认证 URL，或两进程各自脱敏导致口径不一，或半成品 zip 被分享、过期报告不清理」
 - 来源：entry/src/main/ets/services/DiagnosticEventStore.ets:4-6 两个进程的文件名；:112-116 超限淘汰最旧；entry/src/main/ets/services/DiagnosticPrivacy.ets:12-13 条数与字节上限；:17-20 classifyError 只留类别与数字码；:47-55 redactForLog；entry/src/main/ets/services/DiagnosticReportService.ets:10 REPORT_RETENTION_MS=24 h；:216-251 zip 落 cacheDir 且不分享半成品；:257-266 systemShare 分享；:646-654 cleanupExpiredReports；docs/architecture/architecture.md 第五节责任空洞检查第 5 条、第六节 Q-06
 - 上游：R-DIAG-02、R-DIAG-03、R-DIAG-04
-- 待建测试：[集成] scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧
-- 状态：pending-test
+- 测试：scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧
+- 状态：closed
 - 不确定特征：none
-- 归属：owner=项目维护者 接收批次=a01-集成
+- 归属：—
 - 复核：待复核
 
 ### O-SEAM-16 VPN 替换批准通道
