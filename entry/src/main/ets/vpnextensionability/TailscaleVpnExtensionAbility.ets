@@ -17,7 +17,7 @@ import { DeviceNameService } from '../services/DeviceNameService';
 
 const DOMAIN = 0x0000;
 const TAG = 'TailscaleVpn';
-const BUNDLE_NAME = 'io.github.tailscaleohos';
+const BUNDLE_NAME = 'ren.w2h.mesharc';
 const VPN_EXISTS_ERROR_CODE: number = 2203002;
 const VPN_DESTROY_SETTLE_MS: number = 300;
 const VPN_REPLACE_APPROVAL_POLL_INTERVAL_MS: number = 200;

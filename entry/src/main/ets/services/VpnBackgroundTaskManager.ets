@@ -9,7 +9,7 @@ import { DiagnosticEventStore } from './DiagnosticEventStore';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'VpnBackgroundTask';
-const BUNDLE_NAME: string = 'io.github.tailscaleohos';
+const BUNDLE_NAME: string = 'ren.w2h.mesharc';
 const ENTRY_ABILITY_NAME: string = 'EntryAbility';
 const VPN_STATUS_FRESH_MS: number = 15000;
 const VPN_STATUS_GRACE_MS: number = 60000;

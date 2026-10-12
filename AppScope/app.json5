@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "io.github.tailscaleohos",
+    "bundleName": "ren.w2h.mesharc",
     "vendor": "TailscaleOHOS contributors",
     "versionCode": 100000003,
     "versionName": "1.1.0",

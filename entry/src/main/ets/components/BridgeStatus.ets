@@ -2238,7 +2238,7 @@ export struct BridgeStatus {
 
   private vpnWant(): Want {
     return {
-      bundleName: 'io.github.tailscaleohos',
+      bundleName: 'ren.w2h.mesharc',
       abilityName: 'TailscaleVpnExtensionAbility'
     };
   }
