@@ -124,8 +124,11 @@ def load_oracles(stage):
             # 真跑过的锚点：只有给了本次运行证据（基线、命令、时间、环境）才写 pass，
             # 否则宁可 not_evaluated —— 没有运行记录就不算通过。
             for token in executed:
-                level = "integration" if "/integration/" in token else "unit"
-                entry = {"id": f"T-{oid}-{level[:3]}", "level": level, "status": "not_evaluated",
+                # 不要用外层的 level：它在每个文件开头按目录定层，被这里覆盖会让
+                # 同文件后续判据的 level 全变成 integration/unit。
+                test_level = "integration" if "/integration/" in token else "unit"
+                tlev = test_level[:3]
+                entry = {"id": f"T-{oid}-{tlev}", "level": test_level, "status": "not_evaluated",
                          "oracle_ids": [oid], "evidence": token}
                 if args_ran and baseline_matches:
                     entry.update({"status": "pass", "command": args_ran["command"],
@@ -312,6 +315,13 @@ def main():
         "这不代表行为没做，而是没有本基线上的执行记录。本基线实际执行过的是宿主侧 73 条用例，"
         "它们守的是单点层（docs/oracles/points/，按流程随 LLD 层进快照）。",
     ]
+
+    # 本层快照只引用「本层已建立」的设计条目：单点判据同时挂着 HLD 契约与 LLD 状态机，
+    # 但 HLD 阶段的快照里还没有 LLD 条目。这里过滤的是尚未建立的层，不是把悬空引用藏起来
+    # ——真正的笔误（引用了任何层都不存在的 ID）仍会被校验器报出来。
+    known = {item["id"] for item in design}
+    for oracle in oracles:
+        oracle["design_ids"] = [d for d in oracle["design_ids"] if d in known]
 
     snapshot = {
         "skill_version": "a01",

@@ -2935,7 +2935,7 @@
     },
     {
       "id": "O-SEAM-17",
-      "level": "integration",
+      "level": "seam",
       "introduced_at": "architecture",
       "title": "入口分发：Want / 通知 / 卡片 call → 应用外壳",
       "status": "ready",
@@ -3027,7 +3027,7 @@
     },
     {
       "id": "O-SEAM-16",
-      "level": "integration",
+      "level": "seam",
       "introduced_at": "architecture",
       "title": "VPN 替换批准通道",
       "status": "draft",
@@ -3472,7 +3472,7 @@
       "command": "scripts/run-checks.sh",
       "baseline": "cc7ab88",
       "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
-      "executed_at": "2026-10-12T18:18:08+11:00"
+      "executed_at": "2026-10-12T18:19:01+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3494,7 +3494,7 @@
       "command": "scripts/run-checks.sh",
       "baseline": "cc7ab88",
       "environment": "Linux, Node v22.23.2; 76 tests = 73 unit + 3 integration, 全绿",
-      "executed_at": "2026-10-12T18:18:08+11:00"
+      "executed_at": "2026-10-12T18:19:01+11:00"
     },
     {
       "id": "T-O-SEAM-16",
