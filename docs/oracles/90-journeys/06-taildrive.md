@@ -14,6 +14,7 @@
 - 来源：entry/src/main/ets/components/TaildriveBrowser.ets:191 aboutToAppear；:193 cleanupStaleStaging；:2297 breadcrumbText；:1100 executeUpload；:1129 already_exists 分支；:1148 promptUploadOverwrite；:666 blockProtectedFolderContent；entry/src/main/ets/services/TaildriveGateway.ets:4-11 八个 IPC 文件；:14-17 通道超时；:155-157 requestThroughVpnExtension；:312 cleanupStaleStaging 默认 24 h；entry/src/main/ets/components/BridgeStatus.ets:13815 FilesContent；:13821 connected 门控
 - 上游：R-DRIVE-01、R-DRIVE-02、R-DRIVE-03、R-DRIVE-04、R-DRIVE-05
 - 待建测试：[E2E] scripts/e2e/taildrive-browser.mjs::浏览共享目录并完成上传与下载
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）
 - 状态：pending-test
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-E2E
@@ -31,6 +32,7 @@
 - 来源：entry/src/main/ets/components/BridgeStatus.ets:5688 openRemoteFilesFromDevice；:5692 navigateToTab(2)；:9988 remoteFilesEnabled=isConnected()；:9991 onOpenRemoteFiles；entry/src/main/ets/components/TaildriveBrowser.ets:403 requestTargetMachineOpen；:404 目标请求去重
 - 上游：R-DRIVE-06
 - 待建测试：[E2E] scripts/e2e/taildrive-browser.mjs::从设备详情跳转到该设备共享目录
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）
 - 状态：pending-test
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-E2E

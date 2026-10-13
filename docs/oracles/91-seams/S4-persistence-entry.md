@@ -50,6 +50,7 @@
 - 来源：entry/src/main/ets/entryability/EntryAbility.ets:99 callee.on('toggleVpn')；:172 eventHub.emit(APP_FOREGROUND_EVENT)；:191-200 toggleVpnFromCard；:202-227 performCardToggle；:229 raiseWindow；:288-304 handleTaildropNotificationWant/deliverAppShellFeatureAction；entry/src/main/ets/services/AppShellIntentAdapter.ets:12 toFeatureAction；:40-42 isValidNotificationAction；entry/src/main/ets/services/AppLifecycleEvents.ets:1 APP_FOREGROUND_EVENT；entry/src/main/ets/entryformability/EntryFormAbility.ets:10-17 约 10 s 回收与不可导入 backgroundTaskManager；entry/src/main/resources/base/profile/form_config.json:16 updateDuration；entry/src/main/ets/components/BridgeStatus.ets:645/931/1252/1605 AppStorage 键读写；entry/src/main/ets/components/TaildriveBrowser.ets:2347 taildriveCurrentPath；entry/src/main/ets/pages/Index.ets:7
 - 上游：R-UI-05、R-XFER-06
 - 待建测试：[集成] scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）
 - 状态：pending-test
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-集成

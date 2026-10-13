@@ -14,6 +14,8 @@
 - 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:224 start；:309 updateNotification；:382 formatBytes；scripts/test-vpn-background-task.mjs
 - 上游：R-CONN-04
 - 测试：scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-16（special-scenario 长时任务）
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-18（蜂窝下的长时间存活）
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -221,6 +223,8 @@
 - 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:362 readStatus 的 connecting 分支；:171 reconcile 的 live 判定；:200 isLiveState；scripts/test-vpn-background-task.mjs
 - 上游：R-CONN-03
 - 测试：scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-16（special-scenario 长时任务）
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-18（蜂窝下的长时间存活）
 - 状态：closed
 - 不确定特征：none
 - 归属：—

@@ -115,6 +115,7 @@
 - 来源：entry/src/main/ets/services/VpnSessionController.ets:80 connect；entry/src/main/ets/services/VpnSessionController.ets:150 answerBackendHandoff；entry/src/main/ets/entryability/EntryAbility.ets:202 performCardToggle；entry/src/main/ets/entryformability/EntryFormAbility.ets:18 EntryFormAbility；entry/src/main/ets/widget/pages/VpnToggleCard.ets:45
 - 上游：R-CONN-08
 - 待建测试：[E2E] scripts/e2e/headless-connect.mjs::无界面入口独立完成连接并应答后端交接
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）
 - 状态：pending-test
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-E2E

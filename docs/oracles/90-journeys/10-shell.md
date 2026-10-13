@@ -48,6 +48,7 @@
 - 来源：entry/src/main/ets/entryformability/EntryFormAbility.ets:10-17 进程回收与不可导入后台任务模块；:19-30 onAddForm/onUpdateForm；entry/src/main/ets/widget/pages/VpnToggleCard.ets:45-54 postCardAction；entry/src/main/ets/entryability/EntryAbility.ets:99 callee.on；:191 toggleVpnFromCard；:202 performCardToggle；:219-223 结果回写；:229 raiseWindow；entry/src/main/ets/services/FormCardService.ets:28 buildBindingData；:47 refreshAll；:85 stateName；entry/src/main/ets/services/VpnSessionController.ets:80 connect；:118 disconnect；:150 answerBackendHandoff；entry/src/main/resources/base/profile/form_config.json:16 updateDuration；docs/home-screen-card.md:51-67 刷新时效；:95-104 验证状态
 - 上游：R-UI-05
 - 待建测试：[E2E] scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）
 - 状态：pending-test
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-E2E

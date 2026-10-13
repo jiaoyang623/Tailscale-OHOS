@@ -4,10 +4,15 @@
 快照与审核网页都是投影。判据改了而快照没重建，网页就会显示过期内容，
 而没有任何东西会报错。这个检查把投影与它的来源绑在一起。
 
-只比判据正文，也就是 design 与 oracles 两类条目。tests 条目带运行证据
-（基线、执行时刻、环境），每次重建都会变；比它会把「加了一个用例」
-也判成漂移，那不是本检查要管的事。
+比三类条目，但比较范围按条目类型收窄，避免把正常变化判成漂移：
+
+1. design 与 oracles：整条比。
+2. tests：只比身份（id、level、oracle_ids）。执行过的条目带运行证据
+   （状态、基线、执行时刻、环境），每次重建都会变，那不是漂移。
+3. 还没建的计划测试（status 为 not_evaluated）：连描述一起比。这时描述来自
+   判据的「待建测试」行，是来源的一部分；新增一条走查锚点必须被看见。
 """
+RUN_EVIDENCE = ("status", "command", "executed_at", "baseline", "environment")
 import json
 import pathlib
 import subprocess
@@ -46,6 +51,24 @@ def main():
                 for item_id in sorted(set(old) | set(new)):
                     if old.get(item_id) != new.get(item_id):
                         drifted.append(f"{layer}/{key}/{item_id}")
+
+            old_tests = {item["id"]: item for item in committed["tests"]}
+            new_tests = {item["id"]: item for item in fresh["tests"]}
+            for test_id in sorted(set(old_tests) | set(new_tests)):
+                a, b = old_tests.get(test_id), new_tests.get(test_id)
+                if a is None or b is None:
+                    drifted.append(f"{layer}/tests/{test_id}")
+                elif a.get("status") == "not_evaluated" and b.get("status") == "not_evaluated":
+                    if a != b:
+                        drifted.append(f"{layer}/tests/{test_id}")
+                else:
+                    for field in RUN_EVIDENCE:
+                        a.pop(field, None)
+                        b.pop(field, None)
+                    a.pop("evidence", None)
+                    b.pop("evidence", None)
+                    if a != b:
+                        drifted.append(f"{layer}/tests/{test_id}")
 
     if drifted:
         print("审核快照与判据不一致。跑 scripts/a01-review-pages.sh，并提交生成物。")
