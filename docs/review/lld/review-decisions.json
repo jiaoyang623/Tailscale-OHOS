@@ -540,10 +540,10 @@
     {
       "id": "QG-01",
       "decision": "accepted",
-      "content_sha256": "1f64e332bdeef1e95db4e928b6929675b8168209d01d9a2c8eb6b97cf5fb13e6",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "84a1cbfe34ad593eaa1b568f147e0ccb6f8c1a48d9f21c3ae5ce655f0d7ed747",
+      "note": "第 13 轮：原意见已执行。QG-01 拿到真机证据（2026-10-13，Pura X）：1500 个心跳、跨度 750 s、最大间隔 2.8 s、0 处超 15 s、扩展只拉起一次。证据 ~/mesharc-e2e/screen-off-survival-*.log。边界：Wi-Fi 且 USB 供电，蜂窝版未做。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:16:30+11:00"
     },
     {
       "id": "QG-02",
