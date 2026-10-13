@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "09dcb46",
+  "baseline": "c207387",
   "stage": "lld",
   "design": [
     {
@@ -1145,12 +1145,12 @@
       "id": "QG-08",
       "layer": "requirements",
       "title": "启动到可用",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [],
       "content": [
-        "目标值：未定",
-        "观测环境与测量方法：—",
-        "现状：**未定**（见未决 Q6）"
+        "目标值：≤ 200 ms",
+        "观测环境与测量方法：真机：`hdc shell aa force-stop` 后 `aa start`，取设备日志里 `EntryAbility onCreate` 与 `ui_opened` 的时间差。`scripts/device-run.sh` 自动跑 5 次，`scripts/device-analyze.py` 自动计算",
+        "现状：已实测 5 次（M-19）：中位 140 ms，最大 155 ms。**边界：不含启动器点击与进程创建**"
       ],
       "sources": [
         "docs/requirements/requirements.md#质量目标"
@@ -6803,9 +6803,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -6906,9 +6906,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -6928,9 +6928,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -6950,9 +6950,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-18",
@@ -6981,9 +6981,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-02-uni",
@@ -6994,9 +6994,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::stale heartbeat and read errors retain acquired protection for a bounded grace period",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-03-uni",
@@ -7007,9 +7007,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::never starts from stale, future, missing heartbeat or missing TUN evidence",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-04-uni",
@@ -7020,9 +7020,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::explicit disconnect promptly releases the task",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-05-uni",
@@ -7033,9 +7033,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::snapshot failure is uncertain and does not immediately revoke protection",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-06-uni",
@@ -7046,9 +7046,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-07-uni",
@@ -7059,9 +7059,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::system cancellation retries with exponential backoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-08-uni",
@@ -7072,9 +7072,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::unrelated cancellation does not discard the VPN task",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-09-uni",
@@ -7085,9 +7085,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a failed start is throttled instead of retried every second",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-10-uni",
@@ -7098,9 +7098,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-11-uni",
@@ -7111,9 +7111,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::destroy during notification update serializes cleanup after publish",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-12-uni",
@@ -7124,9 +7124,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::reconnect waits for in-flight stop before starting the next task",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-13",
@@ -7146,9 +7146,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-14-uni",
@@ -7159,9 +7159,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::the connect window needs interface evidence, not just an unrecognised status",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BGTASK-15-uni",
@@ -7172,9 +7172,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a stalled connect window still releases protection",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-01-uni",
@@ -7185,9 +7185,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-02-uni",
@@ -7198,9 +7198,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-03-uni",
@@ -7211,9 +7211,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-04-uni",
@@ -7224,9 +7224,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-05-uni",
@@ -7237,9 +7237,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-06-uni",
@@ -7250,9 +7250,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-07-uni",
@@ -7263,9 +7263,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-08-uni",
@@ -7276,9 +7276,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::running without a TUN is not connected",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-STATUS-09-uni",
@@ -7289,9 +7289,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::the connect window reports connecting",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-01-uni",
@@ -7302,9 +7302,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-02-uni",
@@ -7315,9 +7315,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-03-uni",
@@ -7328,9 +7328,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::discards a stale read when default net changes before properties return",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-04-uni",
@@ -7341,9 +7341,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::same interface on a new Wi-Fi network and address renewal both trigger refresh",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-05-uni",
@@ -7354,9 +7354,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::clears the route hint when offline and applies the restored bearer",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-06-uni",
@@ -7367,9 +7367,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::failed native refresh retries without another platform callback",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-07-uni",
@@ -7380,9 +7380,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-08-uni",
@@ -7393,9 +7393,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-09-uni",
@@ -7406,9 +7406,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-NETMON-10-uni",
@@ -7419,9 +7419,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::stop during native work cancels replay and releases the registered listener",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-01-uni",
@@ -7432,9 +7432,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-02-uni",
@@ -7445,9 +7445,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop moments after backgrounding is left alone",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-03-uni",
@@ -7458,9 +7458,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-04-uni",
@@ -7471,9 +7471,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a deliberate reconnect re-arms recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-05-uni",
@@ -7484,9 +7484,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::recovery gives up instead of retrying forever",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-06-uni",
@@ -7497,9 +7497,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::retries back off instead of firing on every sample",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-07-uni",
@@ -7510,9 +7510,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::an unknown state is not treated as a drop",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-08-uni",
@@ -7523,9 +7523,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::returning to the foreground clears the retry ladder",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-09-uni",
@@ -7536,9 +7536,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-RECONN-10-uni",
@@ -7549,9 +7549,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-01-uni",
@@ -7562,9 +7562,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-02-uni",
@@ -7575,9 +7575,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-03-uni",
@@ -7588,9 +7588,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer keeps polling while no request has arrived",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-04-uni",
@@ -7601,9 +7601,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-05-uni",
@@ -7614,9 +7614,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a backend that cannot be stopped still releases the extension",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-06-uni",
@@ -7627,9 +7627,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a malformed handoff request is cleared, not answered",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-07-uni",
@@ -7640,9 +7640,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer window covers the extension wait budget",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SESSION-08-uni",
@@ -7653,9 +7653,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-01-uni",
@@ -7666,9 +7666,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-02-uni",
@@ -7679,9 +7679,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-03-uni",
@@ -7692,9 +7692,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::disconnect overrides a previously cached direct path",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-04-uni",
@@ -7705,9 +7705,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-05-uni",
@@ -7718,9 +7718,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-06-uni",
@@ -7731,9 +7731,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-07-uni",
@@ -7744,9 +7744,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-08-uni",
@@ -7757,9 +7757,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a busy old service request does not consume the reconnect discovery attempt",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-09-uni",
@@ -7770,9 +7770,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a slow service response cannot overwrite a more recent recovered path",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-10-uni",
@@ -7783,9 +7783,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::home polling retries an online peer despite an old unreachable path",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-PEER-11-uni",
@@ -7796,9 +7796,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after offline",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-LOCALSEND-01-uni",
@@ -7809,9 +7809,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::a mounted detail sheet reads a fresh LocalSend result despite its captured old peer",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-LOCALSEND-02-uni",
@@ -7822,9 +7822,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::current peer presence and VPN connection override an old available service",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-01-uni",
@@ -7835,9 +7835,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-02-uni",
@@ -7848,9 +7848,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-03-uni",
@@ -7861,9 +7861,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-04-uni",
@@ -7874,9 +7874,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::unrelated dirty files do not suppress the required Tailscale patch",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-05-uni",
@@ -7887,9 +7887,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::conflicting patch stops before compiling and preserves the source",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-06-uni",
@@ -7900,9 +7900,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Release and unknown products are rejected before any build or signing",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-BUILD-07-uni",
@@ -7913,15 +7913,15 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Debug uses the project directory, wrapper, and explicit debug flags",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     }
   ],
   "open_questions": [
     "Q4：LocalSend 的官方 bundle/ability 契约未定，外部拉起无法验证",
     "Q5：`base` 与 `zh_CN` 的 key 集合已核对：各 657 个 key、差集为空（本批实测）。仍未验证的是译文质量与真机渲染，另外多份设计文档与代码不一致（如 2 页签 vs 实际 4 页签）",
-    "Q6：「启动到可用」没有目标值，也没有测量方法",
+    "Q6：~~「启动到可用」没有目标值，也没有测量方法~~ **已解除**（2026-10-13）：审查人定 ≤ 200 ms，测量方法写进质量目标表，真机实测 5 次中位 140 ms",
     "Q7：卡片、Taildrive 真机共享节点、special-scenario 三条路径从未真机验证",
     "Q8：73 条用例无 CI 门禁，判据的「可达」目前只是「可判定」",
     "架构 Q-01：平台把两个进程里加载的同一份 `libtailscale_ohos.so` 视为一个运行时还是两个？ 若是「一个」，D3(a) 立刻失效，交接协议与 `filesDir/tailscale` 的单写者假设同时被打破。本层未能验证：仓内 73 条测试全是宿主侧纯逻辑测试，不加载 `.so`",

@@ -595,11 +595,11 @@
     },
     {
       "id": "QG-08",
-      "decision": "changes_requested",
-      "content_sha256": "ea3593d7dbd9588810094f763b8df0e09b070f480c08a7f0cd9bc2f7706b897a",
-      "note": "Q6 决定：定值并实测。真机测冷启动到首页可用的耗时，据此写目标值与测量方法；目标值定下来之前本条只能是 draft。",
+      "decision": "accepted",
+      "content_sha256": "9d495c7708bdc80427f7a39a8c1fd2d6fb5a49d25864b2afa6081c632a689cab",
+      "note": "第 13 轮：原意见已执行。审查人定目标值 ≤ 200 ms，测量方法写进需求质量目标表，真机实测 5 次（中位 140 ms，最大 155 ms）。未决项 Q6 解除。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T17:38:05+11:00"
     },
     {
       "id": "O-SETUP-01",

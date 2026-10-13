@@ -595,11 +595,11 @@
     },
     {
       "id": "QG-08",
-      "decision": "pending",
-      "content_sha256": "ea3593d7dbd9588810094f763b8df0e09b070f480c08a7f0cd9bc2f7706b897a",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "decision": "accepted",
+      "content_sha256": "9d495c7708bdc80427f7a39a8c1fd2d6fb5a49d25864b2afa6081c632a689cab",
+      "note": "第 13 轮：原意见已执行。审查人定目标值 ≤ 200 ms，测量方法写进需求质量目标表，真机实测 5 次（中位 140 ms，最大 155 ms）。未决项 Q6 解除。（审查人 jiaoyang623）",
       "reviewer": "",
-      "reviewed_at": ""
+      "reviewed_at": "2026-10-13T17:38:05+11:00"
     },
     {
       "id": "A-SEAMS",

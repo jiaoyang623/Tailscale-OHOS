@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "09dcb46",
+  "baseline": "c207387",
   "stage": "architecture",
   "design": [
     {
@@ -1145,12 +1145,12 @@
       "id": "QG-08",
       "layer": "requirements",
       "title": "启动到可用",
-      "status": "draft",
+      "status": "ready",
       "depends_on": [],
       "content": [
-        "目标值：未定",
-        "观测环境与测量方法：—",
-        "现状：**未定**（见未决 Q6）"
+        "目标值：≤ 200 ms",
+        "观测环境与测量方法：真机：`hdc shell aa force-stop` 后 `aa start`，取设备日志里 `EntryAbility onCreate` 与 `ui_opened` 的时间差。`scripts/device-run.sh` 自动跑 5 次，`scripts/device-analyze.py` 自动计算",
+        "现状：已实测 5 次（M-19）：中位 140 ms，最大 155 ms。**边界：不含启动器点击与进程创建**"
       ],
       "sources": [
         "docs/requirements/requirements.md#质量目标"
@@ -3863,9 +3863,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3966,9 +3966,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3988,9 +3988,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -4010,9 +4010,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "09dcb46",
+      "baseline": "c207387",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T15:16:19+11:00"
+      "executed_at": "2026-10-13T17:37:58+11:00"
     },
     {
       "id": "T-O-SEAM-18",
@@ -4027,7 +4027,7 @@
   "open_questions": [
     "Q4：LocalSend 的官方 bundle/ability 契约未定，外部拉起无法验证",
     "Q5：`base` 与 `zh_CN` 的 key 集合已核对：各 657 个 key、差集为空（本批实测）。仍未验证的是译文质量与真机渲染，另外多份设计文档与代码不一致（如 2 页签 vs 实际 4 页签）",
-    "Q6：「启动到可用」没有目标值，也没有测量方法",
+    "Q6：~~「启动到可用」没有目标值，也没有测量方法~~ **已解除**（2026-10-13）：审查人定 ≤ 200 ms，测量方法写进质量目标表，真机实测 5 次中位 140 ms",
     "Q7：卡片、Taildrive 真机共享节点、special-scenario 三条路径从未真机验证",
     "Q8：73 条用例无 CI 门禁，判据的「可达」目前只是「可判定」",
     "架构 Q-01：平台把两个进程里加载的同一份 `libtailscale_ohos.so` 视为一个运行时还是两个？ 若是「一个」，D3(a) 立刻失效，交接协议与 `filesDir/tailscale` 的单写者假设同时被打破。本层未能验证：仓内 73 条测试全是宿主侧纯逻辑测试，不加载 `.so`",
