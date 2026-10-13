@@ -232,10 +232,29 @@ scenario "M-17" "Q-02（修订）VPN 冲突路径是否收敛" \
 6. 再连一次，看是否报冲突。
 判定：第 6 步报冲突而此刻没有其它 VPN，就证明应用死后扩展仍在空转，挡住了后续连接。"
 
-scenario "M-18" "Q17 蜂窝下的长时间存活" \
-"关掉 Wi-Fi，用蜂窝连接，锁屏静置 720 秒以上。
-这条要的就是等待，期间不要碰手机。等满之后回车。
-没满 720 秒就回车的话，结论里要写明实际时长，不能当成连续存活证据。"
+say "M-18 · Q17 锁屏静置下的后台存活"
+# 锁屏用设备自己的 power-shell，不需要人守着手机。心跳由扩展每秒镜像到设备日志，
+# 收尾时由 device-analyze.py 算相邻两条的间隔。
+SURVIVAL_S="${SURVIVAL_S:-720}"
+if "$HDC_BIN" -t "$DEVICE" shell "which power-shell" >/dev/null 2>&1; then
+  echo "把 Wi-Fi 关掉、改用蜂窝的，现在做；本次默认沿用当前网络。"
+  echo "接下来锁屏静置 ${SURVIVAL_S} 秒。期间不要碰手机。"
+  read -r -p "准备好后回车开始计时： " _
+  "$HDC_BIN" -t "$DEVICE" shell power-shell suspend >/dev/null 2>&1
+  T0="$(date +%s)"
+  while [ $(( $(date +%s) - T0 )) -lt "$SURVIVAL_S" ]; do
+    sleep 15
+    printf '  已静置 %s 秒 / %s\r' "$(( $(date +%s) - T0 ))" "$SURVIVAL_S"
+  done
+  echo
+  "$HDC_BIN" -t "$DEVICE" shell power-shell wakeup >/dev/null 2>&1
+  sleep 5
+  note "M-18 锁屏静置 $SURVIVAL_S 秒完成，心跳间隔见 04-analysis.txt"
+else
+  echo "设备上没有 power-shell，改人工：锁屏静置 ${SURVIVAL_S} 秒，期间不要碰手机。"
+  read -r -p "静置完成后回车： " _
+  note "M-18 人工锁屏静置，时长以操作者为准"
+fi
 
 say "M-19 · Q6 冷启动到可用"
 # 不掐表。日志里有两个带设备时间戳的锚点：EntryAbility onCreate 与 ui_opened，
