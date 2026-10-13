@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "7ed18db",
+  "baseline": "f04326d",
   "stage": "architecture",
   "design": [
     {
@@ -2810,21 +2810,26 @@
       "trigger": "扩展处在任何生命周期状态时都在写；应用进程的长时任务、设备分区、卡片进程都在读同一份 `vpn-probe-status.txt`",
       "observe": "`filesDir/vpn-probe-status.txt` 的状态行与 `heartbeatMs=…`；`vpn-config-summary.txt`、`vpn-peer-probe-status.txt`；诊断事件 `background_status_timeout` / `background_started` / `vpn_status_grace_started` / `vpn_status_grace_expired`；读侧解析出的四值状态（connected / connecting / disconnected / unknown）",
       "expected": [
-        "正常：扩展的 1 s 状态环先调 `writeCurrentStatusHeartbeat()`，把 `<currentVisibleStatus> | heartbeatMs=Date.now()` 原子写进 `vpn-probe-status.txt`（`vpnextensionability/TailscaleVpnExtensionAbility.ets:1909-1911`），再等 `backendSnapshot` 完成后覆写状态与三份快照——心跳先写，存活判据不被快照耗时污染（`:905-951`）。读方以「状态行 + 新鲜度」判读：`services/VpnStatusReader.ets:33-67` 与 `services/VpnBackgroundTaskManager.ets:344-368` 用 15000 ms 新鲜窗口（`VpnStatusReader.ets:9`、`VpnBackgroundTaskManager.ets:14`），`components/BridgeStatus.ets:3297-3313` 用自己的 5000 ms 门限加宽限",
-        "三种实现都把 `state=Running` 且 `tun=true` 判 connected、把 `vpn interface established` 判 connecting、把陈旧或缺失判 unknown。边界：陈旧或缺失一律是「不确定」而不是「已断开」（`services/VpnStatusReader.ets:9` 的注释与 `:43-45` 的早返回都写明这一点）",
-        "读侧优先级是 connected 压过其它标记，避免登录 URL 掩盖可用隧道（`:47-55`）",
+        "正常：扩展的 1 s 状态环先调 `writeCurrentStatusHeartbeat()`，把 `<currentVisibleStatus> | heartbeatMs=Date.now()` 原子写进 `vpn-probe-status.txt`（`vpnextensionability/TailscaleVpnExtensionAbility.ets:1909-1911`），再等 `backendSnapshot` 完成后覆写状态与三份快照——心跳先写，存活判据不被快照耗时污染（`:905-951`）。读方只有一个判读：`services/VpnStatusReader.ets:80-100` 的 `judge()`。`services/VpnBackgroundTaskManager.readStatus`（`services/VpnBackgroundTaskManager.ets:344-354`）调它，而不是自己再解析一遍",
+        "`components/BridgeStatus.ets` 只借用同一个新鲜窗口常量 `VPN_STATUS_FRESH_MS`（`VpnStatusReader.ets:12`），不再自带 5000 ms 门限。判读顺序固定：陈旧、未来或缺失的心跳一律 unknown（`VpnStatusReader.ets:83-85`）",
+        "终态标记压过运行中的隧道（`:87-89`）",
+        "`state=Running` 且 `tun=true` 判 connected（`:90-92`）",
+        "`needsLogin` 判 needs_login（`:93-95`）",
+        "`vpn interface established` 判 connecting（`:96-98`）。边界：陈旧或缺失一律是「不确定」而不是「已断开」（`VpnStatusReader.ets:12` 的注释与 `:83-85` 的早返回都写明这一点）",
+        "一条同时含 connected 与终态标记的行报 disconnected，因为扩展每秒只写一个状态，这种行只来自过渡或拼接，而凭一条自相矛盾的行持有长时任务是更坏的错误",
         "持有长时任务的一方只在 connected/connecting 且心跳新鲜时新建任务，无法辨认的行（`state=Running | tun=false`、裸 lifecycle 行、陈旧心跳）既不新建任务也不凭旧证据取任务（`services/VpnBackgroundTaskManager.ets:171-183`、`:350-368`）。失败与恢复：已持有任务而心跳转陈旧时，宽限 60 s（`VPN_STATUS_GRACE_MS`，`services/VpnBackgroundTaskManager.ets:15`）后释放并记 `background_status_timeout`（`:175`）",
         "系统取消才是 `scheduleRetry` 的触发条件，用户取消后同一会话不再自行恢复（`:182`、`:392`）。写侧失败按 best-effort 处理：状态落盘失败绝不中断 VPN（`vpnextensionability/TailscaleVpnExtensionAbility.ets:1921-1924` 的注释）。走查覆盖：M-01 在锁屏静置 721 s 内采了 25 个样本，UI/VPN 进程 ID 全程不变、最大心跳龄 1104 ms，直接观测的就是这条 1 s 覆写与新鲜度判读",
-        "已知局限是走查在 USB/HDC 连接并充电的条件下完成，蜂窝下的长时间存活（M-11）未闭环，且 M-01/M-02 未直接观测 R-CONN-09 的宽限释放。安全与质量：状态行是自由文本，读侧靠字面量匹配（connecting 的判据是一条 `includes`），所以扩展改一句文案就会静默取消保护——这条耦合必须由集成用例钉住，不能靠审阅",
+        "已知局限是走查在 USB/HDC 连接并充电的条件下完成，蜂窝下的长时间存活（M-11）未闭环，且 M-01/M-02 未直接观测 R-CONN-09 的宽限释放。安全与质量：状态行是自由文本，读侧靠字面量匹配（connecting 的判据是一条 `includes`），所以扩展改一句文案就会静默取消保护。这条耦合已由 `scripts/integration/status-vocabulary.mjs` 逐条钉住",
         "写侧只承诺 1 s 覆写、读侧负责把不确定转成有界宽限，责任划分不可反置。"
       ],
       "failure_message": "期望「1 s 覆写 + 15 s 新鲜窗口，陈旧即判不确定并走有界宽限」，实际「陈旧心跳被判成已连接，或状态文案一改读侧就再也认不出连接窗口」",
       "sources": [
+        "entry/src/main/ets/services/VpnStatusReader.ets:80-100 judge（唯一判读）",
+        "entry/src/main/ets/services/VpnStatusReader.ets:12 VPN_STATUS_FRESH_MS",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:344-354 readStatus 委托",
         "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:1909 writeCurrentStatusHeartbeat",
-        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:905-951 状态环",
-        "entry/src/main/ets/services/VpnStatusReader.ets:9 新鲜度常量",
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:344-368 readStatus",
-        "entry/src/main/ets/components/BridgeStatus.ets:3297-3313 refreshVpnProbeStatus",
+        "entry/src/main/ets/components/BridgeStatus.ets:3313 借用同一个窗口",
+        "scripts/integration/status-vocabulary.mjs",
         "docs/oracles/91-seams/S1-ipc-core.md"
       ],
       "oracle_state": "closed",
@@ -2854,14 +2859,14 @@
         "扩展在 `onCreate` 先写一份空快照（`:341`），使「空」是一个明确的已发布值而不是缺席。失败与恢复：过期（> 5000 ms）、`updatedAtMs` 非正、时间倒流、JSON 解析失败四种情况一律丢弃本次快照并保留上一份（`:3606-3608` 与 `:3631-3634` 的 catch），刷新责任留给下一轮 1 s 轮询",
         "发布责任在扩展（它承诺 1 s 覆写），若读侧的 5000 ms 判定被放宽，陈旧数据就会以「当前」呈现，属数据错误而由读侧负责。安全与质量：原子写保证读不到半写 JSON",
         "快照里只有对端 key、名称、系统、在线态与计数，不含凭据与地址",
-        "卡片进程不读这份文件——`services/VpnStatusReader.ets:24-31` 的头注写明它只读状态文件、不依赖原生桥，所以「隧道健康」与「设备数据」的判据必须分开，不能互相顶替。"
+        "卡片进程不读这份文件——`services/VpnStatusReader.ets:28-35` 的头注写明它只读状态文件、不依赖原生桥，所以「隧道健康」与「设备数据」的判据必须分开，不能互相顶替。"
       ],
       "failure_message": "期望「超过 5 s、时间倒流或 key 不合规的快照被丢弃，只接受整份原子写出的当前快照」，实际「过期快照被当作新数据刷新列表，或异形 key 的对端被渲染成有效设备」",
       "sources": [
         "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:1004-1007 writePeerSnapshot",
         "entry/src/main/ets/components/BridgeStatus.ets:3597-3630 refreshPeerSnapshot",
         "entry/src/main/ets/components/BridgeStatus.ets:3606 五秒新鲜门限",
-        "entry/src/main/ets/services/VpnStatusReader.ets:24-31 卡片只读状态文件的边界",
+        "entry/src/main/ets/services/VpnStatusReader.ets:28-35 卡片只读状态文件的边界",
         "docs/oracles/91-seams/S1-ipc-core.md"
       ],
       "oracle_state": "pending-test",
@@ -3734,6 +3739,19 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-01（源文档实测，本批未复跑）"
     },
     {
+      "id": "T-O-SEAM-03-int",
+      "level": "integration",
+      "status": "pass",
+      "oracle_ids": [
+        "O-SEAM-03"
+      ],
+      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
+      "command": "scripts/run-checks.sh",
+      "baseline": "f04326d",
+      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
+      "executed_at": "2026-10-13T13:23:54+11:00"
+    },
+    {
       "id": "T-O-SEAM-04",
       "level": "e2e",
       "status": "not_evaluated",
@@ -3832,9 +3850,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "7ed18db",
-      "environment": "Linux, Node v22.23.2; 76 tests, pass 76, fail 0",
-      "executed_at": "2026-10-12T19:18:25+11:00"
+      "baseline": "f04326d",
+      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
+      "executed_at": "2026-10-13T13:23:54+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3854,9 +3872,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "7ed18db",
-      "environment": "Linux, Node v22.23.2; 76 tests, pass 76, fail 0",
-      "executed_at": "2026-10-12T19:18:25+11:00"
+      "baseline": "f04326d",
+      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
+      "executed_at": "2026-10-13T13:23:54+11:00"
     },
     {
       "id": "T-O-SEAM-16",
