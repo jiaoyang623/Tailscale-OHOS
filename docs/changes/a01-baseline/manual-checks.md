@@ -2,8 +2,8 @@
 
 判据的走查锚点写成 `真机走查 a01-baseline/manual-checks.md#M-nn`。
 
-**这份登记册是转抄，不是本次复跑。** 每条的「来源」指向仓库里已有的实测记录，
-本批没有重新执行任何一项。哪些是实测数值、哪些只是待执行的规程，逐条写明。
+**这份登记册以转抄为主。** 每条的「来源」指向仓库里已有的实测记录，多数条目本批没有重新执行。
+唯一例外是 M-13，它的来源是「本轮真机（非转抄）」。哪些是实测数值、哪些只是待执行的规程，逐条写明。
 
 设备：`Pura 80 Pro` / `HarmonyOS 7.0.0.105`（M-01～M-04、M-06～M-09）；
 `Pura X` / `56T0225330000021` / `HarmonyOS 7.0.0.105`（M-05、M-10）。
@@ -24,7 +24,7 @@
 | M-10 | 竞争 VPN 冲突（本应用不替换对方） | 部分（未闭环） |
 | M-11 | 720 秒连续蜂窝锁屏 | 未完成（不计入通过） |
 | M-12 | 桌面卡片渲染与点击 | 未执行 |
-| M-13 | 两个进程里同一份 `.so` 是几个运行时 | 未执行（待本轮真机） |
+| M-13 | 两个进程里同一份 `.so` 是几个运行时 | 通过（本轮真机，两个独立运行时） |
 | M-14 | 桌面卡片开关 | 未执行（待本轮真机） |
 | M-15 | Taildrive 真机共享节点 | 未执行（待本轮真机） |
 | M-16 | special-scenario 长时任务 | 未执行（待本轮真机） |
@@ -32,8 +32,8 @@
 | M-18 | 蜂窝下的长时间存活与连接期保活复跑 | 未执行（待本轮真机） |
 | M-19 | 冷启动到可用的耗时 | 未执行（待本轮真机） |
 
-M-13 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/device-run.sh` 在一次上机里跑完。
-**未执行不等于通过。** 本轮执行前，这七条一律不计入任何通过证据。
+M-14 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/device-run.sh` 在一次上机里跑完。
+**未执行不等于通过。** 回填前，这六条一律不计入任何通过证据。
 
 ---
 
@@ -161,12 +161,11 @@ M-13 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/dev
 - 来源：本轮真机（非转抄）。
 - 证据位置：`~/mesharc-e2e/connect-journey-*.log`（439 行设备日志）。
 - 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/connect-journey.mjs`
-- 来源：本轮真机（非转抄）。
 
-## M-13 到 M-19
+## M-14 到 M-19
 
-这七条由 `device-run.sh` 在一次上机里跑完，步骤见 `device-runbook.md`。**全部未执行。**
-执行后逐条回填本节，并把结论写进上面的表。回填前它们不计入任何通过证据。
+M-13 已在本轮真机执行，见上。这六条由 `device-run.sh` 在一次上机里跑完，步骤见 `device-runbook.md`。
+**全部未执行。** 执行后逐条回填本节，并把结论写进上面的表。回填前它们不计入任何通过证据。
 
 ## M-19 冷启动到可用的耗时
 
@@ -182,9 +181,12 @@ M-13 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/dev
 ## M-17 VPN 冲突路径是否收敛
 
 - 阈值：冲突提示出现；应用在检测到冲突后停掉自己的扩展；**杀掉应用进程后不再有其它 VPN 时重连，不得报冲突**。
-- 步骤：见 `device-runbook.md` 的 M-17，共六步。
-- 观测：`vpn_conflict`、`vpn_conflict_self_disconnect_completed`、`vpn_conflict_acknowledged`
-  三个诊断事件经 hilog 镜像到达主机，可用 `devecocli log --keyword` 取到。
+- 步骤：见 `device-runbook.md` 的 M-17，共七步。
+- 观测：`vpn_conflict`、`vpn_conflict_detected`、`vpn_conflict_self_disconnect_requested`、
+  `vpn_conflict_self_disconnect_completed`、`vpn_conflict_self_disconnect_failed`、
+  `vpn_conflict_acknowledged`、`vpn_create_failed` 这些诊断事件经 hilog 镜像到达主机。
+  在 `device-run.sh` 的采集文件里找（`03-log*.txt`）。
+  `devecocli log --from` 与 `devecocli log --keyword` 在这台设备上返回 0 行（设备时钟与主机差 3 小时），不要用。
 - 状态：**未执行**。执行后填结论、测得数值与未闭环的部分。
 - 为什么这么判：冲突循环没有次数上限，也没有自杀超时（`TailscaleVpnExtensionAbility.ets:602`），
   只在应用停掉扩展时结束。应用在检测到冲突时自停（`BridgeStatus.ets:4339`），
