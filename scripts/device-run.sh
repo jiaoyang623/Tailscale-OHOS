@@ -140,14 +140,17 @@ scenario "M-14" "Q7-a 桌面卡片开关" \
 "1. 长按桌面图标添加 2×2 卡片
 2. 点卡片按钮连接，再点一次断开
 3. 在应用内操作，确认卡片跟着变
-4. 记录卡片文案与应用状态是否一致"
+4. 记录卡片文案与应用状态是否一致
+卡片文案与自愈只能人工看，界面结构抓不到桌面。做不了就输入 s 跳过。"
 
 scenario "M-15" "Q7-b Taildrive 真机共享节点" \
-"同一 tailnet 内另有一台开启共享的设备时：浏览共享目录、上传一个文件、再下载回来。"
+"需要同一 tailnet 内另有一台开启共享的设备：浏览共享目录、上传一个文件、再下载回来，
+传输中断网一次看失败态与重试。没有第二台设备就输入 s 跳过，并在结论里写明原因。"
 
 scenario "M-16" "Q7-c special-scenario 长时任务" \
-"仅在 ACL 通过或装了试用调试 Profile 时做。
-用 scripts/toggle-special-scenario-acl.mjs 打开声明后重装，连接后切后台。
+"仅在 ACL 通过或装了试用调试 Profile 时做。没通过就输入 s 跳过。
+要做的话这条会打断采集：先 scripts/toggle-special-scenario-acl.mjs 打开声明，
+重新构建并重装，再回到这里继续。采集不停。
 走了哪条路看 background_started_special_scenario 还是 background_started。
 没走成的原因看四条 background_special_scenario_ 记录：unconfigured / unsupported / denied / failed。"
 
@@ -163,7 +166,8 @@ scenario "M-17" "Q-02（修订）VPN 冲突路径是否收敛" \
 
 scenario "M-18" "Q17 蜂窝下的长时间存活" \
 "关掉 Wi-Fi，用蜂窝连接，锁屏静置 720 秒以上。
-这条要的就是等待，期间不要碰手机。等满之后回车。"
+这条要的就是等待，期间不要碰手机。等满之后回车。
+没满 720 秒就回车的话，结论里要写明实际时长，不能当成连续存活证据。"
 
 say "M-19 · Q6 冷启动到可用"
 echo "强杀应用，冷启动，从点击图标计时到最后一次界面可交互。重复 5 次。"
