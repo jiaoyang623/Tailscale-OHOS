@@ -65,4 +65,13 @@ echo
 echo "== 诊断事件名登记表 =="
 node scripts/check-diagnostic-event-names.mjs || rc=1
 
+# 审核快照也是生成物，也会静默过期：判据改了却忘了重建，网页就显示旧内容。
+# 这个守卫只比判据正文，不比 tests 的运行证据（那部分每次重建都会变）。
+echo
+echo "== 审核快照是否跟得上判据 =="
+python3 scripts/check-review-freshness.py || {
+  echo "重建：scripts/a01-review-pages.sh（工作树要干净），然后提交 docs/review" >&2
+  rc=1
+}
+
 exit "$rc"
