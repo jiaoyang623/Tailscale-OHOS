@@ -347,11 +347,11 @@
     },
     {
       "id": "R-DRIVE-05",
-      "decision": "changes_requested",
-      "content_sha256": "317315fd2ca305649f1a7b7a29c88514908703198f8d02032ce5cc8ada7e06cc",
-      "note": "Q-03 决定：改需求。Taildrop 缓存 7 天、诊断报告 24 h、Taildrive 暂存三类保留期各自写明适用对象与数值，不再写第三套说法。",
+      "decision": "accepted",
+      "content_sha256": "a8e1366ad68ebbca3ddd3de034b8aa5d0397c31a27ee24a8ac3d82ca3271abd5",
+      "note": "第 13 轮：原意见已执行。Q-03 已执行：保留期按代码现状改写，并写明 Taildrive 暂存没有清理实现。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "R-DRIVE-06",
@@ -459,11 +459,11 @@
     },
     {
       "id": "R-DIAG-04",
-      "decision": "changes_requested",
-      "content_sha256": "94fa3bfdc9657e8e8ec9b82f8f1e8df8a945948a153b6b93d6f8e012d4c121b3",
-      "note": "Q-03 决定：改需求。诊断报告保留期按代码现状写明，并核对那个 24 h 常量在代码里的位置。",
+      "decision": "accepted",
+      "content_sha256": "6715bcbdf430043b6498e5196b8113405f53b951085eeefb1c80d8169c1236b9",
+      "note": "第 13 轮：原意见已执行。Q-03 已执行：来源补上真正的保留期常量位置。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "R-DIAG-05",
@@ -604,250 +604,258 @@
     {
       "id": "O-SETUP-01",
       "decision": "accepted",
-      "content_sha256": "7420ae926bab7f63d7ee23051549692b6abcdf983156bdd51f24e7250e54d2a6",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "2a9de3e8699090c9cb4bce800cafa07765bd669acd40d60224588b57f0ac2d18",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-02",
       "decision": "accepted",
-      "content_sha256": "766cb47854c5231ee16c3bbd63654070dc1aaa6f8b3d085187ff1679a4f0f730",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "a256b6d4f5bfcb566a55ad99119801b735ed95c6091aa2ab45a00811dbf46c47",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-03",
       "decision": "accepted",
-      "content_sha256": "4bcf77a2eb1d2a7e04d1ad4b9bf86e4a2abced112dfc2a73797b6a03dab4929b",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "df5b4587a46b0b95c0344618ce08a12e3701ec07d03b7280e8e491122425e2a6",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-04",
       "decision": "accepted",
-      "content_sha256": "2d401636837faa88f2f0ef37fb115842bebc5ae3a96c829d344e8de9527c9c9d",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "eba18fa99d92852eeb199a9f88b91d6af7785d0eb7fec3b107b4306de5a9e335",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-01",
       "decision": "accepted",
-      "content_sha256": "ee5f3670acdd4a11f58e94bb7f31936cada19443f618ed1fe8361761a8fe7cd2",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "0f7e3052d97f1f393488b7895b44e2c44a2acfc4dc08cc4a08060a86f453fe63",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-02",
       "decision": "accepted",
-      "content_sha256": "1abae36461b34c908265c1291e42b67a54bf621fb8f782ecacfeb2e873bb9614",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "6c096113f4e01d71f3d18fcbd8382f277e64be4a74f61d1a9668780acaac5514",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-03",
       "decision": "pending",
-      "content_sha256": "afb22edbf05a23f668063236815b944edce974c87f02f77b740abf720139af39",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "b711e352e2607ecf0417f12a086db4cd07c8df9bd4022a2173e111fdda693c2c",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-CONN-04",
       "decision": "changes_requested",
-      "content_sha256": "8fa58888aa01fc6ed4f348a86d8570c430c439ffbdcb66ad8368122e6cb36412",
-      "note": "Q15 决定：修。期望补「在途重连必须被用户主动断开中止」这条边界。",
+      "content_sha256": "7f97b346680ca70a8dc53586fc6141081b96b416b2725d85d9d8fc9235788480",
+      "note": "Q15 决定：修。期望补「在途重连必须被用户主动断开中止」这条边界。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-CONN-05",
       "decision": "pending",
-      "content_sha256": "0b9f5664a3e3d9e08d7b21dff4d9c0b72a0b4b82ab6ad12a479107f32a1836a8",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "0b9f682e989d33a979fd65835a4d4063b10e0cd6bc766ade8e73d36bb50ff770",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-CONN-06",
       "decision": "accepted",
-      "content_sha256": "2aab7933c7092d0ebd9398637d95ec98c5a0e38e6c82a1fd3b256878ef55937a",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "6109ae32952a30ca87cc347f5c3d9f6d47f5e0f66241f8dfd4fa158cb34f032f",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-07",
       "decision": "accepted",
-      "content_sha256": "b78c182fffd26633ed9a55d9a1c6aae71fa887fd7acebbe8e4045a718ca68d7a",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "b1cdde5a8e236e42426255a0472ad4d60a67d6b3a14100d7a69b93b2d57926fb",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-01",
       "decision": "accepted",
-      "content_sha256": "f92e27d216fd533babaabf01204a32101484e534817416e7edc109e27a5cd8a4",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "c616541fa404d0ec3692deb4f3f6bbb48e7d58ff0f2ef1649acbccb55836766c",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-02",
       "decision": "accepted",
-      "content_sha256": "0fca5c9090d913d73b5c9331670bf6da3eda5a6cba7b72c9dd37ee7f532fa43a",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "57384485539c4ab8bb265e2de8903366ff54d06747075cb54d2e81d69210d34a",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-03",
       "decision": "accepted",
-      "content_sha256": "4dab86db3e94d9da6822be889d0e67decb0fd48390cb3bfbff416741cb6e7a2b",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "a02c53798352e1989b5e9452fbccaf4eef3f8d883d68b4fd8afe53597c2ca9e3",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DEV-01",
       "decision": "accepted",
-      "content_sha256": "8243b9c3bfa96dafb16d609757532112c8f5f492dfbf37dcc4114d9542b5a44c",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "bdb156cccfcce6cd8b9562c22ace27916939543dcfd3d33b17f6a9376ca94445",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DEV-02",
       "decision": "accepted",
-      "content_sha256": "156b0f31d2f88b6763a4560d4d086bb3c680c34f101a400045c26f902984afbd",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "f516cccf7696c89dab16c5cf0c1e394278b526fd2945eea7b0b1e75c7f2d7e1a",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-01",
       "decision": "accepted",
-      "content_sha256": "89a91409def7da69a86ad2d2af7e3155868a7d6752024c9619afc7908b8ddce8",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "673b4fa4e208d8cb2028a37f0627639f04a7909ee6d46b3c45c1bcd7c749c48b",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-02",
       "decision": "pending",
-      "content_sha256": "53ea4378ed2f21e683d0882485363d7db54b2693888818e608fb3a91c9b55163",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "109ce848a4050f45628d368bd7d385e9074c1fcf6b49320daf55d2cab222f65a",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-XFER-03",
-      "decision": "changes_requested",
-      "content_sha256": "67a19f0ac9c5ef657eb6cb9ea3f748524f17370cfa60cda5e06db6dba8d02a5f",
-      "note": "Q4 决定：LocalSend 契约查定后更新期望与锚点。",
+      "decision": "accepted",
+      "content_sha256": "6bef815fcefbce8f348287d4177294beacd852e7b513b69c65b447a7f009db52",
+      "note": "第 13 轮：原意见已执行。Q4 已查证：没有可依赖的公开契约，维持未验证。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-04",
       "decision": "pending",
-      "content_sha256": "36eae3e2273d033993ed6af67273ee556fbc1c5296417fed714abadfb89b6442",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "76a98c5182f4e5c7d3d2312ec49bfafb0c44ae6abcd68b2bbc088139feb9d843",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-XFER-05",
       "decision": "pending",
-      "content_sha256": "55ace45e8a6d25f331921f9e673c15760aa2959efc2a0ea101850c79fb8c726d",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "ec7a7a877760e3940bb86a6c7e50404e09b7df1bb8af8da1476a78e8d76df906",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-DRIVE-01",
       "decision": "accepted",
-      "content_sha256": "b273e976b715a55d8290646130b7be4f6cf5f024e1b3052a54a4c77ebb576de0",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "7f71d64cc8174646db9dcba38e4f7a43836c4ad12ca7510e89d57c9887d056bf",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DRIVE-02",
       "decision": "accepted",
-      "content_sha256": "b23af8e6805dc9df5a379552ad3bdc4530c3b80ba5301df030be01c74a172171",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "488ac731ba341acf632d6e2ff57e50a6b508da1780df234daa9f93827c3ccbf7",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-MEDIA-01",
       "decision": "pending",
-      "content_sha256": "ca1aa6ab24a1214f050da4587201358e7fb556fa2869a97f28e1ebf443a103df",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "7d9534058d8e280dbbc52b1ff43fde778888e3f5b8b04c18d6b3d050f69d50ab",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-MEDIA-02",
       "decision": "pending",
-      "content_sha256": "121684cdadc38e33f63b16ede5717db5f30fee5629cb347d84ddb58139b14793",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "71fd6f267fb2fc5d4bc26ac1b5a02e0bdb3e8fa5165b76a7003607be3d74e3eb",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-PRIV-01",
       "decision": "accepted",
-      "content_sha256": "609c14dc8cbbc8fc471b11298e6eb995f190753469137d3219fd030f2a6ec4b1",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "2b72554a86418934d6a3ccfa6f4aaf8b9d5bbab570dde92eeb380342e61f1171",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PRIV-02",
       "decision": "accepted",
-      "content_sha256": "b1e6aee507618edf4f44bd26cba300c85fcbb062c9003bbae0f35b9a02fab978",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "5938ac225d788cfa589de670c902606c92e4598b49319e2160a64e43ddcb36e4",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DIAG-01",
       "decision": "accepted",
-      "content_sha256": "32f8ada396cb6d39af47aadab023377e7df6ff846f7550dad3fbc107916a561f",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "fe92d0aeea83acaa77a37208486023d604a21c9024ca9a42a1e81189d149fecf",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-UI-01",
       "decision": "accepted",
-      "content_sha256": "c8b584a4ce16334ee52b76e8e51c0fdce8c96f5eecb310c6b6982c290dee3566",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "0fa6b0f4f99d55c65124dd4998464ec9622754efcc90d7d633bd583323433de7",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-UI-02",
-      "decision": "changes_requested",
-      "content_sha256": "c779b5905a0a38d7591a896e49b98fdb6e5a783ff9a1ace3bac2bf94f7af5039",
-      "note": "Q5 决定：改文档 + 加资源一致性检查。",
+      "decision": "accepted",
+      "content_sha256": "9da16d7edf4ea10da06dd8de1966c63f685a51b465db3bc802b4043fad9d199a",
+      "note": "第 13 轮：原意见已执行。Q5 已执行：文档按代码改正，资源一致性检查进门禁。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CARD-01",
       "decision": "accepted",
-      "content_sha256": "e0538dc5a4e8017e73413d90644274bc56eb58c8eb8bf1c862df32e9b7443196",
-      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。",
+      "content_sha256": "7f69639da81bebcb409b08e756628d80227c76c0cc81c6acac98e7063538e58c",
+      "note": "分层签收：需求层整体接受（未逐条阅读）。8 项质量目标与全部未决项已逐项定夺，见 docs/changes/a01-baseline/record.md 的审核决定表。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
+    },
+    {
+      "id": "O-BUILD-00",
+      "decision": "accepted",
+      "content_sha256": "5bfae1350bddbf68d0ec58c06393d91037edf68ee820c124d1f92e9a1441d170",
+      "note": "第 10 轮新增：开发者构建流程旅程（审查人 Q16b 决定的产物）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     }
   ]
 }

@@ -348,10 +348,10 @@
     {
       "id": "R-DRIVE-05",
       "decision": "accepted",
-      "content_sha256": "317315fd2ca305649f1a7b7a29c88514908703198f8d02032ce5cc8ada7e06cc",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "a8e1366ad68ebbca3ddd3de034b8aa5d0397c31a27ee24a8ac3d82ca3271abd5",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "R-DRIVE-06",
@@ -460,10 +460,10 @@
     {
       "id": "R-DIAG-04",
       "decision": "accepted",
-      "content_sha256": "94fa3bfdc9657e8e8ec9b82f8f1e8df8a945948a153b6b93d6f8e012d4c121b3",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "6715bcbdf430043b6498e5196b8113405f53b951085eeefb1c80d8169c1236b9",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "R-DIAG-05",
@@ -636,10 +636,10 @@
     {
       "id": "A-2.4",
       "decision": "accepted",
-      "content_sha256": "d3dfd55dff695b60446d8aea64236f3c2c71b23b934dcc4ec7c5be2d9c1559de",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "2d0c5be9e2be384f43bcb77fe4fa07a87d9e2c0a49a1d8732057d82f3753e3ef",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "A-2.5",
@@ -858,964 +858,988 @@
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
+      "id": "H-C-18",
+      "decision": "accepted",
+      "content_sha256": "e6f0a2c8d0a1506acc998c5b3f7914a20a587ae0170a96999fd31e26a4413fd5",
+      "note": "第 13 轮新增：构建与产物装配契约卡（承接 O-SEAM-18）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
+    },
+    {
       "id": "O-SETUP-01",
       "decision": "accepted",
-      "content_sha256": "7420ae926bab7f63d7ee23051549692b6abcdf983156bdd51f24e7250e54d2a6",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "2a9de3e8699090c9cb4bce800cafa07765bd669acd40d60224588b57f0ac2d18",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-02",
       "decision": "accepted",
-      "content_sha256": "766cb47854c5231ee16c3bbd63654070dc1aaa6f8b3d085187ff1679a4f0f730",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "a256b6d4f5bfcb566a55ad99119801b735ed95c6091aa2ab45a00811dbf46c47",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-03",
       "decision": "accepted",
-      "content_sha256": "4bcf77a2eb1d2a7e04d1ad4b9bf86e4a2abced112dfc2a73797b6a03dab4929b",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "df5b4587a46b0b95c0344618ce08a12e3701ec07d03b7280e8e491122425e2a6",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SETUP-04",
       "decision": "accepted",
-      "content_sha256": "2d401636837faa88f2f0ef37fb115842bebc5ae3a96c829d344e8de9527c9c9d",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "eba18fa99d92852eeb199a9f88b91d6af7785d0eb7fec3b107b4306de5a9e335",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-01",
       "decision": "accepted",
-      "content_sha256": "ee5f3670acdd4a11f58e94bb7f31936cada19443f618ed1fe8361761a8fe7cd2",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "0f7e3052d97f1f393488b7895b44e2c44a2acfc4dc08cc4a08060a86f453fe63",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-02",
       "decision": "accepted",
-      "content_sha256": "1abae36461b34c908265c1291e42b67a54bf621fb8f782ecacfeb2e873bb9614",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "6c096113f4e01d71f3d18fcbd8382f277e64be4a74f61d1a9668780acaac5514",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-03",
       "decision": "pending",
-      "content_sha256": "afb22edbf05a23f668063236815b944edce974c87f02f77b740abf720139af39",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "b711e352e2607ecf0417f12a086db4cd07c8df9bd4022a2173e111fdda693c2c",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-CONN-04",
       "decision": "changes_requested",
-      "content_sha256": "8fa58888aa01fc6ed4f348a86d8570c430c439ffbdcb66ad8368122e6cb36412",
-      "note": "Q15 决定：修。期望补「在途重连必须被用户主动断开中止」这条边界。",
+      "content_sha256": "7f97b346680ca70a8dc53586fc6141081b96b416b2725d85d9d8fc9235788480",
+      "note": "Q15 决定：修。期望补「在途重连必须被用户主动断开中止」这条边界。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-CONN-05",
       "decision": "pending",
-      "content_sha256": "0b9f5664a3e3d9e08d7b21dff4d9c0b72a0b4b82ab6ad12a479107f32a1836a8",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "0b9f682e989d33a979fd65835a4d4063b10e0cd6bc766ade8e73d36bb50ff770",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-CONN-06",
       "decision": "accepted",
-      "content_sha256": "2aab7933c7092d0ebd9398637d95ec98c5a0e38e6c82a1fd3b256878ef55937a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "6109ae32952a30ca87cc347f5c3d9f6d47f5e0f66241f8dfd4fa158cb34f032f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CONN-07",
       "decision": "accepted",
-      "content_sha256": "b78c182fffd26633ed9a55d9a1c6aae71fa887fd7acebbe8e4045a718ca68d7a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "b1cdde5a8e236e42426255a0472ad4d60a67d6b3a14100d7a69b93b2d57926fb",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-01",
       "decision": "accepted",
-      "content_sha256": "f92e27d216fd533babaabf01204a32101484e534817416e7edc109e27a5cd8a4",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "c616541fa404d0ec3692deb4f3f6bbb48e7d58ff0f2ef1649acbccb55836766c",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-02",
       "decision": "accepted",
-      "content_sha256": "0fca5c9090d913d73b5c9331670bf6da3eda5a6cba7b72c9dd37ee7f532fa43a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "57384485539c4ab8bb265e2de8903366ff54d06747075cb54d2e81d69210d34a",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NET-03",
       "decision": "accepted",
-      "content_sha256": "4dab86db3e94d9da6822be889d0e67decb0fd48390cb3bfbff416741cb6e7a2b",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "a02c53798352e1989b5e9452fbccaf4eef3f8d883d68b4fd8afe53597c2ca9e3",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DEV-01",
       "decision": "accepted",
-      "content_sha256": "8243b9c3bfa96dafb16d609757532112c8f5f492dfbf37dcc4114d9542b5a44c",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "bdb156cccfcce6cd8b9562c22ace27916939543dcfd3d33b17f6a9376ca94445",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DEV-02",
       "decision": "accepted",
-      "content_sha256": "156b0f31d2f88b6763a4560d4d086bb3c680c34f101a400045c26f902984afbd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "f516cccf7696c89dab16c5cf0c1e394278b526fd2945eea7b0b1e75c7f2d7e1a",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-01",
       "decision": "accepted",
-      "content_sha256": "89a91409def7da69a86ad2d2af7e3155868a7d6752024c9619afc7908b8ddce8",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "673b4fa4e208d8cb2028a37f0627639f04a7909ee6d46b3c45c1bcd7c749c48b",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-02",
       "decision": "pending",
-      "content_sha256": "53ea4378ed2f21e683d0882485363d7db54b2693888818e608fb3a91c9b55163",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "109ce848a4050f45628d368bd7d385e9074c1fcf6b49320daf55d2cab222f65a",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-XFER-03",
-      "decision": "changes_requested",
-      "content_sha256": "67a19f0ac9c5ef657eb6cb9ea3f748524f17370cfa60cda5e06db6dba8d02a5f",
-      "note": "Q4 决定：LocalSend 契约查定后更新期望与锚点。",
+      "decision": "accepted",
+      "content_sha256": "6bef815fcefbce8f348287d4177294beacd852e7b513b69c65b447a7f009db52",
+      "note": "第 13 轮：原意见已执行。Q4 已查证：没有可依赖的公开契约，维持未验证。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-XFER-04",
       "decision": "pending",
-      "content_sha256": "36eae3e2273d033993ed6af67273ee556fbc1c5296417fed714abadfb89b6442",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "76a98c5182f4e5c7d3d2312ec49bfafb0c44ae6abcd68b2bbc088139feb9d843",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-XFER-05",
       "decision": "pending",
-      "content_sha256": "55ace45e8a6d25f331921f9e673c15760aa2959efc2a0ea101850c79fb8c726d",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "ec7a7a877760e3940bb86a6c7e50404e09b7df1bb8af8da1476a78e8d76df906",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-DRIVE-01",
       "decision": "accepted",
-      "content_sha256": "b273e976b715a55d8290646130b7be4f6cf5f024e1b3052a54a4c77ebb576de0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "7f71d64cc8174646db9dcba38e4f7a43836c4ad12ca7510e89d57c9887d056bf",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DRIVE-02",
       "decision": "accepted",
-      "content_sha256": "b23af8e6805dc9df5a379552ad3bdc4530c3b80ba5301df030be01c74a172171",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "488ac731ba341acf632d6e2ff57e50a6b508da1780df234daa9f93827c3ccbf7",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-MEDIA-01",
       "decision": "pending",
-      "content_sha256": "ca1aa6ab24a1214f050da4587201358e7fb556fa2869a97f28e1ebf443a103df",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "7d9534058d8e280dbbc52b1ff43fde778888e3f5b8b04c18d6b3d050f69d50ab",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-MEDIA-02",
       "decision": "pending",
-      "content_sha256": "121684cdadc38e33f63b16ede5717db5f30fee5629cb347d84ddb58139b14793",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "71fd6f267fb2fc5d4bc26ac1b5a02e0bdb3e8fa5165b76a7003607be3d74e3eb",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-PRIV-01",
       "decision": "accepted",
-      "content_sha256": "609c14dc8cbbc8fc471b11298e6eb995f190753469137d3219fd030f2a6ec4b1",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "2b72554a86418934d6a3ccfa6f4aaf8b9d5bbab570dde92eeb380342e61f1171",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PRIV-02",
       "decision": "accepted",
-      "content_sha256": "b1e6aee507618edf4f44bd26cba300c85fcbb062c9003bbae0f35b9a02fab978",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "5938ac225d788cfa589de670c902606c92e4598b49319e2160a64e43ddcb36e4",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-DIAG-01",
       "decision": "accepted",
-      "content_sha256": "32f8ada396cb6d39af47aadab023377e7df6ff846f7550dad3fbc107916a561f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "fe92d0aeea83acaa77a37208486023d604a21c9024ca9a42a1e81189d149fecf",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-UI-01",
       "decision": "accepted",
-      "content_sha256": "c8b584a4ce16334ee52b76e8e51c0fdce8c96f5eecb310c6b6982c290dee3566",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "0fa6b0f4f99d55c65124dd4998464ec9622754efcc90d7d633bd583323433de7",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-UI-02",
-      "decision": "changes_requested",
-      "content_sha256": "c779b5905a0a38d7591a896e49b98fdb6e5a783ff9a1ace3bac2bf94f7af5039",
-      "note": "Q5 决定：改文档 + 加资源一致性检查。",
+      "decision": "accepted",
+      "content_sha256": "9da16d7edf4ea10da06dd8de1966c63f685a51b465db3bc802b4043fad9d199a",
+      "note": "第 13 轮：原意见已执行。Q5 已执行：文档按代码改正，资源一致性检查进门禁。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-CARD-01",
       "decision": "accepted",
-      "content_sha256": "e0538dc5a4e8017e73413d90644274bc56eb58c8eb8bf1c862df32e9b7443196",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "7f69639da81bebcb409b08e756628d80227c76c0cc81c6acac98e7063538e58c",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
+    },
+    {
+      "id": "O-BUILD-00",
+      "decision": "accepted",
+      "content_sha256": "5bfae1350bddbf68d0ec58c06393d91037edf68ee820c124d1f92e9a1441d170",
+      "note": "第 10 轮新增：开发者构建流程旅程（审查人 Q16b 决定的产物）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-01",
-      "decision": "changes_requested",
-      "content_sha256": "bed45a981341fb3100e60fc04c4e6cd4097a6fa7d5a5943bead4037d04d795b9",
-      "note": "Q14 决定：修。期望补「扩展销毁后 currentState() 不得返回陈旧值」。",
+      "decision": "accepted",
+      "content_sha256": "ade9e792e7371022db1b0eceff30a12aa55d9eef767b1d3e31af86cf8b8bb4da",
+      "note": "第 13 轮：原意见已执行。Q14 已执行：命令状态机销毁后清回 stopped。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-02",
-      "decision": "changes_requested",
-      "content_sha256": "ffb72cd81f3a5542e1d8eac81e568d54c6c6b28d64a1cd48f1285ddfb62c2c64",
-      "note": "Q12 决定：交接预算必须显式耦合，不接受「恰好相等」。",
+      "decision": "accepted",
+      "content_sha256": "ade32073c37753bd3ea9c98d112d3d03a301f8efc21581fd37117611503a1d16",
+      "note": "第 13 轮：原意见已执行。Q12 已执行：交接预算由用例直接断言关系。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-03",
       "decision": "accepted",
-      "content_sha256": "0759fc9578cf04309e2931077f9a5f1c863e97e1b24998e8c7fab2da1d9eee9e",
-      "note": "第 9 轮：原意见已执行。Q9/Q10/Q13 已执行：judge() 成为唯一判读，新鲜度与词表各只有一份。（审查人 jiaoyang623）",
+      "content_sha256": "e5a2b1b823e3ac285621c631b01476e24f018c36353515b851fc592edf2e8e05",
+      "note": "第 9 轮：原意见已执行。Q9/Q10/Q13 已执行：judge() 成为唯一判读，新鲜度与词表各只有一份。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-04",
       "decision": "accepted",
-      "content_sha256": "df4433a5400d3827019b854e6ca87518a1e529fe585acdd25961674aec40fd93",
-      "note": "第 9 轮：原意见已执行。Q13 已执行：同一份状态只有一个判读口径。（审查人 jiaoyang623）",
+      "content_sha256": "b00d4254dcd7ec52773bb6d5c649729166123e0a685283c48ca2c391828246fa",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：同一份状态只有一个判读口径。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-05",
       "decision": "changes_requested",
-      "content_sha256": "22c73089e6054f12fa6789382141f7274d0520d01a38107343150957f4fa81ef",
-      "note": "Q-01 决定：真机验证前标为条件成立，验证项与失败现象写进期望。",
+      "content_sha256": "879df65323cf58088f4c18803ca17e5f7673f325c24bd90e07be1f97dd9b9027",
+      "note": "Q-01 决定：真机验证前标为条件成立，验证项与失败现象写进期望。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-SEAM-06",
       "decision": "changes_requested",
-      "content_sha256": "a967f810eafa9d2b8da51589db0fb19cd92d9c3258f83b835d1b333bd2357fe1",
-      "note": "Q-01 决定：同 O-SEAM-05。",
+      "content_sha256": "a31b4caee9ff98a4049db0a363aba29408830e568d30ebc0e4b13bf88fc6ceb5",
+      "note": "Q-01 决定：同 O-SEAM-05。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-SEAM-07",
       "decision": "pending",
-      "content_sha256": "d189502152601318d7591c13be87a0e82922fc524564b5a8488de4428d560e5d",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "cea31ab6bcf4341a8f6d3dd2c0c2059533cb1075bf400796d2138d9847dfef59",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-SEAM-08",
       "decision": "accepted",
-      "content_sha256": "434171165acac87dda8b65ddd68e76aa8dc844543389727d1d097f0e382e2ce0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "2bb7acc57344a3714114f952cb3f31703207026aee21f94af2e157bd4b56f7e7",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-09",
       "decision": "pending",
-      "content_sha256": "0001b4ec6713284b8634123dac08433f39cf80c114e6270b720c646591bae757",
-      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。",
+      "content_sha256": "c6dc0eae3ace2f847f6806af9c43b51411a0a0f6db1bdd58bd5fdaabc61b0584",
+      "note": "本条目尚未闭环：等待计划测试落地后转 closed。owner 与接收批次见条目自身的「归属」字段。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "",
       "reviewed_at": ""
     },
     {
       "id": "O-SEAM-10",
       "decision": "changes_requested",
-      "content_sha256": "43b66fd8b706bb687e0522a8f2b686b155bf6f876edd8f23d315caa1880fe26b",
-      "note": "Q14 / Q15 / Q16a 决定：状态机销毁后重置、重连可取消、重连归属重定。",
+      "content_sha256": "21492c72ebbba27516d295f000a276162c2f0f631280b01ec45028509231db3b",
+      "note": "Q14 / Q15 / Q16a 决定：状态机销毁后重置、重连可取消、重连归属重定。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-SEAM-11",
       "decision": "changes_requested",
-      "content_sha256": "16b29a3d2c6e7553fb1c45849db0f902acca9a135d36affd38ad232d0f4bfae3",
-      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "content_sha256": "af645f2b444138ce3b047c4769c12a66ebd135dfb12eb095be61159fbf8c2ceb",
+      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-SEAM-12",
       "decision": "accepted",
-      "content_sha256": "dcef26c3f90c8cb8706865c868003e982ab86124a5a0d04a64c3cab4bb18ea82",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "d5cfc6b83d2ace33f0d468eb62ae0ae1482c1e650255a50fafe5eff13f4a57d5",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-13",
       "decision": "changes_requested",
-      "content_sha256": "157bb4cf25dc38cf8bcf3705a3929f3a40a682cc8d4eb7c59ab66cc4f40b5d15",
-      "note": "Q4 决定：LocalSend 契约查定后更新。",
+      "content_sha256": "dc39c6c2aa362e482a34a2f0b21d6be9ff5ffe1558cb5c8c31f8884aeac11327",
+      "note": "Q4 决定：LocalSend 契约查定后更新。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-SEAM-14",
-      "decision": "changes_requested",
-      "content_sha256": "650c6edffe891ae38da5397b12e581faeb0c254254c85f5950a4379bff2af366",
-      "note": "Q11 决定：写方规则限定为「同一时刻只有一个写方」，期望随之更新。",
+      "decision": "accepted",
+      "content_sha256": "11cf79750d8c3fdeb42e78a3300235c06d2e86ce6c3259a3b910d2003eb7f672",
+      "note": "第 13 轮：原意见已执行。Q11 已执行：写方规则限定为同一时刻只有一个写方。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-17",
       "decision": "accepted",
-      "content_sha256": "1e2f5c30ca6663da3f5e46c9e928adaf4b72f3eba085b558c95b3d610da750c5",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "325545ab2d2b7b931a7dc90e400e0659d076fc44f1a7b0318b692ba25d82783e",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-15",
       "decision": "accepted",
-      "content_sha256": "72d4cec96de76ae469fa48d37210c8da398ebfe7433d3bda5bfa7f274ca8cecd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "ed3670e4ce5a80762c07c3e8655253e6606d9993e8f4626a38b0d02cdff18f33",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SEAM-16",
-      "decision": "changes_requested",
-      "content_sha256": "9242e1ca9eceba4e6ebd4dca438fd40189d65a6a5aa65b1eab16c382e734bf1a",
-      "note": "Q-02 决定：先修死代码（批准文件目前没有写方），10 s TTL 的语义随真机验证。",
+      "decision": "accepted",
+      "content_sha256": "b803335b7c80d744f25a3c78cef92d9125028bc84e27cd8b759dbcc44792fe26",
+      "note": "第 13 轮：原意见已执行。Q-02 已执行：不可达的替换分支已删除，判据重写并加结构守卫。10 s TTL 的语义随真机验证，改由 device-runbook M-17 打「应用进程死掉后无人停扩展」这个剩下的空洞。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
+    },
+    {
+      "id": "O-SEAM-18",
+      "decision": "accepted",
+      "content_sha256": "f8d95f0507a5bec1b703aa521b6293fe4f4cb9136333fdfcec417ca315ffe42b",
+      "note": "第 13 轮新增：构建与产物装配接缝（审查人把 Q16b 改为「补一层 HLD」的产物）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-01",
       "decision": "accepted",
-      "content_sha256": "86cc22deebc7a30764d921e78bf3923b91da033fd4d80ff553856434392b16f2",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "ab0f3dd53a9da0f1acc18eba7e280ed1b4a71ee77a6ce24e63c3ed6da52b8299",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-02",
       "decision": "accepted",
-      "content_sha256": "cd0c82de019b1a84c91a4db4e537a71cc6235d894f25cd9bd583bff62b549ec6",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "12b63744bfea93875521c1eb6f5cd5a299351ec1f4a75cecb3ad77f5a82f5bb3",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-03",
       "decision": "accepted",
-      "content_sha256": "71d57e8611649fd52e508f164e5c164788e8813d3bbcb6ead1fc09e2b555927f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "86752d7dab90067cb7025dcab32f62207c1ff6bce1b75dbba972317213d12f19",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-04",
       "decision": "accepted",
-      "content_sha256": "de6127f19d9aa13df411049a46c71a01390c7948717e889078bb7cd988597e7d",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "c239fedcbb6ef99fe914a167c86e3f13cd8bb987c10d40319474893e8cfbaea8",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-05",
       "decision": "accepted",
-      "content_sha256": "6395a468c9c85891f7307a45df1837d903d9105b92892afcf110f41c6a5f580f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "077c1b119d4a2af2d6659d533d97b9822b96ca2bec1cad2f92b3dd7dcef4970f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-06",
       "decision": "accepted",
-      "content_sha256": "768e59715ce48c9fae9de35258e6e8a86e767b6fd548992329412ab128671d59",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "9c13640259c7937308bffbd4f0359527215daf3e5427a069b0190d1167657ebf",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-07",
       "decision": "accepted",
-      "content_sha256": "692256a0654489e1657f2cbe0d1f96cc72053739f645a84d8765baa6aa7ed2e0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "71f3bb4a44824c1325aa0e7bf0cd756c9a1a7d787660ac83ffc86588ba282626",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-08",
       "decision": "accepted",
-      "content_sha256": "afeb7b9f0c88387eb3b1a465aadd7d3c027c0a1b56e244c6569301ea457d2e44",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "cbce0ddfc1ffec3ad4505470ef9565ff8ab39322ed97836bdd6d510de3092a05",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-09",
       "decision": "accepted",
-      "content_sha256": "30bfcdc2d36b10409f18dc9162fa8d28c02311d4fec25f0be68d70efe94d9cf0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "fb38db45161181f6c1c66dab283e74ffb8ba54991d2144f09980561fc6e02dc6",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-10",
       "decision": "accepted",
-      "content_sha256": "a7aba15648aefa16bbe2f01de81e39e4a63c12bad96d060db1297b6ee1918ad0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "9acf7f264508009663b30fc7c345d1a43dfdfdb70b657ab65ff672fa2717ee79",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-11",
       "decision": "accepted",
-      "content_sha256": "b070edc1b86c8880cc8ce8496fe8ac5a0b2d4c7198e89ec841d1a11fee06d3e1",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "eac4727b037f6993e49db2b3fcdfce0880d7fc5f5984632cd0540e778fc8f0f6",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-12",
       "decision": "accepted",
-      "content_sha256": "5aab62187169765a7d8f8b2c27ac41b3d56e4eaa990efabd9c668d279dd4b2cd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "4c8d041f1cef2127e3d70410947e36f7f4669a67aacf6b258f5d179f0c056595",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-13",
       "decision": "accepted",
-      "content_sha256": "f736dc876fed696b7382a56e07d13b7439a54d2b3d76ca7d55ebac5a2b22c9ac",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "36c6615ee739c710258079a2651fdfdb777001309b828b2e5df65093503af1d9",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-14",
       "decision": "accepted",
-      "content_sha256": "cea7d27c4d38757ce8de3cff9a9e10850bc4ce01b54f2bb054504ae39c335d69",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "b587613d093c6a20362e77c66fb372356b6e3b812051a19d1e7a1cc3e8bebf30",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BGTASK-15",
       "decision": "accepted",
-      "content_sha256": "86f8659a4d49c04a86cd46505b05a2b4a68734ece959c43973b8ef8377e62357",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "3341ee669fb87f0857e56a80b27cdd265e0a40189a32a04fc37280612eb34b52",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-01",
       "decision": "accepted",
-      "content_sha256": "6145a1d05843b73e6780c8a3888ded2cc402ae4a76bc358cd9718bb2e089f1d6",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "5b1e4a5eadc84bf8a612095077037c2f9e1c89394c551234ee0038b7253aaaaa",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-02",
       "decision": "accepted",
-      "content_sha256": "128bda61627918e6b2582e8d7cc3001d14bb89e6fa8d1f4da63daad287b241e0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "f8425fdb01df75b0b9315c13adeecf1f3bd3bd1da3dcf2915bc538f33166026f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-03",
       "decision": "accepted",
-      "content_sha256": "518862df3d3bd821d8c651f58e02d5c1cad162bdf306b167b9265381ada83d27",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "efabff36449a259a30589c3745c0033c495fd7b24042315b244540ba9b341977",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-04",
       "decision": "accepted",
-      "content_sha256": "b9aaceba09c527f621da85de49ce0361194fb097369b6f7b69935a0c2afcf08f",
-      "note": "第 9 轮：原意见已执行。Q13 已执行：补上「终态标记压过运行中的隧道」这条边界与用例。（审查人 jiaoyang623）",
+      "content_sha256": "405c208a785868b18da2d243643a867ceb121d46f5c94bf8345cb8d47c145ca4",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：补上「终态标记压过运行中的隧道」这条边界与用例。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-05",
       "decision": "accepted",
-      "content_sha256": "9d176180737147c552b6ecabc7e3faefe28b55cb3946477086d724a67099bbe1",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "198bc9099aa3634856383ddf3b6b8ce3b9b2bad252cd53c84cb926c538668f1e",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-06",
       "decision": "accepted",
-      "content_sha256": "a2be37941c5b531167d9a2590f520dfa9a93c51b6104ec3c701148e5b0703291",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "e569bd2756240f3373ca93741424676100f38cd97f53ca9f4229c3a956acd1af",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-07",
       "decision": "accepted",
-      "content_sha256": "35d576d1643851d2ed303e3e7fdd22530f4af08b61e970e24326c3141079bc39",
-      "note": "第 9 轮：原意见已执行。Q13 已执行：判读只剩一个函数，措辞按现状改正。（审查人 jiaoyang623）",
+      "content_sha256": "959a0c18e22c4ca69752974bfc3e35324e3e565d94681e8ee65aa8c901ade8c8",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：判读只剩一个函数，措辞按现状改正。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-08",
       "decision": "accepted",
-      "content_sha256": "8985360ddfe9557f268a5dc78acfb9e0f6ce290c3bbe9107a5873cfb73efb175",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "120db0935583da882d76795911dbd52b52444b3cc112fc8ed0e26fd535293b6b",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-STATUS-09",
       "decision": "accepted",
-      "content_sha256": "15839bee6ac0f3a8c33839f62b4c2c8d4f36169262a1ee09453a7960c67a8221",
-      "note": "第 9 轮新增判据，审查人接受（连接窗口报 connecting，钉在 test-vpn-status-reader.mjs）。",
+      "content_sha256": "1efd4ca7a2bb05c7b1cdb05abb5097e9a503c396b29fafa71842b318104bb646",
+      "note": "第 9 轮新增判据，审查人接受（连接窗口报 connecting，钉在 test-vpn-status-reader.mjs）。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-01",
       "decision": "accepted",
-      "content_sha256": "92cbeee350e8d8d79c026fc413663eea9f6d17ead29d6c85420ffd76400bcef7",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "431e337c4f64180a8ebd09059e52473a87a2fc2a96d0166cd810b053758399dd",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-02",
       "decision": "accepted",
-      "content_sha256": "997c7377a276101ae87c3e6f97f1c4892de27d238eb2d83a31757b9be2f4228e",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "e4609fa376067bdee05a4fd1c82002d9aaca0af05c160ed4244f1feed41b7b72",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-03",
       "decision": "accepted",
-      "content_sha256": "13073cc3b3740fac64f48d4bdc39b1f71bc631214c200efae479c2ff86975550",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "f2f79dea6ede6e32abf155ba4ffd23ff9d4760f5404030296b5161f0a718a360",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-04",
       "decision": "accepted",
-      "content_sha256": "a61c0a64237663f37cf3a6f595e05e1a47acbed1ff0fc6b95e8a00af3b29fbcd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "98ff21b766b18a6e18aa96d1710c4654b2d502e120fe0fc8d2b8c5c6189473b4",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-05",
       "decision": "accepted",
-      "content_sha256": "3ab836dd99c6fdc4e9e0097012947254bff1cced8371c541222a17a26b6dee80",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "1641617b76044ec99a118327bce1d8001e6cd32a8e6b64d6958a03af0a499025",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-06",
       "decision": "accepted",
-      "content_sha256": "0b2a6a06a1c59ca81ebb7358305ac6b5bdcf5cfdca1cd7ab5fac5df876b6e5b0",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "5e9140574695685316efe1c0a5ef852140af72e52367bac6133c9f0de2602ed7",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-07",
       "decision": "accepted",
-      "content_sha256": "d9bdfbe66769a2262837d31e42dd16cc9d14f8bcb725c14e5418640705551809",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "5cc5ef0c5f633f2a14dcf28197ed756d8783ba8d138c95727284c665695dfcbe",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-08",
       "decision": "accepted",
-      "content_sha256": "67f55b88ade5ca9a9e1b90abf099a97d86dcffeebd975f28c74a622bd21e1a82",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "1782fc3fc741f339abc40e5692d2b1544f3902767071104fd0e11db61d036b77",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-09",
       "decision": "accepted",
-      "content_sha256": "5b75d0ff55eebeacd195c8ba018b70509fd449271537bb294f7cff9d89ffb53b",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "baef46ae0010ddaf79453abadb270e7b808b8cd7b24546735cfb27d5f4113f33",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-NETMON-10",
       "decision": "accepted",
-      "content_sha256": "254e2606fd84c0ac063abc9ee92a7b7f822f5999a88544d6d890bfc3d052ab82",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "31b2e7ff91b1b796aa05e134f928717d93f1efb96e48b8ffa07fdccc076aa665",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-RECONN-01",
-      "decision": "changes_requested",
-      "content_sha256": "332831f4dd66581ab3bdf86b09594781edb2d41cff4184f3b13e5c4bb33ca499",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "878dd3b73a6306a8c2b31141dcad11a09099c6a76f74f2b2070880314a988fb3",
+      "note": "第 13 轮：原意见已执行。Q16a 已执行：父判据重定为 O-SEAM-11 与 O-SEAM-03。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-RECONN-02",
       "decision": "changes_requested",
-      "content_sha256": "f8d310e951b1fef5951cd7430e8eab71a655c10afd136c3877dad48dee20e7b5",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "7df320636d3007c671803594b83c3bf2af45d444a5b5ff8fd0414d642cac5a81",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-03",
       "decision": "changes_requested",
-      "content_sha256": "b0ae6a9f38399c221b9e8986155e1ea299acdc46a107b432c6bf909750fbef16",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "875cd337e5c6ab4558e0e54a6a640248f0abbf5d40fa19c402c89a9d63ec398c",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-04",
       "decision": "changes_requested",
-      "content_sha256": "afccf5aeed26f6b39ec5b7352082e327d7b4c9c0eb9beda58b4dcc50dde25b2f",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "146c637c8e0c926ee3465f8a6f3ef56567cfc725d42286eb13f723484defe8a0",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-05",
       "decision": "changes_requested",
-      "content_sha256": "a308e4d49652c7783a0275b7c70b21311f011405ac80198d4ecdb1be931b560b",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "c7a18917522365d4a903715905a45bed7a583c63e0df97433d61e395333a9248",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-06",
       "decision": "changes_requested",
-      "content_sha256": "f22bd6cb65c15cb954a562348a37c07e10c8f7718023a9a558a1438d7f351d96",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "2da8c810b6097d803790457aa7593711a97a7cb5e0bfc6ee4068c4e0fb8aba38",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-07",
-      "decision": "changes_requested",
-      "content_sha256": "21b44525198506576a8fdb8e609434337857840dd7242021fc10c0217d1ab5f2",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "db1b31efbbae699f25bf9f30035995b39c0fb97facfcd26f7e6e78e83c93b7df",
+      "note": "第 13 轮：原意见已执行。Q16a 已执行：父判据重定为 O-SEAM-11 与 O-SEAM-03。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-RECONN-08",
       "decision": "changes_requested",
-      "content_sha256": "15b7ca05a2e4eb038b2ae6d6e714ac66bc8116877700333ea40f2cfadfa24c14",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "ddc4c8ef38eeae6a579fd49b1d1cf0ab6ef25ed2eb7167b8a9b2cb7bd7e26d21",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-09",
       "decision": "changes_requested",
-      "content_sha256": "3eda67706422c74b52e17782e5bed8283b03c1dd012929ab038e97dcab47c5f2",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "8c3bba9272d94bab8bc4e1f3b7db5c413becc7f753ecefa8dafa933a11a1831d",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
       "id": "O-RECONN-10",
       "decision": "accepted",
-      "content_sha256": "9fd8bf33645559fb94e24b1a684d94147edf80ca63f9759d8e5706c2e914dcda",
-      "note": "第 9 轮新增判据，审查人接受（停止请求作废在途重连，钉在 4 条用例上；保证边界已写明）。",
+      "content_sha256": "ef145f04636d6662a33b72bf8541aec5b2200a933ab7a7c0538c7033b5a5fd3a",
+      "note": "第 9 轮新增判据，审查人接受（停止请求作废在途重连，钉在 4 条用例上；保证边界已写明）。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-01",
       "decision": "accepted",
-      "content_sha256": "03e30b1dd28726ff4cb238c03650f1f24f2cd974633140bbfa0eb16033cc4c3c",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "28192352b11bfeea58f14f8b33c408e6855259569b860e3e6218616600369c06",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-02",
       "decision": "accepted",
-      "content_sha256": "8fc947b283d398005573c5d136f99423dd8365b1307c04aa80ce7774d0d5ae9d",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "cdbc9f8ae5368513ae2e6289d3ab316dca8b437cde87d05762ebca28d59d27c5",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-03",
       "decision": "accepted",
-      "content_sha256": "7af4cba6a83abad7d58b853eeb91f409cbe943e847310359a64e46ae161f31d7",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "654bd8ba1d2ed02f5eb490f7ba15d88e9fcec4b799ee68ae82e9677b90ac987f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-04",
       "decision": "accepted",
-      "content_sha256": "1f1161315ce110263338e82f2e070f51a72c6d2377e95e5c7a3f45c082950bfd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "058ee1cfb9690f9250865b8d08dd0afd70d1db9778d03dde540e80f81b6bc4ab",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-05",
       "decision": "accepted",
-      "content_sha256": "922d23a9eb3180edaedb1623c45126d20bbb947cc2f1318c1a2ee31f0f590f1f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "3829f53d4f7586fde5d61bb8c00eea350087e0c27d7f34f86cea19322987797a",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-06",
       "decision": "accepted",
-      "content_sha256": "16ccb21c6aacc4286b11034ddab3c934a9ab93032086520db562ddfc394ce2a2",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "e52a3350e60508893bb06edd90be31ac5f9f2ef21c0ddf59b67b8951d979ea97",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-07",
-      "decision": "changes_requested",
-      "content_sha256": "4b951a77db82b1b1767bda35b8e6cd7037bc2838ac3564d6b47013791e9a0385",
-      "note": "Q12 决定：把交接预算的耦合写成显式约束，而不是靠两个常量恰好相等。",
+      "decision": "accepted",
+      "content_sha256": "185d0bfd75a28ba13d8a46080ad3eebc25fd456bde760074d86c0bbc48684f5c",
+      "note": "第 13 轮：原意见已执行。Q12 已执行：补上跨模块常量关系断言，判据转 closed。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-SESSION-08",
       "decision": "accepted",
-      "content_sha256": "29a30f624f7b41e138b552aa0d25f96c169c73152ec8c9a8d1a67de1078cd229",
-      "note": "第 9 轮新增判据，审查人接受（销毁后不保留旧态，钉在 3 条用例上）。",
+      "content_sha256": "08dbdffe4518518a03822d67ea33a68eeb306a3a763aaac2e3eac550e4702695",
+      "note": "第 9 轮新增判据，审查人接受（销毁后不保留旧态，钉在 3 条用例上）。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-01",
       "decision": "accepted",
-      "content_sha256": "70efd712b9863876b1eedce561c608f690352a9eb3b4aa582bf1e5df944c9b4f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "66ff6285538e82752e8a261ce85fcf9c709ece97c6b4aa13e033c6692e1ca591",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-02",
       "decision": "accepted",
-      "content_sha256": "2630d7c591b633ff93c872d9ecff885c12fd788e965182f120843f26867f8bd8",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "a0a8af9d6ad33a13967af25e1d0db26185f8f48ef32285a70abc61c654b18b31",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-03",
       "decision": "accepted",
-      "content_sha256": "a7a4c831087157ca1d1d7038f674f27f84913af3df9d07e4b4eae377956b3673",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "f8fe9f4794eff47e3ccf7016ec7bbf4c6f6a9e7bd7b2889858390b1133d8553b",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-04",
       "decision": "accepted",
-      "content_sha256": "833e4136363f5ee0822b3175b5a8d1e75c99a8b3f7e82864d448bdd2a68d3060",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "f534cde607d657a527eac1f489b4f30bb6a7f0c36f51bdb8489c9f4ebaa5744f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-05",
       "decision": "accepted",
-      "content_sha256": "1f0b3d472d89a194a6853487efbd9220df71412aef3c204ea6196f161c7ed76a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "628b23b5acd3a12dea83c3677c7672770b61b2448ca41ef895ccf1b2277d4362",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-06",
       "decision": "accepted",
-      "content_sha256": "46c0d01e5af3483fd38a3591103f755383d357f9ae01922d6edc21799de0aa12",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "3f0674ee2750fdb1eac44a6f774664dc90917b0e2bb21f8bfd01b03cc5e05e14",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-07",
       "decision": "accepted",
-      "content_sha256": "d6d7859bef556470d8fb841bdb199ddb6ce36044e6575d8e2308025fd7cd05d9",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "cae61377cd6822da357a7eb0e76ee3a4711b0b8345fad7254dda379c793c8b99",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-08",
       "decision": "accepted",
-      "content_sha256": "54e221698ee76343e9ed59540a89290e415bc1dce33d6cb2def332da6673831a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "1da0cbc413e6480070ddfe4361a9ab28cfe08087815839ed4188040167656c7f",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-09",
       "decision": "accepted",
-      "content_sha256": "820e53ec0490585cfa5d485ea5d9d50a067ccc1b303b88446e6226083df953a1",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "af7f77da85773fa140868c6f38bfc8b1280111300b4f0dda8d68f23f74b9b1db",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-10",
       "decision": "accepted",
-      "content_sha256": "6aa421ec000746452123db44e7395d60327d08379c0351b19d90a76d186c32a9",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "5a5672194bfc707a03bc88287ebad538a0f81a33ddddb82b20cc4a7a02aa544e",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-PEER-11",
       "decision": "accepted",
-      "content_sha256": "b603e3ea09a8d8815f4e676a5fccb73e4293a77331558b37bc2c41266c355164",
-      "note": "第 9 轮：原意见已执行。Q3 已执行：循环展开成 5 条字面用例名，锚点可达，判据转 closed。（审查人 jiaoyang623）",
+      "content_sha256": "6c09c20064d56d6035589dae9bd3b773188a72927a235191a9ed5768852806e4",
+      "note": "第 9 轮：原意见已执行。Q3 已执行：循环展开成 5 条字面用例名，锚点可达，判据转 closed。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-LOCALSEND-01",
       "decision": "accepted",
-      "content_sha256": "c08ab715921d3b62b24ab76010849b9013170255de87b073df77f33ba059b95a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "9368e4379c9919de3f0341130918d6448cc5cf882a3c41c8e54fadc4de3b3350",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-LOCALSEND-02",
       "decision": "accepted",
-      "content_sha256": "6e29f3a3f169afd27627c7e7ae0bc37e2bd5df83484146736cc928a96f5c1de4",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "b07c8e94d670c06f0f081d255a4b4631ea9f8b26dce1bb16384eed7dfae94eae",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T13:30:27+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-01",
-      "decision": "changes_requested",
-      "content_sha256": "fe6d9801eb895a354064e5e6ecc29b9c011b4e19ce764f1a495823a4e03e6188",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "c4c708639c5fcb4e491bfbacb70cd669f9f580fa60df26cd86682abc4087ceee",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-02",
-      "decision": "changes_requested",
-      "content_sha256": "7ce88a145f2386b369f28d22f3e54da59e02966d3bd209a7f62f261cdca46151",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "b851a8ce45c67a7cc8fed31c6eff74564608ddf8129faaebb74c925452820291",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-03",
-      "decision": "changes_requested",
-      "content_sha256": "36b143e2fedef4bb53a98e548c8ee1bd5eed41e40f1faf08959b2187f432c2ff",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "a51bad508aa442ecb1683e20e2ddba0271a299ff92576e704a8a00bd20b9540a",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-04",
-      "decision": "changes_requested",
-      "content_sha256": "4fb8874512b02a728f021c20280e0f767e009c354626e65a9339feb573b0da2e",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "ecbf33fa35c6907175a9fec9c12de653229a03edd06b0068f1b51b8ffd921e1a",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-05",
-      "decision": "changes_requested",
-      "content_sha256": "c0e0e82cc3e4ac90eedf053c6389b1e2f4d41c2850b0d1afae0ccf98c4013ca3",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "3f140d00b00564493c9eb62efdfe7f448011ad3e7b9461779160444fb494a06a",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-06",
-      "decision": "changes_requested",
-      "content_sha256": "927a990206aff17808a65717b451ad36c383494db22aa88192d9ffc4dbf6eaca",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "c911ec306afbe072ab7acc7c3d04ec720d37710119b1ac0bd631884c30fa741e",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     },
     {
       "id": "O-BUILD-07",
-      "decision": "changes_requested",
-      "content_sha256": "4c999f502111d4eb3eb24a76d4f6a0a263ecb042b07f74ab55df2630a8304b2f",
-      "note": "Q16b 决定：不为构建单立接缝，改为直连旅程并写 seam_not_applicable 理由。",
+      "decision": "accepted",
+      "content_sha256": "12bd6b067e57e98e9a0e872041e1961ec6208da3e5da42ff6ee9d773af205316",
+      "note": "第 13 轮：原意见已执行。Q16b 修订（2026-10-13）已执行：7 条改为挂在新建接缝 O-SEAM-18 下，接缝不适用字段删除，不确定特征改为 none。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T14:22:49+11:00"
     }
   ]
 }
