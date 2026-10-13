@@ -86,6 +86,20 @@ if [ -n "$CLEAN" ]; then
 else
   devecocli run --device "$DEVICE" --skip-build 2>&1 | tee "$OUT/02-install.txt" | tail -5
 fi
+[ "${PIPESTATUS[0]}" -eq 0 ] || { echo "装机失败，停止。见 $OUT/02-install.txt" >&2; exit 1; }
+
+# 应用没跑起来，后面的采集一无所获，而脚本会一直走到收尾才让人发现。
+# devecocli 在没有运行中的进程时明说 "No running process"，就查这一句。
+say "1.5/6 确认应用已经在跑"
+echo "请在手机上打开一次 MeshArc，停在首页。若刚装完，它通常已经起来了。"
+read -r -p "打开后回车： " _
+devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --from 2m --tail 1 \
+  > "$OUT/00-app-alive.txt" 2>&1 || true
+if grep -q 'No running process' "$OUT/00-app-alive.txt"; then
+  cat "$OUT/00-app-alive.txt" >&2
+  echo "应用没在运行。这时候开始采集，整批场景都会是空的。先把它打开再重跑。" >&2
+  exit 1
+fi
 
 say "2/6 开始采集设备日志"
 devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --follow > "$OUT/03-log.txt" 2>&1 &
@@ -93,6 +107,14 @@ LOG_PID=$!
 cleanup() { kill "$LOG_PID" 2>/dev/null; wait "$LOG_PID" 2>/dev/null; }
 trap cleanup EXIT
 echo "日志写入 $OUT/03-log.txt（后台进程 $LOG_PID，收尾时停止）"
+# 起不来的采集会让整批场景白跑，所以在这里就确认它活着。
+sleep 5
+if ! kill -0 "$LOG_PID" 2>/dev/null; then
+  echo "采集进程已经退出，日志不会有内容。检查 --device 与 devecocli 的登录状态。" >&2
+  tail -5 "$OUT/03-log.txt" >&2
+  exit 1
+fi
+echo "采集进程存活，开始走场景。"
 
 scenario() {
   local id="$1" title="$2" instruction="$3"

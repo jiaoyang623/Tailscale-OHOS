@@ -29,3 +29,6 @@ certs/release/*.jks
 certs/release/*.keystore
 certs/release/*.key
 certs/release/*.p7b
+
+# 真机采集产物：截图、日志、导出的诊断报告。不进仓库。
+device-runs/
