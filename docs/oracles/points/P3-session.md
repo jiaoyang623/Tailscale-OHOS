@@ -132,3 +132,22 @@
 - 不确定特征：UNCERTAIN-WIRING
 - 归属：owner=项目维护者 接收批次=a01-单元
 - 复核：待复核
+
+### O-SESSION-08 生命周期销毁后命令状态机不保留旧态
+- 层级：单点
+- 父判据：O-SEAM-01
+- 强度：强
+- 设计依据：需求 R-CONN-02「停止扩展、回到未连接态」；架构 §四 D1（两条编排共用的命令机）；HLD 契约 C-01
+- 触发与前置条件：`VpnCommandStateMachine.begin()` 之后 UI 生命周期被销毁（`BridgeStatus.ets:948`、`:1029` 调 `invalidateLifecycle()`）
+- 可观测点：`currentState()` 与 `currentLifecycleGeneration()` 的返回值；迟到的 `complete()` / `timeout()` 的返回值与副作用
+- 期望：正常：`invalidateLifecycle()` 之后 `currentState()` 回到 `stopped`，不保留这一代的命令结果；边界：上一代停在 `timed_out` 时也必须清掉，因为 `BridgeStatus.finishVpnExtensionStop`（`:2574`、`:2591`）用 `currentState() !== TIMED_OUT` 判断迟到结果能不能走完整停机路径，而那条路径会重启后端；失败与恢复：迟到的 `complete()` 与 `timeout()` 都返回 false 且不改变状态；安全与质量：销毁之后不得让「上一代的超时」把新生命周期里的后端重启一遍。判定在无平台桩的边界下成立
+- 失败信息：期望「销毁后 currentState() 回到 stopped」，实际「停在 starting 或 timed_out，守卫据此走完整停机路径并重启后端」
+- 来源：entry/src/main/ets/services/VpnCommandGateway.ets:63-73 invalidateLifecycle；entry/src/main/ets/components/BridgeStatus.ets:2574、:2591 的 currentState 守卫；scripts/test-vpn-command-state-machine.mjs
+- 上游：R-CONN-02
+- 测试：scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded
+- 测试：scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting a timeout
+- 测试：scripts/test-vpn-command-state-machine.mjs::a late timeout cannot move the state after a destroyed lifecycle
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核

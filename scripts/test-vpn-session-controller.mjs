@@ -167,3 +167,23 @@ test('a connect that is already up never starts or stops anything', async () => 
   assert.equal(f.stops, 0);
   assert.equal(f.sleeps.length, 0, 'an unchanged connect must not poll');
 });
+
+test('a cancelled connect never starts the extension', async () => {
+  // The reconnect supervisor withdraws its authority when the user disconnects.
+  // A connect that keeps running would leave the user with a tunnel they killed.
+  const f = fixture();
+  f.state = 'disconnected';
+  let asked = 0;
+  const result = await f.controller.connect('/files', () => { asked++; return true; });
+  assert.equal(result, 'cancelled');
+  assert.equal(f.extensionStarts, 0, 'a cancelled connect started the extension');
+  assert.ok(asked > 0, 'the connect never consulted the cancellation token');
+});
+
+test('a connect that keeps its authority still starts the extension', async () => {
+  const f = fixture();
+  f.state = 'disconnected';
+  const result = await f.controller.connect('/files', () => false);
+  assert.equal(result, 'started');
+  assert.equal(f.extensionStarts, 1);
+});

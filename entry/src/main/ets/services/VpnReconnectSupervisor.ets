@@ -43,6 +43,12 @@ export class VpnReconnectSupervisor {
   private inForeground: boolean = true;
   private stopRequested: boolean = false;
   private polling: boolean = false;
+  /**
+   * Bumped whenever an attempt loses its authority. A connect that is already
+   * running cannot be stopped in the middle of the extension start, so the
+   * completion checks this token and undoes what it started.
+   */
+  private attemptId: number = 0;
 
   onForeground(): void {
     this.inForeground = true;
@@ -63,6 +69,8 @@ export class VpnReconnectSupervisor {
     this.stopRequested = true;
     this.attempts = 0;
     this.nextAttemptAtMs = 0;
+    // Cancel any attempt that is already in flight.
+    this.attemptId++;
   }
 
   /** Called once the connection is established again or on an explicit connect. */
@@ -70,6 +78,8 @@ export class VpnReconnectSupervisor {
     this.stopRequested = false;
     this.attempts = 0;
     this.nextAttemptAtMs = 0;
+    // An explicit connect supersedes an attempt that is still in flight.
+    this.attemptId++;
   }
 
   /**
@@ -126,7 +136,23 @@ export class VpnReconnectSupervisor {
     this.attempts++;
     this.nextAttemptAtMs = nowMs + Math.min(RETRY_MAX_MS, RETRY_BASE_MS * Math.pow(2, this.attempts - 1));
     this.record(filesDir, 'vpn_reconnect_attempt', this.attempts);
-    this.controller.connect(filesDir).then((result: VpnActionResult): void => {
+    const attemptId: number = ++this.attemptId;
+    const stillAuthorised = (): boolean => attemptId === this.attemptId && !this.stopRequested;
+    this.controller.connect(filesDir, stillAuthorised).then((result: VpnActionResult): void => {
+      if (result === VpnActionResult.CANCELLED) {
+        this.record(filesDir, 'vpn_reconnect_cancelled', 0);
+        return;
+      }
+      if (result === VpnActionResult.STARTED && !stillAuthorised()) {
+        // The user asked to disconnect, and this attempt lost its authority
+        // after the last cancellation point. Undo it rather than leave a tunnel
+        // the user just killed.
+        this.record(filesDir, 'vpn_reconnect_superseded', 0);
+        this.controller.disconnect(filesDir).catch((): void => {
+          this.record(filesDir, 'vpn_reconnect_undo_failed', 0);
+        });
+        return;
+      }
       this.record(filesDir,
         result === VpnActionResult.STARTED ? 'vpn_reconnect_started' : 'vpn_reconnect_not_started', 0);
     }).catch((): void => {

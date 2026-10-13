@@ -64,7 +64,7 @@ scripts/run-checks.sh --strict   # 判据命中 P0 时退出 1
 | HLD | `docs/hld/hld.md`（17 张契约卡） | 无新增（单点补契约引用） | `docs/review/hld/index.html`（224 条） | **已分层签收**（45 条记需改） |
 | LLD | `docs/lld/lld.md` | 无新增 | `docs/review/lld/index.html`（230 条） | **已分层签收**（38 条记需改） |
 
-判据库总计 **118 条**（31 旅程 + 17 接缝 + 70 单点），闭环 77 条（65.3%），三组检查 0 命中、0 P0。
+判据库总计 **120 条**（31 旅程 + 17 接缝 + 72 单点），闭环 79 条（65.8%），三组检查 0 命中、0 P0。
 
 ## 需求状态位口径
 
@@ -373,6 +373,49 @@ not ok 20 - a terminal marker wins over a running tunnel
 这条不是缺陷报告，是**机制粒度**的记录：工具只能看见「文本变了」，看不见「变的只是行号」。
 它宁可多报也不漏报，方向是对的，代价记在 Q20 里。
 
+### 第 9 轮 · 命令状态机与重连取消（Q14 / Q15）
+
+第 7 轮审查人点名的两处「修」，都不需要真机。
+
+**Q14 · `invalidateLifecycle()` 不重置 `state`。** 改之前实测：`begin(CONNECT)` 之后调
+`invalidateLifecycle()`，`currentState()` 仍返回 `starting`，而且会一直停在那一代的值上，
+因为迟到的 `timeout()` 被 `isActive()` 拒绝。这条本身只是「返回值陈旧」，真正危险的是它的
+另一种取值：若上一代停在 `timed_out`，`BridgeStatus.finishVpnExtensionStop`（`:2574`、`:2591`）
+的守卫 `currentState() !== TIMED_OUT` 就不成立，于是迟到结果会走完整停机路径，而那条路径
+**会重启后端**——也就是在一个已经不存在的界面上把后端重启一遍。修法是让
+`invalidateLifecycle()` 把状态一并清回 `stopped`。
+
+**Q15 · 重连不可取消。** `VpnReconnectSupervisor.handleDrop` 里
+`this.controller.connect(filesDir)` 是发射即忘：用户在重连在途时点断开，重连照样把隧道建起来，
+用户刚点下的断开被静默撤销。修法分两层：
+
+| 层 | 做法 |
+| --- | --- |
+| 真取消点 | `VpnSessionController.connect(filesDir, cancelled?)` 在后端就绪之后与启动扩展之前各查一次令牌，命中即返回新增的 `CANCELLED` 且**不启动扩展** |
+| 兜底撤销 | 窗口若落在两次检查之间，`handleDrop` 的完成分支按令牌判断，若已失去授权就 `disconnect` 撤销自己刚建起的隧道，记 `vpn_reconnect_superseded` |
+
+**这条保证的边界要说清楚**：`connect` 在扩展启动中途没有中断点，所以保证是
+「用户停止后不留下隧道」，不是「隧道从不被短暂建起」。判据里就是这么写的，不写成做不到的话。
+
+**有效 Red**：这一轮的两组用例是在改完代码之后写的，按 a01 的顺序**不算数**。所以把两个源文件
+`git checkout` 退回修改前重跑了一次：
+
+```
+# 退回修改前
+not ok 11 - a stop requested while a reconnect is in flight undoes the connect
+not ok 12 - a connect that cancelled itself is not undone
+not ok 14 - the supervisor hands the controller a cancellation token
+not ok 21 - a cancelled connect never starts the extension
+# tests 22 · pass 18 · fail 4
+```
+
+第 5 条新用例（「没有停止请求时不撤销」）在旧代码上也通过，因为它断言的是一个**本来就成立**
+的性质。这正是「红了几条」要逐条看原因的地方：红的必须是我要修的行为，不是顺手写坏的夹具。
+
+**改完**：门禁 `108 通过 / 0 失败`；判据 **120 条 · closed 79（65.8%）**；三组检查 0 命中、P0 为 0。
+新增两条判据：`O-SESSION-08`（销毁后不保留旧态）与 `O-RECONN-10`（停止请求作废在途重连）；
+`O-SEAM-11` 的期望补上取消令牌与兜底撤销。
+
 ## 闭环检查记录
 
 每条命令、时刻、基线与信号条数都记在这里；程序出证据，人签结论。
@@ -386,6 +429,7 @@ not ok 20 - a terminal marker wins over a running tunnel
 | 集成测试试跑后 | 2026-10-12T18:14 | 工作树 | `--entries='scripts/test-*.mjs,scripts/integration/*.mjs'` | 117 | 74 | 0 / 0 / 0 | 0 |
 | **四层收尾（当前）** | 2026-10-12T18:18 | **`cc7ab88`** | `scripts/run-checks.sh`（同一命令内含判据三组检查） | 117 | **76** | 0 / 0 / 0 | 0 |
 | **第 8 轮（Q9/Q10/Q13 改完）** | 2026-10-13T13:2x | 工作树 | `scripts/run-checks.sh`（新增资源键与事件名两个守门人） | **118** | **77** | 0 / 0 / 0 | 0 |
+| **第 9 轮（Q14/Q15 改完）** | 2026-10-13T13:4x | 工作树 | `scripts/run-checks.sh` | **120** | **79** | 0 / 0 / 0 | 0 |
 
 四层收尾这次是**在提交后的基线上跑的**：先提交（`cc7ab88`），再在该基线上跑
 `scripts/run-checks.sh`（**76 通过 / 0 失败 / 0 跳过** = 73 单元 + 3 集成），
@@ -437,8 +481,8 @@ not ok 20 - a terminal marker wins over a running tunnel
 | Q11 | `vpn-connect-config.json` 有两个写方，架构「每类文件只有一个写方」不成立 | 改架构文档 | 未做 |
 | Q12 | `O-PEER-11` 锚点不可达；`O-SESSION-07` 两个预算只是恰好相等；`O-RECONN-09` 有实现无测试 | 随 Q3 与测试批次补齐 | 未做 |
 | Q13 | 同一状态文件的两个读者优先级相反 | 定口径（先判 disconnected）并改代码 | **已做**（先判 disconnected） |
-| Q14 | `VpnCommandStateMachine.invalidateLifecycle()` 不重置 `state` | 修 | 未做 |
-| Q15 | 重连的 `connect()` 发射即忘，用户断开无法中止在途重连 | 修（加取消句柄） | 未做 |
+| Q14 | `VpnCommandStateMachine.invalidateLifecycle()` 不重置 `state` | 修 | **已做**（`invalidateLifecycle` 清状态） |
+| Q15 | 重连的 `connect()` 发射即忘，用户断开无法中止在途重连 | 修（加取消句柄） | **已做**（取消令牌 + 兜底撤销） |
 | Q16 | `O-RECONN-01…09` 归属三处不一致；`O-BUILD-*` 挂占位父判据 | 重定到 O-SEAM-11 + O-SEAM-03；构建不单立接缝 | 未做 |
 | Q17 | `QG-01` 的 M-11（蜂窝下长时间存活）从未完成；`QG-02` 连接期保活真机未复跑 | 加进真机批次 | 未做 |
 | Q18 | 质量目标表与架构视图从未进审核快照（投影不完整） | 已补投影，并由审查人重新定夺 | **已做**（`7ed18db`） |

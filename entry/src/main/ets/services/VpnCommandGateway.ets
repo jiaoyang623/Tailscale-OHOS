@@ -63,6 +63,12 @@ export class VpnCommandStateMachine {
   invalidateLifecycle(): void {
     this.lifecycleGeneration++;
     this.activeCommandId = 0;
+    // Clear the outcome as well. BridgeStatus.finishVpnExtensionStop reads
+    // currentState() to decide whether a late stop result may finish the job,
+    // and a state left over from this generation sends it down the full path.
+    // That path restarts the backend, so a stale TIMED_OUT would restart the
+    // backend of a screen that no longer exists.
+    this.state = VpnCommandState.STOPPED;
   }
 
   currentState(): VpnCommandState {

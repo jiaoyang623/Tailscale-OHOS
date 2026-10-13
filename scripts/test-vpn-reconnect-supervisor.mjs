@@ -34,18 +34,26 @@ function fixture() {
     state: 'disconnected',
     now: 1_000_000,
     connects: 0,
+    disconnects: 0,
     events: [],
-    connectResult: 'started'
+    connectResult: 'started',
+    connectGate: null,
+    lastCancelled: null
   };
   const sandbox = {
     Date: { now: () => f.now },
     VpnLinkState: enumMembers(readerSource, 'VpnLinkState'),
-    VpnActionResult: { STARTED: 'started', STOPPED: 'stopped', UNCHANGED: 'unchanged', NEEDS_UI: 'needs_ui', FAILED: 'failed' },
+    VpnActionResult: { STARTED: 'started', STOPPED: 'stopped', UNCHANGED: 'unchanged', NEEDS_UI: 'needs_ui', FAILED: 'failed', CANCELLED: 'cancelled' },
     VpnStatusReader: { read: () => ({ state: f.state, txBytes: 0, rxBytes: 0 }) },
     VpnSessionController: class {
-      connect() {
+      connect(_filesDir, cancelled) {
         f.connects++;
-        return Promise.resolve(f.connectResult);
+        f.lastCancelled = cancelled;
+        return f.connectGate === null ? Promise.resolve(f.connectResult) : f.connectGate.promise;
+      }
+      disconnect() {
+        f.disconnects++;
+        return Promise.resolve('stopped');
       }
     },
     DiagnosticEventStore: { record: (...args) => f.events.push(args[2]) }
@@ -56,6 +64,11 @@ function fixture() {
   f.connected = () => { f.state = 'connected'; };
   f.dropped = () => { f.state = 'disconnected'; };
   f.push = async () => { await f.supervisor.poll('/files', f.now); await Promise.resolve(); };
+  f.flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
+  f.holdConnect = () => {
+    let release;
+    f.connectGate = { promise: new Promise(r => { release = r; }), release };
+  };
   return f;
 }
 
@@ -226,4 +239,70 @@ test('a connection held past the stability window clears the retry ladder', asyn
   }
   assert.equal(f.connects, 4, 'the ladder was not re-armed after a stable connection');
   assert.equal(f.events.filter((e) => e === 'vpn_reconnect_exhausted').length, 1);
+});
+
+test('a stop requested while a reconnect is in flight undoes the connect', async () => {
+  // The connect cannot be stopped inside the extension start, so the attempt
+  // loses its authority and undoes what it started. Without this the user's
+  // disconnect is silently revoked a moment later.
+  const f = fixture();
+  f.connected();
+  await f.push();
+  f.supervisor.onBackground(f.now);
+  f.now += 60000;
+  f.dropped();
+  f.holdConnect();
+  await f.push();
+  assert.equal(f.connects, 1);
+  f.supervisor.noteRequestedStop();
+  f.connectGate.release('started');
+  await f.flush();
+  assert.equal(f.disconnects, 1, 'the superseded connect was left in place');
+  assert.ok(f.events.includes('vpn_reconnect_superseded'));
+});
+
+test('a connect that cancelled itself is not undone', async () => {
+  const f = fixture();
+  f.connected();
+  await f.push();
+  f.supervisor.onBackground(f.now);
+  f.now += 60000;
+  f.dropped();
+  f.holdConnect();
+  await f.push();
+  f.supervisor.noteRequestedStop();
+  f.connectGate.release('cancelled');
+  await f.flush();
+  assert.equal(f.disconnects, 0, 'a cancelled connect cannot need undoing');
+  assert.ok(f.events.includes('vpn_reconnect_cancelled'));
+});
+
+test('a reconnect that finishes with no stop is left alone', async () => {
+  const f = fixture();
+  f.connected();
+  await f.push();
+  f.supervisor.onBackground(f.now);
+  f.now += 60000;
+  f.dropped();
+  f.holdConnect();
+  await f.push();
+  f.connectGate.release('started');
+  await f.flush();
+  assert.equal(f.disconnects, 0);
+  assert.ok(f.events.includes('vpn_reconnect_started'));
+});
+
+test('the supervisor hands the controller a cancellation token', async () => {
+  const f = fixture();
+  f.connected();
+  await f.push();
+  f.supervisor.onBackground(f.now);
+  f.now += 60000;
+  f.dropped();
+  await f.push();
+  assert.equal(typeof f.lastCancelled, 'function',
+    'the reconnect started without a cancellation token');
+  assert.equal(f.lastCancelled(), true, 'the token does not report the attempt as live');
+  f.supervisor.noteRequestedStop();
+  assert.equal(f.lastCancelled(), false, 'the token kept its authority after a stop request');
 });

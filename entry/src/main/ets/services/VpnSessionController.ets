@@ -47,6 +47,8 @@ export enum VpnActionResult {
   UNCHANGED = 'unchanged',
   /** Cannot be completed without the UI (login, control server, backend). */
   NEEDS_UI = 'needs_ui',
+  /** The caller withdrew its authority before the extension was started. */
+  CANCELLED = 'cancelled',
   FAILED = 'failed'
 }
 
@@ -77,7 +79,16 @@ export class VpnSessionController {
     return !ControlServerConfig.load(filesDir).confirmed;
   }
 
-  async connect(filesDir: string): Promise<VpnActionResult> {
+  /**
+   * Starts the tunnel.
+   *
+   * `cancelled` lets the caller withdraw its authority while this runs. The
+   * reconnect supervisor passes one, because a user disconnect that arrives
+   * during a reconnect must not end with a tunnel the user just killed. The
+   * check sits after the backend wait, which is the long step, and again before
+   * the extension starts.
+   */
+  async connect(filesDir: string, cancelled?: () => boolean): Promise<VpnActionResult> {
     const current: VpnLinkSnapshot = VpnStatusReader.read(filesDir);
     if (current.state === VpnLinkState.CONNECTED) {
       return VpnActionResult.UNCHANGED;
@@ -93,12 +104,18 @@ export class VpnSessionController {
       if (!await this.ensureBackendReady(filesDir, controlServer.controlURL)) {
         return VpnActionResult.NEEDS_UI;
       }
+      if (cancelled !== undefined && cancelled()) {
+        return VpnActionResult.CANCELLED;
+      }
       const config: string = await this.requestConnectConfig();
       if (config.startsWith('FAILED') || config.length === 0) {
         return VpnActionResult.NEEDS_UI;
       }
       if (!this.gateway.stageConnectConfig(filesDir, VPN_CONNECT_CONFIG_FILE_NAME, config)) {
         return VpnActionResult.FAILED;
+      }
+      if (cancelled !== undefined && cancelled()) {
+        return VpnActionResult.CANCELLED;
       }
       this.clearHandoffFiles(filesDir);
       await this.gateway.startVpnExtension(VpnSessionController.vpnWant());

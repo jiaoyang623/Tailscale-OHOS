@@ -328,3 +328,24 @@
 - 不确定特征：none
 - 归属：—
 - 复核：待复核
+
+### O-RECONN-10 用户请求停止后作废在途重连
+- 层级：单点
+- 父判据：O-SEAM-11
+- 强度：强
+- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §五 责任空洞检查第 3 条；HLD 契约 C-11
+- 触发与前置条件：`handleDrop` 已经发起 `VpnSessionController.connect`，该 connect 仍在途时入口点调 `noteRequestedStop()`
+- 可观测点：传给 `connect` 的取消令牌的返回值；`vpn_reconnect_cancelled` 与 `vpn_reconnect_superseded` 事件；`disconnect` 的调用次数；扩展是否被启动
+- 期望：正常：没有停止请求时，重连照常完成并记 `vpn_reconnect_started`，不调用 `disconnect`；边界：停止请求到达后令牌立即返回 false，连接在后端就绪之后与启动扩展之前各查一次，命中即返回 `cancelled` 且**不启动扩展**；失败与恢复：万一窗口落在两次检查之间，完成时按令牌撤销自己刚建起的隧道并记 `vpn_reconnect_superseded`，撤销失败记 `vpn_reconnect_undo_failed`，而返回 `cancelled` 时不需要撤销，记 `vpn_reconnect_cancelled`；安全与质量：`connect` 在扩展启动中途没有中断点，所以保证是「用户停止后不留下隧道」，不是「隧道从不被短暂建起」。判定在桩边界下成立
+- 失败信息：期望「停止请求作废在途重连并且不留下隧道」，实际「重连照常完成，用户刚点下的断开被静默撤销」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:71-77 noteRequestedStop 自增 attemptId；:129-152 handleDrop 的 stillAuthorised 与撤销分支；entry/src/main/ets/services/VpnSessionController.ets:78-125 connect 的两处取消点与 CANCELLED；scripts/test-vpn-reconnect-supervisor.mjs；scripts/test-vpn-session-controller.mjs
+- 上游：R-CONN-06、R-CONN-08
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a connect that cancelled itself is not undone
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::the supervisor hands the controller a cancellation token
+- 测试：scripts/test-vpn-session-controller.mjs::a cancelled connect never starts the extension
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
