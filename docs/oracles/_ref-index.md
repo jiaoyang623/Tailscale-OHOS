@@ -28,98 +28,98 @@
 - 共用承载件: O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-02 状态陈旧或读取失败时把已持有的任务保留到有界宽限期
-- 位置: `docs/oracles/points/P1-background-status.md:22` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:24` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03 O-SEAM-11
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03 O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-03 不以陈旧、未来、缺失的心跳或缺 TUN 的证据启动任务
-- 位置: `docs/oracles/points/P1-background-status.md:39` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:41` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03 O-SEAM-11
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03 O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-04 读到显式断开即刻释放长时任务
-- 位置: `docs/oracles/points/P1-background-status.md:56` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:58` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-02
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-05 快照读取失败按不确定处理，不立即撤销保护
-- 位置: `docs/oracles/points/P1-background-status.md:74` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:76` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03 O-SEAM-11
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03 O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-06 用户取消保活后在同一会话内保持抑制，直到确认断开
-- 位置: `docs/oracles/points/P1-background-status.md:91` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:93` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-10
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-07 系统取消后按指数退避重试启动
-- 位置: `docs/oracles/points/P1-background-status.md:108` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:110` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-08 非本任务的取消事件被忽略
-- 位置: `docs/oracles/points/P1-background-status.md:125` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:127` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-09 启动失败被节流，不按每次巡检重试
-- 位置: `docs/oracles/points/P1-background-status.md:142` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:144` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-10 启动期间收到的取消、断开或销毁不被迟到的启动结果覆盖
-- 位置: `docs/oracles/points/P1-background-status.md:159` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:161` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-10
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-11 通知发布在途时销毁，清理排在发布之后
-- 位置: `docs/oracles/points/P1-background-status.md:178` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:180` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-02
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-12 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-12 重新连接等待进行中的停止完成后再启动下一任务
-- 位置: `docs/oracles/points/P1-background-status.md:195` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:197` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-11
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-13 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-13 连接窗口按 live 处理并提前持有任务
-- 位置: `docs/oracles/points/P1-background-status.md:212` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:214` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03 O-SEAM-11
 - 上游需求: R-CONN-03
 - 本判据引用: O-SEAM-03 O-SEAM-11
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-14 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-14 连接窗口需要接口建立的证据，不接受任意无法识别的状态
-- 位置: `docs/oracles/points/P1-background-status.md:229` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:233` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-03
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-BGTASK-01 O-BGTASK-02 O-BGTASK-03 O-BGTASK-04 O-BGTASK-05 O-BGTASK-06 O-BGTASK-07 O-BGTASK-08 O-BGTASK-09 O-BGTASK-10 O-BGTASK-11 O-BGTASK-12 O-BGTASK-13 O-BGTASK-15 O-CONN-02 O-CONN-03 O-CONN-06 O-SEAM-03 O-SEAM-11
 
 ### O-BGTASK-15 停滞的连接窗口超过宽限期仍释放保护
-- 位置: `docs/oracles/points/P1-background-status.md:246` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:250` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03 O-SEAM-11
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03 O-SEAM-11
@@ -274,7 +274,7 @@
 - 同接收批次(a01-E2E): 28 条
 
 ### O-DRIVE-02 从设备详情跳转到该设备的共享目录
-- 位置: `docs/oracles/90-journeys/06-taildrive.md:22` · 层: 旅程 · 状态: pending-test
+- 位置: `docs/oracles/90-journeys/06-taildrive.md:23` · 层: 旅程 · 状态: pending-test
 - 上游需求: R-DRIVE-06
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 O-SEAM-17 O-SESSION-08 O-SETUP-01 O-SETUP-02 O-SETUP-03 …(+8)
 - 同接收批次(a01-E2E): 28 条
@@ -627,7 +627,7 @@
 - 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-06 应用进程 ↔ Go 引擎：只读与设置面
-- 位置: `docs/oracles/91-seams/S2-native-probes.md:25` · 层: 接缝 · 状态: pending-test
+- 位置: `docs/oracles/91-seams/S2-native-probes.md:26` · 层: 接缝 · 状态: pending-test
 - 父判据: O-NET-01 O-NET-02 O-DEV-02
 - 上游需求: R-NET-01 R-NET-02 R-DEV-02
 - 本判据引用: O-NET-01 O-NET-02 O-DEV-02
@@ -635,7 +635,7 @@
 - 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-07 应用进程 ↔ VPN 扩展：Taildrop 通道
-- 位置: `docs/oracles/91-seams/S2-native-probes.md:42` · 层: 接缝 · 状态: pending-test
+- 位置: `docs/oracles/91-seams/S2-native-probes.md:44` · 层: 接缝 · 状态: pending-test
 - 父判据: O-XFER-01 O-XFER-04 O-XFER-05
 - 上游需求: R-XFER-02 R-XFER-05 R-XFER-07
 - 本判据引用: O-XFER-01 O-XFER-04 O-XFER-05
@@ -643,7 +643,7 @@
 - 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-08 应用进程 ↔ VPN 扩展：Taildrive 通道
-- 位置: `docs/oracles/91-seams/S2-native-probes.md:59` · 层: 接缝 · 状态: pending-test
+- 位置: `docs/oracles/91-seams/S2-native-probes.md:61` · 层: 接缝 · 状态: pending-test
 - 父判据: O-DRIVE-01
 - 上游需求: R-DRIVE-03 R-DRIVE-04
 - 本判据引用: O-DRIVE-01
@@ -651,7 +651,7 @@
 - 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-09 应用进程 ↔ VPN 扩展：探测通道
-- 位置: `docs/oracles/91-seams/S2-native-probes.md:76` · 层: 接缝 · 状态: closed
+- 位置: `docs/oracles/91-seams/S2-native-probes.md:79` · 层: 接缝 · 状态: closed
 - 父判据: O-DEV-02 O-MEDIA-01 O-MEDIA-02
 - 子判据: O-LOCALSEND-01 O-LOCALSEND-02 O-PEER-01 O-PEER-02 O-PEER-03 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11
 - 上游需求: R-DEV-03 R-MEDIA-01 R-MEDIA-04
@@ -828,63 +828,63 @@
 - 同接收批次(a01-E2E): 28 条
 
 ### O-STATUS-01 状态文件缺失或不可读时报告 unknown
-- 位置: `docs/oracles/points/P1-background-status.md:263` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:267` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-02 运行且有 TUN 时报 connected 并带真实流量
-- 位置: `docs/oracles/points/P1-background-status.md:281` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:285` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-03 心跳新鲜度的三条边界都判 unknown
-- 位置: `docs/oracles/points/P1-background-status.md:298` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:302` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-04 终态标记报 disconnected
-- 位置: `docs/oracles/points/P1-background-status.md:317` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:321` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-02
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-05 快照读取失败不当作已停止的隧道
-- 位置: `docs/oracles/points/P1-background-status.md:337` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:341` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-06 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-06 待登录报 needs_login
-- 位置: `docs/oracles/points/P1-background-status.md:354` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:358` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-SETUP-06
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-07 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-07 可用的隧道优先于陈旧的登录标记
-- 位置: `docs/oracles/points/P1-background-status.md:371` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:375` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-04
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-08 O-STATUS-09
 
 ### O-STATUS-08 只有 Running 而没有 TUN 不算连接
-- 位置: `docs/oracles/points/P1-background-status.md:388` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:392` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-09
 - 本判据引用: O-SEAM-03
 - 共用承载件: O-SEAM-03 O-SEAM-04 O-SESSION-01 O-STATUS-01 O-STATUS-02 O-STATUS-03 O-STATUS-04 O-STATUS-05 O-STATUS-06 O-STATUS-07 O-STATUS-09
 
 ### O-STATUS-09 连接窗口报 connecting
-- 位置: `docs/oracles/points/P1-background-status.md:405` · 层: 单点 · 状态: closed
+- 位置: `docs/oracles/points/P1-background-status.md:409` · 层: 单点 · 状态: closed
 - 父判据: O-SEAM-03
 - 上游需求: R-CONN-03
 - 本判据引用: O-SEAM-03
