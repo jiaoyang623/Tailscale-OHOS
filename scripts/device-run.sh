@@ -8,6 +8,7 @@
 # 用法：
 #   DEVICE=<serial> scripts/device-run.sh
 #   DEVICE=<serial> scripts/device-run.sh --skip-build      # 已经装好了
+#   DEVICE=<serial> scripts/device-run.sh --clean           # 先卸载再装（清掉登录态与旧诊断）
 #
 # 前置条件（脚本在第 0 步逐条打印）：
 #   1. 手机上其它 VPN 应用（例如 shadowsocks）已停用，MeshArc 能拿到 VPN 通道
@@ -20,9 +21,11 @@ cd "$(dirname "$0")/.." || exit 2
 
 DEVICE="${DEVICE:-}"
 SKIP_BUILD=""
+CLEAN=""
 for arg in "$@"; do
   case "$arg" in
     --skip-build) SKIP_BUILD=1 ;;
+    --clean) CLEAN=1 ;;
     *) echo "未知参数：$arg" >&2; exit 2 ;;
   esac
 done
@@ -40,8 +43,26 @@ mkdir -p "$OUT"
 
 say() { echo; echo "──────────────────────────────────────────────"; echo "$*"; echo "──────────────────────────────────────────────"; }
 note() { echo "$*" >> "$OUT/notes.txt"; echo "  · $*"; }
-shot() { devecocli ui screenshot --target "$DEVICE" --output "$OUT/$1.png" >/dev/null 2>&1 || echo "（截图失败：$1）"; }
-layout() { devecocli ui layout --target "$DEVICE" > "$OUT/$1.layout.txt" 2>&1 || true; }
+shot() {
+  if ! devecocli ui screenshot --device "$DEVICE" --path "$OUT/$1.png" >/dev/null 2>&1; then
+    note "⚠️ 截图失败：$1（$1.png 没生成）"; return
+  fi
+  [ -s "$OUT/$1.png" ] || { note "⚠️ 截图是空文件：$1"; return; }
+  note "截图 $1.png（$(stat -c%s "$OUT/$1.png") 字节）"
+}
+layout() {
+  # 进度行（"- Dumping layout…"）走 stderr，混进 stdout 就不是合法 JSON。分开存。
+  if ! devecocli ui layout --device "$DEVICE" --format json --mode full \
+      > "$OUT/$1.layout.json" 2> "$OUT/$1.layout.err"; then
+    note "⚠️ 界面结构读取失败：$1（见 $1.layout.err）"; return
+  fi
+  # 抓到了不等于能用。JSON 解析不过就是没抓到，这条要说出来。
+  if ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" \
+      "$OUT/$1.layout.json" 2>/dev/null; then
+    note "⚠️ 界面结构不是合法 JSON：$1（见 $1.layout.err）"; return
+  fi
+  note "界面结构 $1.layout.json（$(stat -c%s "$OUT/$1.layout.json") 字节，JSON 合法）"
+}
 
 say "0/6 前置检查"
 devecocli device list 2>&1 | tee "$OUT/00-devices.txt"
@@ -59,7 +80,12 @@ if [ -z "$SKIP_BUILD" ]; then
 else
   echo "（跳过构建）" > "$OUT/01-build.txt"
 fi
-devecocli run --device "$DEVICE" --skip-build --uninstall 2>&1 | tee "$OUT/02-install.txt" | tail -5
+if [ -n "$CLEAN" ]; then
+  echo "（--clean：先卸载，登录态与上一轮诊断会被清掉）"
+  devecocli run --device "$DEVICE" --skip-build --uninstall 2>&1 | tee "$OUT/02-install.txt" | tail -5
+else
+  devecocli run --device "$DEVICE" --skip-build 2>&1 | tee "$OUT/02-install.txt" | tail -5
+fi
 
 say "2/6 开始采集设备日志"
 devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --follow > "$OUT/03-log.txt" 2>&1 &
@@ -102,10 +128,15 @@ scenario "M-16" "Q7-c special-scenario 长时任务" \
 用 scripts/toggle-special-scenario-acl.mjs 打开声明后重装，
 连接后切后台，观察走 special-scenario 还是回落 DATA_TRANSFER。"
 
-scenario "M-17" "Q-02 VPN 替换批准的 10 秒 TTL" \
-"让手机上另一个应用继续占用 VPN 通道。
-发起连接，等冲突提示与批准对话框出现，立刻切走并等超过 10 秒，再回来。
-记录扩展是重问、直接失败，还是静默继续。"
+scenario "M-17" "Q-02（修订）VPN 冲突路径是否收敛" \
+"让手机上另一个应用继续占用 VPN 通道（shadowsocks）。
+1. 发起连接，记下提示框的标题与正文。
+2. 不点「确定」，等 60 秒。
+3. 断开 shadowsocks，再连一次，确认这次能连上。
+4. 再发起连接，冲突提示出现后立刻强杀应用进程。
+5. 断开 shadowsocks，重启应用，读当前状态文字。
+6. 再连一次，看是否报冲突。
+判定：第 6 步报冲突而此刻没有其它 VPN，就证明应用死后扩展仍在空转，挡住了后续连接。"
 
 scenario "M-18" "Q17 蜂窝下的长时间存活" \
 "关掉 Wi-Fi，用蜂窝连接，锁屏静置 720 秒以上。
