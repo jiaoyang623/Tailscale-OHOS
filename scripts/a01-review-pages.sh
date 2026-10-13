@@ -31,7 +31,8 @@ fi
 OUT="$(mktemp)"
 trap 'rm -f "$OUT"' EXIT
 echo "== 门禁（基线 $BASELINE）=="
-if ! scripts/run-checks.sh >"$OUT" 2>&1; then
+# 本脚本就是重建快照的那条路，所以允许门禁跳过「快照是否过期」这一项。
+if ! SKIP_REVIEW_FRESHNESS=1 scripts/run-checks.sh >"$OUT" 2>&1; then
   cat "$OUT" >&2
   echo "门禁未通过：不生成快照——没有该基线上的绿色运行就不写 pass。" >&2
   exit 1

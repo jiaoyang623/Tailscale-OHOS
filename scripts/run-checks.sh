@@ -69,9 +69,15 @@ node scripts/check-diagnostic-event-names.mjs || rc=1
 # 这个守卫只比判据正文，不比 tests 的运行证据（那部分每次重建都会变）。
 echo
 echo "== 审核快照是否跟得上判据 =="
-python3 scripts/check-review-freshness.py || {
+# 重建网页的脚本会先跑本门禁，而那时快照正是过期的。它设 SKIP_REVIEW_FRESHNESS=1
+# 跳过这一项，否则「生成物过期」会挡住「重建生成物」。
+if [ -n "${SKIP_REVIEW_FRESHNESS:-}" ]; then
+  echo "（调用方要求跳过：它在重建快照本身）"
+elif python3 scripts/check-review-freshness.py; then
+  :
+else
   echo "重建：scripts/a01-review-pages.sh（工作树要干净），然后提交 docs/review" >&2
   rc=1
-}
+fi
 
 exit "$rc"
