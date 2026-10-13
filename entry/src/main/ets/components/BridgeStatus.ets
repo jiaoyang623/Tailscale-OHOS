@@ -151,6 +151,15 @@ const NORMAL_SERVICE_REFRESH_INTERVAL_MS: number = 30000;
 // to finish before a later UI refresh can replace the command/response files.
 const LOCAL_SEND_REFRESH_TIMEOUT_MS: number = 25000;
 const STATUS_CROSS_FADE_MS: number = 180;
+// Handing a file to an external LocalSend app needs a launch contract.
+//
+// Checked on 2026-10-13 (review Q4): neither HarmonyOS port publishes one. The
+// official OpenHarmony port is org.localsend.localsend_app and states that
+// HarmonyOS has no share intent. The third-party AloeSend is
+// com.aloereed.aloesend. Neither documents an exported Want or a URI scheme.
+// The value below is a third team's namespace and is an unverified guess, so
+// O-XFER-03 and O-SEAM-13 stay not-evaluated until a device measurement finds
+// the real contract. Do not treat this constant as confirmed.
 const LOCAL_SEND_APP_TARGETS: LocalSendAppTarget[] = [
   {
     bundleName: 'cn.biandangroup.bcshare',

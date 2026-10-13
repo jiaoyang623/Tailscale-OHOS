@@ -4,6 +4,12 @@
 前者守在扩展进程内的系统网络回调与重绑，后者守「后台掉线后替用户恢复」的意图判读——
 它的每一条守卫都是为了不跟刚刚点了断开的用户抢。
 
+O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
+旧值混用 O-SEAM-10、O-SEAM-11、O-SEAM-03。
+新值统一为 O-SEAM-11（恢复责任）与 O-SEAM-03（状态判读）。
+理由：这些判据断言的是该不该重连，不是两条编排是否交出同一套契约。
+设计依据随之改为引 C-11，只读状态的一条引 C-03。
+
 ### O-NETMON-01 用系统默认网络取样并合并重复回调
 - 层级：单点
 - 父判据：O-SEAM-12
@@ -177,9 +183,9 @@
 
 ### O-RECONN-01 后台静置足够久后的掉线触发一次恢复
 - 层级：单点
-- 父判据：O-SEAM-10、O-SEAM-11
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）；HLD 契约 C-11
 - 触发与前置条件：上一次采样为 connected；onBackground 之后已过 BACKGROUND_SETTLE_MS=10000（测试取 60000）；本次采样为 disconnected
 - 可观测点：VpnSessionController.connect 的调用次数；vpn_reconnect_attempt 诊断事件
 - 期望：正常：调用 connect 一次并记 vpn_reconnect_attempt；边界：只有 connected→disconnected 的边沿才算掉线（同日两次采样都是 disconnected 不重复触发）；失败与恢复：—；安全与质量：恢复责任落在 P1，而 P1 在后台无长时任务时可能已被冻结——这正是 O-SEAM-11 登记的空洞，本判据只保证「能跑时判定正确」，不承诺冻结期间一定恢复。判定在宿主侧桩边界（VpnStatusReader、VpnSessionController 为桩）下成立
@@ -194,9 +200,9 @@
 
 ### O-RECONN-02 前台可见或刚进入后台的掉线视为用户主动
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §2.5 重试「重试必须能被用户意图打断」；HLD 契约 C-10
+- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §2.5 重试「重试必须能被用户意图打断」；HLD 契约 C-11
 - 触发与前置条件：掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）
 - 可观测点：connect 调用次数；vpn_drop_ignored_foreground 诊断事件
 - 期望：正常：—；边界：两种情形都不 connect，并记 vpn_drop_ignored_foreground；失败与恢复：—；安全与质量：用户刚看过应用时的掉线更可能是他自己按的，宁可不重试。判定在桩边界下成立
@@ -212,9 +218,9 @@
 
 ### O-RECONN-03 用户已请求停止后的掉线不被恢复撤销
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §3.2 S2 无 UI 控制面的意图记忆；HLD 契约 C-10
+- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §3.2 S2 无 UI 控制面的意图记忆；HLD 契约 C-11
 - 触发与前置条件：noteRequestedStop() 之后，后台静置足够久，再读到掉线
 - 可观测点：connect 调用次数；vpn_drop_after_requested_stop 诊断事件
 - 期望：正常：—；边界：stopRequested 优先于「已后台足够久」的判据，不 connect，并记 vpn_drop_after_requested_stop；失败与恢复：—；安全与质量：这条是整套守卫里最重要的一条——与刚点了断开的用户抢夺比漏掉一次重试更糟。判定在桩边界下成立
@@ -229,9 +235,9 @@
 
 ### O-RECONN-04 显式重新连接重置停止意图并重新武装恢复
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复」；O-SEAM-10 两条入口共享同一意图记忆；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复」；O-SEAM-11 恢复意图的重新武装；HLD 契约 C-11
 - 触发与前置条件：noteRequestedStop() 之后调用 noteRequestedStart()
 - 可观测点：stopRequested 的效果（后续掉线是否 connect）；connect 调用次数
 - 期望：正常：—；边界：停止意图清零、尝试计数与退避归零，之后的合法后台掉线重新触发一次恢复（connects 变 1）；失败与恢复：—；安全与质量：—。判定在桩边界下成立
@@ -246,9 +252,9 @@
 
 ### O-RECONN-05 恢复尝试有上限，耗尽后放弃
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「最多 3 次」；架构 §2.5 重试；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「最多 3 次」；架构 §2.5 重试；HLD 契约 C-11
 - 触发与前置条件：连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed
 - 可观测点：connect 调用次数；vpn_reconnect_exhausted 诊断事件
 - 期望：正常：—；边界：尝试数达到 MAX_ATTEMPTS=3 后不再 connect（connects 恰为 3），并记 vpn_reconnect_exhausted；失败与恢复：—；安全与质量：不无限重试，也不把失败静默吞掉。判定在桩边界下成立
@@ -263,9 +269,9 @@
 
 ### O-RECONN-06 重试按指数退避，不按每次采样触发
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「指数退避」；架构 §2.5 重试「三处指数退避」；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「指数退避」；架构 §2.5 重试「三处指数退避」；HLD 契约 C-11
 - 触发与前置条件：后台掉线后，反复 connected↔disconnected 采样五轮（时间几乎不推进）
 - 可观测点：connect 调用次数
 - 期望：正常：首次掉线后 connect 一次；边界：退避窗口（RETRY_BASE_MS=30000 起，上限 RETRY_MAX_MS=300000）内再次掉线不再 connect（connects 仍为 1）；失败与恢复：—；安全与质量：网络抖动不得变成每秒重连。判定在桩边界（Date.now 为桩）下成立
@@ -280,7 +286,7 @@
 
 ### O-RECONN-07 未知状态不当作掉线
 - 层级：单点
-- 父判据：O-SEAM-03、O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
 - 设计依据：需求 R-CONN-09「状态缺失/陈旧按不确定处理」；O-SEAM-03「陈旧或缺失一律是不确定，而不是已断开」；HLD 契约 C-03
 - 触发与前置条件：后台静置之后，采样状态为 unknown（心跳陈旧或状态文件不可读）
@@ -297,9 +303,9 @@
 
 ### O-RECONN-08 回到前台清零重试阶梯
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」与 R-CONN-06「用户意图优先」；架构 §2.5 重试；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」与 R-CONN-06「用户意图优先」；架构 §2.5 重试；HLD 契约 C-11
 - 触发与前置条件：一次恢复尝试失败后，onForeground() 再 onBackground()
 - 可观测点：connect 调用次数
 - 期望：正常：—；边界：onForeground 清 attempts 与 nextAttemptAtMs，用户回到应用再离开后的合法掉线重新触发一次恢复（connects 由 1 变 2）；失败与恢复：—；安全与质量：用户在场时可以自行处理，回前台即重置阶梯，不把过期退避背到下一次后台。判定在桩边界下成立
@@ -314,9 +320,9 @@
 
 ### O-RECONN-09 连接稳定 60 s 才清零重试计数
 - 层级：单点
-- 父判据：O-SEAM-10
+- 父判据：O-SEAM-11、O-SEAM-03
 - 强度：弱
-- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」；架构 §2.5 重试；HLD 契约 C-10
+- 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」；架构 §2.5 重试；HLD 契约 C-11
 - 触发与前置条件：一次恢复成功使状态回到 connected，并保持超过 STABLE_MS=60000
 - 可观测点：attempts 与 nextAttemptAtMs 的归零；vpn_reconnect_succeeded 诊断事件
 - 期望：正常：连接持续 ≥60 s 才记 vpn_reconnect_succeeded 并把重试阶梯归零；边界：短于 60 s 的短暂连接不清零，避免「连一下又断」的抖动隧道把计数反复归零而无限重试；失败与恢复：—；安全与质量：—。判定在桩边界（Date.now 为桩）下成立

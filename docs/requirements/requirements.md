@@ -92,7 +92,7 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | R-DRIVE-02 | 可浏览共享目录、沿面包屑上溯、用系统返回键上一级；根目录允许退出应用 | `components/TaildriveBrowser.ets`；`pages/Index.ets` `onBackPress` | 依赖 R-DRIVE-01 | 中 | O-DRIVE-01 | 已实现 | 判据待建 |
 | R-DRIVE-03 | 支持上传、下载、新建文件夹、改名、移动、删除，操作有进度与结果反馈 | `TaildriveBrowser.ets`；`services/TaildriveGateway.ets` | 依赖 R-DRIVE-02 | 中 | O-DRIVE-01 | 已实现 | 判据待建 |
 | R-DRIVE-04 | 上传默认不覆盖，冲突要用户显式确认 | `TaildriveBrowser.ets` 冲突确认分支 | 依赖 R-DRIVE-03 | 高 | O-DRIVE-01 | 已实现 | 判据待建 |
-| R-DRIVE-05 | 传输暂存 24 小时后清理，残留不无限增长 | `TaildriveBrowser.ets` 24h 清理；`services/RecoverableCachePaths.ets` | 无 | 低 | O-DRIVE-01 | 已实现 | 判据待建 |
+| R-DRIVE-05 | 每一类传输暂存都写明适用对象与保留期，且不无限增长：Taildrop 出站暂存在 `cacheDir` 且是可丢弃副本（`services/RecoverableCachePaths.ets:10`），扩展侧 Taildrop 缓存保留 7 天（`vpnextensionability/TailscaleVpnExtensionAbility.ets:56`），诊断报告保留 24 h（`services/DiagnosticReportService.ets:10`）；**Taildrive 暂存当前没有清理实现**，`components/TaildriveBrowser.ets:1891` 的 24 h 只是「yesterday」的分组显示 | 本行原写「24 小时后清理」，来源指 `TaildriveBrowser.ets`，实为显示分组。按 Q-03 决定改写为代码现状 | 无 | 低 | O-DRIVE-01 | Taildrop 与诊断报告已实现；Taildrive 暂存**未实现** | 判据待建 |
 | R-DRIVE-06 | 从设备详情可直接跳到该设备的共享目录 | `BridgeStatus.ets:5688` `openRemoteFilesFromDevice`、`:5692` | 依赖 R-DEV-03 | 低 | O-DRIVE-02 | 已实现 | 判据待建 |
 | R-MEDIA-01 | 设备详情可探测 Jellyfin/Emby/Plex，并说明探测不到的原因 | `BridgeStatus.ets:6146` `detectMediaForPeer`；`services/MediaServiceProbeService.ets` | 依赖 R-CONN-01 | 中 | O-MEDIA-01 | 已实现 | 判据待建 |
 | R-MEDIA-02 | 交给 HosPlayer 时只传类型、端点与名称，凭据由播放器自己收集 | `services/HosPlayerLauncher.ets`；`BridgeStatus.ets:6401` `openHosPlayer` | 依赖 R-MEDIA-01 | 高（安全） | O-MEDIA-01 | 已实现 | 有判据闭环（走查） |
@@ -106,7 +106,7 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | R-DIAG-01 | 诊断入口默认隐藏，需在关于页连点版本号 5 次才出现 | `BridgeStatus.ets:4939` `onAppVersionTap`、`:4953` | 无 | 低 | O-DIAG-01 | 已实现 | 判据待建 |
 | R-DIAG-02 | 落盘诊断必须脱敏：URL、bearer/basic、token/secret 键、查询串令牌一律替换 | `DiagnosticPrivacy.ets:47-55` | 无 | 高（安全） | O-DIAG-01 | 已实现 | 判据待建 |
 | R-DIAG-03 | 诊断事件有按文件条数与字节的上限，超出淘汰最旧 | `DiagnosticEventStore.ets:13-14`、`:111-120` | 无 | 中 | O-DIAG-01 | 已实现 | 判据待建 |
-| R-DIAG-04 | 诊断报告可导出并分享，报告有保留期，过期清理 | `services/DiagnosticReportService.ets:94-160` | 依赖 R-DIAG-02 | 低 | O-DIAG-01 | 已实现 | 判据待建 |
+| R-DIAG-04 | 诊断报告可导出并分享，报告有保留期，过期清理（`REPORT_RETENTION_MS = 24 h`，`services/DiagnosticReportService.ets:10`；导出与分享在 `:94-160`） | `services/DiagnosticReportService.ets:10` 保留期常量；`:94-160` 导出与分享 | 依赖 R-DIAG-02 | 低 | O-DIAG-01 | 已实现 | 判据待建 |
 | R-DIAG-05 | 关键链路（连接、握手、掉线、网络变化、扩展生命周期）留下可复核的事件 | `DiagnosticEventStore.ets`；`docs/background-vpn-reliability.md` Milestone 3 的取证 | 依赖 R-DIAG-02 | 中 | O-DIAG-01 | 已实现 | 判据待建 |
 | R-UI-01 | 四个顶层页签（主页/传输/文件/设置），窄屏悬浮底栏、宽屏侧栏 | `BridgeStatus.ets:14609` `MobileTabs`、`:14862` `WideTabs` | 无 | 中 | O-UI-01 | 已实现 | 判据待建 |
 | R-UI-02 | 页签可显隐与排序，且重启后保持 | `BridgeStatus.ets:10889` `setNavigationTabVisible`、`:10914` `moveNavigationTab`；`services/NavigationPreferences.ets` | 依赖 R-UI-01 | 低 | O-UI-01 | 已实现 | 判据待建 |

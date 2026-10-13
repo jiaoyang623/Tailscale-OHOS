@@ -1,5 +1,9 @@
 import { fileIo } from '@kit.CoreFileKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { DiagnosticPrivacy } from './DiagnosticPrivacy';
+
+const DOMAIN: number = 0x0000;
+const TAG: string = 'MeshArcDiag';
 
 const MAX_EVENTS_PER_PROCESS: number = DiagnosticPrivacy.MAX_EVENTS_PER_FILE;
 const UI_EVENT_FILE_NAME: string = 'diagnostic-ui-events.ndjson';
@@ -28,6 +32,14 @@ export class DiagnosticEventStore {
     events.push(item);
     const retained: DiagnosticEvent[] = DiagnosticEventStore.retainWithinByteLimit(events);
     DiagnosticEventStore.writeFile(path, retained);
+    // Mirror to the device log as well.
+    //
+    // The event files live in the app sandbox. A host-side device run can read
+    // the device log but cannot pull those files, so without this mirror the
+    // whole timeline is only available through a manual export. The values are
+    // already redacted above, so the mirror cannot leak more than the file does.
+    hilog.info(DOMAIN, TAG, '%{public}s %{public}s %{public}s code=%{public}d',
+      safeSource, item.event, item.phase, item.code);
   }
 
   static load(filesDir: string): DiagnosticEvent[] {

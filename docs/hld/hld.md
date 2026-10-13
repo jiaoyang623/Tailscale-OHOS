@@ -181,7 +181,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **错误与责任**：非法参数在拼装前被拒——HosPlayer `unsafe_server_url`（非 http(s)、含 userinfo、超长、含 `#`）与 `invalid_server_name`（空或 >96）直接抛（`:68-77`）；**凭据不进深链**；认证失败停在锁定层可重试、不清锁标志（`AppSecurityAuthenticator.ets:37-42`）。
 - **幂等性**：`AppShellIntentAdapter` 的 `deliveredNotificationKeys` 去重（见 C-17）；认证每次重新挑战（16 字节随机，`AppSecurityAuthenticator.ets:44-45`）。
 - **可观测点**：`secure_login_browser_type_failed` / `_type_error` / `_type_fallback` / `_open_link_failed`（`BridgeStatus.ets:2133,2138,2150,2159`）；`hosplayer_launch_*`、`moonlight_launch_*`、`transfer_localsend_open_failed`。
-- **不确定特征**：`UNCERTAIN-WIRING`——`MOONLIGHT_INTEGRATION_CONFIG` 三字段为**空串**（`MoonlightIntegrationConfig.ets:10-15`），`MoonlightLauncher.isAvailable()` 恒 false，串流成功路径当前不可达；`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` 是**未验证的猜测**（§七 Q-04）。
+- **不确定特征**：`UNCERTAIN-WIRING`——`MOONLIGHT_INTEGRATION_CONFIG` 三字段为**空串**（`MoonlightIntegrationConfig.ets:10-15`），`MoonlightLauncher.isAvailable()` 恒 false，串流成功路径当前不可达；`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` **已查证：没有可依赖的公开契约**（2026-10-13 按 Q4 查证：官方 OpenHarmony 移植 `org.localsend.localsend_app` 明写「鸿蒙未接入 share intent」，第三方 AloeSend `com.aloereed.aloesend` 也未记录导出的 Want 或 URI scheme）。
 
 ### C-14 · O-SEAM-14 持久化：配置所有权与默认值
 
@@ -281,7 +281,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 ### 3.3 失败恢复路径
 
 - **连接窗口期内用户切走 → 交接无人应答 → 扩展 15 s 后销毁 VPN**（本批修复，O-CONN-03）：P2 记 `vpn_backend_handoff_timeout` 并 `destroyProbeTun`；修复点是 D5——把 `connecting` 也算 live 提前持有长时任务，使 P1 有机会应答。→ O-SEAM-02、O-SEAM-10、O-SEAM-11。单点：O-BGTASK-13、O-SESSION-07。**注意**：端到端真机复现尚未重跑（`docs/background-vpn-reliability.md`）。
-- **后台掉线自动恢复**（O-CONN-04）：`VpnReconnectSupervisor` 仅在 `connected→disconnected` 且已后台 ≥10 s 且未 `noteRequestedStop` 时交 `VpnSessionController.connect`；最多 3 次，退避 30/60/120 s，稳定 60 s 才清零。**责任空洞**：P1 若已被冻结（无长时任务），恢复不可靠——没有任何子系统承诺（架构 §五 第 3 条空洞）。→ O-SEAM-11、O-SEAM-03、O-SEAM-01/02。
+- **后台掉线自动恢复**（O-CONN-04）：`VpnReconnectSupervisor` 仅在 `connected→disconnected` 且已后台 ≥10 s 且未 `noteRequestedStop` 时交 `VpnSessionController.connect`；最多 3 次，退避 30/60/120 s，稳定 60 s 才清零。**责任空洞**：P1 若已被冻结（无长时任务），恢复不可靠——没有任何子系统承诺（架构 §五 第 3 条空洞）。→ O-SEAM-11（恢复责任）、O-SEAM-03（状态判读）。审查人裁决 Q16a（2026-10-12）把本条的接缝集收敛为这两条（原记 O-SEAM-01/02）。
 - **停止请求无人应答**（O-CONN-02）：P1 超时（50 ms × 150）后仍调 `stopVpnExtension`，视为无害。→ O-SEAM-01。
 - **报告生成中途失败**：不分享半成品 zip 并删除残留（O-DIAG-01）。→ O-SEAM-15。
 - **网络重绑失败**：P2 有界 5 s 重试，不要求用户重连（O-NET-03）。→ O-SEAM-12。
@@ -385,7 +385,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 | **Q-01** | **平台把两个进程里加载的同一份 `libtailscale_ohos.so` 视为一个运行时还是两个？** 若是「一个」，D3(a) 失效，交接协议与 `filesDir/tailscale` 单写者假设同时被打破；`AccountDiagnosticsGateway.logout`（`:49`）的一次 `backendLogout` 会连带停掉 P2 引擎。本层**未能验证**：仓内 73 条测试全是宿主侧纯逻辑，不加载 `.so` | O-SEAM-05、O-SEAM-02、O-SEAM-14、D3 | 用户（真机：两进程各调 `probeEngine()`/`backendStatus()` 观察是否互相可见） | **唯一会反转决策的未知**；契约定稿前 |
 | **Q-02** | 保留期在代码与需求间不一致：扩展侧 Taildrop 缓存 **7 天**（`TailscaleVpnExtensionAbility.ets:56`）、诊断报告 **24 h**（`DiagnosticReportService.ets:10`）、R-DRIVE-05 声称 Taildrive 暂存 **24 h**——但 `components/TaildriveBrowser.ets` 中**找不到**对应清理常量（该文件的 24 h 是显示分组 `:1891`）；Taildrive staging 的 24 h 实际来自 `TaildriveGateway.cleanupStaleStaging` 的默认参数（`:312`）。需求与代码必有一方修正 | R-DRIVE-05、O-SEAM-14、O-SEAM-08、§四 数据归属 | 用户 | 数据归属表定稿前 |
 | **Q-03** | `vpn-replace-approved` 路径**死路**：仓库内**无写方**（只有常量 `:27` 与读路径 `:729` 两个引用），approved-replace 不可达；真正在跑的是 `showVpnConflictDialog:4316` 提示用户手动断开其它 VPN。O-SEAM-16 只能记为「设计意图 vs 实际」 | O-CONN-05、O-SEAM-16 | 用户 | O-CONN-05 要闭环时 |
-| **Q-04** | LocalSend 外部拉起契约未定：`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` 是**未验证的猜测**（`BridgeStatus.ets:154-160`）；Moonlight 三字段为空串（`MoonlightIntegrationConfig.ets:10-15`）使串流路径不可达。O-XFER-03 / O-MEDIA-02 只能 `not-evaluated` | R-XFER-09、O-SEAM-13 | 用户 | O-XFER-03 闭环时 |
+| **Q-04** | LocalSend 外部拉起契约未定：`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` **已查证：没有可依赖的公开契约**（2026-10-13 按 Q4 查证：官方 OpenHarmony 移植 `org.localsend.localsend_app` 明写「鸿蒙未接入 share intent」，第三方 AloeSend `com.aloereed.aloesend` 也未记录导出的 Want 或 URI scheme）（`BridgeStatus.ets:154-166`）；Moonlight 三字段为空串（`MoonlightIntegrationConfig.ets:10-15`）使串流路径不可达。O-XFER-03 / O-MEDIA-02 只能 `not-evaluated` | R-XFER-09、O-SEAM-13 | 用户 | O-XFER-03 闭环时 |
 | **Q-05** | 诊断事件名是**自由字符串、无受控词表**，也没有跨进程事件名登记表（两进程各自命名，`VpnSessionController.record:187-189` 把 UI 侧事件写进 UI 文件），同一语义可能两种拼写 | R-DIAG-05、O-SEAM-15 | 用户 | 接缝判据写「可观测点」时 |
 | **Q-06** | O-SEAM-16 批准 TTL 仅 10 s（`:28`），若对话框出现时用户切走，标记是否仍有效、扩展是否重问——**未验证** | O-CONN-05、O-SEAM-16 | 用户 | O-CONN-05 闭环时 |
 | **Q-07** | 无 CI（`record.md` Q1）：§5.3 的集成测试全部待建，「接缝无空洞」无法被自动守住 | 全部接缝闭环强度 | 用户 | 声称开发完成之前 |

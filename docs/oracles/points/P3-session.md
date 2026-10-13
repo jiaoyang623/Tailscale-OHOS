@@ -123,14 +123,14 @@
 - 设计依据：需求 R-CONN-03；架构 §五 责任空洞检查第 1 条——「250 ms × 60 = 15 s 与扩展 100 ms × 150 = 15 s 只是恰好相等而无耦合，任何一侧单独调整都会静默失去应答」；HLD 契约 C-02
 - 触发与前置条件：headless 连接已拉起扩展，扩展开始它自己的 15 s 等待
 - 可观测点：`BACKEND_HANDOFF_POLL_INTERVAL_MS × BACKEND_HANDOFF_MAX_ATTEMPTS` 与扩展侧等待常量的关系；把任一常量改小（例如 10 s）后应答仍不丢失
-- 期望：正常：本侧的应答窗口不短于扩展的等待预算，使扩展不会在应答到达前销毁 VPN；边界：改小任一侧常量都应使这条判据失败，而不是静默失效；失败与恢复：若窗口短于预算，扩展记 `vpn_backend_handoff_timeout` 并销毁 VPN（`docs/background-vpn-reliability.md` Milestone 3 的第二次真实故障）；安全与质量：两个常量分处两进程、没有共享定义，判据要求以断言把关系钉死
+- 期望：正常：本侧的应答窗口不短于扩展的等待预算，使扩展不会在应答到达前销毁 VPN；边界：改小任一侧常量都应使这条判据失败，而不是静默失效；失败与恢复：若窗口短于预算，扩展记 `vpn_backend_handoff_timeout` 并销毁 VPN（`docs/background-vpn-reliability.md` Milestone 3 的第二次真实故障）；安全与质量：两个常量分处两进程、没有共享定义，所以这条关系由一条用例直接读两个源文件来钉死（`scripts/test-vpn-session-controller.mjs`），任一侧单独调小都会让用例失败——已实测：把应答预算从 250 ms × 60 改成 250 ms × 20，用例报「answer window 5000 ms is shorter than the extension wait 15000 ms」
 - 失败信息：期望「本侧轮询窗口 ≥ 扩展等待预算，且该关系被一条用例守住」，实际「只靠注释声明两个 15 s『恰好相等』，任一侧改动后无人发现」
-- 来源：entry/src/main/ets/services/VpnSessionController.ets:27-30（注释与两个常量）；vpnextensionability/TailscaleVpnExtensionAbility.ets 的交接等待（100 ms × 150，见架构 §五责任空洞检查第 1 条与需求 R-CONN-03 行）；docs/architecture/architecture.md 第五节责任空洞检查第 1 条；scripts/test-vpn-session-controller.mjs（现有 6 条用例全部手动放行 sleep，未断言常量关系）
+- 来源：entry/src/main/ets/services/VpnSessionController.ets:27-30（注释与两个常量）；vpnextensionability/TailscaleVpnExtensionAbility.ets 的交接等待（100 ms × 150，见架构 §五责任空洞检查第 1 条与需求 R-CONN-03 行）；docs/architecture/architecture.md 第五节责任空洞检查第 1 条；scripts/test-vpn-session-controller.mjs（用例 the handoff answer window covers the extension wait budget 直接读两个源文件里的四个常量并断言关系）
 - 上游：R-CONN-03、R-CONN-08
-- 待建测试：[单元] scripts/test-vpn-session-controller.mjs::交接应答窗口覆盖扩展十五秒等待（常量关系断言）
-- 状态：pending-test
-- 不确定特征：UNCERTAIN-WIRING
-- 归属：owner=项目维护者 接收批次=a01-单元
+- 测试：scripts/test-vpn-session-controller.mjs::the handoff answer window covers the extension wait budget
+- 状态：closed
+- 不确定特征：none
+- 归属：—
 - 复核：待复核
 
 ### O-SESSION-08 生命周期销毁后命令状态机不保留旧态

@@ -29,9 +29,12 @@ const storeSource = loadClass('../../entry/src/main/ets/services/DiagnosticEvent
   'DiagnosticEventStore');
 
 function fixture() {
-  const f = { files: new Map(), clock: 1_000_000 };
+  const f = { files: new Map(), clock: 1_000_000, logs: [] };
   const sandbox = {
     Date: { now: () => f.clock++ },
+    // The device log is the only channel a host-side run can read back without
+    // a file transfer, so every recorded event also has to reach hilog.
+    hilog: { info: (_domain, _tag, format, ...args) => f.logs.push([format, ...args].join(' ')) },
     fileIo: {
       OpenMode: { CREATE: 1, WRITE_ONLY: 2, TRUNC: 4 },
       accessSync: (p) => f.files.has(p),
@@ -96,4 +99,20 @@ test('两进程落盘文本共用脱敏边界且超限淘汰最旧', async () =>
   assert.ok(kept[kept.length - 1].includes(`event_${limit + 29}`), '最新的一条被丢掉了');
   assert.ok(!g.files.get('/files/diagnostic-ui-events.ndjson').includes('event_29'),
     '第 30 条之前的事件本应被淘汰');
+});
+
+test('every recorded event also reaches the device log, redacted', async () => {
+  // A single device run collects the whole timeline from the device log.
+  // Without this mirror the event files stay on the device and the run has to
+  // fall back on manual export.
+  const f = fixture();
+  f.store.record('/files', 'ui', 'connect_requested', 'preflight');
+  assert.equal(f.logs.length, 1, 'the event did not reach the device log');
+  assert.ok(f.logs[0].includes('connect_requested'), `unexpected log line: ${f.logs[0]}`);
+  assert.ok(f.logs[0].includes('preflight'), `unexpected log line: ${f.logs[0]}`);
+
+  f.store.record('/files', 'vpn', `handoff ${SECRET_URL}`, `phase ${BEARER}`);
+  const dumped = f.logs.join('\n');
+  assert.ok(!dumped.includes('t-9f8e7d6c5b4a'), `URL token reached the device log: ${dumped}`);
+  assert.ok(!dumped.includes('kX9secret'), `bearer reached the device log: ${dumped}`);
 });

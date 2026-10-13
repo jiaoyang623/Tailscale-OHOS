@@ -187,3 +187,26 @@ test('a connect that keeps its authority still starts the extension', async () =
   assert.equal(result, 'started');
   assert.equal(f.extensionStarts, 1);
 });
+
+test('the handoff answer window covers the extension wait budget', () => {
+  // Two processes, two pairs of constants, and until now nothing tied them
+  // together. They only happened to be equal, so changing either side alone
+  // would silently lose the answer and the extension would destroy the VPN
+  // fifteen seconds later. Read the real sources and assert the relation.
+  const extension = readFileSync(new URL(
+    '../entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets',
+    import.meta.url), 'utf8');
+  const controller = readFileSync(new URL(
+    '../entry/src/main/ets/services/VpnSessionController.ets', import.meta.url), 'utf8');
+  const number = (text, name) => {
+    const match = text.match(new RegExp(`${name}\\s*:\\s*number\\s*=\\s*([0-9_]+)`));
+    assert.ok(match, `${name} not found`);
+    return Number(match[1].replace(/_/g, ''));
+  };
+  const extensionWait = number(extension, 'VPN_BACKEND_HANDOFF_POLL_INTERVAL_MS')
+    * number(extension, 'VPN_BACKEND_HANDOFF_MAX_ATTEMPTS');
+  const answerWindow = number(controller, 'BACKEND_HANDOFF_POLL_INTERVAL_MS')
+    * number(controller, 'BACKEND_HANDOFF_MAX_ATTEMPTS');
+  assert.ok(answerWindow >= extensionWait,
+    `the answer window ${answerWindow} ms is shorter than the extension wait ${extensionWait} ms`);
+});

@@ -101,6 +101,8 @@ def load_oracles(stage):
                 "oracle_state": f.get("状态", "").split("\n")[0].strip(),
                 "uncertainty": uncertain,
                 "owner": f.get("归属", "").strip(),
+                # 接缝结构性不适用时，单点直连旅程必须写下这条理由（review.py 会校验）。
+                "seam_not_applicable": f.get("seam_not_applicable", ""),
             })
             # 一条判据的锚点合成一条测试条目，一律 not_evaluated：
             # 本批没有在本基线上执行过其中任何一条。

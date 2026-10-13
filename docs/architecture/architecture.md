@@ -482,7 +482,7 @@ TUN 并写 `backend handoff pending`，用户 14:10:23.973 切后台，14:10:34.
 | O-CONN-01 一键连接 | S1 → S5 → S3 → S4(P2) | **SEAM-01 后端交接**、SEAM-02 连接配置投递 | 无人应答 ⇒ **P1**（未持有长时任务）；应答但停不下来 ⇒ P1；扩展超时自毁 ⇒ P2 记账 | 15 s 硬预算；配置 TTL 15 s；R-CONN-03 |
 | O-CONN-02 一键断开 | S1 → S5 → S3 | SEAM-05 停止/断开（`requestId` 匹配） | 请求方 P1 超时（50 ms×150）后仍调 `stopVpnExtension`，视为无害 | 断开即释放长时任务 |
 | O-CONN-03 连接窗口保活 | S1(S2) ⇄ S3 | SEAM-03 状态/心跳（`connecting` 解析） | P1（判据误解析即失去保护） | 15 s 心跳新鲜度；有界宽限（R-CONN-09） |
-| O-CONN-04 掉线自动恢复 | S2 → S5 → S3 | SEAM-03 + SEAM-05 | P2 被杀 ⇒ 隧道断，**恢复责任在 P1**，而 P1 可能已被冻结（D4 风险） | 最多 3 次、指数退避、稳定 60 s 清零；用户意图不可被撤销（R-CONN-05/06） |
+| O-CONN-04 掉线自动恢复 | S2 → S5 → S3 | **O-SEAM-11 恢复责任 + O-SEAM-03 状态判读**（审查人裁决 Q16a，2026-10-12；原记 SEAM-03 + SEAM-05） | P2 被杀 ⇒ 隧道断，**恢复责任在 P1**，而 P1 可能已被冻结（D4 风险） | 最多 3 次、指数退避、稳定 60 s 清零；用户意图不可被撤销（R-CONN-05/06） |
 | O-CONN-05 替换其它 VPN | S3 → S5 → **（无写方）** / S1 提示 | **SEAM-06 替换批准**：`vpn-replace-approved` 只有读方，替换路径不可达；实际走的是 `showVpnConflictDialog` 的「先断开其它 VPN」提示 | 用户不批准 ⇒ 无法连接，责任在用户侧；P2 记账 `vpn_conflict`，P1 负责把状态翻成人能读的提示 | 单 VPN 平台限制；不得在用户批准前静默替换（当前无静默风险，因为通道断了） |
 | O-CONN-06 后台存活 | S2 ⇄ S3 | SEAM-03、SEAM-12（系统长时任务） | P1 若未持有任务即被冻结 | ≥720 s、心跳龄 ≤15 s、进程 ID 不变 |
 | O-CONN-07 无 UI 连接 | S2 → S5 → S3 | **SEAM-01**（`VpnSessionController.answerBackendHandoff:150` 是第二个应答方，D1） | 应答方 P1；漏答即扩展自毁 | 与 O-CONN-01 同一 15 s 预算与同一文件名 |
