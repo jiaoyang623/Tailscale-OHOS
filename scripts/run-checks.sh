@@ -48,7 +48,16 @@ node "$A01/scripts/check-oracles.cjs" \
 
 # Two project-owned guards. Both fail the gate on drift, and both print the
 # offending entries, so a red run says what to fix.
+# 索引是生成物，可以静默过期：判据改了却忘了重建，检查仍会通过。
+# 生成器自带 --check，它自己渲染一遍再与仓里的副本逐字节比对。
 echo
+echo "== 判据索引是否最新 =="
+node "$A01/scripts/oracle-graph.cjs" --root=. --oracles=docs/oracles \
+  --anchor-exts=.mjs --test-exts=.mjs --check || {
+  echo "重建：node $A01/scripts/oracle-graph.cjs --root=. --oracles=docs/oracles --anchor-exts=.mjs --test-exts=.mjs --write" >&2
+  rc=1
+}
+
 echo "== 资源键一致性（base 与 zh_CN）=="
 node scripts/check-resource-parity.mjs || rc=1
 
