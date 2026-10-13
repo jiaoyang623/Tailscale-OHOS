@@ -199,12 +199,16 @@
 - 可观测点：`streamingStates` 是否仍为空（不得被塞进一条路径）、`homeLatencyRefreshInFlight` 是否已复位
 - 期望：正常：五种情形下迟到的探测结果都被丢弃，既不写入 `streamingStates`，也不把在途标记永久留真；边界：守卫是合取——任一条不成立即丢弃，「新会话里的旧探测」与「旧生命周期里的探测」都算过期；失败与恢复：没有这条守卫，切走再回来或断开重连后会出现一条属于上一段连接的路径；安全与质量：丢弃后必须仍然复位 `homeLatencyRefreshInFlight`，否则首页延迟刷新永久停摆
 - 失败信息：期望「过期的首页探测结果一律不写入并在途标记复位」，实际「迟到的探测把上一段会话的路径重新塞进列表，或让在途标记卡住」
-- 来源：entry/src/main/ets/components/BridgeStatus.ets:4035-4062 refreshHomeLatency；:4047-4048 开始前捕获 generation 与 session；:4049-4055 应答后的守卫（appShellReady / isConnected / generation / session / currentPeer 存在且在线 / errorMessage !== 'cancelled'）；:4059-4061 finally 复位在途标记；scripts/test-peer-reconnect.mjs:99-114（5 条用例名由模板字符串在运行时生成，静态文本里不是字面量，故不锚）
+- 来源：entry/src/main/ets/components/BridgeStatus.ets:4035-4062 refreshHomeLatency；:4047-4048 开始前捕获 generation 与 session；:4049-4055 应答后的守卫（appShellReady / isConnected / generation / session / currentPeer 存在且在线 / errorMessage !== 'cancelled'）；:4059-4061 finally 复位在途标记；scripts/test-peer-reconnect.mjs:99-114（Q3 决定已执行：循环展开成 5 条字面用例名，断言逻辑未改，锚点因此可达）
 - 上游：R-DEV-05
-- 待建测试：[单元] scripts/test-peer-reconnect.mjs::过期的首页探测结果在离线、新会话、新生命周期、取消、移除五种情形下都不重新引入路径
-- 状态：pending-test
-- 不确定特征：UNCERTAIN-WIRING
-- 归属：owner=项目维护者 接收批次=a01-单元
+- 测试：scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after offline
+- 测试：scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after new_session
+- 测试：scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after new_lifecycle
+- 测试：scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after cancelled
+- 测试：scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after removed
+- 状态：closed
+- 不确定特征：none
+- 归属：—
 - 复核：待复核
 
 ### O-LOCALSEND-01 挂起中的详情页按 peerKey 读当前对端，而不是打开时捕获的旧对端
