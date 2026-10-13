@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # MeshArc 的回归入口：宿主侧用例 + 判据三组检查。
 #
-# 这是本仓唯一的自动化门禁。项目没有 CI（见 docs/changes/a01-baseline/record.md 的 Q1），
+# 这是本仓唯一的门禁，本地与 CI 都跑它（.github/workflows/checks.yml），
 # 所以「跑一遍」必须是一条能记住的命令，而不是一串手敲的参数。
 #
 # 用法：
@@ -14,7 +14,9 @@ set -uo pipefail
 
 cd "$(dirname "$0")/.." || exit 2
 
-A01="${A01_SKILL_DIR:-/home/w2h/.codex/skills/a01}"
+# The repository carries its own copy of the checkers under scripts/a01, so a
+# clean checkout and CI both work. Set A01_SKILL_DIR to use an installed skill.
+A01="${A01_SKILL_DIR:-scripts/a01}"
 STRICT=""
 for arg in "$@"; do
   case "$arg" in
@@ -43,5 +45,15 @@ node "$A01/scripts/check-oracles.cjs" \
   --test-exts=.mjs \
   --entries='scripts/test-*.mjs,scripts/integration/*.mjs' \
   $STRICT || rc=1
+
+# Two project-owned guards. Both fail the gate on drift, and both print the
+# offending entries, so a red run says what to fix.
+echo
+echo "== 资源键一致性（base 与 zh_CN）=="
+node scripts/check-resource-parity.mjs || rc=1
+
+echo
+echo "== 诊断事件名登记表 =="
+node scripts/check-diagnostic-event-names.mjs || rc=1
 
 exit "$rc"

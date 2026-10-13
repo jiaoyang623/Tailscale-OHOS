@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>@@TITLE@@ · A01 人工审核</title>
+<style>
+:root{color-scheme:light;--ink:#172337;--muted:#59687c;--line:#dce4ed;--paper:#fff;--bg:#f4f7fb;--accent:#205dc5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1280px;margin:auto;padding:36px 24px 80px}h1,h2,h3,h4,p{margin-top:0}h1{font-size:32px;line-height:1.25}h2{font-size:21px;margin:36px 0 14px}h3{font-size:18px;margin:10px 0 4px}h4{margin:14px 0 4px}
+.eyebrow{font-size:12px;letter-spacing:2px;color:var(--accent);font-weight:700}.muted{color:var(--muted);font-size:13px;overflow-wrap:anywhere}.intro{max-width:850px}.notice{padding:14px 18px;border:1px solid #c8d7ee;background:#edf3fc;border-radius:10px;margin:18px 0}.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.chain>div{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:8px;padding:16px;overflow-wrap:anywhere}
+.journey{background:var(--paper);padding:16px;border:1px solid var(--line);border-radius:10px;margin-bottom:12px}.seam{margin:10px 0 0 16px;padding:10px 14px;border-left:2px solid #9ab5df}.points{margin-top:8px;padding-left:14px}.chip{display:inline-block;font:12px/1.4 ui-monospace,monospace;padding:4px 7px;margin:3px 2px;background:#eaf0fa;border:1px solid #d0dcf0;border-radius:5px;color:#17478c;text-decoration:none;overflow-wrap:anywhere}.chip:hover{background:#d9e6fa}
+.toolbar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 0;background:var(--bg);border-bottom:1px solid var(--line)}input,select,textarea,button{font:inherit;border:1px solid #bac8db;border-radius:6px;padding:8px 10px;background:white;color:var(--ink)}input[type=search]{flex:1;min-width:180px}button{cursor:pointer;background:var(--accent);color:white;border-color:var(--accent);font-weight:600}button:hover{background:#184da6}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #b27b00;outline-offset:2px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px;scroll-margin-top:110px;overflow-wrap:anywhere}.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:3px 8px;border-radius:5px;font-size:12px;white-space:nowrap;background:#edf0f5;color:#47556a}.accepted,.pass{background:#e0f3e9;color:#18553a}.stale,.changes_requested,.fail,.blocked{background:#fbe4e1;color:#842e24}.pending,.not_evaluated,.skip{background:#fff1d6;color:#785213}.review-form{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.review-form label{display:block;font-size:13px;font-weight:600;margin-bottom:10px}.review-form select,.review-form textarea{display:block;margin-top:5px;width:100%;font-weight:400}.review-form textarea{resize:vertical}dl{margin:14px 0}dt{font-weight:600;font-size:13px}dd{margin:3px 0 10px}ul{padding-left:20px}li{margin-bottom:6px}details{border-top:1px dashed var(--line);padding-top:10px}summary{cursor:pointer;color:var(--muted);font-size:13px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;background:white}th,td{text-align:left;padding:12px;border:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}th{background:#edf2f8}.questions{background:white;padding:18px;border:1px solid var(--line);border-radius:10px}#message{min-height:24px;margin:10px 0;color:#842e24}footer{margin-top:30px;color:var(--muted);font-size:13px}[hidden]{display:none!important}
+@media(max-width:760px){main{padding:24px 16px 60px}.cards,.chain{grid-template-columns:1fr}h1{font-size:26px}.toolbar{position:static}.card{scroll-margin-top:12px}.toolbar>*{width:100%}}
+@media print{.toolbar,.review-form,#message{display:none}.cards,.chain{display:block}.card,.chain>div,.journey{break-inside:avoid;margin-bottom:14px}main{padding:0}.card[hidden]{display:block!important}}
+</style>
+</head>
+<body>
+<main>
+<p class="eyebrow">AI-NATIVE-CODING / VERSION 01</p>
+<h1>@@TITLE@@</h1>
+<p class="intro">@@SCOPE@@</p>
+<p class="muted">当前设计层：@@STAGE@@ · 代码基线：@@BASELINE@@</p>
+<div class="notice">逐项检查设计与判据，再记录人工结论。内容就绪、结构检查通过与测试通过分别表示不同结果。此页不会自动宣布开发完成。</div>
+<p id="review-summary">@@SUMMARY@@</p>
+<h2>设计链</h2>
+<div class="chain">@@DESIGN_CHAIN@@</div>
+<h2>判据链 · 旅程 → 接缝 → 单点</h2>
+<div>@@ORACLE_CHAIN@@</div>
+<h2>审核链 · 逐项阅读与记录</h2>
+<div class="toolbar">
+<label for="kind" class="muted">层级</label>
+<select id="kind">
+<option value="all">全部设计与判据</option><option value="requirements">需求分析</option><option value="architecture">架构设计</option><option value="hld">HLD 概要设计</option><option value="lld">LLD 详细设计</option><option value="journey">旅程判据</option><option value="seam">接缝判据</option><option value="point">单点判据</option>
+</select>
+<input id="search" type="search" aria-label="搜索 ID 或正文" placeholder="搜索 ID、规则、来源">
+<input id="reviewer" type="text" aria-label="审查人" placeholder="审查人姓名">
+<button id="export" type="button">导出人工审核记录</button>
+</div>
+<p class="muted">导出后将 JSON 保存到项目审核目录，再回读生成网页。操作尚未导出时，刷新页面会丢失修改。</p>
+<p id="message" role="status" aria-live="polite"></p>
+<div class="cards">@@CARDS@@</div>
+<h2>未决项</h2><div class="questions">@@QUESTIONS@@</div>
+<h2>测试计划与实际证据</h2>
+<p>实现顺序：集成测试 → 单元测试 → 开发 → 两类测试全绿 → 编写 E2E → 全部适用测试全绿。</p>
+<div class="table-wrap"><table><thead><tr><th>用例 / 层级</th><th>验证判据</th><th>结果</th><th>命令、环境、时间、基线与报告</th></tr></thead><tbody>@@TEST_ROWS@@</tbody></table></div>
+<footer>A01 第 01 版 · 本地独立网页，无外部脚本或数据请求。测试结果来自输入证据，不由此页执行。</footer>
+</main>
+<script id="review-data" type="application/json">@@PAYLOAD@@</script>
+<script>
+const reviewData = JSON.parse(document.getElementById('review-data').textContent);
+const cards = Array.from(document.querySelectorAll('.card'));
+const changed = new Set();
+let records = Object.assign(Object.create(null), reviewData.current);
+const message = document.getElementById('message');
+const kindSelect = document.getElementById('kind');
+const searchInput = document.getElementById('search');
+
+function filterCards() {
+  const query = searchInput.value.trim().toLocaleLowerCase();
+  for (const card of cards) {
+    card.hidden = (kindSelect.value !== 'all' && card.dataset.kind !== kindSelect.value)
+      || !card.textContent.toLocaleLowerCase().includes(query);
+  }
+}
+kindSelect.addEventListener('change', filterCards);
+searchInput.addEventListener('input', filterCards);
+
+for (const card of cards) {
+  card.querySelector('.decision').addEventListener('change', () => changed.add(card.dataset.id));
+  card.querySelector('.note').addEventListener('input', () => changed.add(card.dataset.id));
+}
+for (const link of document.querySelectorAll('a.chip')) {
+  link.addEventListener('click', () => {
+    kindSelect.value = 'all';
+    searchInput.value = '';
+    filterCards();
+  });
+}
+document.getElementById('export').addEventListener('click', () => {
+  const reviewer = document.getElementById('reviewer').value.trim();
+  if (!reviewer) {
+    message.textContent = '请填写真实审查人，再导出审核记录。';
+    return;
+  }
+  const reviewedAt = new Date().toISOString();
+  const nextRecords = Object.assign(Object.create(null), records);
+  for (const card of cards) {
+    const itemId = card.dataset.id;
+    if (!changed.has(itemId)) continue;
+    nextRecords[itemId] = {
+      id: itemId, content_sha256: reviewData.hashes[itemId],
+      decision: card.querySelector('.decision').value,
+      note: card.querySelector('.note').value.trim(), reviewer, reviewed_at: reviewedAt
+    };
+  }
+  const result = { skill_version: 'a01', baseline: reviewData.baseline,
+    snapshot_sha256: reviewData.snapshot_sha256, exported_at: reviewedAt,
+    items: Object.values(nextRecords) };
+  const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json;charset=utf-8' });
+  const downloadUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = downloadUrl;
+  anchor.download = 'review-decisions.json';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  records = nextRecords;
+  changed.clear();
+  message.textContent = '已导出记录。将文件保存到项目审核目录，回读后才形成持久化审核证据。';
+});
+window.addEventListener('beforeunload', (event) => {
+  if (changed.size) {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+});
+</script>
+</body>
+</html>

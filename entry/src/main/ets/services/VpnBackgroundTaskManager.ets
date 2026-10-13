@@ -5,13 +5,13 @@ import { fileIo } from '@kit.CoreFileKit';
 import { notificationManager } from '@kit.NotificationKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { StoragePaths } from './StoragePaths';
+import { VpnLinkSnapshot, VpnLinkState, VpnStatusReader } from './VpnStatusReader';
 import { DiagnosticEventStore } from './DiagnosticEventStore';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'VpnBackgroundTask';
 const BUNDLE_NAME: string = 'ren.w2h.mesharc';
 const ENTRY_ABILITY_NAME: string = 'EntryAbility';
-const VPN_STATUS_FRESH_MS: number = 15000;
 const VPN_STATUS_GRACE_MS: number = 60000;
 const CONNECTION_CHECK_INTERVAL_MS: number = 1000;
 const NOTIFICATION_UPDATE_INTERVAL_MS: number = 30000;
@@ -31,7 +31,7 @@ const START_RETRY_MAX_MS: number = 300000;
 const SPECIAL_SCENARIO_SUBMODE: number = 0;
 
 interface VpnRuntimeStatus {
-  state: string;
+  state: VpnLinkState;
   txBytes: number;
   rxBytes: number;
 }
@@ -160,7 +160,7 @@ export class VpnBackgroundTaskManager {
         return;
       }
       const status: VpnRuntimeStatus = this.readStatus(context.filesDir);
-      if (status.state === 'disconnected') {
+      if (status.state === VpnLinkState.DISCONNECTED) {
         this.suppressedUntilDisconnect = false;
         this.nextStartAtMs = 0;
         this.retryCount = 0;
@@ -168,7 +168,7 @@ export class VpnBackgroundTaskManager {
         await this.stop(context);
         return;
       }
-      const live: boolean = status.state === 'connected' || status.state === 'connecting';
+      const live: boolean = VpnBackgroundTaskManager.isLiveState(status.state);
       if (!live) {
         // Missing telemetry is uncertain. Retain an acquired task briefly,
         // but never acquire a new task based on stale connection evidence.
@@ -198,8 +198,8 @@ export class VpnBackgroundTaskManager {
   }
 
   /** States in which the tunnel is coming up or running, so it must be held. */
-  private static isLiveState(state: string): boolean {
-    return state === 'connected' || state === 'connecting';
+  private static isLiveState(state: VpnLinkState): boolean {
+    return state === VpnLinkState.CONNECTED || state === VpnLinkState.CONNECTING;
   }
 
   private async start(context: common.UIAbilityContext, generation: number): Promise<void> {
@@ -228,7 +228,7 @@ export class VpnBackgroundTaskManager {
     }
     this.task = task;
     if (!this.monitoring || generation !== this.lifecycleGeneration ||
-      this.readStatus(context.filesDir).state === 'disconnected') {
+      this.readStatus(context.filesDir).state === VpnLinkState.DISCONNECTED) {
       await this.stop(context);
       return;
     }
@@ -342,41 +342,18 @@ export class VpnBackgroundTaskManager {
   }
 
   private readStatus(filesDir: string): VpnRuntimeStatus {
-    const result: VpnRuntimeStatus = { state: 'unknown', txBytes: 0, rxBytes: 0 };
+    const unknown: VpnRuntimeStatus = { state: VpnLinkState.UNKNOWN, txBytes: 0, rxBytes: 0 };
     try {
       const status: string = fileIo.readTextSync(StoragePaths.vpnStatusPath(filesDir));
-      const heartbeatMs: number = this.statusNumber(status, 'heartbeatMs');
-      const ageMs: number = Date.now() - heartbeatMs;
-      if (heartbeatMs <= 0 || ageMs < 0 || ageMs > VPN_STATUS_FRESH_MS) {
-        return result;
-      }
-      const normalized: string = status.toLowerCase();
-      if (normalized.includes('extension destroyed') || normalized.includes('vpn disconnected') ||
-        normalized.includes('state=stopped') || normalized.startsWith('stopped') ||
-        (normalized.startsWith('failed') && !normalized.includes('status unavailable'))) {
-        result.state = 'disconnected';
-      } else if (normalized.includes('state=running') && normalized.includes('tun=true')) {
-        result.state = 'connected';
-        result.txBytes = this.statusNumber(status, 'txBytes');
-        result.rxBytes = this.statusNumber(status, 'rxBytes');
-      } else if (normalized.includes('vpn interface established')) {
-        // The interface exists and the backend is still starting. This is the
-        // connect window, and it needs protection as much as the steady state:
-        // the extension asks this process to hand the backend over, and a
-        // backgrounded process with no continuous task is frozen before it can
-        // answer, so the extension times out and destroys the VPN.
-        result.state = 'connecting';
-      }
+      // One judgement, taken from VpnStatusReader. Two readers of this file used
+      // to rank the same markers differently, so the app and the card could
+      // report opposite states for one line.
+      const reading: VpnLinkSnapshot = VpnStatusReader.readText(status, Date.now());
+      return { state: reading.state, txBytes: reading.txBytes, rxBytes: reading.rxBytes };
     } catch (_error) {
       // Atomic file replacement or temporary I/O failure is uncertain state.
+      return unknown;
     }
-    return result;
-  }
-
-  private statusNumber(status: string, field: string): number {
-    const match: RegExpMatchArray | null = status.match(new RegExp(`(?:^|\\s)${field}=(\\d+)(?:\\s|$)`));
-    const value: number = match === null ? 0 : Number(match[1]);
-    return Number.isSafeInteger(value) && value >= 0 ? value : 0;
   }
 
   private formatBytes(bytes: number): string {

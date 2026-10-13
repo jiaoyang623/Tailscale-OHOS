@@ -126,8 +126,8 @@
 | | `vpn-stop-request.json` / `vpn-stop-response.json` | P1 写请求，P2 写响应 | 互读 | 50 ms × 150（`VpnSessionController.ets:20-21`） |
 | | `vpn-backend-handoff-request.json` / `-response.json` | P2 写请求，P1 写响应 | 互读 | 100 ms × 150 = **15 s**（扩展 `:31-32`）；应答侧轮询 250 ms × 60（`VpnSessionController.ets:29-30`） |
 | | `vpn-replace-approved` | **仓库内无写方**（仅扩展读：`consumeVpnReplaceApproval:732`） | P2 | 读侧 TTL 10 s，200 ms 轮询等待（扩展 `:24`、`:28`、`:741`） |
-| 状态/心跳 | `vpn-probe-status.txt` | P2，每 **1 s**（`:905`、`:951`） | P1 全部读方、P3 | 新鲜度 15 s（`VpnBackgroundTaskManager.ets:14`、`VpnStatusReader.ets:7`） |
-| 对端快照 | `vpn-peers.json` | P2，随 1 s 快照（`:1005`） | P1 | 新鲜度 5 s（`BridgeStatus.ets:142`；`requirements.md` 边界场景） |
+| 状态/心跳 | `vpn-probe-status.txt` | P2，每 **1 s**（`:905`、`:951`） | P1 全部读方、P3 | 新鲜度 15 s，只在 `VpnStatusReader.ets:12` 定义一次；`BridgeStatus` 借用同一个常量，不再自带门限 |
+| 对端快照 | `vpn-peers.json` | P2，随 1 s 快照（`:1005`） | P1 | 新鲜度 5 s（`BridgeStatus.ets:3606` 的比较；`requirements.md` 边界场景）。这与状态文件的 15 s 是两个不同的文件，不是两个口径 |
 | | `vpn-config-summary.txt`、`vpn-peer-probe-status.txt` | P2 | P1 | 随心跳 |
 | Taildrop | `taildrop-send-request.json`、`taildrop-cancel-request.json`、`taildrop-receive-request/-response.json`、`taildrop-targets.json`、`taildrop-inbox-snapshot.json` | 双向 | 双向 | 请求环 **100 ms**（`:884-897`）；接收环 **250 ms**（`:901-903`） |
 | Taildrive | `taildrive-query-*`、`taildrive-transfer-*`、`taildrive-manual-transfer-*`、`taildrive-control-*` | P1 请求 / P2 应答 | 双向 | 单请求超时 32 s / 35 s / 30 min+10 s / 5 s（`services/TaildriveGateway.ets:14-17`） |

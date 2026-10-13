@@ -69,11 +69,11 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 ### C-03 · O-SEAM-03 VPN 扩展 → 应用进程：状态与心跳
 
 - **通道**：`vpn-probe-status.txt`（主状态）；随环发布 `vpn-config-summary.txt`、`vpn-peer-probe-status.txt`（`TailscaleVpnExtensionAbility.ets:955`、`:702-726`）。路径适配见 `StoragePaths.vpnStatusPath`（`StoragePaths.ets:17-19`）。
-- **方向**：P2 只写（`writeStatus:1904-1907`、`writeCurrentStatusHeartbeat:1909-1912`）；P1 全部读方与 P3 只读（`VpnStatusReader.read:33-67`、`VpnBackgroundTaskManager.readStatus:344-374`、`FormCardService.buildBindingData:28-41`）。
+- **方向**：P2 只写（`writeStatus:1904-1907`、`writeCurrentStatusHeartbeat:1909-1912`）；P1 全部读方与 P3 只读（`VpnStatusReader.read:37-44` 与它调用的 `judge:80-100`、`VpnBackgroundTaskManager.readStatus:344-354`、`FormCardService.buildBindingData:28-41`）。
 - **载荷格式**：`<可见状态文本> | heartbeatMs=<毫秒时间戳>`（`:1910-1911`）。可见状态文本来自 `backendSnapshot().status`，含 `state=Running`、`tun=true`、`txBytes=<n>`、`rxBytes=<n>` 等字段；`vpn-config-summary.txt` 是 `addressCount=… | routeCount=… | hasIPv4Address=…` 等（`:719-725`）；`vpn-peer-probe-status.txt` 为原始探测串。
-- **顺序与时机**：1 s `statusTimer`（`:905-951`）**先写心跳再拍快照**，使 liveness 独立于可能耗时数秒的 `backendSnapshot`（`:906-908`）；快照完成后覆写状态与两份快照文件。写用原子写 `.tmp` + `renameSync`（`writeAtomicTextFile:1935-1953`）。新鲜度：>15 s 视为**不确定**而非健康（`VpnStatusReader.ets:9,43`；`VpnBackgroundTaskManager.ets:14`）。
+- **顺序与时机**：1 s `statusTimer`（`:905-951`）**先写心跳再拍快照**，使 liveness 独立于可能耗时数秒的 `backendSnapshot`（`:906-908`）；快照完成后覆写状态与两份快照文件。写用原子写 `.tmp` + `renameSync`（`writeAtomicTextFile:1935-1953`）。新鲜度：>15 s 视为**不确定**而非健康。窗口只在 `VpnStatusReader.ets:12` 定义一次（`VPN_STATUS_FRESH_MS`），`BridgeStatus` 借用同一个常量，不再自带 5000 ms 门限。
 - **错误与责任**：写状态 best-effort，**永不阻断 VPN 启动**（`writeTextFile:1921-1923` 注释）；快照失败保留上一次已知 backend 状态并记 `vpn_snapshot_unavailable`（`:939-946`）。读侧把不确定转成「不新建长时任务、已持有的有界宽限后才释放」（C-11）。`onDestroy` 写 `VPN extension destroyed`（`:1995`）。
-- **幂等性**：每秒整文件覆写（last-writer-wins）；`VpnStatusReader` 与 `readStatus` 词表必须逐字一致（`VpnStatusReader.ets:27-31` 头注）。
+- **幂等性**：每秒整文件覆写（last-writer-wins）；词表不再靠约定维持——`VpnStatusReader.judge`（`VpnStatusReader.ets:80-100`）是唯一判读，`VpnBackgroundTaskManager.readStatus` 调它（`VpnBackgroundTaskManager.ets:344-354`）。判读顺序：陈旧/未来/缺失心跳→unknown；终态标记→disconnected（压过运行中的隧道）；`state=Running` 且 `tun=true`→connected；`needsLogin`→needs_login；`vpn interface established`→connecting。
 - **可观测点**：扩展 `vpn_snapshot_unavailable`、`vpn_connected`（`:546`）；P1 侧由读方派生状态；长时任务事件见 C-11（`background_started`、`background_status_timeout` 等）。
 
 ### C-04 · O-SEAM-04 VPN 扩展 → 应用进程：对端快照

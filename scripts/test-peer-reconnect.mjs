@@ -96,22 +96,41 @@ test('a slow service response cannot overwrite a more recent recovered path', ()
   assert.equal(c.streamingState('peer-test').sunshine.state, 'available');
 });
 
-for (const scenario of ['offline', 'new_session', 'new_lifecycle', 'cancelled', 'removed']) {
-  test(`an obsolete home probe cannot reintroduce a path after ${scenario}`, async () => {
-    const { c } = fixture(); let resolve;
-    c.peerPathService.probe = () => new Promise(r => resolve = r);
-    c.refreshHomeLatency();
-    if (scenario === 'offline') c.peers = [peer(false)];
-    if (scenario === 'removed') c.peers = [];
-    if (scenario === 'new_session') c.trafficSession++;
-    if (scenario === 'new_lifecycle') c.lifecycleGeneration++;
-    resolve({ type: 'unknown', checkedAt: 10,
-      errorMessage: scenario === 'cancelled' ? 'cancelled' : 'no_response' });
-    await flush();
-    assert.equal(c.streamingStates.length, 0);
-    assert.equal(c.homeLatencyRefreshInFlight, false);
-  });
+// Run one case for an obsolete home probe. The caller passes a literal scenario.
+async function assertObsoleteProbeIsIgnored(scenario) {
+  const { c } = fixture(); let resolve;
+  c.peerPathService.probe = () => new Promise(r => resolve = r);
+  c.refreshHomeLatency();
+  if (scenario === 'offline') c.peers = [peer(false)];
+  if (scenario === 'removed') c.peers = [];
+  if (scenario === 'new_session') c.trafficSession++;
+  if (scenario === 'new_lifecycle') c.lifecycleGeneration++;
+  resolve({ type: 'unknown', checkedAt: 10,
+    errorMessage: scenario === 'cancelled' ? 'cancelled' : 'no_response' });
+  await flush();
+  assert.equal(c.streamingStates.length, 0);
+  assert.equal(c.homeLatencyRefreshInFlight, false);
 }
+
+test('an obsolete home probe cannot reintroduce a path after offline', async () => {
+  await assertObsoleteProbeIsIgnored('offline');
+});
+
+test('an obsolete home probe cannot reintroduce a path after new_session', async () => {
+  await assertObsoleteProbeIsIgnored('new_session');
+});
+
+test('an obsolete home probe cannot reintroduce a path after new_lifecycle', async () => {
+  await assertObsoleteProbeIsIgnored('new_lifecycle');
+});
+
+test('an obsolete home probe cannot reintroduce a path after cancelled', async () => {
+  await assertObsoleteProbeIsIgnored('cancelled');
+});
+
+test('an obsolete home probe cannot reintroduce a path after removed', async () => {
+  await assertObsoleteProbeIsIgnored('removed');
+});
 
 test('home polling retries an online peer despite an old unreachable path', async () => {
   const { c } = fixture();

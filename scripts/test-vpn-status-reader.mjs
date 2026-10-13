@@ -1,30 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { stripTypeScriptTypes } from 'node:module';
-import vm from 'node:vm';
 import test from 'node:test';
+import { enumToObject, runModules } from './lib/arkts-module.mjs';
 
 // Run the real status reader against a deterministic file/clock boundary.
 // The card, the FormExtensionAbility and the app all derive state from this
 // one function, so a drift here would make the card disagree with the app.
-const source = readFileSync(new URL('../entry/src/main/ets/services/VpnStatusReader.ets', import.meta.url), 'utf8');
-
-// stripTypeScriptTypes only removes types; an enum is runtime syntax it
-// rejects. Rewrite the enum into an equivalent object, reading the members
-// straight out of the source so the test cannot drift from the real values.
-function enumToObject(text, name) {
-  const match = text.match(new RegExp(`export enum ${name} \\{([\\s\\S]*?)\\n\\}`));
-  assert.ok(match, `enum ${name} not found`);
-  const members = [...match[1].matchAll(/(\w+)\s*=\s*'([^']*)'/g)]
-    .map(pair => `${pair[1]}: '${pair[2]}'`);
-  assert.ok(members.length > 0, `enum ${name} has no members`);
-  return text.replace(match[0], `const ${name} = { ${members.join(', ')} };`);
-}
-
-const javascript = stripTypeScriptTypes(
-  enumToObject(source, 'VpnLinkState')
-    .replace(/^import .*;\r?$/gm, '')
-    .replace('export class VpnStatusReader', 'class VpnStatusReader'));
+const source = readFileSync(
+  new URL('../entry/src/main/ets/services/VpnStatusReader.ets', import.meta.url), 'utf8');
 
 function fixture() {
   const f = { now: 1_000_000, status: '', missing: false, readError: false };
@@ -39,11 +22,15 @@ function fixture() {
         return f.status;
       }
     },
-    StoragePaths: { vpnStatusPath: dir => `${dir}/vpn-probe-status.txt` }
+    StoragePaths: { vpnStatusPath: (dir) => `${dir}/vpn-probe-status.txt` }
   };
-  vm.runInNewContext(javascript + '\nglobalThis.Reader = VpnStatusReader; globalThis.State = VpnLinkState;', sandbox);
-  f.read = () => sandbox.Reader.read('/files');
-  f.at = status => { f.status = `${status} | heartbeatMs=${f.now}`; };
+  runModules(sandbox, [
+    { source: enumToObject(source, 'VpnLinkState'),
+      names: ['VpnStatusReader', 'VpnLinkState', 'VPN_STATUS_FRESH_MS'] }
+  ]);
+  f.read = () => sandbox.VpnStatusReader.read('/files');
+  f.at = (status) => { f.status = `${status} | heartbeatMs=${f.now}`; };
+  f.window = sandbox.VPN_STATUS_FRESH_MS;
   return f;
 }
 
@@ -70,13 +57,15 @@ test('a running tunnel reports connected with real traffic', () => {
 
 test('a heartbeat older than the freshness window is unknown, not healthy', () => {
   const f = fixture();
-  f.status = 'OK | state=Running | tun=true | heartbeatMs=900000';
+  f.at('OK | state=Running | tun=true');
+  f.now += f.window + 1;
   assert.equal(f.read().state, 'unknown');
 });
 
 test('a heartbeat from the future is unknown', () => {
   const f = fixture();
-  f.status = 'OK | state=Running | tun=true | heartbeatMs=1000001';
+  f.at('OK | state=Running | tun=true');
+  f.now -= 1;
   assert.equal(f.read().state, 'unknown');
 });
 
@@ -94,13 +83,13 @@ test('extension teardown reports disconnected', () => {
 
 test('an explicit stop reports disconnected', () => {
   const f = fixture();
-  f.at('VPN disconnected | backend stopping');
+  f.at('OK | state=stopped');
   assert.equal(f.read().state, 'disconnected');
 });
 
 test('a failed extension reports disconnected', () => {
   const f = fixture();
-  f.at('FAILED | VPN conflict | code=2203002');
+  f.at('FAILED | VPN start | code=1');
   assert.equal(f.read().state, 'disconnected');
 });
 
@@ -112,18 +101,40 @@ test('a failed snapshot read is not treated as a stopped tunnel', () => {
 
 test('a pending sign-in reports needs_login', () => {
   const f = fixture();
-  f.at('NeedsLogin | loginURLReady=true');
+  f.at('OK | needsLogin=true');
   assert.equal(f.read().state, 'needs_login');
 });
 
 test('a working tunnel wins over a stale sign-in marker', () => {
   const f = fixture();
-  f.at('NeedsLogin | state=Running | tun=true');
+  f.at('OK | state=Running | tun=true | needsLogin=true');
   assert.equal(f.read().state, 'connected');
 });
 
 test('running without a TUN is not connected', () => {
   const f = fixture();
-  f.at('state=Running | tun=false');
+  f.at('OK | state=Running | tun=false');
   assert.equal(f.read().state, 'unknown');
+});
+
+test('the connect window reports connecting', () => {
+  // The extension writes this line after it creates the TUN and before the
+  // backend reports Running. The continuous task must be held here, so the
+  // reader has to name the state instead of returning unknown.
+  const f = fixture();
+  f.at('VPN interface established | backend handoff pending');
+  assert.equal(f.read().state, 'connecting');
+});
+
+test('a terminal marker wins over a running tunnel', () => {
+  // The extension writes one state per second, so this line is transitional or
+  // concatenated. Report the tunnel as down. Holding protection on a
+  // contradictory line is the worse error.
+  const f = fixture();
+  f.at('OK | state=Running | tun=true | VPN extension destroyed');
+  assert.equal(f.read().state, 'disconnected');
+});
+
+test('the freshness window is the one shared value', () => {
+  assert.equal(fixture().window, 15000);
 });

@@ -21,7 +21,7 @@
 - 可观测点：connect 的返回值、`VpnCommandGateway.startVpnExtension` 的调用次数、后端 stop 次数、应答循环是否入队了 sleep 句柄
 - 期望：正常：状态已是 connected 时立即返回 `VpnActionResult.UNCHANGED`；边界：不得调用 `startVpnExtension`，也不得启动交接应答轮询（sleep 队列为空）——「已经连上」不是一次新连接；失败与恢复：状态文件读不到或缺心跳时 `VpnStatusReader` 报 unknown 而不是 connected，由此走的是正常连接流程（O-SESSION-02）而不是这条早退
 - 失败信息：期望「已连接时 connect 返回 unchanged 且不起扩展、不轮询」，实际「重复拉起扩展，或为空转的应答循环排入轮询」
-- 来源：entry/src/main/ets/services/VpnSessionController.ets:80 connect；:81-84 读状态并在 connected 时早退；:104 startVpnExtension；:108 answerBackendHandoff（未 await）；entry/src/main/ets/services/VpnStatusReader.ets:33-45 read 与 :43 新鲜度判定；scripts/test-vpn-session-controller.mjs
+- 来源：entry/src/main/ets/services/VpnSessionController.ets:80 connect；:81-84 读状态并在 connected 时早退；:104 startVpnExtension；:108 answerBackendHandoff（未 await）；entry/src/main/ets/services/VpnStatusReader.ets:37-44 read 与 :43 新鲜度判定；scripts/test-vpn-session-controller.mjs
 - 上游：R-CONN-08
 - 测试：scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything
 - 状态：closed

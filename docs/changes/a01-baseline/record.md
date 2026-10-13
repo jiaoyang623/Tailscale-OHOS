@@ -64,7 +64,7 @@ scripts/run-checks.sh --strict   # 判据命中 P0 时退出 1
 | HLD | `docs/hld/hld.md`（17 张契约卡） | 无新增（单点补契约引用） | `docs/review/hld/index.html`（224 条） | **已分层签收**（45 条记需改） |
 | LLD | `docs/lld/lld.md` | 无新增 | `docs/review/lld/index.html`（230 条） | **已分层签收**（38 条记需改） |
 
-判据库总计 **117 条**（31 旅程 + 17 接缝 + 69 单点），闭环 76 条（65.0%），三组检查 0 命中、0 P0。
+判据库总计 **118 条**（31 旅程 + 17 接缝 + 70 单点），闭环 77 条（65.3%），三组检查 0 命中、0 P0。
 
 ## 需求状态位口径
 
@@ -292,6 +292,65 @@ a01 的审核记录靠指纹生效：每条结论存的是「该条目 + 它的�
 两轮框（上表第 22、23 行），由审查人当场分别定夺。这条也说明「程序检查全绿」不等于审核范围
 完整——`--check` 只验结构与引用，验不出「该投影的没投影」。
 
+### 第 8 轮 · 第一轮实现迭代（Q9 / Q10 / Q13，以及四件不碰产品代码的事）
+
+按第 7 轮的决定，先做不碰产品代码的四件事，再改第一组产品代码。五个 subagent 并行。
+
+**四件不碰产品代码的事**：
+
+| 项 | 结果 |
+| --- | --- |
+| CI | `.github/workflows/checks.yml`：push 与 PR 上跑 vendored 自测，再跑 `scripts/run-checks.sh` |
+| 工具链入库 | `scripts/a01/`：三个判据检查器 + 模板，加审核链的 `review.py` 与 `assets/review.html`。`run-checks.sh` 与 `a01-review-pages.sh` 的默认值都改指仓内副本 |
+| 资源键一致性 | `scripts/check-resource-parity.mjs` + 7 条单元用例 |
+| 诊断事件名登记表 | `docs/diagnostics/event-names.md` + `scripts/check-diagnostic-event-names.mjs` + 5 条单元用例 |
+| 字面用例名 | `test-peer-reconnect.mjs` 的循环展开成 5 条字面用例名，断言语义未动 |
+
+**检查器入库这一步，原计划是错的。** 四份 `.cjs` 直接放在 `scripts/a01/` 下跑不起来，两个独立原因：
+`run-checks.sh` 会把它拼成 `$A01/scripts/check-oracles.cjs`；而 `--self-test` 要读 `../references/templates.md`，
+四份文件放在一起会报「找不到模板文件」。改成按技能根镜像：`scripts/a01/scripts/` 放检查器，
+`scripts/a01/references/` 放模板，根部再加四个符号链接，让两种路径都能跑。
+`run-checks.sh` 的默认值同时改成 vendored 副本，干净检出不再依赖作者本机的技能目录。
+
+**登记表在建成当天就抓到了东西。** 两个进程给同一件事起了不同的名字：
+`media_probe_start`（UI）对 `media_probe_started`（扩展），
+`media_probe_success` / `media_probe_no_service`（UI）对 `media_probe_available` / `media_probe_completed`（扩展）。
+这正是 Q-06 担心的「同一语义可能两种拼写」。另有 **3 个非字面量调用点**（事件名来自变量或模板字符串）
+写进登记表的单独一节，不假装它们已被覆盖。字面名总数 **154 个**。
+
+**Q9 / Q10 / Q13 一次改完**，因为三者落在同一份 `vpn-probe-status.txt` 上：
+
+| 决定 | 改法 |
+| --- | --- |
+| Q10 统一词表 | `VpnStatusReader.judge()`（`:80-100`）成为唯一判读；`VpnBackgroundTaskManager.readStatus`（`:344-354`）调它，不再自己解析一遍；`VpnLinkState` 补上 `CONNECTING` |
+| Q13 统一判读口径 | 顺序固定为：陈旧、未来或缺失心跳→unknown；**终态标记→disconnected，且压过运行中的隧道**；`state=Running` 且 `tun=true`→connected；`needsLogin`→needs_login；`vpn interface established`→connecting |
+| Q9 统一新鲜度 | `VPN_STATUS_FRESH_MS`（15000）只在 `VpnStatusReader.ets:12` 定义一次，`BridgeStatus` 借用它，它自带的 5000 ms 常量删除。`vpn-peers.json` 的 5 s 属另一个文件，未动 |
+
+**有效 Red 的记录**（唯一能证明「这些用例真的会红」的东西）。改源码之前，只跑受影响的三个文件：
+
+```
+# tests 21 · pass 16 · fail 5
+not ok 1  - both readers give the same answer for every status line
+not ok 2  - a terminal marker wins over a running tunnel in both readers
+not ok 5  - one freshness window serves every reader, and the UI reads it from here
+not ok 19 - the connect window reports connecting
+not ok 20 - a terminal marker wins over a running tunnel
+```
+
+16 条既有用例在这一步全过，红的正好是 5 条新用例。**第一次跑出来的红不算数**：
+一条是夹具错误（集成测试的相对路径少了一层，`../entry/` 被解析成 `scripts/entry/`），
+另一条也是夹具错误（两个模块在同一个 vm 上下文里声明了同名的顶层常量，
+`Identifier 'VPN_STATUS_FRESH_MS' has already been declared`）。两类都是「夹具坏」，不是「行为缺」。
+修掉夹具后才是上面这份。
+
+**改完**：门禁 `96 通过 / 0 失败 / 0 跳过`；判据 **118 条 · closed 77（闭环率 65.3%）**；
+三组检查 0 命中、P0 为 0；两个新守门人也接进了 `run-checks.sh`。
+
+判据这一侧跟了三件事：`O-SEAM-03` 的期望改写成「只有一个判读」并挂上三条集成用例；
+`O-STATUS-04` 补上「终态标记压过运行中的隧道」这条边界；新增 `O-STATUS-09`（连接窗口报 connecting）。
+`VpnStatusReader` 被重写，所以判据里所有指向它的行号引用一并更正（`O-STATUS-*`、`O-SEAM-03`、
+`P3-session.md`、`O-SEAM-04` 的来源行）。
+
 ## 闭环检查记录
 
 每条命令、时刻、基线与信号条数都记在这里；程序出证据，人签结论。
@@ -304,6 +363,7 @@ a01 的审核记录靠指纹生效：每条结论存的是「该条目 + 它的�
 | **M-05 过度声明改正后** | 2026-10-12T18:1x | `41282d6`+ | 同上 | 117 | 73 | 0 / 0 / 0 | 0 |
 | 集成测试试跑后 | 2026-10-12T18:14 | 工作树 | `--entries='scripts/test-*.mjs,scripts/integration/*.mjs'` | 117 | 74 | 0 / 0 / 0 | 0 |
 | **四层收尾（当前）** | 2026-10-12T18:18 | **`cc7ab88`** | `scripts/run-checks.sh`（同一命令内含判据三组检查） | 117 | **76** | 0 / 0 / 0 | 0 |
+| **第 8 轮（Q9/Q10/Q13 改完）** | 2026-10-13T13:2x | 工作树 | `scripts/run-checks.sh`（新增资源键与事件名两个守门人） | **118** | **77** | 0 / 0 / 0 | 0 |
 
 四层收尾这次是**在提交后的基线上跑的**：先提交（`cc7ab88`），再在该基线上跑
 `scripts/run-checks.sh`（**76 通过 / 0 失败 / 0 跳过** = 73 单元 + 3 集成），
@@ -342,19 +402,19 @@ a01 的审核记录靠指纹生效：每条结论存的是「该条目 + 它的�
 
 | # | 问题 | 决定 | 状态 |
 | --- | --- | --- | --- |
-| Q1 | 73 条用例没有 CI 门禁 | 现在就加 CI | 未做（`.github/workflows`） |
+| Q1 | 73 条用例没有 CI 门禁 | 现在就加 CI | **已做**（`.github/workflows/checks.yml`） |
 | Q2 | 8 个 `device-*-probe.ps1` 需 Windows + 真机 | 并入真机批次 | 未做 |
-| Q3 | `test-peer-reconnect.mjs` 5 个用例名运行时生成 | 改成字面用例名 | 未做 |
+| Q3 | `test-peer-reconnect.mjs` 5 个用例名运行时生成 | 改成字面用例名 | **已做**（5 条字面用例名） |
 | Q4 | LocalSend 的 bundle/Want 契约未定 | 去查官方约定后定下来 | 未做 |
 | Q5 | 设计文档与代码不一致；两份资源无守卫 | 改文档 + 加资源一致性检查 | 未做 |
 | Q6 | 「启动到可用」无目标值、无测量方法 | 定值并实测 | 未做 |
 | Q7 | 卡片 / Taildrive 真机共享节点 / special-scenario 从未真机验证 | 三条都上真机 | 未做 |
 | Q8 | 平台把两进程的同一份 `.so` 视为一个运行时还是两个（会反转 D3） | 上真机验一次 | 未做 |
-| Q9 | 同一状态文件两套新鲜度（5000 / 15000 ms） | 统一到 15000 ms | 未做 |
-| Q10 | 两套读状态词汇表，架构 §2.3 的「同一个共享词汇表」与代码不符 | 改代码统一词表 | 未做 |
+| Q9 | 同一状态文件两套新鲜度（5000 / 15000 ms） | 统一到 15000 ms | **已做**（统一到 15000 ms） |
+| Q10 | 两套读状态词汇表，架构 §2.3 的「同一个共享词汇表」与代码不符 | 改代码统一词表 | **已做**（`judge()` 唯一判读） |
 | Q11 | `vpn-connect-config.json` 有两个写方，架构「每类文件只有一个写方」不成立 | 改架构文档 | 未做 |
 | Q12 | `O-PEER-11` 锚点不可达；`O-SESSION-07` 两个预算只是恰好相等；`O-RECONN-09` 有实现无测试 | 随 Q3 与测试批次补齐 | 未做 |
-| Q13 | 同一状态文件的两个读者优先级相反 | 定口径（先判 disconnected）并改代码 | 未做 |
+| Q13 | 同一状态文件的两个读者优先级相反 | 定口径（先判 disconnected）并改代码 | **已做**（先判 disconnected） |
 | Q14 | `VpnCommandStateMachine.invalidateLifecycle()` 不重置 `state` | 修 | 未做 |
 | Q15 | 重连的 `connect()` 发射即忘，用户断开无法中止在途重连 | 修（加取消句柄） | 未做 |
 | Q16 | `O-RECONN-01…09` 归属三处不一致；`O-BUILD-*` 挂占位父判据 | 重定到 O-SEAM-11 + O-SEAM-03；构建不单立接缝 | 未做 |
@@ -374,13 +434,13 @@ a01 的审核记录靠指纹生效：每条结论存的是「该条目 + 它的�
 
 ## 下一步（按依赖排序）
 
-1. **先做不改行为的**：加 CI（`scripts/run-checks.sh` 作为唯一门禁）、加资源一致性检查、
-   建诊断事件名登记表、改 `test-peer-reconnect.mjs` 的用例名为字面量。
-   这四件事不碰产品代码，做完就能让门禁更强。
-2. **再改文档**：§2.4 写方规则、§五 重连归属、HLD §3.3、LLD 转换表、需求页签数与保留期、
-   `QG-07`/`QG-08` 的现状。
-3. **再改代码（每条先写有效 Red）**：Q14 状态机销毁重置 → Q15 重连取消句柄 →
-   Q13 判读口径统一 → Q10 词表统一 → Q9 新鲜度统一 → Q11/Q-02 的两处死代码。
+1. ~~**先做不改行为的**：加 CI、加资源一致性检查、建诊断事件名登记表、用例名改字面量。~~
+   **第 8 轮已做完。** 四个守门人里有两个接进了 `run-checks.sh`，CI 已就位。
+2. **再改文档**：§2.4 写方规则、§五 重连归属、HLD §3.3、需求页签数与保留期、
+   `QG-07`/`QG-08` 的现状。第 8 轮已改掉 §2.3（新鲜度只有一个来源）与 HLD C-03，
+   LLD 的状态词表结论同步收口。
+3. **再改代码（每条先写有效 Red）**：~~Q13 判读口径统一、Q10 词表统一、Q9 新鲜度统一~~（第 8 轮已做完）
+   → Q14 状态机销毁重置 → Q15 重连取消句柄 → Q11/Q-02 的两处死代码。
 4. **补测试到闭环**：先集成（HLD §5.3 的 7 个计划文件）→ 单元缺口（`O-SESSION-07`、
    `O-PEER-11`、`O-RECONN-09`）→ 最后写 31 条旅程 E2E。
 5. **真机批次**（需清掉手机上另一个 VPN）：Q-01 的 `.so` 可见性、Q7 三条路径、

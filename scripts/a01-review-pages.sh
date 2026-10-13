@@ -9,7 +9,9 @@
 #   scripts/a01-review-pages.sh --baseline <sha> # 指定基线号
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
-A01="${A01_SKILL_DIR:-/home/w2h/.codex/skills/a01}"
+# The repository carries its own copy of the toolchain under scripts/a01, so a
+# clean checkout works. Set A01_SKILL_DIR to use an installed skill instead.
+A01="${A01_SKILL_DIR:-scripts/a01}"
 
 BASELINE="$(git rev-parse --short HEAD)"
 while [ $# -gt 0 ]; do

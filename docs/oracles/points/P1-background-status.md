@@ -269,7 +269,7 @@
 - 可观测点：返回快照的 state
 - 期望：正常：—；边界：文件不存在、原子替换或临时 I/O 失败，一律返回 unknown 而不是 disconnected；失败与恢复：文件重新可读且新鲜时再按后续各条判定；安全与质量：缺证据不等于断开，否则卡片会误报掉线。判定在桩边界（fileIo 为桩）下成立
 - 失败信息：期望「缺文件或读失败报 unknown」，实际「报 disconnected，让卡片显示掉线」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:33 read；:37 accessSync 守卫；:63 catch；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:37 read；:37 accessSync 守卫；:63 catch；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-09
 - 测试：scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected
 - 测试：scripts/test-vpn-status-reader.mjs::an unreadable status file is unknown
@@ -287,7 +287,7 @@
 - 可观测点：快照的 state、txBytes、rxBytes
 - 期望：正常：state 为 connected，txBytes/rxBytes 按字段解析出真实值；边界：—；失败与恢复：—；安全与质量：—。判定在桩边界（fileIo、Date.now 为桩）下成立
 - 失败信息：期望「Running 且 tun=true 报 connected 并带字节数」，实际「报 unknown 或字节数恒为 0」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:49 read 的 connected 分支；:77 field；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:120 judge 的 connected 分支；:110 field；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-04
 - 测试：scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic
 - 状态：closed
@@ -304,7 +304,7 @@
 - 可观测点：返回快照的 state
 - 期望：正常：—；边界：三者一律返回 unknown，即便同一行还写着 state=Running|tun=true——过期（heartbeatMs=900000）、未来（heartbeatMs 比 now 大 1）、无值（缺 heartbeatMs）都不例外；失败与恢复：—；安全与质量：陈旧心跳不得当作健康，否则卡片会显示早已冻结的隧道为已连接。判定在桩边界（fileIo、Date.now 为桩）下成立
 - 失败信息：期望「过期、未来、缺值一律 unknown」，实际「拿旧心跳或坏字段当成 connected」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:41 read；:43 新鲜度守卫；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:37 read；:83 新鲜度守卫；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-09
 - 测试：scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy
 - 测试：scripts/test-vpn-status-reader.mjs::a heartbeat from the future is unknown
@@ -319,15 +319,16 @@
 - 父判据：O-SEAM-03
 - 强度：强
 - 设计依据：需求 R-CONN-02「停止扩展、回到未连接态」；架构 §2.5 错误处理；HLD 契约 C-03
-- 触发与前置条件：status 含 extension destroyed、vpn disconnected、state=stopped / stopped 开头，或非 status unavailable 的 FAILED 行
+- 触发与前置条件：status 含 extension destroyed、vpn disconnected、state=stopped / stopped 开头，或非 status unavailable 的 FAILED 行；以及同一行里既有终态标记又有 `state=Running | tun=true` 的过渡或拼接行
 - 可观测点：返回快照的 state
-- 期望：正常：—；边界：扩展拆除、显式停止、失败扩展（如 VPN conflict）三类都报 disconnected；失败与恢复：—；安全与质量：—。判定在桩边界下成立
+- 期望：正常：—；边界：扩展拆除、显式停止、失败扩展（如 VPN conflict）三类都报 disconnected；一行同时含终态标记与运行中标记时也报 disconnected，因为扩展每秒只写一个状态，凭自相矛盾的行持有长时任务是更坏的错误；失败与恢复：—；安全与质量：判读只在这一个函数里，不在三个读者里各写一份。判定在桩边界下成立
 - 失败信息：期望「终态标记报 disconnected」，实际「把它压成 unknown，卡片迟迟不显示已断开」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:56 read；:69 isDisconnected；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:87 judge；:102 isDisconnected；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-02
 - 测试：scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected
 - 测试：scripts/test-vpn-status-reader.mjs::an explicit stop reports disconnected
 - 测试：scripts/test-vpn-status-reader.mjs::a failed extension reports disconnected
+- 测试：scripts/test-vpn-status-reader.mjs::a terminal marker wins over a running tunnel
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -342,7 +343,7 @@
 - 可观测点：返回快照的 state
 - 期望：正常：—；边界：FAILED 但含 status unavailable 时报 unknown，不报 disconnected；失败与恢复：真正的失败（如 VPN conflict，不带该短语）才报 disconnected；安全与质量：不把「读不到状态」当成隧道已停，避免卡片与应用的判断分叉。判定在桩边界下成立
 - 失败信息：期望「status unavailable 报 unknown」，实际「报 disconnected，误报隧道已停」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:69 isDisconnected 的 status unavailable 例外；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:102 isDisconnected 的 status unavailable 例外；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-09
 - 测试：scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel
 - 状态：closed
@@ -359,7 +360,7 @@
 - 可观测点：返回快照的 state
 - 期望：正常：state 为 needs_login；边界：—；失败与恢复：—；安全与质量：登录态是独立词表，不得混入 connected/disconnected。判定在桩边界下成立
 - 失败信息：期望「待登录报 needs_login」，实际「报 unknown 或 disconnected，卡片无法提示去登录」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:59 read 的 needs_login 分支；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:123 judge 的 needs_login 分支；scripts/test-vpn-status-reader.mjs
 - 上游：R-SETUP-06
 - 测试：scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login
 - 状态：closed
@@ -374,9 +375,9 @@
 - 设计依据：需求 R-CONN-04「隧道不中断」；架构 §3.1 卡片、FormExtensionAbility 与应用共用 VpnStatusReader，词表优先级必须一致；HLD 契约 C-03
 - 触发与前置条件：status 同时含 NeedsLogin 与 state=Running|tun=true
 - 可观测点：返回快照的 state
-- 期望：正常：connected 的判定排在 needs_login 之前，报 connected；边界：登录标记不得盖过工作中的隧道，否则卡片会与应用对同一条隧道给出相反结论；失败与恢复：—；安全与质量：优先级写死在单一函数里，避免三处各写一份而漂移。判定在桩边界下成立
+- 期望：正常：connected 的判定排在 needs_login 之前，报 connected；边界：登录标记不得盖过工作中的隧道，否则卡片会与应用对同一条隧道给出相反结论；失败与恢复：—；安全与质量：优先级写在 `VpnStatusReader.judge` 这一个函数里（`VpnStatusReader.ets:80-100`），`VpnBackgroundTaskManager` 也调它，所以三处各写一份而漂移的可能已经消除。判定在桩边界下成立
 - 失败信息：期望「connected 优先于 needs_login」，实际「登录标记盖住可用隧道，卡片显示需登录而应用显示已连接」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:49 read（connected 分支先于 :59 的 needs_login）；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:120 judge（connected 分支先于 :93 的 needs_login）；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-04
 - 测试：scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker
 - 状态：closed
@@ -393,9 +394,26 @@
 - 可观测点：返回快照的 state
 - 期望：正常：—；边界：缺 tun=true 时报 unknown 而不是 connected；失败与恢复：—；安全与质量：没有 TUN 就没有隧道，不得报 connected。判定在桩边界下成立
 - 失败信息：期望「Running 无 TUN 报 unknown」，实际「只要见到 Running 就报 connected」
-- 来源：entry/src/main/ets/services/VpnStatusReader.ets:49 read 的 connected 合取条件；scripts/test-vpn-status-reader.mjs
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:120 judge 的 connected 合取条件；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-09
 - 测试：scripts/test-vpn-status-reader.mjs::running without a TUN is not connected
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-STATUS-09 连接窗口报 connecting
+- 层级：单点
+- 父判据：O-SEAM-03
+- 强度：强
+- 设计依据：需求 R-CONN-03「连接窗口期内应用进程必须持有长时任务」；架构 §四 D5（连接窗口也算 live）；HLD 契约 C-03
+- 触发与前置条件：status 含 `vpn interface established`（扩展建好 TUN、后端仍在启动），且心跳新鲜
+- 可观测点：返回快照的 state
+- 期望：正常：—；边界：这一类行报 connecting，不报 unknown，因为持有长时任务的一方要按 live 处理它；失败与恢复：—；安全与质量：connecting 的判据是一条 `includes`，扩展改文案就会静默取消保护，所以它必须与 VpnBackgroundTaskManager 的判读一致，这条一致性由集成用例钉住。判定在桩边界下成立
+- 失败信息：期望「连接窗口报 connecting」，实际「压成 unknown，长时任务在交接窗口里拿不到保护」
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets:96-98 judge 的 connecting 分支；scripts/test-vpn-status-reader.mjs
+- 上游：R-CONN-03
+- 测试：scripts/test-vpn-status-reader.mjs::the connect window reports connecting
 - 状态：closed
 - 不确定特征：none
 - 归属：—

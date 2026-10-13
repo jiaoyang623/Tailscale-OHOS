@@ -29,6 +29,7 @@ import {
   VpnCommandStateMachine,
   VpnCoreCommand
 } from '../services/VpnCommandGateway';
+import { VPN_STATUS_FRESH_MS } from '../services/VpnStatusReader';
 import {
   NetworkSettingKey,
   NetworkSettingsGateway,
@@ -139,7 +140,6 @@ const CONNECTION_START_FRAME_DELAY_MS: number = 32;
 const CONNECTION_POLL_INTERVAL_MS: number = 250;
 const BACKEND_READINESS_POLL_INTERVAL_MS: number = 250;
 const CACHE_SIZE_POLL_INTERVAL_MS: number = 500;
-const VPN_HEARTBEAT_FRESH_MS: number = 5000;
 const VPN_HEARTBEAT_CONFIRM_TIMEOUT_MS: number = 2500;
 const VPN_CONNECTED_GRACE_MS: number = 8000;
 const FILE_WATCH_CLOSE_WRITE: number = 0x8;
@@ -3310,7 +3310,7 @@ export struct BridgeStatus {
       const heartbeatMs: number = heartbeatMatch === null ? 0 : Number(heartbeatMatch[1]);
       const heartbeatAgeMs: number = Date.now() - heartbeatMs;
       const heartbeatIsFresh: boolean = heartbeatMs > 0 && heartbeatAgeMs >= 0 &&
-        heartbeatAgeMs <= VPN_HEARTBEAT_FRESH_MS;
+        heartbeatAgeMs <= VPN_STATUS_FRESH_MS;
       const visibleStatus: string = persistedStatus.replace(/\s*\|\s*heartbeatMs=\d+/, '');
       this.processVpnBackendHandoffRequest(context.filesDir, visibleStatus);
       let extensionIsLive: boolean = heartbeatIsFresh && !visibleStatus.includes('destroyed');
@@ -3503,7 +3503,7 @@ export struct BridgeStatus {
       normalizedStatus.includes('disconnect') || normalizedStatus.includes('stopped') ||
       normalizedStatus.startsWith('failed');
     const heartbeatUnavailable: boolean = heartbeatMs <= 0 ||
-      Date.now() - heartbeatMs > VPN_HEARTBEAT_FRESH_MS;
+      Date.now() - heartbeatMs > VPN_STATUS_FRESH_MS;
     const liveTunTransition: boolean = status.includes('backend starting') ||
       (status.includes('tun=true') &&
         (status.includes('state=NoState') || status.includes('state=Starting')));

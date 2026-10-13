@@ -2,9 +2,9 @@
 
 - 流程版本：a01 · 层：LLD
 - 上层输入：`docs/hld/hld.md`（17 张契约卡 C-01…C-17，对应接缝 O-SEAM-01…O-SEAM-17）、`docs/oracles/91-seams/`（S1…S5）、`docs/oracles/90-journeys/`（29 条旅程判据）
-- 下层输入：`docs/oracles/points/`（P1…P5，共 **69** 条单点判据：O-BGTASK-01…15、O-STATUS-01…08、O-NETMON-01…10、O-RECONN-01…09、O-SESSION-01…07、O-PEER-01…11、O-LOCALSEND-01…02、O-BUILD-01…07）
+- 下层输入：`docs/oracles/points/`（P1…P5，共 **70** 条单点判据：O-BGTASK-01…15、O-STATUS-01…09、O-NETMON-01…10、O-RECONN-01…09、O-SESSION-01…07、O-PEER-01…11、O-LOCALSEND-01…02、O-BUILD-01…07）
 - 事实来源：生产代码 `entry/src/main/ets/**`，逐条给 `file:line`（本层把上一层的行号重核了一遍，**发现并更正了一处引用偏差**，见 §八 D-4）
-- 本层做的：把每条单点判据补成**可独立断言的条件与结果**；把四台状态机写全（状态 / 事件 / 条件 / 下一状态 / 输出 / **非法组合**）；把算法边界钉死；把 69 条判据全部收进测试计划表
+- 本层做的：把每条单点判据补成**可独立断言的条件与结果**；把四台状态机写全（状态 / 事件 / 条件 / 下一状态 / 输出 / **非法组合**）；把算法边界钉死；把 70 条判据全部收进测试计划表
 - 本层不做的：不新增判据 ID；不改行为；不把计划写成实现；不修复任何代码或判据文件（发现的问题只登记在 §八）
 
 **引用可信度声明**：契约与行号一律以当前工作区代码为准。文档与代码冲突处登记进 §八，**不抹平**。本层的「现状」栏只描述代码里已经存在的行为；尚未存在的（集成测试、真机复现、special-scenario 路径）一律标 `不存在` 或 `不可达`，绝不写成实现。
@@ -21,41 +21,41 @@
 
 | 单元 | 位置 | 已有的事实 |
 | --- | --- | --- |
-| 保活任务生命周期 | `services/VpnBackgroundTaskManager.ets`（404 行） | 常量 :14–:19；15 个实例字段 :40–:55；两个系统回调 :57 / :78；`register`/`unregister`/`onBackground`/`onForeground` :88/:111/:139/:144；`reconcile` :151；`start` :205；`startSpecialScenario` :255；`stop` :292；`updateNotification` :309；`readStatus` :344；`statusNumber` :376；`formatBytes` :382；`scheduleRetry` :392 |
+| 保活任务生命周期 | `services/VpnBackgroundTaskManager.ets`（381 行） | 常量 :11–:19；15 个实例字段 :40–:55；两个系统回调 :57 / :78；`register`/`unregister`/`onBackground`/`onForeground` :88/:111/:139/:144；`reconcile` :151；`isLiveState` :201；`start` :205；`startSpecialScenario` :255；`stop` :292；`updateNotification` :309；`readStatus` :344（调 `VpnStatusReader.readText`，不再自解析）；`formatBytes` :359；`scheduleRetry` :369；`record` :375 |
 | 命令状态机 | `services/VpnCommandGateway.ets:25-75` | 6 状态枚举 :6-13、3 命令枚举 :15-19、5 个字段 :26-29、`begin`/`isActive`/`complete`/`timeout`/`invalidateLifecycle`/`currentState`/`currentLifecycleGeneration` :31/:46/:50/:59/:63/:68/:72 |
 | 掉线恢复监督者 | `services/VpnReconnectSupervisor.ets`（144 行） | 5 常量 :11–:20；9 字段 :37–:45；`onForeground`/`onBackground`/`noteRequestedStop`/`noteRequestedStart`/`poll`/`handleDrop` :47/:56/:62/:69/:78/:107 |
-| 状态读取与判定优先级 | `services/VpnStatusReader.ets`（82 行） | 新鲜度 :9；4 状态枚举 :11-16；`read` :33；`isDisconnected` :69；`field` :77。**头注 :27-31 声明词表必须与 `VpnBackgroundTaskManager.readStatus` 和 `BridgeStatus` 逐字一致** |
+| 状态读取与判定优先级 | `services/VpnStatusReader.ets`（115 行） | `VPN_STATUS_FRESH_MS`（15000，全仓唯一定义）:12；5 状态枚举 :14-20；`read` :37-44（catch :45-48）；`readText` :67-78；`judge` :80-100（全仓唯一判读，顺序固定）；`isDisconnected` :102-108；`field` :110-114。**Q9/Q10/Q13 决策后，词表与判读只有一份：`VpnBackgroundTaskManager.readStatus` 调 `readText`，`BridgeStatus` 借用此处导出的 `VPN_STATUS_FRESH_MS`** |
 | 卡片侧状态词表 | `services/FormCardService.ets:14-18, 86-108` | 卡片自己的 5 个态名常量；`stateName` 把 `UNKNOWN` 映射成 `connecting`（:102） |
 | 状态文件路径适配 | `services/StoragePaths.ets:17-19` | `vpnStatusPath = ${filesDir}/vpn-probe-status.txt` |
 | 无 UI 编排 | `services/VpnSessionController.ets`（287 行） | 镜像 UI 侧文件名 :14-18；超时常量 :20-30；`connect` :80；`disconnect` :118；`answerBackendHandoff` :150；`requestIdOf` :178；`awaitBackendStop` :228；`matchesRequest` :263 |
 | UI 侧编排与交接应答 | `components/BridgeStatus.ets`（15 149 行） | 状态轮询 250 ms（:139 `CONNECTION_POLL_INTERVAL_MS`）；状态文件读取与心跳判定 :3300-:3320；宽限态 :3497-:3520；`commitConnectedStatus` :3570；`processVpnBackendHandoffRequest` :3407；停止轮询 `requestId` 匹配 :2545-:2555 |
 | 对端/接收侧算法 | `components/BridgeStatus.ets` | 对端快照 5 s 新鲜度 :3606；Taildrop 快照 5 s 新鲜度 :3878；等待文件身份 `name:size` :6981；形状校验 :6985；接收超时常量 :183-:184 与按状态二选一 :8461-:8463；通知动作按 name+size(+receivedAtMs) 找文件 :1609-1611 |
 | Taildrive 上传冲突 | `components/TaildriveBrowser.ets:1100-1160, 1411-1450`；`services/TaildriveGateway.ets:56-57, 74, 266-270` | 默认 `overwrite=false` 上传；`already_exists`/`file_exists` 且未 overwrite → 弹覆盖对话框；暂存目录已存在即抛 |
-| 已闭环的单点判据 | `scripts/test-*.mjs`（宿主侧纯逻辑） | 66 / 69 条 `状态：closed`，各带字面用例名 |
+| 已闭环的单点判据 | `scripts/test-*.mjs`（宿主侧纯逻辑） | 67 / 70 条 `状态：closed`，各带字面用例名 |
 
 ### 1.3 修改（本层提出、本层不实施）
 
 | # | 内容 | 为什么 | 影响判据 |
 | --- | --- | --- | --- |
-| M-1 | 三个「状态文件新鲜度」常量收敛为单一权威源（见 §八 D-1） | 同一个文件被两个不同的窗口读，且 `VpnStatusReader` 头注声明词表一致 | O-STATUS-01…08、O-BGTASK-02/03/13/14/15 |
-| M-2 | 状态词表增补 `connecting` 或明确「卡片窗口期为 connecting、读取器为 unknown」为**登记在案的偏差**（见 §八 D-2） | 头注声明的不变量当前为假 | O-BGTASK-13、O-BGTASK-14、O-STATUS-*（卡片一致性） |
-| M-3 | `VpnLinkState` 判定顺序与 `readStatus` 判定顺序对齐（见 §三 表 4 的非法组合） | 同一行在两侧可解析出相反结果 | O-STATUS-02、O-STATUS-04、O-STATUS-07 |
+| M-1 | 三个「状态文件新鲜度」常量收敛为单一权威源。**Q9 决策已解决**：`VPN_STATUS_FRESH_MS` 只在 `VpnStatusReader.ets:12` 定义一次（见 §八 D-1） | 同一个文件被两个不同的窗口读 | O-STATUS-01…09、O-BGTASK-02/03/13/14/15 |
+| M-2 | 状态词表增补 `connecting`。**Q10 决策已解决**：`VpnLinkState` 增 `CONNECTING`，`judge` 增 connecting 分支（见 §八 D-2） | 卡片与读取器曾经各用一套词表 | O-BGTASK-13、O-BGTASK-14、O-STATUS-*（卡片一致性） |
+| M-3 | `VpnLinkState` 判定顺序与 `readStatus` 判定顺序对齐。**Q13 决策已解决**：`readStatus` 调 `judge`，两处只有一份顺序（见 §三 表 4 与 §八 D-3） | 同一行在两侧曾可解析出相反结果 | O-STATUS-02、O-STATUS-04、O-STATUS-07 |
 | M-4 | 四台状态机的转换表落成可执行断言的表驱动用例（见 §六） | 现在只有行为用例，没有转换覆盖 | 全部 |
 
-**M-1…M-4 均**为 LLD 的结论，**代码尚未改动**；登记在此供架构层裁决，不在本层实施。
+**M-1…M-3 已由 Q9、Q10、Q13 决策落地**（代码与判据均已改动）。**M-4 仍未实施**：转换表尚未落成表驱动用例。两条记录都保留在此，作为「曾出过什么错、后来怎么改」的凭证。
 
 ### 1.4 新增 / 不存在 / 不可达（绝不写成实现）
 
 | 项 | 现状 | 依据 |
 | --- | --- | --- |
-| 集成测试 | **不存在**。仓内 73 条全是 `scripts/test-*.mjs` 宿主侧纯逻辑，不加载 `.so`，不跨进程 | HLD §5.3 |
+| 集成测试 | **部分存在**。第 8 轮起有 3 个文件：`scripts/integration/diagnostic-redaction.mjs`、`persistence-ownership.mjs`、`status-vocabulary.mjs`。它们把两个**真实模块**放进同一个桩边界里，经真实落盘路径交接，但不加载 `.so`，也不跨进程 | HLD §5.3 |
 | special-scenario 长时任务 | **不可达**。`SPECIAL_SCENARIO_SUBMODE = 0`（`VpnBackgroundTaskManager.ets:31`）使 `startSpecialScenario` 在 :257-259 直接返回 false | HLD Q-08 |
 | VPN 替换批准通道 | **写方缺失，不可达**。全仓只有常量与读路径 | HLD C-16 / Q-03 |
 | Moonlight 串流 | **不可达**。三字段空串使 `isAvailable()` 恒 false | HLD C-13 / Q-04 |
 | 连接窗口 15 s 真机复现 | **未重跑** | HLD §3.3 |
 | 720 s 蜂窝锁屏存活 | **未完成**（M-11） | S3/O-SEAM-11 已知局限 |
 
-**结论**：本层之下，MeshArc 的「已有」是四台状态机 + 两套编排 + 69 条宿主侧单点判据；「没有」是全部跨进程证据。LLD 只能把「没有」变成**可写成断言的行**，不能把它变成「有」。
+**结论**：本层之下，MeshArc 的「已有」是四台状态机 + 两套编排 + 70 条宿主侧单点判据；「没有」是全部跨进程证据。LLD 只能把「没有」变成**可写成断言的行**，不能把它变成「有」。
 
 ---
 
@@ -75,8 +75,9 @@
 | `startSpecialScenario(...)` | private async | 特殊场景任务；**默认惰性** | `start` | `backgroundTaskManager` |
 | `stop(ctx)` | private async | 释放任务；失败只记账不抛 | `reconcile`、`start` 的善后 | `backgroundTaskManager` |
 | `updateNotification(ctx, status)` | private async | LIVE_VIEW 实况窗，30 s 节流 | `reconcile` | `notificationManager` |
-| `readStatus(filesDir)` | private | 状态文件 → `{state, tx, rx}`；**唯一解析点** | `reconcile`、`start` | `fileIo`、`StoragePaths` |
-| `statusNumber` / `formatBytes` | private | 字段正则解析 / 字节格式化 | `readStatus` / `updateNotification` | — |
+| `readStatus(filesDir)` | private | 状态文件 → `{state, tx, rx}`；**委托 `VpnStatusReader.readText`**，不再自解析 | `reconcile`、`start` | `VpnStatusReader`、`fileIo`、`StoragePaths` |
+| `isLiveState(state)` | private static | `connected` 或 `connecting` 即应持有任务 | `reconcile`、`start` | — |
+| `formatBytes(bytes)` | private | 字节格式化 | `updateNotification` | — |
 | `scheduleRetry()` | private | 指数退避设 `nextStartAtMs` | 取消回调、`reconcile` 的 catch | — |
 | `cancelCallback` / `suspendCallback` | private readonly | 系统回调 | `backgroundTaskManager` | — |
 
@@ -110,22 +111,28 @@
 
 ### 2.4 `VpnStatusReader`（S7/S1/S2 共用，P1）
 
+导出的 `VPN_STATUS_FRESH_MS`（:12，15000）是全仓唯一的新鲜度定义（Q9 决策）。`VpnLinkState` 现在有 5 个成员，含 `CONNECTING`（:14-20）。
+
 | 成员 | 可见性 | 责任 | 调用者 |
 | --- | --- | --- | --- |
-| `read(filesDir)` | public static | **唯一**「状态文件 → 四态」映射；无引擎、无 ArkUI 依赖 | `VpnReconnectSupervisor.poll`、`VpnSessionController.connect/disconnect`、`FormCardService.buildBindingData`、`VpnToggleCard` |
-| `isDisconnected(normalized)` | private static | 5 个终态标记 | `read` |
-| `field(status, name)` | private static | 数字字段解析 | `read` |
+| `read(filesDir)` | public static | 文件访问：`accessSync` + `readTextSync`，再调 `readText`（:37-44，catch :45-48） | `VpnReconnectSupervisor.poll`、`VpnSessionController.connect/disconnect`、`FormCardService.buildBindingData`、`EntryAbility` |
+| `readText(status, nowMs)` | public static | 状态文本 → `VpnLinkSnapshot`；调 `judge`，connected 时读 tx/rx 字节计数（:67-78） | `VpnBackgroundTaskManager.readStatus` |
+| `judge(status, nowMs)` | public static | **全仓唯一判读**；顺序固定（:80-100） | `readText` |
+| `isDisconnected(normalized)` | private static | 5 个终态标记 | `judge` |
+| `field(status, name)` | private static | 数字字段解析 | `judge`、`readText` |
 
-**这是全仓唯一的「同一份读取被三处消费」点**：卡片（P3）、应用外壳、恢复监督者。它的一致性不是「最好有」，是头注 :27-31 写下的**契约**。§八 D-2 记录该契约当前为假。
+`judge` 的顺序（:80-100）就是唯一的判读口径：陈旧、未来或缺失心跳 → `unknown`；终态标记 → `disconnected`，且压过运行中的隧道；`state=running` 且 `tun=true` → `connected`；`needslogin` 或 `loginurlready=true` → `needs_login`；`vpn interface established` → `connecting`；其余 → `unknown`。
+
+**这是全仓唯一的「同一份读取被三处消费」点**：卡片（P3）、应用外壳、恢复监督者。Q10 与 Q13 决策把一致性从「头注里的声明」变成代码事实：`VpnBackgroundTaskManager.readStatus` 调 `readText`，两处不再各判一遍。§八 D-2 与 D-3 记录旧的不一致及解决方式。
 
 ### 2.5 责任分配总表（SWEBOK「责任分配」）
 
 | 问题 | 归谁 | 不归谁 | 证据 |
 | --- | --- | --- | --- |
-| 连接窗口内 P1 会不会被冻结 | `VpnBackgroundTaskManager`（持有任务） | 扩展 | `readStatus:362` 判 connecting → `reconcile:182` 取得任务 |
+| 连接窗口内 P1 会不会被冻结 | `VpnBackgroundTaskManager`（持有任务） | 扩展 | `judge:96-98` 报 connecting → `isLiveState:201` → `reconcile:182` 取得任务 |
 | 扩展交接超时后自毁 | P1（漏答） | 扩展 | HLD C-02「责任在 P1」 |
 | 后台掉线后谁恢复 | `VpnReconnectSupervisor` | 无（**责任空洞**） | HLD Q-09、S3/O-SEAM-11 |
-| 状态文件该读成什么 | `VpnStatusReader`（卡片）与 `readStatus`（保活）**各读一份** | 无人统一 | §八 D-1/D-2 |
+| 状态文件该读成什么 | `VpnStatusReader.judge`（唯一判读，卡片与保活共用） | 无人另判 | Q9/Q10/Q13 决策；§八 D-1/D-2/D-3（已解决） |
 | 上传覆盖与否 | 用户（对话框） | 应用不静默覆盖 | `TaildriveBrowser.ets:1129`、R-DRIVE-04 |
 | 另一个 VPN 占用 | 用户（提示先断开） | 应用不静默替换 | HLD C-16、Q-03 |
 
@@ -182,13 +189,13 @@
 | I2 | 迟到启动成功复活「已被取消」的任务 | `revision` 快照（:206）比对（:226）→ 丢弃 | 已守（O-BGTASK-10） |
 | I3 | 迟到启动成功复活「已销毁」的任务 | `generation`（:156/:214/:230）→ `stop` 善后 | 已守（O-BGTASK-10） |
 | I4 | 用户取消后自行恢复 | `suppressedUntilDisconnect` 只在读到 **disconnected** 时清（:164），前台不清 | 已守（O-BGTASK-06） |
-| I5 | 凭陈旧/未来/缺失心跳新建任务 | `readStatus:350` 三条守卫 → `unknown` → 不 live | 已守（O-BGTASK-03） |
+| I5 | 凭陈旧/未来/缺失心跳新建任务 | `VpnStatusReader.judge:83` 三条守卫 → `unknown` → 不 live（:172） | 已守（O-BGTASK-03） |
 | I6 | 停滞的连接窗口永久占住任务 | `lastLiveAtMs` 只在 live 时推进（:181）；停滞 60 s 后 T4 | 已守（O-BGTASK-15） |
 | I7 | 非本任务的取消事件误伤本任务 | `info.id !== task.continuousTaskId` → return（:59-62） | 已守（O-BGTASK-08） |
 | I8 | 销毁与 `publish` 并发（留下「通知已撤而任务仍在」） | `updateNotification` 由 reconcile 的 `await` 串起，`finally`（:193-195）在 publish 返回后才 stop | 已守（O-BGTASK-11） |
 | I9 | special-scenario 与 dataTransfer 同时持有 | `startSpecialScenario` 成功即 `return`（:219-221），走不到 `startBackgroundRunning` | 已守；但**整条路径不可达**（:257-259），本行只证明「不可达时不会误伤」 |
 | I10 | `HELD_DATA` 被当成 `HELD_SPECIAL` 去刷实况窗 | `specialScenarioTask` 早退（:310） | 已守 |
-| I11 | **同一份状态文件在 `readStatus` 与 `VpnStatusReader` 里得到相反的态** | **无守卫**。`readStatus` 先判 disconnected（:354）再判 connected（:358）；`VpnStatusReader` 先判 connected（:49）再判 disconnected（:56）。一行同时含 `state=Running|tun=true` 与 `state=stopped` 时，前者得 disconnected、后者得 connected | **未守（登记）** → §八 D-3 |
+| I11 | **同一份状态文件在 `readStatus` 与 `VpnStatusReader` 里得到相反的态** | **已守（Q13 决策）**。`readStatus:351` 调 `VpnStatusReader.readText`，两处只有一份顺序。`judge:87-89` 先判终态标记，因此一行同时含 `state=Running\|tun=true` 与 `state=stopped` 时两边都报 disconnected | 已守（O-STATUS-04；§八 D-3） |
 
 ### 3.2 VM-2 · `VpnCommandStateMachine`（`services/VpnCommandGateway.ets:25-75`）
 
@@ -287,39 +294,40 @@
 
 ### 3.4 VM-4 · `VpnStatusReader` 判定优先级（`services/VpnStatusReader.ets`）
 
-这不是「状态机」而是**优先级判定**：谁压过谁。代码注释在 :47-48 明确写了「connected 压过其它标记」，本表把它写成全序。
+这不是「状态机」而是**优先级判定**：谁压过谁。Q13 决策把口径定死在一处，`judge`（:80-100）是唯一的顺序，终态标记压过运行中的隧道。
 
 **顺序（短路，前者命中即返回）**
 
 | 优先级 | 条件 | 结果 | 代码 |
 | --- | --- | --- | --- |
-| P0 | `!accessSync(path)` → 文件不存在 | `unknown` | :37-39 |
-| P0′ | `heartbeatMs <= 0 \|\| ageMs < 0 \|\| ageMs > 15000` | `unknown`（**短路一切**，即使同一行还写着 `state=Running\|tun=true`） | :43-45 |
-| P0″ | `readTextSync` / `JSON` 抛错 | `unknown` | :63-66 |
-| P1 | `state=running && tun=true` | `connected`（+ tx/rx） | :49-55 |
-| P2 | 5 个终态标记之一 | `disconnected` | :56-58, :69-75 |
-| P3 | `needslogin \|\| loginurlready=true` | `needs_login` | :59-61 |
-| P4 | 其余 | `unknown` | :62 |
+| P0 | `!accessSync(path)` → 文件不存在 | `unknown` | :41-43 |
+| P0′ | `heartbeatMs <= 0 \|\| ageMs < 0 \|\| ageMs > VPN_STATUS_FRESH_MS` | `unknown`（**短路一切**，即使同一行还写着 `state=Running\|tun=true`） | :81-85 |
+| P1 | 5 个终态标记之一 | `disconnected`（**压过运行中的隧道**） | :87-89, :102-108 |
+| P2 | `state=running && tun=true` | `connected`（+ tx/rx） | :90-92 |
+| P3 | `needslogin \|\| loginurlready=true` | `needs_login` | :93-95 |
+| P4 | `vpn interface established` | `connecting` | :96-98 |
+| P5 | 其余 | `unknown` | :99 |
 
-不在这张表里的词：**`connecting`**。含 `vpn interface established` 的新鲜行会掉到 P4 → `unknown`。
+文件读取失败（`readTextSync` / `accessSync` 抛错）在 `read` 的 catch（:45-48）归 `unknown`。
 
 **非法组合**
 
 | # | 非法组合 | 行为 | 判定 |
 | --- | --- | --- | --- |
 | L1 | 陈旧/未来/缺失心跳被当成健康 | P0′ 短路 | 已守（O-STATUS-03） |
-| L2 | `Running` 无 `tun=true` 报 connected | P1 是合取 | 已守（O-STATUS-08） |
-| L3 | 陈旧登录标记盖过可用隧道 | P1 先于 P3 | 已守（O-STATUS-07） |
-| L4 | `FAILED` 但含 `status unavailable` 被当成已停 | P2 的 `!includes('status unavailable')`（:74） | 已守（O-STATUS-05） |
+| L2 | `Running` 无 `tun=true` 报 connected | P2 是合取 | 已守（O-STATUS-08） |
+| L3 | 陈旧登录标记盖过可用隧道 | P2 先于 P3 | 已守（O-STATUS-07） |
+| L4 | `FAILED` 但含 `status unavailable` 被当成已停 | P1 的 `!includes('status unavailable')`（:107） | 已守（O-STATUS-05） |
 | L5 | 缺文件报 disconnected | P0 | 已守（O-STATUS-01） |
-| L6 | **同一行在 VM-1 与 VM-4 得到相反结果** | **无守卫**（见 I11）。本次复核确认这是**机械可推导**的分歧：两侧标记集相同，但判定顺序相反（VM-1：disconnected > connected > connecting；VM-4：connected > disconnected > needs_login > unknown） | **未守** → §八 D-3 |
-| L7 | **`connecting` 被卡片看见** | 不可达：`VpnLinkState` 无此成员；卡片只能拿到 `unknown`，再由 `FormCardService.stateName:102` 把它渲染成 `connecting` | 语义等价但**词汇不同**（§八 D-2） |
+| L6 | **同一行在 VM-1 与 VM-4 得到相反结果** | **已守（Q13 决策）**：两处只有一份顺序（见 I11）。旧的分歧是 VM-1 先判 disconnected 而 VM-4 先判 connected | 已守（§八 D-3） |
+| L7 | **`connecting` 被卡片看见** | **可达（Q10 决策）**：`VpnLinkState` 增 `CONNECTING`，`judge` 报 connecting，卡片照此渲染 | 已闭环（O-STATUS-09；§八 D-2） |
+| L8 | 同一行同时含 `state=Running\|tun=true` 与终态标记 | P1 先于 P2，两处都报 `disconnected` | 已守（O-STATUS-04；Q13 决策） |
 
 ### 3.5 四台机器的非法组合汇总（跨机器）
 
 | 跨机器非法组合 | 现状 |
 | --- | --- |
-| VM-1 说「任务该持有」而 VM-4 说 `unknown` | **正常现象，不是 bug**：连接窗口内 VM-1=connecting（:362）、VM-4=unknown（:62）。卡片因此显示 `connecting`（`FormCardService:102`）而读取器返回 `unknown`——同一份文件三套词（§八 D-2） |
+| VM-1 说「任务该持有」而 VM-4 说 `unknown` | **已消除（Q10/Q13 决策）**：两处调同一份 `judge`。连接窗口内 VM-1 与 VM-4 都报 `connecting`（`judge:96-98`），卡片照此显示（`FormCardService:102`） |
 | VM-2 的 `running` 与 VM-3 的 `WATCHING` 不一致 | 无守卫。VM-2 由 UI 命令驱动，VM-3 由状态文件驱动；两者可以同时成立（VM-2=`running` 且 VM-3 已见掉线边沿）。这是设计（两套独立判据），但**没有任何判据断言它们的分歧有界** |
 | VM-3 发起 `connect` 时 VM-2 未参与 | 正常：headless 路径不用 VM-2（§2.2） |
 | VM-1 的 `HELD_*` 与 VM-3 的恢复同时作用 | 可以同时动作：VM-3 只做「请求连接」，VM-1 只做「持有任务」，不冲突 |
@@ -332,7 +340,7 @@
 
 ### 4.1 字节格式化（`formatBytes`）
 
-两处**独立实现**，逐字相同：`VpnBackgroundTaskManager.ets:382-390` 与 `FormCardService.ets:122-130`。调用点：保活实况窗 :321、卡片详情 :119。
+两处**独立实现**，逐字相同：`VpnBackgroundTaskManager.ets:359-367` 与 `FormCardService.ets:122-130`。调用点：保活实况窗 :321、卡片详情 :119。
 
 - **输入**：`bytes: number`（来自状态文件 `txBytes`/`rxBytes` 的数字字段）。
 - **输出**：`≥1 GiB` → `x.x GiB`；`≥1 MiB` → `x.x MiB`；否则 `x.x KiB`。**没有 B 档**。
@@ -342,13 +350,13 @@
   - `1023` → `1.0 KiB`（**向上进位**：`1023/1024 = 0.999…` → `toFixed(1)` = `1.0`）；
   - `1024` → `1.0 KiB`；`1048575` → `1024.0 KiB`（**不是** `1.0 MiB`，因为判定用 `>=` 于 1 MiB 之前的那一档）；
   - `1048576` → `1.0 MiB`；`1073741824` → `1.0 GiB`；
-  - `NaN`/`Infinity`：`NaN >= x` 恒 false → 落到 KiB 分支，输出 `NaN KiB`。**上游不给 NaN**（`statusNumber` 只返回安全非负整数，:379），所以这是「不可达但未防御」的边界，登记不修改。
+  - `NaN`/`Infinity`：`NaN >= x` 恒 false → 落到 KiB 分支，输出 `NaN KiB`。**上游不给 NaN**（`VpnStatusReader.field:110-114` 只返回安全非负整数），所以这是「不可达但未防御」的边界，登记不修改。
 - **异常**：无（无 I/O、无分配）。
 - **重复**：同一算法两份实现，任一改动都会让实况窗与卡片对同一字节数显示不同单位。本层登记为**已知重复**（HLD §七 第 4 条同源）。
 
 ### 4.2 状态文件解析：心跳缺失 / 未来 / 陈旧
 
-两个实现：`VpnBackgroundTaskManager.statusNumber:376-380` 与 `VpnStatusReader.field:77-81`，正则逐字相同：
+只有一个实现：`VpnStatusReader.field:110-114`（Q10 决策删除了 `VpnBackgroundTaskManager.statusNumber`）。正则：
 
 ```
 new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
@@ -357,7 +365,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 - **输入**：整份状态文件文本（形如 `<可见状态> | heartbeatMs=<ms>`）。
 - **输出**：`{ state, txBytes, rxBytes }`（VM-1）或 `VpnLinkSnapshot`（VM-4）。
 - **不变量**：
-  1. 新鲜度守卫**先于**任何语义判定（VM-1 :350、VM-4 :43）；
+  1. 新鲜度守卫**先于**任何语义判定（唯一判读 `judge:83`）；
   2. 任何不确定 → `unknown`，**从不**→ `disconnected`（安全方向：缺证据不等于断开）；
   3. 字段缺失 → 0（正则不匹配），而非抛错。
 - **边界（三条，均已闭环）**：
@@ -370,8 +378,8 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | 陈旧 | `heartbeatMs = now-15001` | `>15000` | `unknown` | O-STATUS-03 |
 | 恰好新鲜 | `ageMs === 15000` | `=15000` | **不触发守卫**（`>` 非 `>=`）→ 继续语义判定 | 未单列判据 |
 
-- **异常**：`readTextSync`/`accessSync` 抛错 → catch → `unknown`（:370-372 / :63-66）。原子替换期间的半写也走这条。
-- **不变量 4（跨文件）**：同一份文件的两个读者必须给出**同一态**。当前为假，见 §八 D-1/D-3。
+- **异常**：`readTextSync`/`accessSync` 抛错 → catch → `unknown`（`VpnStatusReader.read:45-48`）。原子替换期间的半写也走这条。
+- **不变量 4（跨文件）**：同一份文件的两个读者必须给出**同一态**。**现已成立**（Q9/Q10/Q13 决策）：两处调同一份 `judge`，也共用同一个新鲜度常量。旧的假状态见 §八 D-1/D-3。
 - **复杂度**：O(n)，n = 文件字节数；每 1 s 一次（VM-1）与每 250 ms 一次（`BridgeStatus` :139）。无累积状态。
 
 ### 4.3 `requestId` 匹配
@@ -413,7 +421,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | 排序 | 先按 `receivedAtMs` 降序，再按小写名称，最后按 `size` | :7002-7008 |
 
 - **异常**：无 I/O 在这段；纯函数式过滤 + 排序。
-- **未覆盖**：`taildropWaitingFileKey`（:6981）与 `isTaildropPendingDelete`（:7010）在 P4 的 69 条判据里**没有对应用例**；`name:size` 这条身份规则只在 :1609 / :3821 间接被覆盖。登记为覆盖空缺（§八 G-4）。
+- **未覆盖**：`taildropWaitingFileKey`（:6981）与 `isTaildropPendingDelete`（:7010）在 P4 的 70 条判据里**没有对应用例**；`name:size` 这条身份规则只在 :1609 / :3821 间接被覆盖。登记为覆盖空缺（§八 G-4）。
 
 ### 4.5 上传冲突判定（Taildrive）
 
@@ -452,7 +460,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | 覆盖确认（Taildrive） | 原生返回 `already_exists` | 模态对话框，取消 / 替换 | `TaildriveBrowser.ets:1147-1160` |
 | 冲突提示（其它 VPN） | `vpn_conflict` → `showVpnConflictDialog` | 提示用户**手动**断开其它 VPN | `BridgeStatus.ets:4350-4375` |
 
-**卡片与应用可能各说各话的地方**（本层唯一发现的用户可见分歧）：连接窗口内读取器返回 `unknown`，卡片把它渲染成 `connecting`（`FormCardService.ets:102`）。**用户看不到分歧**（卡片显示「连接中」），但**代码层面词表不一致**，且 `VpnStatusReader` 头注声称一致。见 §八 D-2。
+**卡片与应用曾经可能各说各话的地方**（本层发现的用户可见分歧）：连接窗口内读取器曾返回 `unknown`，卡片把它渲染成 `connecting`（`FormCardService.ets:102`）。**现已消除**（Q10/Q13 决策）：读取器报 `connecting`，卡片、应用与保活任务用同一份结果。旧的词表不一致见 §八 D-2。
 
 ### 5.2 异步取消（逐台机器）
 
@@ -490,11 +498,11 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 ## 六、判据与测试计划
 
-**本表收录 `docs/oracles/points/` 全部 69 条单点判据。** 已闭环的写它锚的用例；未闭环的写在「单元测试计划」栏并注明归属（对齐判据的 `归属`）。父接缝与 HLD 契约两栏照抄判据现文，**分歧不加修饰**（复核结论见 §八 A）。
+**本表收录 `docs/oracles/points/` 全部 70 条单点判据。** 已闭环的写它锚的用例；未闭环的写在「单元测试计划」栏并注明归属（对齐判据的 `归属`）。父接缝与 HLD 契约两栏照抄判据现文，**分歧不加修饰**（复核结论见 §八 A）。
 
-状态口径：**closed = 66 条**；**pending-test = 3 条**（O-RECONN-09、O-SESSION-07、O-PEER-11）。
+状态口径：**closed = 67 条**；**pending-test = 3 条**（O-RECONN-09、O-SESSION-07、O-PEER-11）。
 
-### 6.1 O-BGTASK-01…15 / O-STATUS-01…08（`P1-background-status.md`）
+### 6.1 O-BGTASK-01…15 / O-STATUS-01…09（`P1-background-status.md`）
 
 | 单点判据 | 类/方法 | 父接缝 | 单元测试计划 | 对应集成场景 |
 | --- | --- | --- | --- | --- |
@@ -502,7 +510,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | O-BGTASK-02 | `reconcile` :171 宽限分支 / `readStatus` :344 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::stale heartbeat and read errors retain acquired protection for a bounded grace period` | O-CONN-06 |
 | O-BGTASK-03 | `readStatus` :344 / `reconcile` :182 启动条件 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::never starts from stale, future, missing heartbeat or missing TUN evidence` | O-CONN-06；边界路径 §3.2 |
 | O-BGTASK-04 | `reconcile` :163 disconnected 分支 / `stop` :292 | O-SEAM-11（C-11） | closed：`…::explicit disconnect promptly releases the task`；`…::an explicit disconnect during the connect window releases promptly` | O-CONN-02 |
-| O-BGTASK-05 | `readStatus` :354 failed 例外 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::snapshot failure is uncertain and does not immediately revoke protection` | O-CONN-06 |
+| O-BGTASK-05 | `judge` 的 `isDisconnected` failed 例外 :107 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::snapshot failure is uncertain and does not immediately revoke protection` | O-CONN-06 |
 | O-BGTASK-06 | `cancelCallback` :57 / 启动条件 :182 / `onForeground` :144 | O-SEAM-11（C-11） | closed：`…::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect` | O-CONN-06 |
 | O-BGTASK-07 | `cancelCallback` 系统分支 :70 / `scheduleRetry` :392 | O-SEAM-11（C-11） | closed：`…::system cancellation retries with exponential backoff` | O-CONN-06 |
 | O-BGTASK-08 | `cancelCallback` 的 id 守卫 :59 | O-SEAM-11（C-11） | closed：`…::unrelated cancellation does not discard the VPN task` | O-CONN-06 |
@@ -510,17 +518,18 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | O-BGTASK-10 | `start` 的 revision :206 / :226 / 后校验 :230 | O-SEAM-11（C-11） | closed：`…::cancellation received during start cannot be overwritten by its late result`；`…::disconnect during start cleans up the late successful task without publishing`；`…::destroy during start cleans up the late successful task` | O-CONN-06；VM-1 I2/I3 |
 | O-BGTASK-11 | `reconcile` 世代守卫 :185 / `finally` :191 / `updateNotification` :315 | O-SEAM-11（C-11） | closed：`…::destroy during notification update serializes cleanup after publish` | O-CONN-06；VM-1 I8 |
 | O-BGTASK-12 | `reconcile` 的 `operationInFlight` :152 / `stop` :292 / `stopping` :49 | O-SEAM-11（C-11） | closed：`…::reconnect waits for in-flight stop before starting the next task` | O-CONN-06；VM-1 I1 |
-| O-BGTASK-13 | `readStatus` connecting 分支 :362 / `reconcile` live 判定 :171 / `isLiveState` :200 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::holds protection through the connect window so the handoff can be answered` | **O-CONN-03**（HLD §3.3 的失败恢复路径）+ O-SEAM-02/10/11 |
-| O-BGTASK-14 | `readStatus` connecting 判据 :362 / 新鲜度守卫 :350 | O-SEAM-03（C-03） | closed：`…::the connect window needs interface evidence, not just an unrecognised status` | O-CONN-03；边界路径 §3.2 |
+| O-BGTASK-13 | `judge` connecting 分支 :96-98 / `reconcile` live 判定 :171 / `isLiveState` :201 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::holds protection through the connect window so the handoff can be answered` | **O-CONN-03**（HLD §3.3 的失败恢复路径）+ O-SEAM-02/10/11 |
+| O-BGTASK-14 | `judge` connecting 判据 :96-98 / 新鲜度守卫 :83 | O-SEAM-03（C-03） | closed：`…::the connect window needs interface evidence, not just an unrecognised status` | O-CONN-03；边界路径 §3.2 |
 | O-BGTASK-15 | `reconcile` 宽限分支 :171 / `VPN_STATUS_GRACE_MS` :175 | O-SEAM-03、O-SEAM-11（HLD **仅 C-03**） | closed：`…::a stalled connect window still releases protection` | O-CONN-03/06 |
-| O-STATUS-01 | `VpnStatusReader.read` :33 / accessSync 守卫 :37 / catch :63 | O-SEAM-03（C-03） | closed：`test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected`；`…::an unreadable status file is unknown` | O-CONN-06；卡片/应用一致性 |
-| O-STATUS-02 | `read` connected 分支 :49 / `field` :77 | O-SEAM-03（C-03） | closed：`…::a running tunnel reports connected with real traffic` | O-DEV-01 |
-| O-STATUS-03 | `read` 新鲜度守卫 :41/:43 | O-SEAM-03（C-03） | closed：`…::a heartbeat older than the freshness window is unknown, not healthy`；`…::a heartbeat from the future is unknown`；`…::a heartbeat without a value is unknown` | 边界路径 §3.2 |
-| O-STATUS-04 | `read` :56 / `isDisconnected` :69 | O-SEAM-03（C-03） | closed：`…::extension teardown reports disconnected`；`…::an explicit stop reports disconnected`；`…::a failed extension reports disconnected` | O-CONN-02 |
-| O-STATUS-05 | `isDisconnected` 的 status unavailable 例外 :74 | O-SEAM-03（C-03） | closed：`…::a failed snapshot read is not treated as a stopped tunnel` | O-CONN-06 |
-| O-STATUS-06 | `read` needs_login 分支 :59 | O-SEAM-03（C-03） | closed：`…::a pending sign-in reports needs_login` | O-SETUP-03 |
-| O-STATUS-07 | `read` :49 先于 :59 | O-SEAM-03（C-03） | closed：`…::a working tunnel wins over a stale sign-in marker` | O-CARD-01 |
-| O-STATUS-08 | `read` connected 合取 :49 | O-SEAM-03（C-03） | closed：`…::running without a TUN is not connected` | O-DEV-01 |
+| O-STATUS-01 | `VpnStatusReader.read` :37-44 / accessSync 守卫 :41 / catch :45-48 | O-SEAM-03（C-03） | closed：`test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected`；`…::an unreadable status file is unknown` | O-CONN-06；卡片/应用一致性 |
+| O-STATUS-02 | `judge` connected 分支 :90-92 / `field` :110-114 | O-SEAM-03（C-03） | closed：`…::a running tunnel reports connected with real traffic` | O-DEV-01 |
+| O-STATUS-03 | `judge` 新鲜度守卫 :83 | O-SEAM-03（C-03） | closed：`…::a heartbeat older than the freshness window is unknown, not healthy`；`…::a heartbeat from the future is unknown`；`…::a heartbeat without a value is unknown` | 边界路径 §3.2 |
+| O-STATUS-04 | `judge` 终态分支 :87-89 / `isDisconnected` :102-108 | O-SEAM-03（C-03） | closed：`…::extension teardown reports disconnected`；`…::an explicit stop reports disconnected`；`…::a failed extension reports disconnected`；`…::a terminal marker wins over a running tunnel` | O-CONN-02 |
+| O-STATUS-05 | `isDisconnected` 的 status unavailable 例外 :107 | O-SEAM-03（C-03） | closed：`…::a failed snapshot read is not treated as a stopped tunnel` | O-CONN-06 |
+| O-STATUS-06 | `judge` needs_login 分支 :93-95 | O-SEAM-03（C-03） | closed：`…::a pending sign-in reports needs_login` | O-SETUP-03 |
+| O-STATUS-07 | `judge` :90-92 先于 :93-95 | O-SEAM-03（C-03） | closed：`…::a working tunnel wins over a stale sign-in marker` | O-CARD-01 |
+| O-STATUS-08 | `judge` connected 合取 :90-92 | O-SEAM-03（C-03） | closed：`…::running without a TUN is not connected` | O-DEV-01 |
+| O-STATUS-09 | `judge` connecting 分支 :96-98 | O-SEAM-03（C-03） | closed：`test-vpn-status-reader.mjs::the connect window reports connecting`；`integration/status-vocabulary.mjs::both readers give the same answer for every status line` | O-CONN-03；卡片/应用一致性 |
 
 ### 6.2 O-NETMON-01…10 / O-RECONN-01…09（`P2-network-reconnect.md`）
 
@@ -598,26 +607,27 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | `integration/orchestration-fork.mjs` | O-SEAM-10（**O-SESSION-02/07 的收敛点**） | 不存在 |
 | `integration/vpn-replace-approval.mjs` | O-SEAM-16 | 不存在 |
 | `integration/external-app-handoff.mjs` | O-SEAM-13 | 不存在 |
-| `integration/persistence-ownership.mjs` | O-SEAM-14 | 不存在 |
-| `integration/diagnostic-redaction.mjs` | O-SEAM-15（与 O-NETMON-02 相邻） | 不存在 |
+| `integration/persistence-ownership.mjs` | O-SEAM-14 | **已建**（1 条用例，closed） |
+| `integration/diagnostic-redaction.mjs` | O-SEAM-15（与 O-NETMON-02 相邻） | **已建**（1 条用例，closed） |
 | `integration/entry-dispatch.mjs` | O-SEAM-17 | 不存在 |
+| `integration/status-vocabulary.mjs` | O-SEAM-03（**计划外新增**：Q9/Q10/Q13 决策要求两个读者对同一行给出同一答案） | **已建**（第 8 轮，5 条用例，给 O-SEAM-03 与 O-STATUS-09 闭环） |
 
-**开口小结**：单点判据层面 3 条开（O-RECONN-09、O-SESSION-07、O-PEER-11）；接缝层面 O-SEAM-10、O-SEAM-13、O-SEAM-14、O-SEAM-15、O-SEAM-16、O-SEAM-17 只有 `pending-test`；集成层 7 个文件全不存在。
+**开口小结**：单点判据层面 3 条开（O-RECONN-09、O-SESSION-07、O-PEER-11）；接缝层面 O-SEAM-10、O-SEAM-13、O-SEAM-16、O-SEAM-17 只有 `pending-test`（O-SEAM-14 与 O-SEAM-15 已由集成用例闭环）；集成层 8 个文件里 3 个已建、5 个仍不存在。
 
 ---
 
 ## 七、旅程复核
 
-方法：把 §三 的四张转换表与 §六 的 69 条单点按旅程重新组合，检查**接缝与单点组合后是否仍满足完整旅程**。逐条给「结论 + 依据 + 残留风险」。
+方法：把 §三 的四张转换表与 §六 的 70 条单点按旅程重新组合，检查**接缝与单点组合后是否仍满足完整旅程**。逐条给「结论 + 依据 + 残留风险」。
 
 | 旅程判据 | 涉及的接缝 | 涉及的单点 | 复核结论 | 残留风险 |
 | --- | --- | --- | --- | --- |
-| **O-CONN-01** 一键连接 | O-SEAM-01/02/03/05/11 | O-BGTASK-13 | **成立（宿主侧）**。VM-1 T2 在连接窗口内取得任务（:362 → :182），使交接能被应答 | 真机 15 s 窗口未重跑（HLD §3.3）；`Q-01`（两进程引擎实例）未验证 |
+| **O-CONN-01** 一键连接 | O-SEAM-01/02/03/05/11 | O-BGTASK-13 | **成立（宿主侧）**。VM-1 T2 在连接窗口内取得任务（`judge:96-98` → `isLiveState:201` → `:182`），使交接能被应答 | 真机 15 s 窗口未重跑（HLD §3.3）；`Q-01`（两进程引擎实例）未验证 |
 | **O-CONN-02** 一键断开 | O-SEAM-01 | 无专属单点 | **成立**。VM-1 T1 读到 disconnected 即释放；停止应答 7.5 s 超时后仍调 `stopVpnExtension` | 无（超时被显式定为无害） |
 | **O-CONN-03** 连接窗口保活 | O-SEAM-03/11 | O-BGTASK-13/14/15 | **成立**。VM-1 把 connecting 与 connected 等重（:171），且有界（T4） | **VM-3 K8**：重连在途用户按断开不可中止（本旅程邻域） |
 | **O-CONN-04** 后台掉线自动恢复 | O-SEAM-10/11/03（**归属分歧** §八 A-1） | O-RECONN-01…09 | **部分成立**。VM-3 的意图判读（R5/R6/R7/R8）完整；**但 K8 与 O-RECONN-09 的缺口**使「稳定 60 s 才清零」这条防线没有证据 | **责任空洞**（HLD Q-09）：P1 被冻结时无人恢复，本层转换表无法覆盖 |
 | **O-CONN-05** 其它 VPN 冲突 | O-SEAM-16（不可达）/ O-SEAM-10 | 无 | **成立（走的是替代路径）**。实际是 `showVpnConflictDialog`；批准通道不可达 | 批准 TTL 10 s 与写方缺失（Q-03/Q-06） |
-| **O-CONN-06** 后台长时存活 | O-SEAM-03/11 | O-BGTASK-01…15、O-STATUS-01…08 | **成立**。VM-1 全表 + VM-4 P0–P4 全序都有用例 | 蜂窝 720 s（M-11）未完成；**D-1/D-2** 使「存活判据」与「卡片显示」用两个窗口、两套词 |
+| **O-CONN-06** 后台长时存活 | O-SEAM-03/11 | O-BGTASK-01…15、O-STATUS-01…09 | **成立**。VM-1 全表 + VM-4 P0–P5 全序都有用例 | 蜂窝 720 s（M-11）未完成；D-1/D-2 已由 Q9/Q10 决策解决 |
 | **O-CONN-07** 无 UI 连接 | O-SEAM-10/01/02/17 | O-SESSION-01…07 | **部分成立**。VM-2 不参与（§2.2），headless 用 `VpnActionResult`；交接半环有 6 条用例；**O-SESSION-07 未闭环**——R 侧 15 s 与扩展 15 s 无耦合 | `orchestration-fork.mjs` 不存在 |
 | **O-NET-01/02** 出口节点与子网路由 | O-SEAM-06（待建） | 无 | **不能复核**（无单点判据、无集成锚点） | HLD §5.3 记待建 |
 | **O-NET-03** 网络切换重绑 | O-SEAM-12 | O-NETMON-01…10 | **成立**。10 条覆盖合并/限速/离线/重试/重放/停止 | M-03/M-04 数值转抄未复跑 |
@@ -629,13 +639,13 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | **O-UI-01/02** 导航与主题 | O-SEAM-14 | 无 | **不能复核** | — |
 | **O-PRIV-01/02** 应用锁 | O-SEAM-13 | 无 | **不能复核** | — |
 | **O-DIAG-01** 诊断导出 | O-SEAM-15 | O-NETMON-02（相邻） | **部分成立**。脱敏有 O-NETMON-02 一条邻接证据；**O-SEAM-15 本身 pending-test** | 事件名词表无受控（Q-05） |
-| **O-CARD-01** 卡片开关 | O-SEAM-17/10 | O-SESSION-01…03 | **部分成立**。VM-4 P1/P3 有用例；卡片词表分歧见 D-2 | 卡片真机未验证（Q-08） |
+| **O-CARD-01** 卡片开关 | O-SEAM-17/10 | O-SESSION-01…03 | **部分成立**。VM-4 P1/P3/P4（connecting）有用例；卡片词表分歧已由 Q10 决策解决（D-2） | 卡片真机未验证（Q-08） |
 
 **复核结论（三条）**
 
 1. **连接类旅程（O-CONN-01…07）在宿主侧成立**：四台状态机的转换表覆盖了它们的每一次判定；残留的是真机证据与两处登记偏差，不是逻辑缺口。
 2. **非连接类旅程大量「不能复核」**：设备/传输/Taildrive/媒体/配置/诊断六组共 15 条旅程判据，**没有**单点判据挂接，对应接缝多为 `pending-test` 或「待建」。这是本项目当前最大的覆盖空洞，**不是** LLD 能靠补转换表填上的。
-3. **两条算法规则（同名不同大小、上传冲突）实现完整但无判据**（§八 G-4）：它们是 O-XFER-04 / O-DRIVE-01 的核心，却在 69 条里没有对应行。
+3. **两条算法规则（同名不同大小、上传冲突）实现完整但无判据**（§八 G-4）：它们是 O-XFER-04 / O-DRIVE-01 的核心，却在 70 条里没有对应行。
 
 ---
 
@@ -647,6 +657,8 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 **A-1（实质性分歧 · 最重）`O-RECONN-01…09` 的父接缝 `O-SEAM-10` 与 HLD 自身不符**
 
+**已由审查人裁决（Q16a，2026-10-12）**：父判据重定为 `O-SEAM-11`（恢复责任，即 §五 那条责任空洞）与 `O-SEAM-03`（状态判读）。架构 §五 与 HLD §3.3 同步收敛到同一套。**待执行**：判据文件的 `父判据` 字段尚未改；接收批次 `a01-判据`。下面保留当初的分歧记录。
+
 | 来源 | 对「后台掉线自动恢复」（O-CONN-04）的归属 |
 | --- | --- |
 | 判据现文（P2，9 条） | `O-SEAM-10`（O-RECONN-01 另加 `O-SEAM-11`），HLD `C-10` |
@@ -657,6 +669,8 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 即：三处归属互不相同，且 `O-SEAM-10` 是唯一**在本层看来站得住但不能单独站住**的一处——S3 的 O-SEAM-10 触发条件确实把 `VpnReconnectSupervisor` 列为 headless 入口之一（`S3-orchestration-system.md:12`），所以「重连经由 headless 编排」成立；但 O-RECONN-01…09 断言的是**该不该重连**（静置、意图、退避、上限、稳定性），不是**两条编排是否交出同一套契约**（C-10 的主题）。**建议**：父接缝合为 `O-SEAM-10、O-SEAM-11`，契约栏补 `C-11`；或另立一条「恢复意图」接缝。**本层不改判据，交由判据库裁决。**
 
 **A-2（已声明的暂挂）`O-BUILD-01…07` 的父接缝 `O-SEAM-05`**
+
+**已由审查人裁决（Q16b，2026-10-12）**：不为构建单立接缝。7 条改为直连旅程，并逐条写 `seam_not_applicable` 理由。**待执行**：父子关系尚未改；接收批次 `a01-判据`。下面保留当初的分歧记录。
 
 `P5-build.md:6-8` 自述「17 条接缝里没有构建这条……暂挂 O-SEAM-05，并在 `不确定特征` 记 `UNCERTAIN-WIRING`」。**这是显式声明，不是隐藏错误**。但仍应记录：`C-05` 的正文（引擎生命周期 N-API 面）**不描述**构建行为——它描述的是构建产物所服务的那条边。7 条判据的**真实归属是 S9「构建与交付」**（HLD §一），而 S9 没有对应的 O-SEAM。**建议**：在接缝库补一条构建接缝，或把 7 条的父判据改为「S9（无接缝 ID）」并保留 `UNCERTAIN-WIRING`。
 
@@ -710,37 +724,36 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 - **本层补充发现（K10，登记不修）**：VM-3 对 `needs_login` 与 `unknown` 一样是**静默**（R11），因此「恢复后停在待登录」这一结局没有任何事件、也没有判据。这与 O-RECONN-09 是同一邻域的另一半，登记为**新识别的空缺**（不新增判据 ID）。
 - 归属：`owner=项目维护者 接收批次=a01-单元`（判据现文）。
 
-### C. 两处文档化不一致，以及 LLD 设计认为它们应该是
+### C. 三处文档化不一致，以及 LLD 设计认为它们应该是（Q9/Q10/Q13 决策已全部解决）
 
-**D-1 同一个状态文件上的两个新鲜度窗口（5000 ms vs 15000 ms）**
+**D-1 同一个状态文件上的两个新鲜度窗口（5000 ms vs 15000 ms）——已解决（Q9 决策）**
 
-- 事实（三处独立常量，全部复核过行号）：
-  - `components/BridgeStatus.ets:142` `VPN_HEARTBEAT_FRESH_MS = 5000`，用于 `:3313`（`heartbeatIsFresh → extensionIsLive`）与 `:3506`（`heartbeatUnavailable` 送入宽限判定）——**读的就是 `vpn-probe-status.txt`**（:3300 显式拼出该文件名）；
-  - `services/VpnBackgroundTaskManager.ets:14` `VPN_STATUS_FRESH_MS = 15000`（:350）；
-  - `services/VpnStatusReader.ets:9` `VPN_STATUS_FRESH_MS = 15000`（:43）。
+- 事实（问题发生时，三处独立常量）：
+  - `components/BridgeStatus.ets` 的 `VPN_HEARTBEAT_FRESH_MS = 5000`，用于 `heartbeatIsFresh → extensionIsLive` 与 `heartbeatUnavailable` 送入宽限判定——**读的就是 `vpn-probe-status.txt`**（该文件路径显式拼出）；
+  - `services/VpnBackgroundTaskManager.ets:14` `VPN_STATUS_FRESH_MS = 15000`；
+  - `services/VpnStatusReader.ets` 另有 `VPN_STATUS_FRESH_MS = 15000`。
 - **不要混淆**：`BridgeStatus.ets:3606` 与 `:3878` 也用字面量 `5000`，但那是 `vpn-peers.json` 与 `taildrop-targets.json`（HLD C-04 的 5 s 快照新鲜度），**不是**本一致性问题的对象。
 - HLD 的契约值：C-03 明写「新鲜度：>15 s 视为**不确定**而非健康」。
-- **LLD 设计说应该是**：**一个文件，一个新鲜度阈值，一个属主。** 依据三条：
-  1. 写侧周期是 1 s（`:905-951` 的 `statusTimer`），5 s 与 15 s 都能覆盖任意合理的丢帧；窗口的具体数值不改变语义，**重复的数值才改变语义**；
-  2. `BridgeStatus` 的 5000 ms 并非「更严格」而是**不同的问题**：它喂给 `preserveConfirmedVpnStatus` 的宽限态（:3497-:3520，事件 `vpn_status_grace_started`/`vpn_status_grace_expired`），所以它在 5 s 之后**不会**立刻判死，而是进宽限——机制上合理，但阈值与另两处无关地各自演化;
-  3. `VpnStatusReader.ets:27-31` 的头注把「词表一致」写成契约；阈值是同一份契约的另一半，却没人声明。
-  **建议**：把该文件的新鲜度收敛到一个常量（HLD 已定 15 s），`BridgeStatus` 若确需更早进入宽限，应把「进入宽限」与「判为不确定」拆成两个**命名**阈值，而不是让 5000/15000 两处裸值各自漂移。
+- **Q9 决策的实施**：`VPN_STATUS_FRESH_MS = 15000` 现在只在 `services/VpnStatusReader.ets:12` 定义一次；`VpnBackgroundTaskManager` 自带的那份删除；`BridgeStatus` 改为 `import { VPN_STATUS_FRESH_MS }`（`BridgeStatus.ets:32`，使用点 :3313、:3506）。`vpn-peers.json` 的 5 s 属另一个文件，未动。集成用例 `integration/status-vocabulary.mjs::one freshness window serves every reader, and the UI reads it from here` 钉住这一条。
 
-**D-2 同一行状态的两套词表（`connecting` vs `unknown`）**
+**D-2 同一行状态的两套词表（`connecting` vs `unknown`）——已解决（Q10 决策，按选项 (a)）**
 
-- 事实（比简报更精确：**三套词**）：
-  - `VpnBackgroundTaskManager.readStatus:362-369`：含 `vpn interface established` 的新鲜行 → `connecting`；
-  - `VpnStatusReader.read`：**没有这条分支**，同上数据 → `unknown`（:62）；
+- 事实（问题发生时，比简报更精确：**三套词**）：
+  - `VpnBackgroundTaskManager.readStatus`：含 `vpn interface established` 的新鲜行 → `connecting`；
+  - `VpnStatusReader.read`：**没有这条分支**，同上数据 → `unknown`；
   - `FormCardService.stateName:102`：把 `VpnLinkState.UNKNOWN` 映射为态名 `connecting`（:16 `STATE_CONNECTING = 'connecting'`）。
-- 即：**语义上三方一致**（连接窗口都被当作「连接中」），**代码词表上不一致**（`VpnLinkState` 里根本没有 `connecting` 这个成员）。而 `VpnStatusReader.ets:27-31` 的头注写的是「词表必须与 `VpnBackgroundTaskManager.readStatus` 和 `BridgeStatus` 逐字一致」——**按逐字标准，这句当前为假**。
-- **LLD 设计说应该是**：二选一，且必须选一个：
-  - **(a) 扩词表**：给 `VpnLinkState` 加 `CONNECTING`，`read` 增加 `vpn interface established` 分支，`FormCardService` 直连 `CONNECTING`（不再靠 `UNKNOWN` 兜底）。好处：头注的不变量成真，卡片与应用可被同一条断言比对。
-  - **(b) 改声明**：保留 `unknown`，把 `VpnStatusReader` 头注改成「语义等价于 `readStatus` 的 connecting，但以 `unknown` 表示，卡片渲染层负责翻译」。好处：不动三处消费方；坏处：头注从「逐字一致」降级为「语义等价」，需要**显式**写下来。
-  **本层的倾向是 (a)**，理由是 C-11（:159）把「`connecting` 也算 live」写成契约的一部分，而契约里出现一个读取器无法表达的态，正是 D-3 那条机械可推导分歧的温床。**本层不实施，不新增判据 ID。**
+- 即：**语义上三方一致**（连接窗口都被当作「连接中」），**代码词表上不一致**（`VpnLinkState` 里当时没有 `connecting` 这个成员）。
+- **Q10 决策选 (a) 扩词表，并已实施**：`VpnLinkState` 增 `CONNECTING`（`VpnStatusReader.ets:18`），`judge` 增 connecting 分支（:96-98），`readStatus` 调 `judge`，不再自己映射词表。卡片仍经 `FormCardService.stateName` 渲染，但输入已是一个真实的 `CONNECTING`。判据 O-STATUS-09 与集成用例 `integration/status-vocabulary.mjs` 钉住这一条。
+- **当时给过的另一个选项 (b)（保留 `unknown`，改头注声明）被否**：理由是 C-11（:159）把「`connecting` 也算 live」写成契约的一部分，契约里不该出现读取器无法表达的态。
+
+**D-3 同一行的判定顺序相反（VM-1 vs VM-4）——已解决（Q13 决策）**
+
+- 事实（问题发生时）：同一份状态文件有两个读者，标记集相同但顺序相反。`VpnBackgroundTaskManager.readStatus` 先判 disconnected 再判 connected；`VpnStatusReader` 先判 connected 再判 disconnected。一行同时含 `state=Running\|tun=true` 与 `state=stopped` 时，前者报 disconnected、后者报 connected（§3.1 I11、§3.4 L6）。
+- **Q13 决策定口径并已实施**：同一份状态只有一份判读。`VpnBackgroundTaskManager.readStatus:351` 调 `VpnStatusReader.readText`，两处共用 `judge` 的固定顺序，终态标记压过运行中的隧道。判据 O-STATUS-04 与集成用例 `integration/status-vocabulary.mjs::a terminal marker wins over a running tunnel in both readers` 钉住这一条。
 
 ### D. 本层复核中更正的引用偏差
 
-**D-4** 简报与本层初稿曾按「`VpnBackgroundTaskManager.ets:344-374` 为 readStatus、`:14` 为新鲜度」引用，**复核后全部核对无误**；但把 **`components/BridgeStatus.ets` 的 5000 ms 窗口**定位为 `:142`（常量）/ `:3313`、`:3506`（使用点），**而非 HLD C-04 引的 `:3606`** ——`:3606` 是 `vpn-peers.json` 的快照窗口（不同文件）。上一层的 C-04 引用本身正确，问题在于「5000」这个数字在同一文件里出现两次（:3606/:3878 为快照，:142 为状态），引用时容易互相顶替。**登记，供上一层在 C-03 里补一个精确的 `file:line`。**
+**D-4** 简报与本层初稿曾按「`VpnBackgroundTaskManager.ets:344-374` 为 readStatus、`:14` 为新鲜度」引用，**复核后全部核对无误**；但把 **`components/BridgeStatus.ets` 的 5000 ms 窗口**定位为 `:142`（常量）/ `:3313`、`:3506`（使用点），**而非 HLD C-04 引的 `:3606`** ——`:3606` 是 `vpn-peers.json` 的快照窗口（不同文件）。上一层的 C-04 引用本身正确，问题在于「5000」这个数字在同一文件里出现两次（:3606/:3878 为快照，:142 为状态），引用时容易互相顶替。**登记，供上一层在 C-03 里补一个精确的 `file:line`。Q9 决策删除了状态文件的 5000 ms 窗口，因此 `:142` 现在是历史引用；C-04 的对端快照窗口 `:3606` 未变。**
 
 ### E. 仍开放的问题（沿用上层，不重复论证）
 
@@ -749,11 +762,11 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | Q-01 | 两进程加载同一份 `.so` 是一个运行时还是两个 | 唯一会反转决策的未知 |
 | Q-03 / Q-06 | 替换批准写方缺失 / 批准 TTL 10 s | O-CONN-05 |
 | Q-05 | 诊断事件名无受控词表 | 接缝判据的「可观测点」栏 |
-| Q-07 | 无 CI：7 个集成文件全不存在 | 声称开发完成之前 |
+| Q-07 | ~~无 CI~~ **已解决**（第 8 轮加了 `.github/workflows/checks.yml`）。剩下的缺口是 5 个计划中的集成文件尚未建立 | 声称开发完成之前 |
 | Q-08 | 卡片 / Taildrive 真机 / special-scenario 从未真机验证 | 相应旅程 |
 | Q-09 | 责任空洞：P1 被冻结期间的掉线恢复无人承诺 | O-CONN-04（本层 VM-3 的转换表**无法**覆盖：冻结时没有任何事件到达 `poll`） |
 | **新** K8 | 重连在途时用户断开不可中止（~20 s 窗口） | 无判据；登记，待判据库裁决 |
 | **新** K10 | 恢复后停在 `needs_login` 无事件、无判据 | 同上 |
 | **新** J4 | `invalidateLifecycle` 不重置状态名，`currentState()` 会返回失效值 | 无判据；登记 |
 
-**本层没有修改任何判据文件、没有新增判据 ID、没有改动任何生产代码。** 以上 A–E 全部交由判据库与上一层裁决。
+**本层（LLD）当时没有修改任何判据文件、没有新增判据 ID、没有改动任何生产代码。** 以上 A–E 全部交由判据库与上一层裁决。**后续：Q9、Q10、Q13 三条决策落地，改了 `VpnStatusReader.ets`、`VpnBackgroundTaskManager.ets`、`BridgeStatus.ets` 三处生产代码，新增判据 O-STATUS-09（判据库 117 → 118 条，本层单点判据 69 → 70 条），并补了单元与集成用例。本层保留原结论与新的解决说明，作为记录。**

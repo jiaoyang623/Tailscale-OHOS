@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { stripTypeScriptTypes } from 'node:module';
-import vm from 'node:vm';
 import test from 'node:test';
+import { enumToObject, runModules } from './lib/arkts-module.mjs';
 
 // Run the real lifecycle coordinator with deterministic platform boundaries.
 // ArkTS compilation is verified separately by the repository debug build.
+//
+// The coordinator reads vpn-probe-status.txt through VpnStatusReader, so the
+// reader loads first. Loading the real reader is deliberate: the two used to
+// rank the same status markers differently.
 const source = readFileSync(new URL('../entry/src/main/ets/services/VpnBackgroundTaskManager.ets', import.meta.url), 'utf8');
-const javascript = stripTypeScriptTypes(source.replace(/^import .*;\r?$/gm, '')
-  .replace('export class VpnBackgroundTaskManager', 'class VpnBackgroundTaskManager'));
+const readerSource = readFileSync(new URL('../entry/src/main/ets/services/VpnStatusReader.ets', import.meta.url), 'utf8');
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
 function deferred() {
   let resolve;
@@ -46,8 +48,11 @@ function fixture() {
     },
     hilog: { info: () => {} }, DiagnosticEventStore: { record: (...args) => f.events.push(args) }
   };
-  vm.runInNewContext(javascript + '\nglobalThis.Manager = VpnBackgroundTaskManager;', sandbox);
-  f.manager = new sandbox.Manager();
+  runModules(sandbox, [
+    { source: enumToObject(readerSource, 'VpnLinkState'), names: ['VpnStatusReader', 'VpnLinkState'] },
+    { source, names: ['VpnBackgroundTaskManager'] }
+  ]);
+  f.manager = new sandbox.VpnBackgroundTaskManager();
   f.live = () => { f.status = `OK | state=Running | tun=true | txBytes=2048 | rxBytes=1048576 | heartbeatMs=${f.now}`; };
   f.connecting = () => {
     f.status = `VPN interface established | backend handoff pending | heartbeatMs=${f.now}`;

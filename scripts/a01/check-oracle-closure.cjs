@@ -1,0 +1,1 @@
+scripts/check-oracle-closure.cjs
