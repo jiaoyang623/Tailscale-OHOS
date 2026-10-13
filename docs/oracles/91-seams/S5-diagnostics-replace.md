@@ -36,7 +36,7 @@
 - 测试：scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch
 - 测试：scripts/test-vpn-conflict-contract.mjs::the extension republishes the conflict while it waits for the app
 - 测试：scripts/test-vpn-conflict-contract.mjs::the app tells the user to disconnect the other VPN
-- 待建测试：[真机] 真机走查 a01-baseline/device-runbook.md#M-17（冲突提示与用户自行断开的完整路径）
+- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-17（冲突提示、应用自停，以及应用进程死掉后扩展是否仍在空转）
 - 状态：pending-test
 - 不确定特征：NOT-EVALUATED
 - 归属：owner=项目维护者 接收批次=真机批次（device-runbook.md 的 M-17）
