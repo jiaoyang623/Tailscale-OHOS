@@ -362,6 +362,12 @@
 
 ### D3 · Go 引擎在两个进程各加载一份，还是只留一个属主
 
+**2026-10-13 真机确认 (a) 成立。** 连接成功后在工程诊断面板读到：扩展侧
+`vpn-status = state=Running | tun=true`，而 UI 进程侧 `engine-status = Tailscale Engine Pending`、
+`backend-status = STOPPED | backend not started`。两侧还有各自的进程号与日志 tag。
+所以两个进程确实各有一份独立的引擎运行时，选 (a) 不需要改。证据与复跑命令见
+`docs/changes/a01-baseline/manual-checks.md#M-13` 与 `scripts/e2e/engine-runtimes.mjs`。
+
 **问题**：`libtailscale_ohos.so` → `libtailscale_go.so` 被 7 个 ArkTS 文件导入
 （`components/BridgeStatus.ets`、`vpnextensionability/TailscaleVpnExtensionAbility.ets` 与 5 个 gateway）。
 原生库在 P1 与 P2 各被加载。
@@ -525,7 +531,7 @@ TUN 并写 `backend handoff pending`，用户 14:10:23.973 切后台，14:10:34.
 
 | # | 问题 | 影响 | 谁确认 | 何时阻塞 |
 | --- | --- | --- | --- | --- |
-| **Q-01** | **平台把两个进程里加载的同一份 `libtailscale_ohos.so` 视为一个运行时还是两个？** 若是「一个」，D3(a) 立刻失效，交接协议与 `filesDir/tailscale` 的单写者假设同时被打破。本层**未能验证**：仓内 73 条测试全是宿主侧纯逻辑测试，不加载 `.so` | D3、SEAM-01、O-SETUP-04、O-CONN-01 | 用户（真机） | HLD 写「接口与事件契约」之前 |
+| **Q-01** | ~~平台把两个进程里加载的同一份 `libtailscale_ohos.so` 视为一个运行时还是两个？~~ **已解答（2026-10-13 真机）：两个。** 连接成功时扩展侧 `state=Running` 而 UI 进程侧引擎 Pending、后端 STOPPED，两侧进程号与日志 tag 也不同。D3(a) 成立，交接协议与单写者假设不变。证据 `manual-checks.md#M-13`，复跑 `scripts/e2e/engine-runtimes.mjs` | D3、SEAM-01、O-SETUP-04、O-CONN-01 | 用户（真机） | 已解除 |
 | **Q-02** | R-CONN-07 的替换批准路径：`vpn-replace-approved` 的写方在 UI 进程，而 TTL 只有 10 s（`TailscaleVpnExtensionAbility.ets:28`）。若批准对话框出现时用户正好切走，10 s 后批准文件是否还有效、扩展是否重问——**未验证** | O-CONN-05、SEAM-06 | 用户 | O-CONN-05 要闭环时 |
 | **Q-03** | 缓存保留期在代码与需求之间不一致：扩展的 Taildrop 缓存是 **7 天**（`TailscaleVpnExtensionAbility.ets:56`），诊断报告是 **24 h**（`DiagnosticReportService.ets:10`），而 R-DRIVE-05 写的是 Taildrive 暂存 **24 h**——在 `TaildriveBrowser.ets` 中**找不到**对应的保留常量（该文件的 24 h 出现在按「今天」分组的显示逻辑 `:1891`，不是清理逻辑）。需求与代码必有一方需要修正 | R-DRIVE-05、§2.4 数据归属 | 用户 | 架构层通过前（数据归属表要定稿） |
 | **Q-04** | LocalSend 的官方 bundle/Want 契约未定（承接 `record.md` Q4 / 需求 Q4），O-XFER-03 只能 `not-evaluated` | O-XFER-03、SEAM-12 | 用户 | O-XFER-03 要闭环时 |

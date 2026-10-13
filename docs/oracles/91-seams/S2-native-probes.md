@@ -17,7 +17,7 @@
 - 来源：entry/src/main/ets/services/VpnCommandGateway.ets:99-117 startBackend/stopBackend/backendStatus/requestVpnConfig/requestLoginUrl；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:537 backendRestartWithTun；entry/src/main/cpp/types/libtailscale_ohos/index.d.ts:45 backendRestartWithTun 的 TUN fd 形参；entry/src/main/cpp/napi_init.cpp:102-120 ExecuteAsyncInput
 - 上游：R-CONN-01、R-CONN-02
 - 待建测试：[集成] scripts/integration/native-engine-lifecycle.mjs::两进程各起一份引擎后互不可见
-- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）
+- 测试：真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）
 - 状态：pending-test
 - 不确定特征：UNCERTAIN-PLATFORM
 - 归属：owner=项目维护者 接收批次=a01-集成
@@ -35,7 +35,7 @@
 - 来源：entry/src/main/ets/services/HomeReadOnlyGateway.ets:8-17 三个读方法；entry/src/main/ets/services/HomeReadOnlyGateway.ets:22-35 RequestGuard；entry/src/main/ets/services/NetworkSettingsGateway.ets:52-66 设置面；entry/src/main/ets/services/NetworkSettingsGateway.ets:14-48 UpdateQueue；entry/src/main/ets/components/BridgeStatus.ets:1938 queueExitNodeUpdate
 - 上游：R-NET-01、R-NET-02、R-DEV-02
 - 待建测试：[集成] scripts/integration/native-engine-settings.mjs::已连接时出口节点变更被拒
-- 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）
+- 测试：真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）
 - 状态：pending-test
 - 不确定特征：UNCERTAIN-PLATFORM
 - 归属：owner=项目维护者 接收批次=a01-集成

@@ -146,8 +146,19 @@ M-13 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/dev
 
   结论：**UI 与扩展各在自己的进程里**，扩展的生命周期与建 TUN、隧道可用全部落在 8168。
   这是 D3(a) 成立的必要条件。
-- **还没测的部分**：两个进程里**各自那份引擎**处于什么状态。那要打开诊断面板读「本进程引擎状态」，
-  本次没有做。所以本条仍是**部分**，不能据此宣称 M-13 通过。
+- **已实测的部分二（2026-10-13）**：连接成功后，在工程诊断面板读三个读数：
+
+  | 读数 | 值 |
+  | --- | --- |
+  | `vpn-status` | `OK │ state=Running │ tun=true │ tailscaleIPs=2` |
+  | `engine-status` | `Tailscale Engine Pending` |
+  | `backend-status` | `STOPPED │ backend not started` |
+
+  隧道由扩展侧跑着，而 **UI 进程这一侧没有引擎**（Pending）**也没有后端**（STOPPED）。
+- **结论：两个独立运行时，D3(a) 成立。** 三个证据互相独立：两个进程号、两个日志 tag、
+  以及 UI 进程侧引擎与后端均为空。
+- 复跑：`DEVICE=<序列号> node --test scripts/e2e/engine-runtimes.mjs`（4 条）
+- 来源：本轮真机（非转抄）。
 - 证据位置：`~/mesharc-e2e/connect-journey-*.log`（439 行设备日志）。
 - 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/connect-journey.mjs`
 - 来源：本轮真机（非转抄）。
