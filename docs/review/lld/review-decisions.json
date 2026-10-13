@@ -740,10 +740,10 @@
     {
       "id": "H-C-03",
       "decision": "accepted",
-      "content_sha256": "62f3ad4b81d57cc384c491209f6c28e6622fe6615e464ab7a3d2e5bd97e1aa01",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "98f673b197b71350e08e8a20b33951ffada2a3ae87acca68dde10fc2af51968c",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "H-C-04",
@@ -859,11 +859,11 @@
     },
     {
       "id": "L-VM-1",
-      "decision": "changes_requested",
-      "content_sha256": "efeb21c58a77bdee047840ca516ec9dcc2a235a1758a44e68ae7bbde00d71ebb",
-      "note": "Q15 决定：修。用户主动断开必须中止在途重连，保活任务生命周期随之调整。",
+      "decision": "accepted",
+      "content_sha256": "0e448aca0d38c5e2844bb20df9266fa2957c84ea02e4fd592a832d465f173e6d",
+      "note": "第 9 轮：原意见已执行。Q15 已执行：用户请求停止后作废在途重连。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "L-VM-2",
@@ -883,19 +883,19 @@
     },
     {
       "id": "L-VM-4",
-      "decision": "changes_requested",
-      "content_sha256": "f9169eb534652c6166eeffe5aa3af2c4f8dcfff50eb5a92afdd14d9529a1f772",
-      "note": "Q9 / Q13 决定：新鲜度统一 15000 ms，判读口径统一为先判 disconnected，转换表随之更新。",
+      "decision": "accepted",
+      "content_sha256": "d1812d41b04d8742ce1d11b4969d3d9875fb37e9a5bbbeb7f2eace3c631922b1",
+      "note": "第 9 轮：原意见已执行。Q9/Q13 已执行：转换表与成员表按新判读更新。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "L-ALGO",
       "decision": "accepted",
-      "content_sha256": "4efbe583c560e1c1f3d00866e7a457c24ed6980000a85c18d28d6e6c9e652263",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "028ed0bc5a1e18c3d2560ae2d493342a90c605f237f0457ae9b6d7b2df3daaa5",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "L-UI",
@@ -1171,19 +1171,19 @@
     },
     {
       "id": "O-SEAM-03",
-      "decision": "changes_requested",
-      "content_sha256": "8a0308ed713590b71da02c40706dd612e5789ba73a4c49684d69fae4bf5eeb43",
-      "note": "Q9 / Q10 / Q13 决定：新鲜度统一 15000 ms；读侧词表按代码统一为一份；两个读者的判读口径统一为先判 disconnected。",
+      "decision": "accepted",
+      "content_sha256": "0759fc9578cf04309e2931077f9a5f1c863e97e1b24998e8c7fab2da1d9eee9e",
+      "note": "第 9 轮：原意见已执行。Q9/Q10/Q13 已执行：judge() 成为唯一判读，新鲜度与词表各只有一份。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-SEAM-04",
-      "decision": "changes_requested",
-      "content_sha256": "20be26bad30798b74226767357478e55a05fd60722ff2f195306b4fe7c086fe3",
-      "note": "Q13 决定：同一份状态只有一个判读口径。",
+      "decision": "accepted",
+      "content_sha256": "df4433a5400d3827019b854e6ca87518a1e529fe585acdd25961674aec40fd93",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：同一份状态只有一个判读口径。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-SEAM-05",
@@ -1236,8 +1236,8 @@
     {
       "id": "O-SEAM-11",
       "decision": "changes_requested",
-      "content_sha256": "592556a29651471401a4519beb0f5481aca34d02b1146c90f7a3b823adbfa6af",
-      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。",
+      "content_sha256": "16b29a3d2c6e7553fb1c45849db0f902acca9a135d36affd38ad232d0f4bfae3",
+      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
@@ -1292,186 +1292,194 @@
     {
       "id": "O-BGTASK-01",
       "decision": "accepted",
-      "content_sha256": "b3f8dd9facc4c2dde5c4c8f422cf4083e77c2f171815361e42393fd41aade45e",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "8c14da01be2dabea67f2f060b65cd59ca83d3ef5d2372b70a488df5fe86f186b",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-02",
       "decision": "accepted",
-      "content_sha256": "8d7cb9afa2ff68c82f39afcb8f9d81031ed2caf74b450055e3cfc626a95d78fd",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "c5a42557f76b653a7139de0daff48e6d50e75899012f6ef3f5d30c213c7fb092",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-03",
       "decision": "accepted",
-      "content_sha256": "eb7f6c94602415866fc86847fa7d2cf5857c873f5d8ec69a85a9bd7d4d40c3a1",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "4cb49c04662d3fcb0fc4468673d1306074ebf819a67c877b7658ad5bab0bc0c9",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-04",
       "decision": "accepted",
-      "content_sha256": "ea8a5d4511017e9d70c0ae46e607081f2721c77d29a8f8b9ae49417253ba3d71",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "121d660b0b9314fad8ebad3ea77302f1823d0bf0caf93c2c6f7194674bd0d8a5",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-05",
       "decision": "accepted",
-      "content_sha256": "a62dd5020686ac685fb33b4a6e27568c7d55d0a0a931f8d91a71e8e7f71b121e",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "f42f1d4b5a3cbee39158d450c6e7eecb883f11506c92711b9318adf6659a0532",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-06",
       "decision": "accepted",
-      "content_sha256": "5907f10ebdbef275f4732b5da28c7bd31a575af0b5379828dff9a1eca89a8682",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "ba26957120dcb71fd25b7d35e738bee45fe18c43f70b2d70d54e8546e67e680c",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-07",
       "decision": "accepted",
-      "content_sha256": "ebf48b710ca2dfe7eb40cc78ef3e26887d464134a8993d58e8178a723879a8be",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "8c24e621b93f3d6c5b31c2b9ebeec1ad913953132aa67e3b1c2a1404c32b8679",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-08",
       "decision": "accepted",
-      "content_sha256": "6d03e0e61031b901860c006eb0e6be54640ac6749a0ef1b1f2fd2b76b27ae0f7",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "260c87a173d4aaccc5359ac99d7723b9006b52e6df0eed13700afdd62d7245ac",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-09",
       "decision": "accepted",
-      "content_sha256": "4a50c6270e883d82f1f71e9957f7521463f1c08e6d5f15eae7b6a77bd1b200a4",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "d71652f9b106c2de41bc8149db8e3f721e632ea571e6739912f238ba09b76b9d",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-10",
       "decision": "accepted",
-      "content_sha256": "38c3ea1156ee45017b5bf5c9461f5df0060861f12c78a1c92a0b02c023660922",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "c83b916ae34d68866c2d617f2e5c6157715823aec0b04f00694512ff05e15e4d",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-11",
       "decision": "accepted",
-      "content_sha256": "1ac765f7b054f8c02ff49fe86b370907287d7efa74b020e904cea32b32dc767d",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "2ff6034e50aee3cca0902291e8bff26f9c12ef904a604b2d2c6653e24d4d5156",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-12",
       "decision": "accepted",
-      "content_sha256": "3b5c61b9545f74057fc75bc180a654b56d6bd9a2fc6c1a14cbf8d093b6829f81",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "24fff48baac31fe4aae5506dfe22d8e2058aaf51cfa4efefdf38dafcfe613e72",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-13",
       "decision": "accepted",
-      "content_sha256": "f68fe15bff8c130f9f2c3498f7c44b3cf82981f4b16d59caae671668345e0c87",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "5a6e35b2e5737a91eff3bde86b757d9ec3e4e50d5405570d37fca02d486fcc1c",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-14",
       "decision": "accepted",
-      "content_sha256": "5752e17a7c9eb8d7d7bf306adbcdeaa9f58cfff8db0864a80185827754180349",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "662f2e21f98f75b6f32dba666f65c71025f681574b10b31b04b9d8170320ba60",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BGTASK-15",
       "decision": "accepted",
-      "content_sha256": "8c94ba65c14ca82266eadee11fe9c3b996baa6d3bdcd12563f2a3b33b99e6f61",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "60d11bff8929e793aa1100295e41ecb4e4eb8d703b955c258e1dde4aa4ebfc7f",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-01",
       "decision": "accepted",
-      "content_sha256": "0e135f06137936b083730a81704e3dfa25426453605f977fba69443deffefd34",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "a2e97724ebe2f08822402adfffb989fef05b87dc56228a8b7a87daefbd86d20b",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-02",
       "decision": "accepted",
-      "content_sha256": "6ab0fdb965047da325b88573cf964b1e06cfc8fea4b8023617992ec224730205",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "311250df0581b09ec35c808954a9c5bd21713976d7aa8d5eb8db0fa324fefc7a",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-03",
       "decision": "accepted",
-      "content_sha256": "672758ecc6ca043b8b9abfd777730c41ba12742cebff7dfc933be390f6c1eade",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "724536a66f55c7f428fab61e92c227a95e28dc989718120c6e037bbbb7b1a284",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-04",
-      "decision": "changes_requested",
-      "content_sha256": "38ebe9cf8e9d6ff48247791acc722356b12d15dc7097613d16f9f0f472464233",
-      "note": "Q13 决定：补一条边界——一行同时含 connected 与 disconnected 标记时先判 disconnected。",
+      "decision": "accepted",
+      "content_sha256": "c6e0f6a2913841a36b8e84add20f7ad8e7bfe471f3ac2458e852cce7dee9c2ca",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：补上「终态标记压过运行中的隧道」这条边界与用例。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-05",
       "decision": "accepted",
-      "content_sha256": "ecf1b47af6d5e814df7d707c82631942a3adcc91c79e6fbb248d5d278b69b245",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "b6070425667bc43f0e7d07442fa2d8025d60b82c84dc342fe66a9462697f9d6c",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-06",
       "decision": "accepted",
-      "content_sha256": "d70ee8f79d871d446db6a2d7985b00e033c01a6747585bb06f1f6c2d26a76814",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "77956d84d4dbb5f925befccec5a987703485f1078f1e2b905bb567d190a178cd",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-07",
-      "decision": "changes_requested",
-      "content_sha256": "7cf68461a7d5d30c3d6645a5a821b755a667a54d885b6cdd3c420e37c3bbefbe",
-      "note": "Q13 决定：「优先级写死在单一函数里」与现状不符（两处各写一份），随判读口径统一下来。",
+      "decision": "accepted",
+      "content_sha256": "4e157839e984f179b7d609d6895f4be6436d30d9bbd33701ee3c03e662793598",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：判读只剩一个函数，措辞按现状改正。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-STATUS-08",
       "decision": "accepted",
-      "content_sha256": "f622753860b5d44108734372b8362a0bd2db42fa9e5df5570090b7fb5caf2a0f",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "bc9418151e7f167c20d6131e02b19cd290c6a772e7b373c7f88c16efb5cc7bb4",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
+    },
+    {
+      "id": "O-STATUS-09",
+      "decision": "accepted",
+      "content_sha256": "2f6f2deb9a67d35b1e53e96fb6b1ce49df88c8db27d970ccd528a91f36682964",
+      "note": "第 9 轮新增判据，审查人接受（连接窗口报 connecting，钉在 test-vpn-status-reader.mjs）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-NETMON-01",
@@ -1556,8 +1564,8 @@
     {
       "id": "O-RECONN-01",
       "decision": "changes_requested",
-      "content_sha256": "b2bbbfaf5d0cfde4f40151ddccd1980c56ef94c7980baeb547c8e8746ed65fb5",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "ecf18f7f6c78940ecd4e7057b6c127ae098c7fa186eea91eb1b80cc494b913b2",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
@@ -1604,8 +1612,8 @@
     {
       "id": "O-RECONN-07",
       "decision": "changes_requested",
-      "content_sha256": "a0fc7b5c0c3211e285e77a3970f415885d9ea249d568501f96b8aa80c3c00351",
-      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。",
+      "content_sha256": "8f5c12f85db2fab6ddc3c4d4f15661fcaea10c50a7579f69d8e8a6cdc23f4d68",
+      "note": "Q16a 决定：父判据重定为 O-SEAM-11 与 O-SEAM-03（架构 §五 / HLD §3.3 / 判据三处收敛到一套）。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
@@ -1626,12 +1634,20 @@
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
+      "id": "O-RECONN-10",
+      "decision": "accepted",
+      "content_sha256": "6d625e2780253d444ea80617b1539bc92be53c960ad422ea00f40ac59cc66100",
+      "note": "第 9 轮新增判据，审查人接受（停止请求作废在途重连，钉在 4 条用例上；保证边界已写明）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
+    },
+    {
       "id": "O-SESSION-01",
       "decision": "accepted",
-      "content_sha256": "e42703c3d257389f2f568d09be064c2edc94161221dbca6e79469182e64e8912",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "ac5388968b84571b5ef768883fb2b86d0f54c2321d1bf0660725f755d95fc663",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-SESSION-02",
@@ -1682,52 +1698,60 @@
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
     {
+      "id": "O-SESSION-08",
+      "decision": "accepted",
+      "content_sha256": "9c3e6abcf7eaee73cdf2c52f04433d267c90825d556dedfbee6eb25ebe75a2b9",
+      "note": "第 9 轮新增判据，审查人接受（销毁后不保留旧态，钉在 3 条用例上）。",
+      "reviewer": "jiaoyang623",
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
+    },
+    {
       "id": "O-PEER-01",
       "decision": "accepted",
-      "content_sha256": "644d97eaed3877a341f1998b3067ba2f745e93db8e5e83b49ef42cdbbea632e7",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "70efd712b9863876b1eedce561c608f690352a9eb3b4aa582bf1e5df944c9b4f",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-02",
       "decision": "accepted",
-      "content_sha256": "06ea4f58b21945f26a25c5ab1a08558a4f7428573c79498b924b02db82a9159c",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "2630d7c591b633ff93c872d9ecff885c12fd788e965182f120843f26867f8bd8",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-03",
       "decision": "accepted",
-      "content_sha256": "8154da106c1781e9a0e7e774eec2b5846ad22e3227c0adb04ebec4f7da94ab37",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "a7a4c831087157ca1d1d7038f674f27f84913af3df9d07e4b4eae377956b3673",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-04",
       "decision": "accepted",
-      "content_sha256": "773661b8c4bbd1518a0fa2ffcf0977b67bafa3fa6ff6460c4343817b0a5aabf1",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "58ccc77e0d3e7fd22e94c95fabbec305ebc41a3dfcdf63b04bf43e130d9edb31",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-05",
       "decision": "accepted",
-      "content_sha256": "372a0627abada49f4ddc355d068274933ff59c2b5fb303481a0cd1b477b25350",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "f7c3b0223ac6f046e35392b94ab1d70cfc91e40d3b7728b38de4228d78810088",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-06",
       "decision": "accepted",
-      "content_sha256": "0df8272b7855711a8e2cf117d128bb6dd4644a678e96a21904c6cb9bfe7b1472",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "2dac02249f26307b3aab30d311856fe625ec8be4efeac9051b75e44da0e10f02",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-07",
@@ -1748,42 +1772,42 @@
     {
       "id": "O-PEER-09",
       "decision": "accepted",
-      "content_sha256": "0d34458fd622fd679c83db87b56f5ae9d4b908b902e985d3773e856f4ea811cd",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "843f99a3837a3ff0745e160040034bfdddb45798416339d72a7491a7de681e7b",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-10",
       "decision": "accepted",
-      "content_sha256": "efadc1798bbae40502c92d3564b1f62202f75c76b57c608c4fb311df0736b034",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "6aa421ec000746452123db44e7395d60327d08379c0351b19d90a76d186c32a9",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-PEER-11",
-      "decision": "changes_requested",
-      "content_sha256": "4f4255c7051f7129192208a1b40c01fca4aa2fc5085a4a5c311d574d23a21fef",
-      "note": "Q3 决定：把 test-peer-reconnect.mjs 的运行时循环展开成 5 条字面用例名，锚点随后可闭环。",
+      "decision": "accepted",
+      "content_sha256": "b603e3ea09a8d8815f4e676a5fccb73e4293a77331558b37bc2c41266c355164",
+      "note": "第 9 轮：原意见已执行。Q3 已执行：循环展开成 5 条字面用例名，锚点可达，判据转 closed。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-LOCALSEND-01",
       "decision": "accepted",
-      "content_sha256": "75fc14e6bc47d37fe5bb923703aa7ec28523bb58ef446dcd731203f9c696491e",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "4c4c75db9617e2440041a97e9c4f80267ad0b80c40e6d092f22dd12d79e89dd4",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-LOCALSEND-02",
       "decision": "accepted",
-      "content_sha256": "51556413c9012e01f641ee8a4b13a35ed373fb04a63d5e763168f0c889ff56ea",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "6e29f3a3f169afd27627c7e7ae0bc37e2bd5df83484146736cc928a96f5c1de4",
+      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。 ｜第 9 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-BUILD-01",

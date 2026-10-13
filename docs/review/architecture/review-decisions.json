@@ -987,19 +987,19 @@
     },
     {
       "id": "O-SEAM-03",
-      "decision": "changes_requested",
-      "content_sha256": "8a0308ed713590b71da02c40706dd612e5789ba73a4c49684d69fae4bf5eeb43",
-      "note": "Q9 / Q10 / Q13 决定：新鲜度统一 15000 ms；读侧词表按代码统一为一份；两个读者的判读口径统一为先判 disconnected。",
+      "decision": "accepted",
+      "content_sha256": "0759fc9578cf04309e2931077f9a5f1c863e97e1b24998e8c7fab2da1d9eee9e",
+      "note": "第 9 轮：原意见已执行。Q9/Q10/Q13 已执行：judge() 成为唯一判读，新鲜度与词表各只有一份。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-SEAM-04",
-      "decision": "changes_requested",
-      "content_sha256": "20be26bad30798b74226767357478e55a05fd60722ff2f195306b4fe7c086fe3",
-      "note": "Q13 决定：同一份状态只有一个判读口径。",
+      "decision": "accepted",
+      "content_sha256": "df4433a5400d3827019b854e6ca87518a1e529fe585acdd25961674aec40fd93",
+      "note": "第 9 轮：原意见已执行。Q13 已执行：同一份状态只有一个判读口径。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T13:30:27+11:00"
     },
     {
       "id": "O-SEAM-05",
@@ -1052,8 +1052,8 @@
     {
       "id": "O-SEAM-11",
       "decision": "changes_requested",
-      "content_sha256": "592556a29651471401a4519beb0f5481aca34d02b1146c90f7a3b823adbfa6af",
-      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。",
+      "content_sha256": "16b29a3d2c6e7553fb1c45849db0f902acca9a135d36affd38ad232d0f4bfae3",
+      "note": "Q15 / Q16a 决定：恢复责任归本接缝（重定后为 O-RECONN 的父判据之一），用户主动断开须中止在途重连。 ｜第 9 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
       "reviewer": "jiaoyang623",
       "reviewed_at": "2026-10-12T19:19:56+11:00"
     },
