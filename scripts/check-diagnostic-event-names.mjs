@@ -34,6 +34,33 @@ export function checkEventNames(foundNames, registryNames) {
   return { unknown, unused };
 }
 
+// Pure function. It reads no file.
+// It returns the names the registry misses and the registry rows the source misses.
+// It also returns rows whose file:line does not match the first source occurrence.
+export function checkEventNamesWithPositions(foundNames, foundPositions, registryRows) {
+  const found = new Set(foundNames);
+  const registry = new Set(registryRows.map((row) => row.name));
+  const unknown = [...found].filter((name) => !registry.has(name)).sort();
+  const unused = [...registry].filter((name) => !found.has(name)).sort();
+  const misplaced = [];
+  for (const row of registryRows) {
+    const position = foundPositions.get(row.name);
+    if (!position) {
+      continue;
+    }
+    if (position.file !== row.file || position.line !== row.line) {
+      misplaced.push({
+        name: row.name,
+        registryFile: row.file,
+        registryLine: row.line,
+        sourceFile: position.file,
+        sourceLine: position.line
+      });
+    }
+  }
+  return { unknown, unused, misplaced };
+}
+
 function lineNumberAt(sourceText, index) {
   let line = 1;
   for (let i = 0; i < index; i++) {
@@ -197,8 +224,9 @@ function findEntryPoints(sourceText) {
 
 // Read every literal event name in one source text.
 // A call site with no literal event name is a non-literal call site.
-export function extractEventNames(sourceText) {
+export function extractEventNames(sourceText, filePath = '') {
   const names = [];
+  const positions = new Map();
   const nonLiteral = [];
   CALL_PATTERN.lastIndex = 0;
   let match;
@@ -210,7 +238,13 @@ export function extractEventNames(sourceText) {
     const open = match.index + match[0].length - 1;
     const resolved = resolveLiteralLeaves(readArgument(sourceText, open, 0));
     if (resolved.values.length > 0) {
-      names.push(...resolved.values);
+      const line = lineNumberAt(sourceText, match.index);
+      for (const name of resolved.values) {
+        names.push(name);
+        if (!positions.has(name)) {
+          positions.set(name, { file: filePath, line });
+        }
+      }
     }
     if (!resolved.literal) {
       nonLiteral.push({
@@ -226,7 +260,13 @@ export function extractEventNames(sourceText) {
       const open = match.index + match[0].length - 1;
       const resolved = resolveLiteralLeaves(readArgument(sourceText, open, position));
       if (resolved.values.length > 0) {
-        names.push(...resolved.values);
+        const line = lineNumberAt(sourceText, match.index);
+        for (const name of resolved.values) {
+          names.push(name);
+          if (!positions.has(name)) {
+            positions.set(name, { file: filePath, line });
+          }
+        }
       }
       if (!resolved.literal) {
         nonLiteral.push({
@@ -236,7 +276,7 @@ export function extractEventNames(sourceText) {
       }
     }
   }
-  return { names, nonLiteral };
+  return { names, positions, nonLiteral };
 }
 
 // List every .ets file under a directory.
@@ -265,24 +305,43 @@ export function parseRegistryNames(markdownText) {
   return names;
 }
 
+// Read the registry rows.
+// Each row carries the name, the file, and the line of the first occurrence.
+export function parseRegistryRows(markdownText) {
+  const rows = [];
+  const pattern = /^\|\s*`([a-z0-9_]+)`\s*\|[^|]*\|\s*`([^`]+):(\d+)`\s*\|/gm;
+  let match;
+  while ((match = pattern.exec(markdownText)) !== null) {
+    rows.push({ name: match[1], file: match[2], line: Number(match[3]) });
+  }
+  return rows;
+}
+
 function collectSourceNames() {
   const names = [];
+  const positions = new Map();
   const nonLiteral = [];
   for (const file of listSourceFiles(join(REPO_ROOT, SOURCE_DIR))) {
-    const result = extractEventNames(readFileSync(file, 'utf8'));
+    const relativePath = file.slice(REPO_ROOT.length + 1);
+    const result = extractEventNames(readFileSync(file, 'utf8'), relativePath);
     names.push(...result.names);
+    for (const [name, position] of result.positions) {
+      if (!positions.has(name)) {
+        positions.set(name, position);
+      }
+    }
     for (const site of result.nonLiteral) {
-      nonLiteral.push({ file: file.slice(REPO_ROOT.length + 1), ...site });
+      nonLiteral.push({ file: relativePath, ...site });
     }
   }
-  return { names, nonLiteral };
+  return { names, positions, nonLiteral };
 }
 
 function main() {
   const found = collectSourceNames();
-  const registry = parseRegistryNames(readFileSync(join(REPO_ROOT, REGISTRY_FILE), 'utf8'));
-  const result = checkEventNames(found.names, registry);
-  if (result.unknown.length === 0 && result.unused.length === 0) {
+  const registry = parseRegistryRows(readFileSync(join(REPO_ROOT, REGISTRY_FILE), 'utf8'));
+  const result = checkEventNamesWithPositions(found.names, found.positions, registry);
+  if (result.unknown.length === 0 && result.unused.length === 0 && result.misplaced.length === 0) {
     console.log(`诊断事件名检查通过：${new Set(found.names).size} 个名字。`);
     return 0;
   }
@@ -294,6 +353,12 @@ function main() {
   console.error(`已失效的登记行（${result.unused.length}）：`);
   for (const name of result.unused) {
     console.error(`  - ${name}`);
+  }
+  console.error(`行号不一致的登记行（${result.misplaced.length}）：`);
+  for (const row of result.misplaced) {
+    console.error(
+      `  - ${row.name}: 登记 ${row.registryFile}:${row.registryLine}，实际 ${row.sourceFile}:${row.sourceLine}`
+    );
   }
   return 1;
 }

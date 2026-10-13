@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { checkEventNames, extractEventNames } from './check-diagnostic-event-names.mjs';
+import { checkEventNames, checkEventNamesWithPositions, extractEventNames } from './check-diagnostic-event-names.mjs';
 
 // The pure function reads two name lists.
 // It returns the names the registry misses and the registry rows the source misses.
@@ -138,4 +138,73 @@ class Caller {
 test('the static store writer is not an event-name entry point', () => {
   const result = extractEventNames(STORE_WRITER_FIXTURE);
   assert.deepEqual(result.names, []);
+});
+
+// Position tests. The registry records file:line for every row.
+// The checker must verify the first occurrence matches the registry.
+
+test('extractEventNames returns file and line for every name', () => {
+  const result = extractEventNames(PRIVATE_METHOD_FIXTURE, 'entry/src/main/ets/services/VpnBackgroundTaskManager.ets');
+  assert.equal(result.names.length, 4);
+  assert.equal(result.positions.get('background_started').file, 'entry/src/main/ets/services/VpnBackgroundTaskManager.ets');
+  assert.equal(result.positions.get('background_started').line, 7);
+  assert.equal(result.positions.get('background_stop_failed').line, 8);
+  assert.equal(result.positions.get('background_user_cancelled').line, 9);
+  assert.equal(result.positions.get('background_system_cancelled').line, 9);
+});
+
+test('checkEventNamesWithPositions passes when positions match', () => {
+  const foundNames = ['a', 'b'];
+  const foundPositions = new Map([
+    ['a', { file: 'src/a.ets', line: 10 }],
+    ['b', { file: 'src/b.ets', line: 20 }]
+  ]);
+  const registryRows = [
+    { name: 'a', file: 'src/a.ets', line: 10 },
+    { name: 'b', file: 'src/b.ets', line: 20 }
+  ];
+  const result = checkEventNamesWithPositions(foundNames, foundPositions, registryRows);
+  assert.deepEqual(result, { unknown: [], unused: [], misplaced: [] });
+});
+
+test('checkEventNamesWithPositions reports wrong line', () => {
+  const foundNames = ['a'];
+  const foundPositions = new Map([['a', { file: 'src/a.ets', line: 10 }]]);
+  const registryRows = [{ name: 'a', file: 'src/a.ets', line: 11 }];
+  const result = checkEventNamesWithPositions(foundNames, foundPositions, registryRows);
+  assert.deepEqual(result.unknown, []);
+  assert.deepEqual(result.unused, []);
+  assert.deepEqual(result.misplaced, [
+    {
+      name: 'a',
+      registryFile: 'src/a.ets',
+      registryLine: 11,
+      sourceFile: 'src/a.ets',
+      sourceLine: 10
+    }
+  ]);
+});
+
+test('checkEventNamesWithPositions reports wrong file', () => {
+  const foundNames = ['a'];
+  const foundPositions = new Map([['a', { file: 'src/a.ets', line: 10 }]]);
+  const registryRows = [{ name: 'a', file: 'src/b.ets', line: 10 }];
+  const result = checkEventNamesWithPositions(foundNames, foundPositions, registryRows);
+  assert.deepEqual(result.misplaced, [
+    {
+      name: 'a',
+      registryFile: 'src/b.ets',
+      registryLine: 10,
+      sourceFile: 'src/a.ets',
+      sourceLine: 10
+    }
+  ]);
+});
+
+test('checkEventNamesWithPositions keeps first occurrence when name repeats', () => {
+  const foundNames = ['a', 'a'];
+  const foundPositions = new Map([['a', { file: 'src/a.ets', line: 10 }]]);
+  const registryRows = [{ name: 'a', file: 'src/a.ets', line: 10 }];
+  const result = checkEventNamesWithPositions(foundNames, foundPositions, registryRows);
+  assert.deepEqual(result.misplaced, []);
 });
