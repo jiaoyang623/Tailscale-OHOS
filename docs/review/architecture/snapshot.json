@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "c207387",
+  "baseline": "82c3719",
   "stage": "architecture",
   "design": [
     {
@@ -1060,7 +1060,7 @@
       "content": [
         "目标值：从扩展建 TUN 到隧道可用，全程持有长时任务",
         "观测环境与测量方法：真机诊断文件中的 `background_started` 与 `vpn_connected` 先后顺序",
-        "现状：逻辑已闭环（单元）；真机**未复跑**"
+        "现状：已真机实测（2026-10-13，Pura X）：`background_started` 14:45:40 早于 `vpn_connected` 14:45:59，连接窗口全程持有长时任务。证据 `~/mesharc-e2e/connect-journey-*.log`，命令 `DEVICE=<序列号> node --test scripts/e2e/connect-journey.mjs`"
       ],
       "sources": [
         "docs/requirements/requirements.md#质量目标"
@@ -3863,9 +3863,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "c207387",
+      "baseline": "82c3719",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T17:37:58+11:00"
+      "executed_at": "2026-10-13T17:47:53+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3966,9 +3966,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "c207387",
+      "baseline": "82c3719",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T17:37:58+11:00"
+      "executed_at": "2026-10-13T17:47:53+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3988,9 +3988,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "c207387",
+      "baseline": "82c3719",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T17:37:58+11:00"
+      "executed_at": "2026-10-13T17:47:53+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -4010,9 +4010,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "c207387",
+      "baseline": "82c3719",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T17:37:58+11:00"
+      "executed_at": "2026-10-13T17:47:53+11:00"
     },
     {
       "id": "T-O-SEAM-18",

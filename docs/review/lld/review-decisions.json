@@ -548,10 +548,10 @@
     {
       "id": "QG-02",
       "decision": "accepted",
-      "content_sha256": "06da9a5e8afdee418e4354cac3b01781608e555984f1fe617a229546b469f5c5",
-      "note": "分层签收：LLD 整体接受（未逐条阅读）。状态机与非法组合表随四层结论。",
+      "content_sha256": "ac42c41721339f44929cbf100485d070fe6099e997da507bc9dadbbfee6dafff",
+      "note": "第 13 轮：原意见已执行。QG-02 拿到真机证据：background_started 14:45:40 早于 vpn_connected 14:45:59，连接窗口全程持有长时任务。证据 ~/mesharc-e2e/connect-journey-*.log。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T17:47:53+11:00"
     },
     {
       "id": "QG-03",
