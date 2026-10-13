@@ -154,7 +154,7 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | 目标 | 目标值 | 观测环境与测量方法 | 现状 |
 | --- | --- | --- | --- |
 | 锁屏静置后台存活 | ≥ 720 s（12 min），全程心跳龄 ≤ 15 s、进程 ID 不变 | 真机 + `scripts/device-background-vpn-probe.ps1 -DurationSeconds 720 -LockScreen`，逐样本记录 | 已实测 721 s（M-01）；蜂窝版**未完成**（M-11） |
-| 连接期保活覆盖 | 从扩展建 TUN 到隧道可用，全程持有长时任务 | 真机诊断文件中的 `background_started` 与 `vpn_connected` 先后顺序 | 逻辑已闭环（单元）；真机**未复跑** |
+| 连接期保活覆盖 | 从扩展建 TUN 到隧道可用，全程持有长时任务 | 真机诊断文件中的 `background_started` 与 `vpn_connected` 先后顺序 | 已真机实测（2026-10-13，Pura X）：`background_started` 14:45:40 早于 `vpn_connected` 14:45:59，连接窗口全程持有长时任务。证据 `~/mesharc-e2e/connect-journey-*.log`，命令 `DEVICE=<序列号> node --test scripts/e2e/connect-journey.mjs` |
 | 网络切换恢复 | 同会话内自动恢复直连，无需重连 | 真机切换承载，测 discovery 响应时间与 TUN 双向包数 | 已实测 11 ms / +142 包（M-03） |
 | 掉线自动恢复 | 不重建 VPN 会话即回到可用路径 | 真机短 down/up，记录恢复路径与耗时 | 已实测 436 ms（M-04） |
 | 传输完整性 | 双向双向计数都增长，不丢方向 | `scripts/device-vpn-data-probe.ps1` | 已实测 +13/+18、+16/+20（M-02） |

@@ -129,6 +129,29 @@ M-13 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/dev
 - 状态：**未执行**。需要在桌面手工添加卡片后逐项验证。
 - 来源：`docs/home-screen-card.md` 的 Validation status（转抄）。
 
+## M-13 两个进程里同一份 `.so` 是几个运行时
+
+- 阈值：读两个进程各自的「本进程引擎状态」。UI 进程显示 `stopped` / `NoState` 而扩展侧在跑
+  → 两个独立运行时，D3(a) 成立。
+- **已实测的部分（2026-10-13，Pura X `56T0225330000021`）**：一次连接旅程里，
+  设备日志出现**两个不同的进程号**，且 tag 不同。
+
+  | 时间 | 事件 | 进程 | tag |
+  | --- | --- | --- | --- |
+  | 14:45:40.245 | `background_started` | 7641 | `ren.w2h.mesharc` |
+  | 14:45:55.584 | `vpn_extension_created` | 8168 | `ren.w2h.mesharc:vpn` |
+  | 14:45:55.643 | `vpn_tun_created` | 8168 | 同上 |
+  | 14:45:59.919 | `vpn_connected` | 8168 | 同上 |
+  | 14:46:06.769 | `vpn_extension_destroyed` | 8168 | 同上 |
+
+  结论：**UI 与扩展各在自己的进程里**，扩展的生命周期与建 TUN、隧道可用全部落在 8168。
+  这是 D3(a) 成立的必要条件。
+- **还没测的部分**：两个进程里**各自那份引擎**处于什么状态。那要打开诊断面板读「本进程引擎状态」，
+  本次没有做。所以本条仍是**部分**，不能据此宣称 M-13 通过。
+- 证据位置：`~/mesharc-e2e/connect-journey-*.log`（439 行设备日志）。
+- 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/connect-journey.mjs`
+- 来源：本轮真机（非转抄）。
+
 ## M-13 到 M-19
 
 这七条由 `device-run.sh` 在一次上机里跑完，步骤见 `device-runbook.md`。**全部未执行。**
