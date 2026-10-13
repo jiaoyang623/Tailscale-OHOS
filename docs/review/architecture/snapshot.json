@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "8015c4a",
+  "baseline": "09dcb46",
   "stage": "architecture",
   "design": [
     {
@@ -3636,7 +3636,7 @@
       "oracle_ids": [
         "O-CONN-07"
       ],
-      "evidence": "未建：scripts/e2e/headless-connect.mjs::无界面入口独立完成连接并应答后端交接"
+      "evidence": "未建：scripts/e2e/headless-connect.mjs::无界面入口独立完成连接并应答后端交接；未建：真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）"
     },
     {
       "id": "T-O-NET-01",
@@ -3735,7 +3735,7 @@
       "oracle_ids": [
         "O-DRIVE-01"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::浏览共享目录并完成上传与下载"
+      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::浏览共享目录并完成上传与下载；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
     },
     {
       "id": "T-O-DRIVE-02",
@@ -3744,7 +3744,7 @@
       "oracle_ids": [
         "O-DRIVE-02"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::从设备详情跳转到该设备共享目录"
+      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::从设备详情跳转到该设备共享目录；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
     },
     {
       "id": "T-O-MEDIA-01",
@@ -3816,7 +3816,7 @@
       "oracle_ids": [
         "O-CARD-01"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN"
+      "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN；未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
     },
     {
       "id": "T-O-BUILD-00",
@@ -3863,9 +3863,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "8015c4a",
-      "environment": "Linux, Node v22.23.2; 113 tests, pass 113, fail 0",
-      "executed_at": "2026-10-13T14:23:22+11:00"
+      "baseline": "09dcb46",
+      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
+      "executed_at": "2026-10-13T15:16:19+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3883,7 +3883,7 @@
       "oracle_ids": [
         "O-SEAM-05"
       ],
-      "evidence": "未建：scripts/integration/native-engine-lifecycle.mjs::两进程各起一份引擎后互不可见"
+      "evidence": "未建：scripts/integration/native-engine-lifecycle.mjs::两进程各起一份引擎后互不可见；未建：真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）"
     },
     {
       "id": "T-O-SEAM-06",
@@ -3892,7 +3892,7 @@
       "oracle_ids": [
         "O-SEAM-06"
       ],
-      "evidence": "未建：scripts/integration/native-engine-settings.mjs::已连接时出口节点变更被拒"
+      "evidence": "未建：scripts/integration/native-engine-settings.mjs::已连接时出口节点变更被拒；未建：真机走查 a01-baseline/manual-checks.md#M-13（两个进程里同一份 .so 是几个运行时）"
     },
     {
       "id": "T-O-SEAM-07",
@@ -3910,7 +3910,7 @@
       "oracle_ids": [
         "O-SEAM-08"
       ],
-      "evidence": "未建：scripts/integration/taildrive-channel.mjs::超时的 Taildrive 请求以失败态返回并清掉请求文件"
+      "evidence": "未建：scripts/integration/taildrive-channel.mjs::超时的 Taildrive 请求以失败态返回并清掉请求文件；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
     },
     {
       "id": "T-O-SEAM-09",
@@ -3966,9 +3966,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "8015c4a",
-      "environment": "Linux, Node v22.23.2; 113 tests, pass 113, fail 0",
-      "executed_at": "2026-10-13T14:23:22+11:00"
+      "baseline": "09dcb46",
+      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
+      "executed_at": "2026-10-13T15:16:19+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3977,7 +3977,7 @@
       "oracle_ids": [
         "O-SEAM-17"
       ],
-      "evidence": "未建：scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃"
+      "evidence": "未建：scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃；未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
     },
     {
       "id": "T-O-SEAM-15-int",
@@ -3988,9 +3988,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "8015c4a",
-      "environment": "Linux, Node v22.23.2; 113 tests, pass 113, fail 0",
-      "executed_at": "2026-10-13T14:23:22+11:00"
+      "baseline": "09dcb46",
+      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
+      "executed_at": "2026-10-13T15:16:19+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -3999,7 +3999,7 @@
       "oracle_ids": [
         "O-SEAM-16"
       ],
-      "evidence": "未建：真机走查 a01-baseline/device-runbook.md#M-17（冲突提示与用户自行断开的完整路径）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-17（冲突提示、应用自停，以及应用进程死掉后扩展是否仍在空转）"
     },
     {
       "id": "T-O-SEAM-16-uni",
@@ -4010,9 +4010,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "8015c4a",
-      "environment": "Linux, Node v22.23.2; 113 tests, pass 113, fail 0",
-      "executed_at": "2026-10-13T14:23:22+11:00"
+      "baseline": "09dcb46",
+      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
+      "executed_at": "2026-10-13T15:16:19+11:00"
     },
     {
       "id": "T-O-SEAM-18",
