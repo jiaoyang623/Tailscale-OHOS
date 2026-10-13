@@ -9,46 +9,60 @@ import re
 import sys
 
 run = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".")
-log_path = run / "03-log.txt"
-if not log_path.exists():
-    raise SystemExit(f"找不到日志：{log_path}")
-raw = log_path.read_text(encoding="utf-8", errors="replace").split("\n")
 
-# hilog 行以 MM-DD HH:MM:SS.mmm 开头。进度行与其它输出没有这个前缀。
-# 毫秒可以缺，缺了按 0 算。
+# hilog 行以 MM-DD HH:MM:SS.mmm 开头。毫秒可以缺，缺了按 0 算。
 STAMP = re.compile(r"^(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(?:\.(\d\d\d))?")
 # 时钟文件里那行带中文前缀，所以不锚定行首。
 STAMP_ANY = re.compile(r"(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(?:\.(\d\d\d))?")
 
 
-def device_clock():
-    """采集开始时设备的当下时间，由 device-run.sh 记在 00-device-clock.txt。"""
-    path = run / "00-device-clock.txt"
-    if not path.exists():
-        return None
-    found = STAMP_ANY.search(path.read_text(encoding="utf-8", errors="replace"))
-    if not found:
-        return None
-    return tuple(int(part) if part is not None else 0 for part in found.groups())
+def stamp_tuple(match):
+    return tuple(int(part) if part is not None else 0 for part in match.groups())
 
 
-start = device_clock()
-if start is None:
-    lines = raw
-    print(f"日志：{log_path}（{len(lines)} 行）")
-    print("⚠️ 没有设备时钟记录，无法剔除采集开始前的积压。"
-          "若这次采集把整段缓冲区回放了，下面的事件可能来自上一次运行。")
-else:
-    # --follow 会先把缓冲区整个回放一遍再从当下往前流，所以必须按时间切一刀。
-    lines = []
-    for line in raw:
+def window_of(text, start):
+    """按采集起点过滤。起点为空则原样返回，并说明过滤没有生效。"""
+    kept = []
+    for line in text.split("\n"):
         found = STAMP.match(line)
-        if found and tuple(int(part) if part is not None else 0
-                           for part in found.groups()) >= start:
-            lines.append(line)
-    skipped = sum(1 for line in raw if STAMP.match(line)) - len(lines)
-    print(f"日志：{log_path}（{len(raw)} 行，其中采集开始前的积压 {skipped} 行已剔除，"
-          f"本次窗口 {len(lines)} 行）")
+        if found and (start is None or stamp_tuple(found) >= start):
+            kept.append(line)
+    return kept
+
+
+parts_path = run / "00-capture-parts.txt"
+files = []
+if parts_path.exists():
+    # 采集可能中断过，由 device-run.sh 续采成多段，每段有自己的起点。
+    for entry in parts_path.read_text(encoding="utf-8", errors="replace").split("\n"):
+        if not entry.strip():
+            continue
+        name, _, clock = entry.partition("\t")
+        found = STAMP_ANY.search(clock)
+        files.append((run / name.strip(), stamp_tuple(found) if found else None))
+else:
+    found = None
+    clock_path = run / "00-device-clock.txt"
+    if clock_path.exists():
+        found = STAMP_ANY.search(clock_path.read_text(encoding="utf-8", errors="replace"))
+    files.append((run / "03-log.txt", stamp_tuple(found) if found else None))
+
+lines = []
+unfiltered = []
+for path, start in files:
+    if not path.exists():
+        print(f"⚠️ 找不到采集分段：{path}")
+        continue
+    text = path.read_text(encoding="utf-8", errors="replace")
+    kept = window_of(text, start)
+    lines.extend(kept)
+    if start is None:
+        unfiltered.append(path.name)
+
+print(f"日志：{len(files)} 段，本次窗口 {len(lines)} 行")
+if unfiltered:
+    print(f"⚠️ 这些分段没有采集起点，无法剔除回放：{'、'.join(unfiltered)}。"
+          "若采集把整段缓冲区回放了，下面的事件可能来自上一次运行。")
 log = "\n".join(lines)
 print()
 
@@ -103,6 +117,11 @@ def pattern_for(name):
 
 def count(name):
     return len(re.findall(pattern_for(name), log))
+
+
+def first(key):
+    return next((i for i, line in enumerate(lines)
+                 if re.search(pattern_for(key), line)), None)
 
 
 print("== 事件计数（在设备日志里出现过的）==")
@@ -194,6 +213,40 @@ if found["vpn_conflict"] or found["vpn_conflict_detected"]:
             print("    自停完成之后没有再出现冲突记录 ✅")
 else:
     print("  M-17 冲突路径：本次没有冲突，未观测到")
+
+# M-19 · 冷启动到可用。
+# 两个锚点都在设备日志里带设备时间戳：EntryAbility onCreate（进程内第一步）
+# 与 ui_opened（界面出现）。两者之差就是这一条要的耗时。
+RUNS = re.compile(r"EntryAbility onCreate")
+OPENED = re.compile(r"MeshArcDiag: ui ui_opened")
+marks = []
+for line in lines:
+    found = STAMP.match(line)
+    if not found:
+        continue
+    parts = line.split()
+    seconds = (int(parts[1][0:2]) * 3600 + int(parts[1][3:5]) * 60
+               + int(parts[1][6:8]) + int(parts[1][9:12]) / 1000)
+    pid = parts[2] if len(parts) > 2 else "0"
+    if RUNS.search(line):
+        marks.append(("onCreate", seconds, pid))
+    elif OPENED.search(line):
+        marks.append(("opened", seconds, pid))
+pairs = []
+pending = None
+for kind, seconds, pid in marks:
+    if kind == "onCreate":
+        pending = (seconds, pid)
+    elif pending is not None:
+        pairs.append(((seconds - pending[0]) * 1000, pid))
+        pending = None
+if pairs:
+    values = sorted(value for value, _ in pairs)
+    print(f"  M-19 冷启动：{len(values)} 次，中位 {values[len(values) // 2]:.0f} ms，"
+          f"最小 {values[0]:.0f} ms，最大 {values[-1]:.0f} ms"
+          "（onCreate → ui_opened；不含启动器与进程创建的时间）")
+else:
+    print("  M-19 冷启动：未观测到 onCreate 与 ui_opened 成对出现")
 
 if found["vpn_backend_handoff_timeout"]:
     print("  ⚠️ 出现后端交接超时：这是用户最早报告「用到一半自己断了」的那条路径，必须单独看")

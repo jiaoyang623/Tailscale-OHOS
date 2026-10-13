@@ -36,6 +36,11 @@ if [ -z "$DEVICE" ]; then
 fi
 
 BUNDLE="ren.w2h.mesharc"
+# 采集走 hdc 的 hilog，不走 devecocli log --follow。
+# 实测：跑本脚本时 devecocli 的 follow 会在启动约 28 秒后停止输出，
+# 而进程还活着（kill -0 验不出），本脚本之外又复现不出来。
+# hdc 是另一套子系统，实现在并发 ui 调用下一直稳。
+HDC_BIN="${HDC:-/opt/harmony/sdk/sdk/default/openharmony/toolchains/hdc}"
 STAMP="$(date +%Y%m%dT%H%M%S)"
 # 仓库根目录归 w2h。以别的用户跑时建不了 device-runs/，整批会在第一步就死，
 # 所以先探可写性，不可写就换到主目录下，并把实际位置打出来。
@@ -118,29 +123,65 @@ if ! grep -qE '^[0-9][0-9]-[0-9][0-9] ' "$OUT/00-app-alive.txt"; then
 fi
 
 say "2/6 开始采集设备日志"
-# --follow 会先把设备日志缓冲区的**全部积压**回放一遍，再从当下往前流。
-# 记下设备此刻的时间，分析器据此把回放的部分剔掉，否则上一次运行的事件
-# 会被当成这一次的证据。
-devecocli log --device "$DEVICE" --tail 5 > "$OUT/00-device-clock.txt" 2>&1 || true
-DEVICE_NOW="$(grep -E '^[0-9][0-9]-[0-9][0-9] ' "$OUT/00-device-clock.txt" | tail -1 | cut -c1-18)"
-HOST_NOW="$(date '+%m-%d %H:%M:%S')"
-echo "设备当下时间：${DEVICE_NOW:-未取到}（主机 $HOST_NOW）"
-if [ -n "$DEVICE_NOW" ]; then
-  echo "设备当下时间：$DEVICE_NOW（主机 $HOST_NOW）" > "$OUT/00-device-clock.txt"
-fi
-devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --follow > "$OUT/03-log.txt" 2>&1 &
-LOG_PID=$!
-cleanup() { kill "$LOG_PID" 2>/dev/null; wait "$LOG_PID" 2>/dev/null; }
+# 采集可能中途停掉（实测遇到过一次，采集文件在场景跑到一半时就不再增长）。
+# 所以采集成段：每个检查点验活，断了就续一段。每段记下设备当时的时间，
+# 分析器按各段自己的起点过滤，段与段之间不会重复计数。
+# 为什么要过滤：--follow 会先把设备日志缓冲区的全部积压回放一遍，
+# 不过滤就会把上一次运行的事件当成这一次的证据。
+CAPTURE_PARTS="$OUT/00-capture-parts.txt"
+: > "$CAPTURE_PARTS"
+PART_NO=0
+LOG_PID=""
+
+device_clock() {
+  devecocli log --device "$DEVICE" --tail 5 > "$OUT/00-device-clock.txt" 2>&1 || true
+  grep -E '^[0-9][0-9]-[0-9][0-9] ' "$OUT/00-device-clock.txt" | tail -1 | cut -c1-18
+}
+
+start_capture() {
+  PART_NO=$((PART_NO + 1))
+  if [ "$PART_NO" -eq 1 ]; then
+    PART_FILE="$OUT/03-log.txt"
+  else
+    PART_FILE="$OUT/03-log-$PART_NO.txt"
+  fi
+  DEVICE_NOW="$(device_clock)"
+  echo "设备当下时间：${DEVICE_NOW:-未取到}（主机 $(date '+%m-%d %H:%M:%S')）"
+  printf '%s\t%s\n' "$(basename "$PART_FILE")" "$DEVICE_NOW" >> "$CAPTURE_PARTS"
+  if [ ! -x "$HDC_BIN" ]; then
+    echo "找不到 hdc：$HDC_BIN。设 HDC=<路径> 再跑。" >&2
+    exit 2
+  fi
+  # 设备整机的 hilog 很大，按包名就地过滤，落盘的就只剩本应用的行。
+  ( "$HDC_BIN" -t "$DEVICE" shell hilog 2>&1 \
+      | grep --line-buffered -E 'ren\.w2h\.mesharc' > "$PART_FILE" ) &
+  LOG_PID=$!
+  sleep 5
+  if ! kill -0 "$LOG_PID" 2>/dev/null; then
+    echo "采集进程起不来，日志不会有内容。检查 --device 与 devecocli 的登录状态。" >&2
+    tail -5 "$PART_FILE" >&2
+    exit 1
+  fi
+  echo "第 $PART_NO 段采集写入 $PART_FILE（后台进程 $LOG_PID）"
+}
+
+check_capture() {
+  if [ -n "$LOG_PID" ] && kill -0 "$LOG_PID" 2>/dev/null; then
+    return 0
+  fi
+  note "⚠️ 采集在第 $PART_NO 段中断，已续采一段。中断期间的事件没有记录。"
+  start_capture
+}
+
+cleanup() {
+  [ -n "$LOG_PID" ] || return 0
+  # LOG_PID 是子 shell，hdc 与 grep 是它的子进程，要一起停。
+  pkill -P "$LOG_PID" 2>/dev/null
+  kill "$LOG_PID" 2>/dev/null
+  wait "$LOG_PID" 2>/dev/null
+}
 trap cleanup EXIT
-echo "日志写入 $OUT/03-log.txt（后台进程 $LOG_PID，收尾时停止）"
-# 起不来的采集会让整批场景白跑，所以在这里就确认它活着。
-sleep 5
-if ! kill -0 "$LOG_PID" 2>/dev/null; then
-  echo "采集进程已经退出，日志不会有内容。检查 --device 与 devecocli 的登录状态。" >&2
-  tail -5 "$OUT/03-log.txt" >&2
-  exit 1
-fi
-echo "采集进程存活，开始走场景。"
+start_capture
 
 scenario() {
   local id="$1" title="$2" instruction="$3"
@@ -151,6 +192,7 @@ scenario() {
   if [ "$answer" = "s" ]; then note "$id $title — 跳过（操作者选择）"; return; fi
   shot "$id"
   layout "$id"
+  check_capture
   read -r -p "这一条看到什么？一句话： " observation
   note "$id $title — ${observation:-（未填）}"
 }
@@ -196,18 +238,35 @@ scenario "M-18" "Q17 蜂窝下的长时间存活" \
 没满 720 秒就回车的话，结论里要写明实际时长，不能当成连续存活证据。"
 
 say "M-19 · Q6 冷启动到可用"
-echo "强杀应用，冷启动，从点击图标计时到最后一次界面可交互。重复 5 次。"
-read -r -p "5 次耗时（秒，逗号分隔，可空）： " timings
-[ -n "$timings" ] && note "M-19 冷启动耗时（秒）：$timings"
+# 不掐表。日志里有两个带设备时间戳的锚点：EntryAbility onCreate 与 ui_opened，
+# 两者之差就是这一条要的耗时，收尾时由 device-analyze.py 算出来。
+if [ -x "$HDC_BIN" ]; then
+  COLD_RUNS="${COLD_RUNS:-5}"
+  echo "自动跑 $COLD_RUNS 次冷启动（强杀 → 拉起 → 等 6 秒）。"
+  for i in $(seq 1 "$COLD_RUNS"); do
+    printf '  第 %s 次…' "$i"
+    "$HDC_BIN" -t "$DEVICE" shell aa force-stop "$BUNDLE" >/dev/null 2>&1
+    sleep 3
+    "$HDC_BIN" -t "$DEVICE" shell aa start -a EntryAbility -b "$BUNDLE" >/dev/null 2>&1
+    sleep 6
+    echo " 完成"
+  done
+  note "M-19 冷启动：已自动跑 $COLD_RUNS 次，耗时见 04-analysis.txt"
+else
+  echo "找不到 hdc（$HDC_BIN），改人工：强杀应用，从点击图标计时到首页可交互，重复 5 次。"
+  read -r -p "5 次耗时（秒，逗号分隔，可空）： " timings
+  [ -n "$timings" ] && note "M-19 冷启动耗时（秒，人工）：$timings"
+fi
 
 say "4/6 导出诊断报告"
 echo "在应用内导出一次诊断报告并分享给自己，把文件放到：$OUT/diagnostic-report.zip"
 read -r -p "导出完成后回车：" _
 
 say "5/6 停止采集"
+check_capture
 cleanup
 trap - EXIT
-echo "日志已停止，共 $(wc -l < "$OUT/03-log.txt") 行"
+echo "日志已停止，共 $(cat "$OUT"/03-log*.txt | wc -l) 行"
 
 say "6/6 派生事实"
 python3 scripts/device-analyze.py "$OUT" | tee "$OUT/04-analysis.txt"
