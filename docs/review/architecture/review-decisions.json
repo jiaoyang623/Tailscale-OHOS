@@ -691,11 +691,11 @@
     },
     {
       "id": "A-D3",
-      "decision": "changes_requested",
-      "content_sha256": "069b4ac032079f1f05212877d17784e5158b45bc04ebe400eba55bfa04f478cd",
-      "note": "Q-01 决定：上真机验一次。验证前 D3 标为条件成立；若结论是「平台把两进程的同一份 .so 视为一个运行时」，D3 立刻失效。",
+      "decision": "accepted",
+      "content_sha256": "1f28107fbd9bf4585760fbd3d46ae420ee1a65534aedac4c2ed88cdf8e1a7094",
+      "note": "第 13 轮：原意见已执行。Q-01 已执行：上真机验证过。扩展侧 Running 而 UI 进程侧引擎 Pending、后端 STOPPED，两个独立运行时成立，D3(a) 不变。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "A-D4",
@@ -988,10 +988,10 @@
     {
       "id": "O-SEAM-02",
       "decision": "accepted",
-      "content_sha256": "ade32073c37753bd3ea9c98d112d3d03a301f8efc21581fd37117611503a1d16",
-      "note": "第 13 轮：原意见已执行。Q12 已执行：交接预算由用例直接断言关系。（审查人 jiaoyang623）",
+      "content_sha256": "6d35c696becc623745e0293ecf6129e515511694efdef0033fe930d386bb767c",
+      "note": "第 13 轮：原意见已执行。Q12 已执行：交接预算由用例直接断言关系。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-03",
@@ -1011,19 +1011,19 @@
     },
     {
       "id": "O-SEAM-05",
-      "decision": "changes_requested",
-      "content_sha256": "879df65323cf58088f4c18803ca17e5f7673f325c24bd90e07be1f97dd9b9027",
-      "note": "Q-01 决定：真机验证前标为条件成立，验证项与失败现象写进期望。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "9ccea4d9b32087f3ef84130c9cd36590146ca91a586a7e981b2f58b94e102314",
+      "note": "第 13 轮：原意见已执行。Q-01 已执行：真机验证完成，前提由条件成立转为已验证，结论已写进期望。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-06",
-      "decision": "changes_requested",
-      "content_sha256": "a31b4caee9ff98a4049db0a363aba29408830e568d30ebc0e4b13bf88fc6ceb5",
-      "note": "Q-01 决定：同 O-SEAM-05。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "c663012c84eb1ab33926203dff5e594de74f175699c02137ee33872cf825d663",
+      "note": "第 13 轮：原意见已执行。Q-01 已执行：同 O-SEAM-05。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-07",
@@ -1084,10 +1084,10 @@
     {
       "id": "O-SEAM-14",
       "decision": "accepted",
-      "content_sha256": "11cf79750d8c3fdeb42e78a3300235c06d2e86ce6c3259a3b910d2003eb7f672",
-      "note": "第 13 轮：原意见已执行。Q11 已执行：写方规则限定为同一时刻只有一个写方。（审查人 jiaoyang623）",
+      "content_sha256": "79938ee12a19151797f5bb2df3bd66915e2aebcec2fe1d3c2f977c3ebaa170da",
+      "note": "第 13 轮：原意见已执行。Q11 已执行：写方规则限定为同一时刻只有一个写方。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-17",

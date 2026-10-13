@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "437a58f",
+  "baseline": "7d1b8e1",
   "stage": "architecture",
   "design": [
     {
@@ -2965,7 +2965,7 @@
         "无法辨认的返回值不得被当作就绪。失败与恢复：同一时刻只允许一个进程用 `filesDir/tailscale` 起引擎，交接靠 O-SEAM-02 的协议而不是锁（架构 §二 2.4「没有锁、没有租约」）",
         "`startBackend` 抛错时调用方以 `NEEDS_UI` / `FAILED` 收尾而不是重试成环，`stopBackend` 抛错时仍必须回写交接应答（O-SEAM-02）。Q-01 未决且会反转结论：若平台把两进程加载的同一份 `.so` 视为同一个运行时，P1 的一次 `backendStopAsync` 会连带停掉 P2 的隧道，而文件协议仍会把它读成「扩展自己停了」",
         "本层不假设答案，必须先按架构 §六 Q-01 的要求在两个进程里各调一次 `backendStatus()` / `probeEngine()` 观察是否互相可见。安全与质量：这一面没有跨进程序列化，凭据与登录态始终留在引擎侧，调用方只拿到状态串、配置串与 URL",
-        "日志只记状态类别与数字码（R-DIAG-02）。"
+        "日志只记状态类别与数字码（R-DIAG-02）。　**2026-10-13 真机已验证**：连接成功时扩展侧 `vpn-status=state=Running|tun=true`，而 UI 进程侧 `engine-status=Tailscale Engine Pending`、`backend-status=STOPPED|backend not started`。两侧各有一份独立引擎，本条的前提由条件成立转为已验证。证据 `manual-checks.md#M-13`，复跑 `scripts/e2e/engine-runtimes.mjs`。"
       ],
       "failure_message": "期望「两侧各自的引擎实例只由本进程的命令驱动，状态串是唯一的交接物」，实际「一侧的命令把另一侧的引擎一起停掉，或状态串被误解析后进程自认为已经就绪」",
       "sources": [
@@ -3006,7 +3006,7 @@
         "一次开关的连续快速切换被队列串行化，最后一次胜出。失败与恢复：写入失败必须让调用方看到失败串并回到已知设置，不允许界面停在一个没落盘的开关位",
         "被守卫丢弃的迟到完成不得改写当前值。Q-01 未决：这份只读面读的是本进程引擎实例的状态，若平台共享运行时，读到的可能是另一个进程正在写的状态",
         "本层不假设答案。安全与质量：这一面只传设置键、布尔值与节点标识，不传凭据",
-        "读面的返回串由调用方 `JSON.parse`，解析失败要按不可用处理而不是让异常穿透。"
+        "读面的返回串由调用方 `JSON.parse`，解析失败要按不可用处理而不是让异常穿透。　**2026-10-13 真机已验证**：连接成功时扩展侧 `vpn-status=state=Running|tun=true`，而 UI 进程侧 `engine-status=Tailscale Engine Pending`、`backend-status=STOPPED|backend not started`。两侧各有一份独立引擎，本条的前提由条件成立转为已验证。证据 `manual-checks.md#M-13`，复跑 `scripts/e2e/engine-runtimes.mjs`。"
       ],
       "failure_message": "期望「设置只在断开时生效、旧代次的完成结果被丢弃」，实际「已连接时设置被写进引擎，或上一代读的结果覆盖了当前设备与设置」",
       "sources": [
@@ -3863,9 +3863,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "437a58f",
+      "baseline": "7d1b8e1",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:00:13+11:00"
+      "executed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3966,9 +3966,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "437a58f",
+      "baseline": "7d1b8e1",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:00:13+11:00"
+      "executed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3988,9 +3988,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "437a58f",
+      "baseline": "7d1b8e1",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:00:13+11:00"
+      "executed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -4010,9 +4010,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "437a58f",
+      "baseline": "7d1b8e1",
       "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:00:13+11:00"
+      "executed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "T-O-SEAM-18",

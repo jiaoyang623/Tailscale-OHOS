@@ -692,10 +692,10 @@
     {
       "id": "A-D3",
       "decision": "accepted",
-      "content_sha256": "069b4ac032079f1f05212877d17784e5158b45bc04ebe400eba55bfa04f478cd",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。",
+      "content_sha256": "1f28107fbd9bf4585760fbd3d46ae420ee1a65534aedac4c2ed88cdf8e1a7094",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "A-D4",
@@ -1132,10 +1132,10 @@
     {
       "id": "O-SEAM-02",
       "decision": "accepted",
-      "content_sha256": "ade32073c37753bd3ea9c98d112d3d03a301f8efc21581fd37117611503a1d16",
-      "note": "第 13 轮：原意见已执行。Q12 已执行：交接预算由用例直接断言关系。（审查人 jiaoyang623）",
+      "content_sha256": "6d35c696becc623745e0293ecf6129e515511694efdef0033fe930d386bb767c",
+      "note": "第 13 轮：原意见已执行。Q12 已执行：交接预算由用例直接断言关系。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-03",
@@ -1155,19 +1155,19 @@
     },
     {
       "id": "O-SEAM-05",
-      "decision": "changes_requested",
-      "content_sha256": "879df65323cf58088f4c18803ca17e5f7673f325c24bd90e07be1f97dd9b9027",
-      "note": "Q-01 决定：真机验证前标为条件成立，验证项与失败现象写进期望。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "9ccea4d9b32087f3ef84130c9cd36590146ca91a586a7e981b2f58b94e102314",
+      "note": "第 13 轮：原意见已执行。Q-01 已执行：真机验证完成，前提由条件成立转为已验证，结论已写进期望。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-06",
-      "decision": "changes_requested",
-      "content_sha256": "a31b4caee9ff98a4049db0a363aba29408830e568d30ebc0e4b13bf88fc6ceb5",
-      "note": "Q-01 决定：同 O-SEAM-05。 ｜第 13 轮：文本已刷新，本意见仍未执行（2026-10-13）。",
+      "decision": "accepted",
+      "content_sha256": "c663012c84eb1ab33926203dff5e594de74f175699c02137ee33872cf825d663",
+      "note": "第 13 轮：原意见已执行。Q-01 已执行：同 O-SEAM-05。（审查人 jiaoyang623）",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-12T19:19:56+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-07",
@@ -1228,10 +1228,10 @@
     {
       "id": "O-SEAM-14",
       "decision": "accepted",
-      "content_sha256": "11cf79750d8c3fdeb42e78a3300235c06d2e86ce6c3259a3b910d2003eb7f672",
-      "note": "第 13 轮：原意见已执行。Q11 已执行：写方规则限定为同一时刻只有一个写方。（审查人 jiaoyang623）",
+      "content_sha256": "79938ee12a19151797f5bb2df3bd66915e2aebcec2fe1d3c2f977c3ebaa170da",
+      "note": "第 13 轮：原意见已执行。Q11 已执行：写方规则限定为同一时刻只有一个写方。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SEAM-17",
@@ -1636,42 +1636,42 @@
     {
       "id": "O-SESSION-03",
       "decision": "accepted",
-      "content_sha256": "654bd8ba1d2ed02f5eb490f7ba15d88e9fcec4b799ee68ae82e9677b90ac987f",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "c94f716f899ac1bfca803d7d3166081e6ff8a98e640844717ef078d3f08e82c6",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SESSION-04",
       "decision": "accepted",
-      "content_sha256": "058ee1cfb9690f9250865b8d08dd0afd70d1db9778d03dde540e80f81b6bc4ab",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "6c4bb4959cf7f31e2bc65144a5293b616691859a880e626fe390529c4750c119",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SESSION-05",
       "decision": "accepted",
-      "content_sha256": "3829f53d4f7586fde5d61bb8c00eea350087e0c27d7f34f86cea19322987797a",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "578488953ddf9a6d5340532608a8883ef6c6c8ff9d1de4252b4ebd116b7e542e",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SESSION-06",
       "decision": "accepted",
-      "content_sha256": "e52a3350e60508893bb06edd90be31ac5f9f2ef21c0ddf59b67b8951d979ea97",
-      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。",
+      "content_sha256": "01f56446000355eac17c4794d4a52bbe7bc1e44fbe76028bdd4704c42f0ff21a",
+      "note": "分层签收：HLD 整体接受（未逐条阅读）。17 张契约卡的结论随架构层与 LLD 层收敛。 ｜第 13 轮重签（2026-10-13，审查人 jiaoyang623）：上游改动刷新了本条文本，原结论不变。 ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SESSION-07",
       "decision": "accepted",
-      "content_sha256": "185d0bfd75a28ba13d8a46080ad3eebc25fd456bde760074d86c0bbc48684f5c",
-      "note": "第 13 轮：原意见已执行。Q12 已执行：补上跨模块常量关系断言，判据转 closed。（审查人 jiaoyang623）",
+      "content_sha256": "cd74b69c1457a8cd5b968993848ff68f78a75ce016546b1caf1d713cda25112e",
+      "note": "第 13 轮：原意见已执行。Q12 已执行：补上跨模块常量关系断言，判据转 closed。（审查人 jiaoyang623） ｜第 13 轮重签（2026-10-13）：上游改动刷新了本条文本，原结论不变。",
       "reviewer": "jiaoyang623",
-      "reviewed_at": "2026-10-13T14:22:49+11:00"
+      "reviewed_at": "2026-10-13T18:00:42+11:00"
     },
     {
       "id": "O-SESSION-08",
