@@ -37,9 +37,18 @@ fi
 
 BUNDLE="ren.w2h.mesharc"
 STAMP="$(date +%Y%m%dT%H%M%S)"
-OUT="device-runs/$STAMP"
-mkdir -p "$OUT"
-: > "$OUT/notes.txt"
+# 仓库根目录归 w2h。以别的用户跑时建不了 device-runs/，整批会在第一步就死，
+# 所以先探可写性，不可写就换到主目录下，并把实际位置打出来。
+OUT_ROOT="${OUT_ROOT:-device-runs}"
+if ! mkdir -p "$OUT_ROOT" 2>/dev/null || [ ! -w "$OUT_ROOT" ]; then
+  OUT_ROOT="${HOME}/mesharc-device-runs"
+  mkdir -p "$OUT_ROOT" || { echo "无法创建产物目录：$OUT_ROOT" >&2; exit 2; }
+  echo "仓库根目录不可写，产物改放：$OUT_ROOT"
+  echo "（要放进仓库就跑：sudo -n -u w2h scripts/device-run.sh）"
+fi
+OUT="$OUT_ROOT/$STAMP"
+mkdir -p "$OUT" || { echo "无法创建 $OUT" >&2; exit 2; }
+: > "$OUT/notes.txt" || { echo "无法写 $OUT/notes.txt" >&2; exit 2; }
 
 say() { echo; echo "──────────────────────────────────────────────"; echo "$*"; echo "──────────────────────────────────────────────"; }
 note() { echo "$*" >> "$OUT/notes.txt"; echo "  · $*"; }
@@ -93,15 +102,32 @@ fi
 say "1.5/6 确认应用已经在跑"
 echo "请在手机上打开一次 MeshArc，停在首页。若刚装完，它通常已经起来了。"
 read -r -p "打开后回车： " _
-devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --from 2m --tail 1 \
-  > "$OUT/00-app-alive.txt" 2>&1 || true
-if grep -q 'No running process' "$OUT/00-app-alive.txt"; then
+# 不要用 --from：它的窗口按主机时间算，而设备时钟可能与主机相差数小时
+# （本机实测差 3 小时），带 --from 的查询在那种设备上一行都取不到。
+# --tail 1 在本机返回 0 行（工具自身的边界行为），用 5。
+if ! devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --tail 5 \
+    > "$OUT/00-app-alive.txt" 2>&1; then
   cat "$OUT/00-app-alive.txt" >&2
-  echo "应用没在运行。这时候开始采集，整批场景都会是空的。先把它打开再重跑。" >&2
+  echo "取应用日志失败或应用没在运行。这样开始采集，整批场景都会是空的。" >&2
+  exit 1
+fi
+if ! grep -qE '^[0-9][0-9]-[0-9][0-9] ' "$OUT/00-app-alive.txt"; then
+  cat "$OUT/00-app-alive.txt" >&2
+  echo "没有取到任何本应用的日志行，无法确认它在跑。停止。" >&2
   exit 1
 fi
 
 say "2/6 开始采集设备日志"
+# --follow 会先把设备日志缓冲区的**全部积压**回放一遍，再从当下往前流。
+# 记下设备此刻的时间，分析器据此把回放的部分剔掉，否则上一次运行的事件
+# 会被当成这一次的证据。
+devecocli log --device "$DEVICE" --tail 5 > "$OUT/00-device-clock.txt" 2>&1 || true
+DEVICE_NOW="$(grep -E '^[0-9][0-9]-[0-9][0-9] ' "$OUT/00-device-clock.txt" | tail -1 | cut -c1-18)"
+HOST_NOW="$(date '+%m-%d %H:%M:%S')"
+echo "设备当下时间：${DEVICE_NOW:-未取到}（主机 $HOST_NOW）"
+if [ -n "$DEVICE_NOW" ]; then
+  echo "设备当下时间：$DEVICE_NOW（主机 $HOST_NOW）" > "$OUT/00-device-clock.txt"
+fi
 devecocli log --device "$DEVICE" --bundle-name "$BUNDLE" --follow > "$OUT/03-log.txt" 2>&1 &
 LOG_PID=$!
 cleanup() { kill "$LOG_PID" 2>/dev/null; wait "$LOG_PID" 2>/dev/null; }

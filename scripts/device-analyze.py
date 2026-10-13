@@ -12,10 +12,44 @@ run = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".")
 log_path = run / "03-log.txt"
 if not log_path.exists():
     raise SystemExit(f"找不到日志：{log_path}")
-log = log_path.read_text(encoding="utf-8", errors="replace")
-lines = log.split("\n")
+raw = log_path.read_text(encoding="utf-8", errors="replace").split("\n")
 
-print(f"日志：{log_path}（{len(lines)} 行）")
+# hilog 行以 MM-DD HH:MM:SS.mmm 开头。进度行与其它输出没有这个前缀。
+# 毫秒可以缺，缺了按 0 算。
+STAMP = re.compile(r"^(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(?:\.(\d\d\d))?")
+# 时钟文件里那行带中文前缀，所以不锚定行首。
+STAMP_ANY = re.compile(r"(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(?:\.(\d\d\d))?")
+
+
+def device_clock():
+    """采集开始时设备的当下时间，由 device-run.sh 记在 00-device-clock.txt。"""
+    path = run / "00-device-clock.txt"
+    if not path.exists():
+        return None
+    found = STAMP_ANY.search(path.read_text(encoding="utf-8", errors="replace"))
+    if not found:
+        return None
+    return tuple(int(part) if part is not None else 0 for part in found.groups())
+
+
+start = device_clock()
+if start is None:
+    lines = raw
+    print(f"日志：{log_path}（{len(lines)} 行）")
+    print("⚠️ 没有设备时钟记录，无法剔除采集开始前的积压。"
+          "若这次采集把整段缓冲区回放了，下面的事件可能来自上一次运行。")
+else:
+    # --follow 会先把缓冲区整个回放一遍再从当下往前流，所以必须按时间切一刀。
+    lines = []
+    for line in raw:
+        found = STAMP.match(line)
+        if found and tuple(int(part) if part is not None else 0
+                           for part in found.groups()) >= start:
+            lines.append(line)
+    skipped = sum(1 for line in raw if STAMP.match(line)) - len(lines)
+    print(f"日志：{log_path}（{len(raw)} 行，其中采集开始前的积压 {skipped} 行已剔除，"
+          f"本次窗口 {len(lines)} 行）")
+log = "\n".join(lines)
 print()
 
 # 监视的名字。按词边界匹配，否则 vpn_conflict 会把 vpn_conflict_acknowledged

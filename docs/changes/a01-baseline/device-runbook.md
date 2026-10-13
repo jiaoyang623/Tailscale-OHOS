@@ -31,7 +31,7 @@
 | --- | --- |
 | 设备列表与详情 | `devecocli device list`、`devecocli device view` |
 | 装机并拉起 | `devecocli run --device <serial> --skip-build` |
-| 应用日志（按包名、按时间窗、按关键字） | `devecocli log --device <serial> --bundle-name ren.w2h.mesharc --from 5m --keyword <词>` |
+| 应用日志（按包名、取末尾若干行） | `devecocli log --device <serial> --bundle-name ren.w2h.mesharc --tail 40` |
 | 实时跟踪 | `devecocli log --device <serial> --follow` |
 | 崩溃日志 | `devecocli log --device <serial> --crash` |
 | 界面结构、截图、点击 | `devecocli ui layout`、`devecocli ui screenshot`、`devecocli ui click <x> <y>` |
@@ -67,7 +67,7 @@
 
 1. 连接 Tailscale，等到状态显示已连接。
 2. 打开应用的诊断面板，读「本进程引擎状态」（M-06 引擎自检读到的就是这个）。
-3. 记下扩展侧的状态：`devecocli log --device <serial> --bundle-name ren.w2h.mesharc --keyword vpn_connected`。
+3. 记下扩展侧的状态：在采集文件里找：`grep vpn_connected device-runs/<时间戳>/03-log.txt`。
 4. 断开连接，观察扩展进程是否随之销毁。
 
 **判定**
@@ -94,7 +94,7 @@
 4. 在应用内操作连接/断开，确认卡片跟着变。
 5. 杀掉应用进程，等待，确认卡片在 30 分钟内自愈到正确状态。
 
-**观察**：`devecocli log --keyword "Card toggle"`。应用打的是 `Card toggle result=…`
+**观察**：在采集文件里找 `Card toggle`。应用打的是 `Card toggle result=…`
 （`EntryAbility.ets:218`）与 `Card toggle failed`（`:225`）。
 **`performCardToggle` 是方法名，不是日志串**，按它过滤取不到任何东西。
 
@@ -123,7 +123,7 @@
 2. 上传一个文件到共享目录，再下载回来。
 3. 在传输过程中断网，观察失败态与重试。
 
-**观察**：`devecocli log --keyword taildrive`；`docs/` 里 Taildrive 的请求环超时（32 s / 35 s / 30 min+10 s / 5 s）。
+**观察**：在采集文件里找 `taildrive`；`docs/` 里 Taildrive 的请求环超时（32 s / 35 s / 30 min+10 s / 5 s）。
 
 **一半是盲的。** 界面层（`TaildriveBrowser.ets`）有 hilog，列表与传输的起止看得见。
 网关层 `TaildriveGateway.ets` 有 446 行，**没有任何 hilog，也没有任何诊断事件**，
@@ -183,7 +183,8 @@
 6. 断开 shadowsocks，重启应用，读当前状态文字。
 7. 再发起一次连接，看是否报冲突。
 
-**观察**：`devecocli log --keyword vpn_conflict`、`vpn_conflict_self_disconnect`、`vpn_create_failed`；`devecocli log --crash`；`devecocli ui layout`。
+**观察**：在采集文件里找 `vpn_conflict`、`vpn_conflict_self_disconnect`、`vpn_create_failed`；
+`devecocli log --device <serial> --crash`；`devecocli ui layout`。
 
 **判「自停成功」要看 failed 那条没出现，不能只看 completed。** `completed` 在
 `finishVpnConflictCleanup`（`BridgeStatus.ets:4352`）里无条件记录，`stopVpnExtension` 失败时
@@ -211,7 +212,7 @@
 
 1. 关掉 Wi-Fi，用蜂窝数据连接。
 2. 锁屏静置，保持 **720 s 以上**。
-3. 期间用 `devecocli log --from 12m --keyword heartbeatMs` 取心跳序列
+3. 心跳序列不用手工取，`device-analyze.py` 收尾时会从采集文件里算出来
    （扩展的状态定时器每秒刷新一次，本次已给它加了设备日志镜像）。
 4. 另外单独跑一次连接期保活：从扩展建 TUN 到隧道可用，确认全程持有长时任务。
 
@@ -243,6 +244,21 @@
 **影响**：`QG-08`、需求质量目标表。
 
 ---
+
+## 真机上不能用 `--from` 与 `--keyword`
+
+2026-10-13 在 Mate 60 Pro（`2LQGK24828000076`）上实测：
+
+| 命令 | 结果 |
+| --- | --- |
+| `log --bundle-name X --from 30m` | 0 行（设备时钟比主机慢 3 小时，`--from` 的窗口按主机时间算，两者不重叠） |
+| `log --bundle-name X --keyword MeshArcDiag` | 0 行 |
+| `log --bundle-name X --tail 40` | 40 行，可用 |
+| `log --follow` | 可用，但**会先把整个缓冲区从头回放** |
+
+所以：日志只采一次，之后一律在采集文件里本地过滤。
+`device-run.sh` 在采集开始时记下设备当下时间，`device-analyze.py` 据此把回放的部分剔掉，
+否则上一次运行的事件会被当成这一次的证据。
 
 ## 一次运行取不到的东西
 
