@@ -143,22 +143,32 @@
 
 ---
 
-## M-17 · Q-02：VPN 替换批准的 10 秒 TTL（并与 M-10 合并）
+## M-17 · Q-02（修订）：VPN 冲突路径是否收敛
 
-**为什么**：`vpn-replace-approved` 的读侧 TTL 只有 10 s，
-而写方在 UI 进程。批准对话框弹出时用户正好切走，10 s 后批准还灵不灵，未验证。
-另外**全仓库目前找不到这个文件的写方**——"批准后替换"这条路径没有实现。
+**为什么**：Q-02 原问「替换批准的 10 s TTL」。复核发现那个批准文件的写方不存在，整个替换分支已删（`fe35016`）。剩下的冲突路径有一条真机风险：冲突时扩展用 200 ms 心跳保持存活，等应用来停它（`TailscaleVpnExtensionAbility.ets:602`）。这个循环没有次数上限，也没有自杀超时。应用侧在检测到冲突时就调 `stopVpnExtension`（`BridgeStatus.ets:4339`），不等用户点确定。所以**「应用检测不到」是唯一的空洞**，本条的步骤就是往这个空洞上打。
 
 **步骤**
 
 1. 手机上保留另一个占用 VPN 通道的应用（shadowsocks）。
-2. 在 MeshArc 里发起连接，等冲突提示与批准对话框出现。
-3. 立刻切到别的应用，等待超过 10 s，再回到 MeshArc。
-4. 记录扩展是重问、直接失败，还是静默继续。
+2. 在应用内发起连接，记下提示框的标题与正文。
+3. 不点「确定」，等 60 s。该对话框 `autoCancel: false`，点框外不会关。
+4. 断开 shadowsocks，再发起一次连接，确认这次能连上。
+5. 冲突提示出现后立刻强杀应用进程。
+6. 断开 shadowsocks，重启应用，读当前状态文字。
+7. 再发起一次连接，看是否报冲突。
 
-**观察**：`devecocli log --keyword vpn_replace`、`vpn_conflict`、`vpn_replacement_approved`。
+**观察**：`devecocli log --keyword vpn_conflict`、`vpn_conflict_self_disconnect`、`vpn_create_failed`；`devecocli log --crash`；`devecocli ui layout`。
 
-**影响**：`O-SEAM-16`、`R-CONN-07`、登记册的 M-10（目前记为「部分」）。
+**判定**
+
+| 观察 | 结论 |
+| --- | --- |
+| 第 2 步标题「请先断开其它 VPN」、正文「请断开其它 VPN 以连接 Tailscale」 | 冲突文案与代码一致，登记册 M-10 的「部分」可升级 |
+| 第 3 步 60 s 内出现 `vpn_conflict_self_disconnect_completed` | 应用侧自停有效，删除替换分支没有留下空洞 |
+| 第 6 步状态文字仍是冲突 | 应用被杀后扩展仍在空转，新会话把它读成在场的冲突 |
+| 第 7 步报冲突，而此刻没有其它 VPN | 空洞确认：无人停的扩展会挡住后续连接。需要给心跳加自杀超时 |
+
+**影响**：`O-SEAM-16`、`R-CONN-07`、登记册 M-10、D4 的责任空洞。
 
 ---
 

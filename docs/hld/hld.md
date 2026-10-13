@@ -2,7 +2,7 @@
 
 - 流程版本：a01 · 层：HLD
 - 上层输入：`docs/architecture/architecture.md`（§2.2 子系统、§2.3 通信方式、§三 视图、§四 D1–D6、§五 旅程↔接缝、§六 未决项、§七 编号对照）
-- 接缝判据：`docs/oracles/91-seams/`（已落 O-SEAM-10…17）；O-SEAM-01…09 的 ID 与范围以 `/tmp/mesharc/a01/SEAM-SPEC.md` 末表为准（正文待建）
+- 接缝判据：`docs/oracles/91-seams/`（已落 O-SEAM-01…18）；O-SEAM-01…09 的 ID 与范围以 `/tmp/mesharc/a01/SEAM-SPEC.md` 末表为准（正文待建）
 - 单点判据：`docs/oracles/points/P1-background-status.md`、`docs/oracles/points/P3-session.md`
 - 事实来源：生产代码 `entry/src/main/ets/**`、`entry/src/main/cpp/types/libtailscale_ohos/index.d.ts`，逐条给 `file:line`
 - 本层做的：把每条接缝从「责任边界」细化成**接口与事件契约**（消费方不读提供方实现即可正确调用），并给出它分解出的单点判据归属
@@ -41,7 +41,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 
 ## 二、接口与事件契约
 
-**本层主体。每条接缝一张契约卡，字段固定：通道 / 方向 / 载荷格式 / 顺序与时机 / 错误与责任 / 幂等性 / 可观测点。** 17 条接缝 O-SEAM-01…O-SEAM-17 全部出现；不掌握处写 `不确定特征` 并记入未决项，但不缺席。所有文件路径均为 `context.filesDir`（`StoragePaths.ets:6-7` 说明该目录跨能力共享）；文件名与常量逐字取自代码。
+**本层主体。每条接缝一张契约卡，字段固定：通道 / 方向 / 载荷格式 / 顺序与时机 / 错误与责任 / 幂等性 / 可观测点。** 18 条接缝 O-SEAM-01…O-SEAM-18 全部出现；不掌握处写 `不确定特征` 并记入未决项，但不缺席。所有文件路径均为 `context.filesDir`（`StoragePaths.ets:6-7` 说明该目录跨能力共享）；文件名与常量逐字取自代码。
 
 ### C-01 · O-SEAM-01 应用进程 ↔ VPN 扩展：生命周期命令通道
 
@@ -225,6 +225,16 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **幂等性**：`eventId:action` 去重，超 64 条淘汰最旧（`AppShellIntentAdapter.ets:28-31`）；卡片 `refreshAll` 是幂等的全量推送。
 - **可观测点**：无专门诊断事件名；`callee 'toggleVpn'` 注册失败记 hilog（`EntryAbility.ets:102`）。
 
+### C-18 · 构建与产物装配
+
+- **通道**：三个构建入口与产物路径。macOS 与 Linux 入口是 `scripts/build.sh` 和 `.build/compile.sh`。Windows 入口是 `scripts/build.ps1`。三者都先调 `scripts/build-go.sh` 或它的 Windows 对应物（`scripts/build.sh:51`、`.build/compile.sh:21`、`scripts/build.ps1:168-169`）。引擎产物在 `native/go_bridge/dist/arm64-v8a/libtailscale_go.so`。装配用副本在 `entry/libs/arm64-v8a/libtailscale_go.so` 与同目录的 `libtailscale_go.h`（`scripts/build-go.sh:43-45`、`:91-92`）。HAP 落 `entry/build/default/outputs/default/`（`scripts/build.sh:61`）。
+- **方向**：构建机 → 产物。这条接缝不在运行期，也不跨两个运行时模块。构建机取走源码与补丁，交回可装配的动态库与 HAP。
+- **载荷格式**：两个补丁文件，一份 AArch64 c-shared 动态库，一份同名头文件。`patches/ohos-go-interface-resources.patch` 落 Go 工具链源码树 `$go_root`。`$go_root` 默认是 `~/.ohos-go-build/ohos-go`，回退 `third_party/ohos-go`。`patches/tailscale-ohos.patch` 落 `third_party/tailscale`（`scripts/build-go.sh:15-20`、`:67-68`）。`go build -buildmode=c-shared` 同时产出 `.so` 与 `.h`。
+- **顺序与时机**：先应用补丁，再编译，再复制，最后装配。`apply_patch` 先做 `git apply --reverse --check --ignore-space-change --ignore-whitespace`。reverse-check 失败才 `git apply`（`scripts/build-go.sh:60-64`）。编译在补丁之后（`scripts/build-go.sh:86-89`）。复制把 `.so` 与 `.h` 一起写进 `entry/libs/arm64-v8a/`（`scripts/build-go.sh:91-92`）。装配用 hvigor wrapper 与显式 debug 参数（`scripts/build.sh:53-59`）。
+- **错误与责任**：补丁缺失、补丁冲突、编译失败都让脚本非零退出。`set -euo pipefail` 让脚本在编译前中止（`scripts/build-go.sh:10`、`:56-59`）。非 default 产品在 macOS 入口开头被拒，责任在误用入口的一方（`scripts/build.sh:6-12`）。Windows 入口只接受 `default` 与 `release`。release 还要先过 changelog 校验（`scripts/build.ps1:1-4`、`:126-132`）。构建模式不是独立校验项，它由产品派生（`scripts/build.ps1:134-135`）。macOS 入口固定 debug（`scripts/build.sh:58-59`）。
+- **幂等性**：补丁应用是幂等的。reverse-check 成功即判定「已应用」，不再叠加（`scripts/build-go.sh:60-61`）。判定只看补丁自身，不读工作区整体状态。
+- **可观测点**：两次连续执行的退出码与 stdout（`Applied patch` 或 `Patch already applied`）。传给 `go` 的实参（`-buildmode=c-shared`、`-trimpath`、两个 `-X` 版本戳都等于 1.86.5）。`entry/libs/arm64-v8a/` 下 `.so` 与 `.h` 是否落位。传给 node 的装配参数（`hvigorw.js`、`buildMode=debug`、`debuggable=true`、`assembleHap`）。非 default 产品时的 stderr 文案。
+
 ### SWEBOK 六项逐项核对
 
 | 项 | 适用性 | 说明 |
@@ -344,6 +354,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 | `scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认` | O-SEAM-14 | `load` 回落；`getSync` 默认 |
 | `scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧` | O-SEAM-15 | `redactForLog`；100 事件 / 24 KB |
 | `scripts/integration/entry-dispatch.mjs::卡片 call 与通知 Want 被翻译成内部信号且非法 Want 被丢弃` | O-SEAM-17 | AppStorage 键；`isValidNotificationAction` |
+| `scripts/integration/build-flow.mjs::补丁幂等且产物落进 entry/libs/arm64-v8a 而非 default 产品在装配前被拒` | O-SEAM-18 | 补丁 reverse-check；产物路径；产品门 |
 
 其余接缝（O-SEAM-02/03/04/05/06/07/08/09/11/12）尚无独立的集成测试锚点，记入 §七 待建。
 
@@ -373,6 +384,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 | O-SEAM-15 诊断记录、脱敏与报告导出 | P1（`DiagnosticEventStore` + `DiagnosticReportService`）、P2（`DiagnosticEventStore`） | P1 合并、用户分享 | 待建 | O-DIAG-01：脱敏不可绕过；100 事件/24 KB；报告 24 h |
 | O-SEAM-16 VPN 替换批准通道 | **P1（写方缺失，不可达）** | P2（`consumeVpnReplaceApproval:732`） | 待建 | O-CONN-05：批准路径不可达，实际走冲突对话框 |
 | O-SEAM-17 入口分发 | 外部（卡片 `call`、通知 Want、P3 定时刷新）→ P1（`EntryAbility`） | P1 `BridgeStatus` / `TaildriveBrowser` | 待建 | O-CARD-01/O-XFER-04/O-SETUP-03/O-MEDIA-01/O-MEDIA-02/O-XFER-03：翻译成内部信号；非法 Want 丢弃 |
+| O-SEAM-18 构建与产物装配 | `scripts/build-go.sh`（补丁、c-shared 构建、复制）、`scripts/build.sh` / `build.ps1` / `.build/compile.sh`（入口与装配） | 装配（hvigor `assembleHap`）与产物校验 | O-BUILD-01…07 | O-BUILD-00：开发者从仓库根跑一次构建得到可装配的 AArch64 产物 |
 
 ---
 

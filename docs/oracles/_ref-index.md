@@ -6,7 +6,7 @@
 > 为什么需要它：判据之间是有关系的（父子、同需求、同用例、同承载件、互相引用）。
 > 改一条判据前，先在这里查它牵动哪些判据；改完再查一次，确认没有漏改。
 
-判据 121 条 · 关系边：父判据 138 · 正文引用 160 · 共用锚点 22 · 共用承载件 3284 · 同批次 902
+判据 122 条 · 关系边：父判据 139 · 正文引用 169 · 共用锚点 22 · 共用承载件 3284 · 同批次 922
 
 ## 关系检查
 
@@ -127,56 +127,57 @@
 
 ### O-BUILD-00 开发者构建流程：打补丁、编译引擎、装配 HAP
 - 位置: `docs/oracles/90-journeys/11-build.md:3` · 层: 旅程 · 状态: pending-test
-- 子判据: O-BUILD-01 O-BUILD-02 O-BUILD-03 O-BUILD-04 O-BUILD-05 O-BUILD-06 O-BUILD-07
+- 子判据: O-SEAM-18
 - 上游需求: R-BUILD-01 R-BUILD-02
-- 引用了本判据: O-BUILD-01 O-BUILD-02 O-BUILD-03 O-BUILD-04 O-BUILD-05 O-BUILD-06 O-BUILD-07
+- 本判据引用: O-SEAM-18
+- 引用了本判据: O-BUILD-01 O-BUILD-02 O-BUILD-03 O-BUILD-04 O-BUILD-05 O-BUILD-06 O-BUILD-07 O-SEAM-18
 - 同接收批次(a01-E2E): 28 条
 
 ### O-BUILD-01 补丁应用幂等：全新与已打过补丁的 checkout 都能构建成功
 - 位置: `docs/oracles/points/P5-build.md:22` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-01 R-BUILD-02
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 - 共用锚点: O-BUILD-02 O-BUILD-03
 
 ### O-BUILD-02 构建产物被复制进 HAP 的库目录
-- 位置: `docs/oracles/points/P5-build.md:40` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:39` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-01
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 - 共用锚点: O-BUILD-01 O-BUILD-03
 
 ### O-BUILD-03 引擎版本戳经 ldflags 注入且与依赖声明一致
-- 位置: `docs/oracles/points/P5-build.md:58` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:56` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-01
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 - 共用锚点: O-BUILD-01 O-BUILD-02
 
 ### O-BUILD-04 无关的本地改动不阻止必需补丁，也不被覆盖
-- 位置: `docs/oracles/points/P5-build.md:76` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:73` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-02
-- 本判据引用: O-BUILD-00 O-BUILD-05
+- 本判据引用: O-SEAM-18 O-BUILD-00 O-BUILD-05
 
 ### O-BUILD-05 补丁冲突在编译前失败并保留源码原状
-- 位置: `docs/oracles/points/P5-build.md:94` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:90` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-02
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 - 引用了本判据: O-BUILD-04
 
 ### O-BUILD-06 Release 与未知产品在构建或签名前被拒绝
-- 位置: `docs/oracles/points/P5-build.md:112` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:107` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-02
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 
 ### O-BUILD-07 Debug 装配用项目目录与 hvigor wrapper，并传显式 debug 参数
-- 位置: `docs/oracles/points/P5-build.md:130` · 层: 单点 · 状态: closed
-- 父判据: O-BUILD-00
+- 位置: `docs/oracles/points/P5-build.md:124` · 层: 单点 · 状态: closed
+- 父判据: O-SEAM-18
 - 上游需求: R-BUILD-02
-- 本判据引用: O-BUILD-00
+- 本判据引用: O-SEAM-18 O-BUILD-00
 
 ### O-CARD-01 桌面卡片开关 VPN
 - 位置: `docs/oracles/90-journeys/10-shell.md:39` · 层: 旅程 · 状态: pending-test
@@ -586,7 +587,7 @@
 - 本判据引用: O-CONN-01 O-CONN-02
 - 引用了本判据: O-SESSION-02 O-SESSION-08
 - 共用承载件: O-CARD-01 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-CONN-07 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-RECONN-10 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-05 O-SEAM-06 O-SEAM-07 O-SEAM-08 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 …(+20)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-02 应用进程 ↔ VPN 扩展：后端交接
 - 位置: `docs/oracles/91-seams/S1-ipc-core.md:26` · 层: 接缝 · 状态: pending-test
@@ -596,7 +597,7 @@
 - 本判据引用: O-CONN-01 O-CONN-03 O-CONN-07
 - 引用了本判据: O-SEAM-05 O-SESSION-03 O-SESSION-04 O-SESSION-05 O-SESSION-06 O-SESSION-07
 - 共用承载件: O-CARD-01 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-CONN-07 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-RECONN-10 O-SEAM-01 O-SEAM-03 O-SEAM-04 O-SEAM-05 O-SEAM-06 O-SEAM-07 O-SEAM-08 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 …(+20)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-03 VPN 扩展 → 应用进程：状态与心跳
 - 位置: `docs/oracles/91-seams/S1-ipc-core.md:43` · 层: 接缝 · 状态: closed
@@ -615,7 +616,7 @@
 - 本判据引用: O-DEV-02
 - 引用了本判据: O-LOCALSEND-01 O-LOCALSEND-02 O-PEER-01 O-PEER-02 O-PEER-03 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-09 O-PEER-10 O-PEER-11
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-05 O-SEAM-06 O-SEAM-07 O-SEAM-08 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 O-SEAM-17 O-SESSION-01 O-SESSION-08 …(+20)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-05 应用进程 ↔ Go 引擎：生命周期面
 - 位置: `docs/oracles/91-seams/S2-native-probes.md:8` · 层: 接缝 · 状态: pending-test
@@ -623,7 +624,7 @@
 - 上游需求: R-CONN-01 R-CONN-02
 - 本判据引用: O-CONN-01 O-CONN-02 O-SEAM-02
 - 共用承载件: O-CONN-01 O-CONN-03 O-CONN-05 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-07 O-SEAM-08 O-SEAM-09 O-SEAM-14 O-SEAM-16 O-SESSION-08
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-06 应用进程 ↔ Go 引擎：只读与设置面
 - 位置: `docs/oracles/91-seams/S2-native-probes.md:25` · 层: 接缝 · 状态: pending-test
@@ -631,7 +632,7 @@
 - 上游需求: R-NET-01 R-NET-02 R-DEV-02
 - 本判据引用: O-NET-01 O-NET-02 O-DEV-02
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-16 O-SEAM-17 O-SESSION-08 O-SETUP-01 O-SETUP-02 O-SETUP-03 O-SETUP-04 …(+7)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-07 应用进程 ↔ VPN 扩展：Taildrop 通道
 - 位置: `docs/oracles/91-seams/S2-native-probes.md:42` · 层: 接缝 · 状态: pending-test
@@ -639,7 +640,7 @@
 - 上游需求: R-XFER-02 R-XFER-05 R-XFER-07
 - 本判据引用: O-XFER-01 O-XFER-04 O-XFER-05
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-05 O-SEAM-06 O-SEAM-08 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 O-SEAM-17 O-SESSION-08 O-SETUP-01 …(+10)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-08 应用进程 ↔ VPN 扩展：Taildrive 通道
 - 位置: `docs/oracles/91-seams/S2-native-probes.md:59` · 层: 接缝 · 状态: pending-test
@@ -647,7 +648,7 @@
 - 上游需求: R-DRIVE-03 R-DRIVE-04
 - 本判据引用: O-DRIVE-01
 - 共用承载件: O-CONN-01 O-CONN-03 O-CONN-05 O-DRIVE-01 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-05 O-SEAM-07 O-SEAM-09 O-SEAM-14 O-SEAM-16
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-09 应用进程 ↔ VPN 扩展：探测通道
 - 位置: `docs/oracles/91-seams/S2-native-probes.md:76` · 层: 接缝 · 状态: closed
@@ -666,7 +667,7 @@
 - 本判据引用: O-CONN-01 O-CONN-07 O-CARD-01
 - 引用了本判据: O-SESSION-01 O-SESSION-02 O-SESSION-03 O-SESSION-07
 - 共用承载件: O-CARD-01 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-04 O-CONN-05 O-CONN-07 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-RECONN-10 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-13 O-SEAM-16 O-SEAM-17 O-SESSION-01 …(+18)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-11 应用进程 ↔ 系统：长时任务与实况窗
 - 位置: `docs/oracles/91-seams/S3-orchestration-system.md:24` · 层: 接缝 · 状态: closed
@@ -692,7 +693,7 @@
 - 上游需求: R-SETUP-06 R-MEDIA-02 R-XFER-09 R-PRIV-01
 - 本判据引用: O-SETUP-03 O-MEDIA-01 O-MEDIA-02 O-XFER-03 O-PRIV-01
 - 共用承载件: O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-05 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-16 O-SEAM-17 O-SESSION-08 O-SETUP-01 O-SETUP-02 O-SETUP-03 O-SETUP-04 …(+7)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
 
 ### O-SEAM-14 持久化：配置所有权与默认值
 - 位置: `docs/oracles/91-seams/S4-persistence-entry.md:24` · 层: 接缝 · 状态: closed
@@ -724,7 +725,16 @@
 - 上游需求: R-UI-05 R-XFER-06
 - 本判据引用: O-CARD-01 O-XFER-04
 - 共用承载件: O-CARD-01 O-CONN-01 O-CONN-02 O-CONN-03 O-CONN-04 O-CONN-05 O-CONN-07 O-DEV-01 O-DEV-02 O-DIAG-01 O-DRIVE-01 O-DRIVE-02 O-LOCALSEND-01 O-LOCALSEND-02 O-MEDIA-01 O-MEDIA-02 O-NET-01 O-NET-02 O-PEER-04 O-PEER-05 O-PEER-06 O-PEER-07 O-PEER-08 O-PEER-09 O-PEER-10 O-PEER-11 O-PRIV-01 O-PRIV-02 O-SEAM-01 O-SEAM-02 O-SEAM-03 O-SEAM-04 O-SEAM-06 O-SEAM-07 O-SEAM-09 O-SEAM-10 O-SEAM-13 O-SEAM-14 O-SEAM-16 O-SESSION-08 …(+11)
-- 同接收批次(a01-集成): 9 条
+- 同接收批次(a01-集成): 10 条
+
+### O-SEAM-18 构建与产物装配
+- 位置: `docs/oracles/91-seams/S6-build-assembly.md:11` · 层: 接缝 · 状态: pending-test
+- 父判据: O-BUILD-00
+- 子判据: O-BUILD-01 O-BUILD-02 O-BUILD-03 O-BUILD-04 O-BUILD-05 O-BUILD-06 O-BUILD-07
+- 上游需求: R-BUILD-01 R-BUILD-02
+- 本判据引用: O-BUILD-00
+- 引用了本判据: O-BUILD-00 O-BUILD-01 O-BUILD-02 O-BUILD-03 O-BUILD-04 O-BUILD-05 O-BUILD-06 O-BUILD-07
+- 同接收批次(a01-集成): 10 条
 
 ### O-SESSION-01 已连接态下无 UI 连接判为 unchanged
 - 位置: `docs/oracles/points/P3-session.md:15` · 层: 单点 · 状态: closed

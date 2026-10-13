@@ -26,6 +26,7 @@ LLM_BY_SEAM = {
     "05": {"L-VM-2"}, "06": set(), "07": {"L-ALGO"}, "08": {"L-ALGO"},
     "09": set(), "10": {"L-VM-2", "L-VM-3"}, "11": {"L-VM-1", "L-VM-3"},
     "12": {"L-VM-3"}, "13": set(), "14": set(), "15": set(), "16": set(), "17": {"L-UI"},
+    "18": {"L-BUILD"},
 }
 ANCHOR_RE = re.compile(r"^\[[^\]]{0,10}\]\s*(.+)$")
 
@@ -296,7 +297,8 @@ def load_lld():
         })
     for needle, did, parents, title in [
         ("四、算法与数据结构", "L-ALGO", ["H-C-03", "H-C-04", "H-C-07", "H-C-08"], "算法与数据结构"),
-        ("五、UI 与生命周期", "L-UI", ["H-C-11", "H-C-17"], "UI 与生命周期")]:
+        ("五、UI 与生命周期", "L-UI", ["H-C-11", "H-C-17"], "UI 与生命周期"),
+        ("九、构建与产物装配", "L-BUILD", ["H-C-18"], "构建与产物装配")]:
         m = re.search(r"(?m)^##\s+" + re.escape(needle) + r".*$", text)
         if not m:
             continue

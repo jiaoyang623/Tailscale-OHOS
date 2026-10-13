@@ -657,7 +657,9 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 **A-1（实质性分歧 · 最重）`O-RECONN-01…09` 的父接缝 `O-SEAM-10` 与 HLD 自身不符**
 
-**已由审查人裁决（Q16a，2026-10-12）**：父判据重定为 `O-SEAM-11`（恢复责任，即 §五 那条责任空洞）与 `O-SEAM-03`（状态判读）。架构 §五 与 HLD §3.3 同步收敛到同一套。**待执行**：判据文件的 `父判据` 字段尚未改；接收批次 `a01-判据`。下面保留当初的分歧记录。
+**已由审查人裁决（Q16a，2026-10-12）**：父判据重定为 `O-SEAM-11`（恢复责任，即 §五 那条责任空洞）与 `O-SEAM-03`（状态判读）。架构 §五 与 HLD §3.3 同步收敛到同一套。
+
+**已执行（2026-10-13）**：判据文件的 `父判据` 字段已改。证据：`P2-network-reconnect.md:186` 与 `:289` 均写 `O-SEAM-11、O-SEAM-03`。接收批次 `a01-判据`。下面保留当初的分歧记录。
 
 | 来源 | 对「后台掉线自动恢复」（O-CONN-04）的归属 |
 | --- | --- |
@@ -670,7 +672,11 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 **A-2（已声明的暂挂）`O-BUILD-01…07` 的父接缝 `O-SEAM-05`**
 
-**已由审查人裁决（Q16b，2026-10-12）**：不为构建单立接缝。7 条改为直连旅程，并逐条写 `seam_not_applicable` 理由。**待执行**：父子关系尚未改；接收批次 `a01-判据`。下面保留当初的分歧记录。
+**原裁决（Q16b，2026-10-12，已于 2026-10-13 撤销）**：不为构建单立接缝。7 条改为直连旅程，并逐条写 `seam_not_applicable` 理由。
+
+**撤销理由**：该裁决与 a01 的工具规则冲突。单点判据就绪时必须引用 HLD 或 LLD 设计条目。构建流程当时没有承载件，7 条因此永远停在 draft。
+
+**修订后的裁决（Q16b 修订，2026-10-13）**：给构建流程补一条接缝。7 条的父判据改为 `O-SEAM-18 构建与产物装配`。承载件是 HLD 契约 `C-18` 与 LLD 条目 `L-BUILD`（本文档 §九）。`seam_not_applicable` 字段已删除，`不确定特征` 由 `UNCERTAIN-WIRING` 改为 `none`。下面保留当初的分歧记录。
 
 `P5-build.md:6-8` 自述「17 条接缝里没有构建这条……暂挂 O-SEAM-05，并在 `不确定特征` 记 `UNCERTAIN-WIRING`」。**这是显式声明，不是隐藏错误**。但仍应记录：`C-05` 的正文（引擎生命周期 N-API 面）**不描述**构建行为——它描述的是构建产物所服务的那条边。7 条判据的**真实归属是 S9「构建与交付」**（HLD §一），而 S9 没有对应的 O-SEAM。**建议**：在接缝库补一条构建接缝，或把 7 条的父判据改为「S9（无接缝 ID）」并保留 `UNCERTAIN-WIRING`。
 
@@ -770,3 +776,58 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | **新** J4 | `invalidateLifecycle` 不重置状态名，`currentState()` 会返回失效值 | 无判据；登记 |
 
 **本层（LLD）当时没有修改任何判据文件、没有新增判据 ID、没有改动任何生产代码。** 以上 A–E 全部交由判据库与上一层裁决。**后续：Q9、Q10、Q13 三条决策落地，改了 `VpnStatusReader.ets`、`VpnBackgroundTaskManager.ets`、`BridgeStatus.ets` 三处生产代码，新增判据 O-STATUS-09（判据库 117 → 118 条，本层单点判据 69 → 70 条），并补了单元与集成用例。本层保留原结论与新的解决说明，作为记录。**
+
+---
+
+## 九、构建与产物装配（S9，契约 C-18）
+
+**本层新增的顶层小节。** 它把 HLD 契约 `C-18` 细化成 7 条单点判据（`O-BUILD-01…07`）站立的行为面。
+构建流程不在运行期，也不跨两个运行时模块。所以这一节描述的是**构建机与产物**之间的交接。
+设计依据：架构 §2.2 的子系统 S9 与 §3.3 的部署视图。事实来源是脚本本身，逐条给 `file:line`。
+
+### 9.1 两级流程
+
+| 级 | 入口 | 动作 | 产物 |
+| --- | --- | --- | --- |
+| 1 引擎 | `scripts/build-go.sh` | 应用补丁 → `go build -buildmode=c-shared` → 复制 | `entry/libs/arm64-v8a/libtailscale_go.so` 与 `.h` |
+| 2 装配 | `scripts/build.sh`（macOS/Linux）、`scripts/build.ps1`（Windows） | hvigor `assembleHap` | Debug HAP 落 `entry/build/default/outputs/default/` |
+
+`.build/compile.sh` 用同样的两级。它的注释写作「stage 1/2」与「stage 2/2」（`.build/compile.sh:20-26`）。
+
+### 9.2 幂等的补丁应用
+
+`scripts/build-go.sh:54-66` 的 `apply_patch` 只做两件事。它先 `git apply --reverse --check --ignore-space-change --ignore-whitespace`。
+reverse-check 成功即判定补丁已应用，打印 `Patch already applied` 并继续（`:60-61`）。否则它 `git apply --ignore-space-change --ignore-whitespace` 应用补丁（`:63`）。
+判定只看补丁自身，不读工作区整体状态。所以与补丁无关的本地脏文件既不阻止补丁，也不被覆盖。
+两棵源码树各有一个补丁。`patches/ohos-go-interface-resources.patch` 落 Go 工具链源码树 `$go_root`。`patches/tailscale-ohos.patch` 落 `third_party/tailscale`（`:67-68`）。
+`$go_root` 默认 `~/.ohos-go-build/ohos-go`，回退 `third_party/ohos-go`（`:15-20`）。
+补丁冲突时 `git apply` 非零退出。`set -euo pipefail` 让脚本在编译前中止（`scripts/build-go.sh:10`）。源码保持冲突时的原状。
+
+### 9.3 产物路径与版本戳
+
+输出目录与装配目录在脚本开头定义。`output_dir` 是 `native/go_bridge/dist/arm64-v8a`。`hap_lib_dir` 是 `entry/libs/arm64-v8a`。两者都先 `mkdir -p`（`scripts/build-go.sh:43-45`）。
+`go build` 用 `-buildmode=c-shared -trimpath`。它用 `-ldflags` 注入两个版本戳（`scripts/build-go.sh:86-89`）。
+两个版本戳是 `tailscale.com/version.longStamp=1.86.5` 与 `tailscale.com/version.shortStamp=1.86.5`。它们取自同一版本号，与 `native/go_bridge/go.mod` 声明的 v1.86.5 一致。
+`-ldflags` 同时设 `-extldflags=-Wl,-soname,libtailscale_go.so`。`-trimpath` 让产物路径不含构建机目录。
+构建后脚本把 `.so` 与 `.h` 一起复制进 `hap_lib_dir`（`scripts/build-go.sh:91-92`）。HAP 从 `hap_lib_dir` 取库。
+
+### 9.4 产品拒绝
+
+macOS 入口只支持 default Debug 产品。参数多于一个或产品名不是 `default` 时，脚本在开头打印错误并退出（`scripts/build.sh:6-12`）。
+错误文案指出 Release 的正确入口是 Windows 的 `build.ps1 -Product release`。这个门在任何构建或签名动作之前。
+Windows 入口用 `ValidateSet` 只接受 `default` 与 `release`（`scripts/build.ps1:1-4`）。
+release 产品还要先过 changelog 校验（`scripts/build.ps1:126-132`），装配后再过 `verify-artifacts.ps1`（`:194-198`）。
+构建模式不是独立的校验项。它由产品派生。release 产品用 `buildMode=release` 与 `debuggable=false`。default 产品用 `buildMode=debug` 与 `debuggable=true`（`scripts/build.ps1:134-135`）。
+macOS 入口固定传 `buildMode=debug` 与 `debuggable=true`（`scripts/build.sh:58-59`）。装配用 hvigor wrapper，并在调用前 `unset NODE_PATH`（`scripts/build.sh:53-57`）。
+
+### 9.5 与 7 条单点判据的对应
+
+| 单点判据 | 本节的锚点 |
+| --- | --- |
+| O-BUILD-01 补丁应用幂等 | §9.2 |
+| O-BUILD-02 产物复制 | §9.3 |
+| O-BUILD-03 版本戳 | §9.3 |
+| O-BUILD-04 无关脏文件不阻止补丁 | §9.2 |
+| O-BUILD-05 补丁冲突在编译前失败 | §9.2 |
+| O-BUILD-06 产品拒绝 | §9.4 |
+| O-BUILD-07 装配参数 | §9.4 |
