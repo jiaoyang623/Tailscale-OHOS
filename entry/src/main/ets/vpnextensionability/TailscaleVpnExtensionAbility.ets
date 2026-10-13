@@ -1854,8 +1854,15 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
   }
 
   private writeCurrentStatusHeartbeat(): void {
+    const heartbeatMs: number = Date.now();
     this.writeAtomicTextFile(`${this.context.filesDir}/vpn-probe-status.txt`,
-      `${this.currentVisibleStatus} | heartbeatMs=${Date.now()}`);
+      `${this.currentVisibleStatus} | heartbeatMs=${heartbeatMs}`);
+    // Mirror the timestamp to the device log. The host cannot read this file,
+    // and no file-pull command exists, so this line is the only way a device
+    // run can measure the heartbeat. A gap between two lines is how long the
+    // extension stopped writing, which is the quantity QG-01 asks about.
+    // Only the timestamp is mirrored. The status text stays in the file.
+    hilog.info(DOMAIN, TAG, 'status heartbeatMs=%{public}d', heartbeatMs);
   }
 
   private writeTextFile(path: string, content: string): boolean {
