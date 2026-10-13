@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "f04326d",
+  "baseline": "3cc449b",
   "stage": "architecture",
   "design": [
     {
@@ -3139,7 +3139,8 @@
         "用户主动取消保活通知（`USER_CANCEL` / `USER_CANCEL_REMOVE_NOTIFICATION`）后 `suppressedUntilDisconnect` 置真，同一会话内不自行恢复。失败与恢复：只有系统侧取消（非用户）才由 `scheduleRetry` 安排退避重试（`START_RETRY_BASE_MS` 30000 起、指数、`START_RETRY_MAX_MS` 300000 封顶）",
         "读到 `disconnected` 时立即清零重试态并释放任务。**责任空洞（本层确认的唯一空洞，必须写在此处）**：P1 在后台且未持有长时任务时会被系统冻结，此时若 P2 被杀导致掉线，没有任何子系统承诺「P1 被冻结期间的掉线恢复」——恢复责任在 `VpnReconnectSupervisor`，而它恰恰是可能已被冻结的一方",
         "用户回到应用之前会一直保持断开（`docs/background-vpn-reliability.md` Milestone 2「stayed disconnected until the user noticed」，D4 风险）。安全与质量：把连接窗口与稳定连接等重持有不得放松 Milestone 1 的收紧原则——无法识别的状态（`state=Running | tun=false`、裸 lifecycle 行、陈旧心跳）仍不持有任务",
-        "实况窗只回显字节数与本地化标题，不含地址或凭据。已知局限：M-01/M-02 在 USB/HDC 连接且充电下完成，通过一次不代表电池深度休眠、拔线、强杀或重启仍成立",
+        "实况窗只回显字节数与本地化标题，不含地址或凭据。用户请求停止后，在途重连必须作废：`VpnReconnectSupervisor` 给 `VpnSessionController.connect` 传一个取消令牌（`services/VpnReconnectSupervisor.ets` 的 `stillAuthorised`），连接在后端就绪之后与启动扩展之前各查一次",
+        "若窗口落在两次检查之间，完成时按令牌撤销自己刚建起的那条隧道。已知局限：M-01/M-02 在 USB/HDC 连接且充电下完成，通过一次不代表电池深度休眠、拔线、强杀或重启仍成立",
         "M-11 的 720 s 连续蜂窝锁屏未完成，不得据此宣称蜂窝下的长时间后台存活。"
       ],
       "failure_message": "期望「连接窗口与稳定连接期都持有 dataTransfer 长时任务、心跳陈旧按不确定有界宽限释放」，实际「窗口期 P1 被冻结、无人应答交接；或拿到陈旧证据就新建任务、用户取消后自行恢复；或后台掉线在 P1 被冻结期间无人恢复」",
@@ -3747,9 +3748,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "f04326d",
-      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
-      "executed_at": "2026-10-13T13:23:54+11:00"
+      "baseline": "3cc449b",
+      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
+      "executed_at": "2026-10-13T13:27:52+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3850,9 +3851,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "f04326d",
-      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
-      "executed_at": "2026-10-13T13:23:54+11:00"
+      "baseline": "3cc449b",
+      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
+      "executed_at": "2026-10-13T13:27:52+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3872,9 +3873,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "f04326d",
-      "environment": "Linux, Node v22.23.2; 96 tests, pass 96, fail 0",
-      "executed_at": "2026-10-13T13:23:54+11:00"
+      "baseline": "3cc449b",
+      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
+      "executed_at": "2026-10-13T13:27:52+11:00"
     },
     {
       "id": "T-O-SEAM-16",
