@@ -125,8 +125,9 @@ scenario "M-15" "Q7-b Taildrive 真机共享节点" \
 
 scenario "M-16" "Q7-c special-scenario 长时任务" \
 "仅在 ACL 通过或装了试用调试 Profile 时做。
-用 scripts/toggle-special-scenario-acl.mjs 打开声明后重装，
-连接后切后台，观察走 special-scenario 还是回落 DATA_TRANSFER。"
+用 scripts/toggle-special-scenario-acl.mjs 打开声明后重装，连接后切后台。
+走了哪条路看 background_started_special_scenario 还是 background_started。
+没走成的原因看四条 background_special_scenario_ 记录：unconfigured / unsupported / denied / failed。"
 
 scenario "M-17" "Q-02（修订）VPN 冲突路径是否收敛" \
 "让手机上另一个应用继续占用 VPN 通道（shadowsocks）。
