@@ -45,8 +45,12 @@
    官方约束原文：系统在 starter 进程或 extension 进程任一退出时停止 VPN；
    两个 VPN 同时占用通道时本应用的连接会失败或被顶掉。
 2. 确认设备在线：`devecocli device list`。
-3. 装机：`devecocli run --device <serial> --skip-build`（先在本机构建）。
-4. 清空上一轮的诊断文件，避免旧事件混进来。
+3. 装机：`DEVICE=<serial> scripts/device-run.sh`。它构建、安装，然后开始采集。
+   默认**保留应用数据**，所以登录态还在，不用在真机时段里重新登录。
+4. **不需要手工清上一轮的诊断文件。** 本批的证据是这次运行采到的设备日志。
+   采集从脚本开启 `log --follow` 起、到脚本收尾止，这条窗口就是证据边界，旧文件混不进来。
+   沙箱里的诊断文件另有条数与字节上限，也不会无限增长。
+   只有确实想要一份干净的沙箱诊断文件时才加 `--clean`。代价是登录态被清掉。
 
 **所有真机结论都受一个条件限制，必须一起写进登记册**：USB/HDC 连接且充电会改变电源管理行为。
 通过一次不代表电池深度休眠、拔线、强杀或重启仍成立。这不是免责声明，是这批证据的适用边界。
@@ -141,11 +145,22 @@
 **步骤**
 
 1. 打开权限声明，重新构建并确认能装上去。
-2. 设置子类型常量（`SUBMODE_*`），先在应用内触发 `requestAuthFromUser`，看用户授权横幅。
-3. 连接后切到后台，观察是走 special-scenario 还是回落到 `DATA_TRANSFER`。
+2. 设置子类型常量（`SUBMODE_*`），重新构建并安装。
+3. 连接后切到后台，观察日志里走了哪条路。
 
-**判定**：`isModeSupported()` 与 `checkSpecialScenarioAuth()` 的实际返回值要记下来；
-回落路径必须与现在完全一致。
+**判定**
+
+| 观察到 | 含义 |
+| --- | --- |
+| `background_started_special_scenario` | 走的是 special-scenario |
+| `background_started` | 回落到 `DATA_TRANSFER` |
+| `background_special_scenario_unconfigured` | 子类型常量还是 0，什么都没试 |
+| `background_special_scenario_unsupported` | `isModeSupported()` 返回 false |
+| `background_special_scenario_denied` | 授权没拿到，`code` 是原始的 `UserAuthResult` 数值 |
+| `background_special_scenario_failed` | `startBackgroundRunning` 抛异常，`code` 是错误码 |
+
+后四个名字是本轮新加的埋点。在此之前这四个返回点是静默的，真机上只看得到「没走成」，
+看不到「为什么没走成」。回落路径必须与现在完全一致。
 
 **注意**：子类型的选定等于向华为申明本应用的用途。这是一个需要提交方承担的决定，
 不由实现者代选。
@@ -238,7 +253,7 @@
 | 卡片文案、白屏、30 分钟自愈 | 卡片挂在系统桌面，界面结构只覆盖本应用窗口。自愈成功路径没有日志，只有失败才打 `Card refresh failed` | 人工看，写进结论 |
 | 冷启动耗时（M-19） | 设备时间戳与操作者点击时刻对不齐，「界面可交互」没有日志锚点 | 人工掐表，5 次 |
 | Taildrive 网关层失败（M-15） | `TaildriveGateway.ets` 没有 hilog，也没有诊断事件 | 只能从界面表现判断，把这条限制写进结论 |
-| special-scenario 的两个返回值（M-16） | `isModeSupported()`（`VpnBackgroundTaskManager.ets:268`）与 `checkSpecialScenarioAuth()`（`:271-275`）的返回值不落任何日志 | 本轮只能看走了哪条路。`background_started_special_scenario` 是前者，`background_started` 是后者 |
+| 授权横幅（M-16） | `requestAuthFromUser` 全仓库没有调用点，只在注释里出现过，触发入口不存在 | 本轮不做。为什么没走成 special-scenario 改由四个新埋点回答 |
 | 进程 ID（M-18） | 诊断事件只有时间戳、来源、事件名、阶段、错误码，不含 PID。`devecocli` 也没有取进程列表的命令 | 用扩展生命周期事件代替：扩展重启会再打一条 `vpn_extension_created` |
 
 **已经补掉的两项**：

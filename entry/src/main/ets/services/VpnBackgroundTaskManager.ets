@@ -255,6 +255,9 @@ export class VpnBackgroundTaskManager {
   private async startSpecialScenario(context: common.UIAbilityContext, agent: WantAgent,
     generation: number, revision: number): Promise<boolean> {
     if (SPECIAL_SCENARIO_SUBMODE === 0) {
+      // The subtype is a statement to Huawei about what this app is for, so it
+      // stays unset until the submitting party picks it. Record why nothing ran.
+      this.record('background_special_scenario_unconfigured');
       return false;
     }
     try {
@@ -266,11 +269,15 @@ export class VpnBackgroundTaskManager {
       // Special-scenario tasks must stand alone; notification merging is rejected.
       request.combinedTaskNotification = false;
       if (!request.isModeSupported()) {
+        this.record('background_special_scenario_unsupported');
         return false;
       }
       const auth: backgroundTaskManager.UserAuthResult = await request.checkSpecialScenarioAuth(context);
       if (auth !== backgroundTaskManager.UserAuthResult.GRANTED_ONCE &&
         auth !== backgroundTaskManager.UserAuthResult.GRANTED_ALWAYS) {
+        // The code carries the raw UserAuthResult, so a device run can tell
+        // "the user declined" from "the system does not support the mode".
+        this.record('background_special_scenario_denied', auth);
         return false;
       }
       const task: backgroundTaskManager.ContinuousTaskNotification =
@@ -284,7 +291,8 @@ export class VpnBackgroundTaskManager {
       this.specialScenarioTask = true;
       this.record('background_started_special_scenario');
       return true;
-    } catch (_error) {
+    } catch (error) {
+      this.record('background_special_scenario_failed', (error as BusinessError).code ?? -1);
       return false;
     }
   }

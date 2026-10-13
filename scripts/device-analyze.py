@@ -28,6 +28,10 @@ WATCH = [
     ("vpn_backend_handoff_timeout", "后端交接超时（扩展等满 15 s 后自毁）"),
     ("background_started_special_scenario", "长时任务开始（special-scenario）"),
     ("background_started", "长时任务开始（回落 DATA_TRANSFER）"),
+    ("background_special_scenario_unconfigured", "special-scenario：子类型常量还是 0"),
+    ("background_special_scenario_unsupported", "special-scenario：isModeSupported() 为 false"),
+    ("background_special_scenario_denied", "special-scenario：授权未拿到（code=UserAuthResult）"),
+    ("background_special_scenario_failed", "special-scenario：startBackgroundRunning 抛异常"),
     ("background_status_timeout", "心跳陈旧超过宽限后释放"),
     ("background_stopped", "长时任务释放"),
     ("vpn_network_rebound", "网络重绑"),
@@ -42,6 +46,11 @@ WATCH = [
     ("vpn_reconnect_cancelled", "重连被取消"),
     ("vpn_reconnect_superseded", "重连被用户断开作废"),
     ("vpn_drop_after_requested_stop", "用户请求停止后的掉线（不恢复）"),
+]
+
+# 这三项是关键字，不是诊断事件名，所以不出现在登记表里。
+# 它们只用来从设备日志里找相关行。
+KEYWORDS = [
     ("Card toggle", "卡片动作结果"),
     ("taildrive", "Taildrive 相关"),
     ("media_probe", "媒体服务探测"),
@@ -64,11 +73,11 @@ def count(name):
 
 print("== 事件计数（在设备日志里出现过的）==")
 found = {}
-for name, label in WATCH:
+for name, label in WATCH + KEYWORDS:
     found[name] = count(name)
     if found[name]:
         print(f"  {found[name]:>4}  {name:<38} {label}")
-missing = [f"{n}（{l}）" for n, l in WATCH if not found[n]]
+missing = [f"{n}（{l}）" for n, l in WATCH + KEYWORDS if not found[n]]
 if missing:
     print("\n未观测到：" + "、".join(missing))
 
