@@ -90,9 +90,16 @@
 4. 在应用内操作连接/断开，确认卡片跟着变。
 5. 杀掉应用进程，等待，确认卡片在 30 分钟内自愈到正确状态。
 
-**观察**：`devecocli ui layout` 读卡片节点文本；`devecocli log --keyword performCardToggle`。
+**观察**：`devecocli log --keyword "Card toggle"`。应用打的是 `Card toggle result=…`
+（`EntryAbility.ets:218`）与 `Card toggle failed`（`:225`）。
+**`performCardToggle` 是方法名，不是日志串**，按它过滤取不到任何东西。
 
-**判定**：卡片不得白屏；文案不得与应用的连接状态相反；未登录时必须拉起窗口。
+**只能人工看的**：卡片挂在系统桌面上，`devecocli ui layout` 只抓本应用的窗口树，抓不到卡片节点。
+所以「是否白屏」与「文案是否与连接状态相反」必须用眼睛看。第 5 步的自愈只在失败时留下
+`Card refresh failed`（`EntryFormAbility.ets:28`），成功是静默的，同样只能人工看。
+
+**判定**：卡片不得白屏；文案不得与应用的连接状态相反；未登录时必须把窗口拉到前台。
+第 2 步的未登录分支可从 `Card toggle result=` 里读出 NEEDS_UI，窗口是否真拉起来靠截图。
 
 **边界**：应用进程完全退出后卡片最多滞后 30 分钟，这是 HarmonyOS 卡片机制的硬限制，不算缺陷。
 
@@ -113,6 +120,10 @@
 3. 在传输过程中断网，观察失败态与重试。
 
 **观察**：`devecocli log --keyword taildrive`；`docs/` 里 Taildrive 的请求环超时（32 s / 35 s / 30 min+10 s / 5 s）。
+
+**一半是盲的。** 界面层（`TaildriveBrowser.ets`）有 hilog，列表与传输的起止看得见。
+网关层 `TaildriveGateway.ets` 有 446 行，**没有任何 hilog，也没有任何诊断事件**，
+所以断网后网关层的失败与重试在日志里看不见，只能从界面表现判断。这条限制写进结论。
 
 **影响**：`O-DRIVE-01`、`O-DRIVE-02`、`O-SEAM-08`。
 
@@ -159,12 +170,16 @@
 
 **观察**：`devecocli log --keyword vpn_conflict`、`vpn_conflict_self_disconnect`、`vpn_create_failed`；`devecocli log --crash`；`devecocli ui layout`。
 
+**判「自停成功」要看 failed 那条没出现，不能只看 completed。** `completed` 在
+`finishVpnConflictCleanup`（`BridgeStatus.ets:4352`）里无条件记录，`stopVpnExtension` 失败时
+也经 `:4342` 的失败分支走到它。所以 `completed` 只证明清理流程走完，不证明自停成功。
+
 **判定**
 
 | 观察 | 结论 |
 | --- | --- |
 | 第 2 步标题「请先断开其它 VPN」、正文「请断开其它 VPN 以连接 Tailscale」 | 冲突文案与代码一致，登记册 M-10 的「部分」可升级 |
-| 第 3 步 60 s 内出现 `vpn_conflict_self_disconnect_completed` | 应用侧自停有效，删除替换分支没有留下空洞 |
+| 第 3 步出现 `vpn_conflict_self_disconnect_completed`，且**没有** `vpn_conflict_self_disconnect_failed` | 应用侧自停有效，删除替换分支没有留下空洞 |
 | 第 6 步状态文字仍是冲突 | 应用被杀后扩展仍在空转，新会话把它读成在场的冲突 |
 | 第 7 步报冲突，而此刻没有其它 VPN | 空洞确认：无人停的扩展会挡住后续连接。需要给心跳加自杀超时 |
 
@@ -181,10 +196,16 @@
 
 1. 关掉 Wi-Fi，用蜂窝数据连接。
 2. 锁屏静置，保持 **720 s 以上**。
-3. 期间按 `device-background-vpn-probe.ps1` 的同一节拍采样（或 `devecocli log --from 12m --keyword heartbeatMs`）。
+3. 期间用 `devecocli log --from 12m --keyword heartbeatMs` 取心跳序列
+   （扩展的状态定时器每秒刷新一次，本次已给它加了设备日志镜像）。
 4. 另外单独跑一次连接期保活：从扩展建 TUN 到隧道可用，确认全程持有长时任务。
 
-**判定**：心跳龄全程 ≤ 15 s、进程 ID 不变、`background_started` 早于 `vpn_connected`。
+**判定**：相邻两条 `heartbeatMs=` 的间隔全程 ≤ 15 s；`vpn_extension_created` 全程只出现一次，
+且没有 `vpn_extension_destroyed`；`background_started` 早于 `vpn_connected`。
+
+**「进程 ID 不变」这条已换掉。** 诊断事件只有时间戳、来源、事件名、阶段、错误码，不含 PID；
+`devecocli` 也没有取进程列表的命令。扩展重启会再打一条 `vpn_extension_created`，
+所以用生命周期事件代替 PID，判定力等价。
 
 **影响**：`QG-01`、`QG-02`、M-11、`O-BGTASK-13`。
 
@@ -207,6 +228,25 @@
 **影响**：`QG-08`、需求质量目标表。
 
 ---
+
+## 一次运行取不到的东西
+
+下面几项不要指望从设备日志或界面结构里拿到。`device-analyze.py` 收尾时也会把它们打出来。
+
+| 项 | 为什么取不到 | 怎么办 |
+| --- | --- | --- |
+| 卡片文案、白屏、30 分钟自愈 | 卡片挂在系统桌面，界面结构只覆盖本应用窗口。自愈成功路径没有日志，只有失败才打 `Card refresh failed` | 人工看，写进结论 |
+| 冷启动耗时（M-19） | 设备时间戳与操作者点击时刻对不齐，「界面可交互」没有日志锚点 | 人工掐表，5 次 |
+| Taildrive 网关层失败（M-15） | `TaildriveGateway.ets` 没有 hilog，也没有诊断事件 | 只能从界面表现判断，把这条限制写进结论 |
+| special-scenario 的两个返回值（M-16） | `isModeSupported()`（`VpnBackgroundTaskManager.ets:268`）与 `checkSpecialScenarioAuth()`（`:271-275`）的返回值不落任何日志 | 本轮只能看走了哪条路。`background_started_special_scenario` 是前者，`background_started` 是后者 |
+| 进程 ID（M-18） | 诊断事件只有时间戳、来源、事件名、阶段、错误码，不含 PID。`devecocli` 也没有取进程列表的命令 | 用扩展生命周期事件代替：扩展重启会再打一条 `vpn_extension_created` |
+
+**已经补掉的两项**：
+
+1. 心跳。它原先只写进沙箱文件，主机读不到，`QG-01` 因此永远判不了。扩展现在把时间戳镜像到设备日志。
+2. 诊断事件到主机。先前只有文件，`DiagnosticEventStore.record` 现在同时镜像到 hilog。
+
+**心跳现在可判了，但有一条前提**：镜像要生效，采集窗口要覆盖连接期。日志里一个 `heartbeatMs=` 都没有，就是这两条里有一条没满足。
 
 ## 回填规则
 
