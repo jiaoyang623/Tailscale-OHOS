@@ -131,6 +131,61 @@ export function textOfId(id) {
   return hit;
 }
 
+// 连续快速点击。解锁诊断要求在 1500 ms 内点满 5 次
+// （BridgeStatus.ets:4958），而每次 devecocli ui click 要起一个进程，来不及。
+// 设备侧的 uitest 快得多，所以这一条走它。
+export function fastTap(x, y, times) {
+  const command = `for i in $(seq 1 ${times}); do uitest uiInput click ${Math.round(x)} ${Math.round(y)}; done`;
+  return hdc(['shell', command]);
+}
+
+// 按节点 id 取中心坐标。找不到返回 null。
+export function centerOfId(id) {
+  let hit = null;
+  const walk = (node) => {
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+    if (!node || typeof node !== 'object') {
+      return;
+    }
+    if (node.id === id && Array.isArray(node.bounds)) {
+      hit = [(node.bounds[0] + node.bounds[2]) / 2, (node.bounds[1] + node.bounds[3]) / 2];
+      return;
+    }
+    walk(node.children || []);
+  };
+  walk(layout());
+  return hit;
+}
+
+// 底部页签栏盖住的区域。落在这里的坐标会被页签截走，
+// 而 devecocli 的 --id 点击就是按节点中心点，所以「找得到」不等于「点得到」。
+const TAB_BAR_TOP = 1840;
+
+// 往下滚到某个 id 出现，**并且在页签栏之上**。设置页比一屏长，直接找会找不到。
+export async function scrollToId(id, maxSwipes = 6) {
+  for (let i = 0; i <= maxSwipes; i++) {
+    const point = centerOfId(id);
+    if (point && point[1] < TAB_BAR_TOP) {
+      return point;
+    }
+    swipeUp();
+    await new Promise((resolve) => setTimeout(resolve, 900));
+  }
+  return null;
+}
+
+// 按坐标点击（拿到 scrollToId 的结果之后用它，避免 --id 点到页签栏）。
+export function clickAt(point) {
+  return devecocli(['ui', 'click'], [String(Math.round(point[0])), String(Math.round(point[1]))]);
+}
+
+export function swipeUp() {
+  return devecocli(['ui', 'swipe'], ['660', '1500', '660', '600']);
+}
+
 export function clickText(text) {
   const point = centerOf(text);
   if (!point) {
