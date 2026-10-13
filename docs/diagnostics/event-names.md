@@ -143,8 +143,6 @@
 | `vpn_connected` | backend | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:546` | 扩展 |
 | `vpn_control_server_missing` | preflight | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:399` | 扩展 |
 | `vpn_create_failed` | extension、create、replace | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:380` | 扩展 |
-| `vpn_existing_destroy_failed` | replace | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:620` | 扩展 |
-| `vpn_existing_destroyed` | replace | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:617` | 扩展 |
 | `vpn_extension_created` | lifecycle | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:340` | 扩展 |
 | `vpn_extension_destroyed` | lifecycle | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:1958` | 扩展 |
 | `vpn_failed_extension_stop_failed` | recovery | `entry/src/main/ets/components/BridgeStatus.ets:3481` | UI |
@@ -153,8 +151,6 @@
 | `vpn_preflight_failed` | backend_config、exception | `entry/src/main/ets/components/BridgeStatus.ets:2413` | UI |
 | `vpn_process_protect_failed` | network | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:522` | 扩展 |
 | `vpn_process_protected` | network | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:518` | 扩展 |
-| `vpn_replace_retry` | create | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:637` | 扩展 |
-| `vpn_replacement_approved` | destroy_existing | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:612` | 扩展 |
 | `vpn_snapshot_unavailable` | status | `entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:939` | 扩展 |
 | `vpn_start_failed` | system | `entry/src/main/ets/components/BridgeStatus.ets:2494` | UI |
 | `vpn_start_requested` | system | `entry/src/main/ets/components/BridgeStatus.ets:2486` | UI |

@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "d270daa",
+  "baseline": "e8f8e1e",
   "stage": "hld",
   "design": [
     {
@@ -671,17 +671,16 @@
     {
       "id": "R-DRIVE-05",
       "layer": "requirements",
-      "title": "传输暂存 24 小时后清理，残留不无限增长",
+      "title": "每一类传输暂存都写明适用对象与保留期，且不无限增长：Taildrop 出站暂存在 `cacheDir` 且是可丢弃副本（",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：传输暂存 24 小时后清理，残留不无限增长",
+        "规则：每一类传输暂存都写明适用对象与保留期，且不无限增长：Taildrop 出站暂存在 `cacheDir` 且是可丢弃副本（`services/RecoverableCachePaths.ets:10`），扩展侧 Taildrop 缓存保留 7 天（`vpnextensionability/TailscaleVpnExtensionAbility.ets:56`），诊断报告保留 24 h（`services/DiagnosticReportService.ets:10`）；**Taildrive 暂存当前没有清理实现**，`components/TaildriveBrowser.ets:1891` 的 24 h 只是「yesterday」的分组显示",
         "优先级：低",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "实现状态：Taildrop 与诊断报告已实现；Taildrive 暂存**未实现**（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`TaildriveBrowser.ets` 24h 清理",
-        "`services/RecoverableCachePaths.ets`"
+        "本行原写「24 小时后清理」，来源指 `TaildriveBrowser.ets`，实为显示分组。按 Q-03 决定改写为代码现状"
       ]
     },
     {
@@ -884,16 +883,17 @@
     {
       "id": "R-DIAG-04",
       "layer": "requirements",
-      "title": "诊断报告可导出并分享，报告有保留期，过期清理",
+      "title": "诊断报告可导出并分享，报告有保留期，过期清理（`REPORT_RETENTION_MS = 24 h`，`service",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：诊断报告可导出并分享，报告有保留期，过期清理",
+        "规则：诊断报告可导出并分享，报告有保留期，过期清理（`REPORT_RETENTION_MS = 24 h`，`services/DiagnosticReportService.ets:10`；导出与分享在 `:94-160`）",
         "优先级：低",
         "实现状态：已实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`services/DiagnosticReportService.ets:94-160`"
+        "`services/DiagnosticReportService.ets:10` 保留期常量",
+        "`:94-160` 导出与分享"
       ]
     },
     {
@@ -1890,7 +1890,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-02",
@@ -1925,7 +1926,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-03",
@@ -1954,7 +1956,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-04",
@@ -1983,7 +1986,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-01",
@@ -2016,7 +2020,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-02",
@@ -2045,7 +2050,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-03",
@@ -2077,7 +2083,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-04",
@@ -2110,7 +2117,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-05",
@@ -2140,7 +2148,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-06",
@@ -2176,7 +2185,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-07",
@@ -2207,7 +2217,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-01",
@@ -2239,7 +2250,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-02",
@@ -2271,7 +2283,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-03",
@@ -2304,7 +2317,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DEV-01",
@@ -2340,7 +2354,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DEV-02",
@@ -2379,7 +2394,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-01",
@@ -2415,7 +2431,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-02",
@@ -2449,7 +2466,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-03",
@@ -2484,7 +2502,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-04",
@@ -2524,7 +2543,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-05",
@@ -2562,7 +2582,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DRIVE-01",
@@ -2607,7 +2628,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DRIVE-02",
@@ -2637,7 +2659,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-MEDIA-01",
@@ -2683,7 +2706,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-MEDIA-02",
@@ -2723,7 +2747,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PRIV-01",
@@ -2763,7 +2788,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PRIV-02",
@@ -2799,7 +2825,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DIAG-01",
@@ -2850,7 +2877,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-UI-01",
@@ -2885,7 +2913,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-UI-02",
@@ -2916,7 +2945,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-VALUE",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CARD-01",
@@ -2959,7 +2989,40 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-BUILD-00",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "开发者构建流程：打补丁、编译引擎、装配 HAP",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "R-BUILD-01",
+        "R-BUILD-02"
+      ],
+      "trigger": "开发者在 macOS 或 Linux 上从仓库根目录运行 `scripts/build.sh`。**这是一条开发者旅程，不是用户旅程**。本项目把构建脚本当作第一类流程，所以为它单列旅程判据。审查人裁决 Q16b（2026-10-12）：不为构建另立接缝，7 条构建单点判据直连本条。",
+      "observe": "两次连续执行的退出码与 stdout（Applied patch 与 Patch already applied）、`third_party/tailscale/source.txt` 的内容、传给 `go` 的 argv 里的两个版本戳、`entry/libs/arm64-v8a/libtailscale_go.so` 与 `libtailscale_go.h` 是否落位、传给 node 的工作目录与参数（`hvigorw.js`、`buildMode=debug`、`debuggable=true`、`assembleHap`）、非 default 产品时的 stderr 文案",
+      "expected": [
+        "正常：开发者从仓库根目录运行 `scripts/build.sh`。脚本应用必需的 tailscale 补丁。脚本调用 `go build -buildmode=c-shared` 产出 AArch64 动态库。脚本把 `.so` 与 `.h` 复制进 `entry/libs/arm64-v8a/`。脚本再用 hvigor wrapper 装配 Debug HAP。边界：补丁已应用时判定幂等并继续构建。工程目录含空格时引号处理仍成立。无关的本地脏文件不阻止补丁，也不被覆盖。失败与恢复：补丁冲突时在编译前中止，并保留源码原状。Release 或未知产品在任何构建或签名动作之前被拒。安全与质量：构建脚本对参数与路径的处理可被测试守住（R-BUILD-02）。"
+      ],
+      "failure_message": "期望「开发者从仓库根跑一次构建就得到可装配的 AArch64 产物」，实际「补丁被跳过、产物缺 .h、在错误目录装配，或 Release 静默产出未评审的包」",
+      "sources": [
+        "scripts/build.sh:6-12 产品门",
+        "scripts/build.sh:13 cd 工程根",
+        "scripts/build.sh:53-59 hvigor wrapper 与显式 debug 参数",
+        "scripts/build-go.sh:54-66 apply_patch 幂等",
+        "scripts/build-go.sh:87-92 go build 与产物复制",
+        "scripts/test-macos-build.mjs（5 条用例）",
+        "docs/oracles/points/P5-build.md",
+        "docs/oracles/90-journeys/11-build.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-01",
@@ -3001,7 +3064,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "NOT-EVALUATED",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-02",
@@ -3042,7 +3106,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-03",
@@ -3089,7 +3154,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-04",
@@ -3126,7 +3192,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-05",
@@ -3165,7 +3232,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-06",
@@ -3206,7 +3274,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-07",
@@ -3247,7 +3316,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-08",
@@ -3282,7 +3352,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-09",
@@ -3322,7 +3393,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-10",
@@ -3367,7 +3439,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-11",
@@ -3414,7 +3487,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-12",
@@ -3455,7 +3529,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-13",
@@ -3485,7 +3560,7 @@
         "HosPlayer 的深链只含 `protocolVersion`/`type`/`endpoint`/`name` 四个字段，经 `validate` 通过后才拼装为 `hosplayer://server/import` 的 Want，凭据由播放器自取",
         "外部 LocalSend 只按显式 Want（bundleName/moduleName/abilityName）拉起，不做跨应用包名查询",
         "系统认证统一 `ATL2`，只接受已录入的 `FACE`/`FINGERPRINT`/`PIN`。边界：契约未定的外部目标不得猜测——`MOONLIGHT_INTEGRATION_CONFIG` 的 bundleName/abilityName/moduleName 在基线中是**空串**（`services/MoonlightIntegrationConfig.ets:10-15`），故 `MoonlightLauncher.isAvailable()` 恒返回 false，串流成功路径当前不可达，只能走到「未安装 MoonlightOH」分支",
-        "`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` 是未验证的猜测（未决 Q4），判据不据此断言契约成立。失败与恢复：非法参数在拼装深链前就被拒——HosPlayer 的 `unsafe_server_url`（非 http(s)、超长、含 userinfo 或 fragment）与 `invalid_server_name`（空或 >96 字符）直接抛出，不生成深链、不拉起",
+        "`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` **已查证：没有可依赖的公开契约**（2026-10-13 按 Q4 查证：官方 OpenHarmony 移植 `org.localsend.localsend_app` 明写「鸿蒙未接入 share intent」，第三方 AloeSend `com.aloereed.aloesend` 也未记录导出的 Want 或 URI scheme），判据不据此断言契约成立。失败与恢复：非法参数在拼装深链前就被拒——HosPlayer 的 `unsafe_server_url`（非 http(s)、超长、含 userinfo 或 fragment）与 `invalid_server_name`（空或 >96 字符）直接抛出，不生成深链、不拉起",
         "没有可用认证方式时既不放过也不误报成功，认证失败停在锁定层可重试、不清除锁定标志。安全与质量：凭据（用户名/密码/token）一律不进深链、不进 Want",
         "三种浏览器回退都只接受 http(s) 登录 URL，非 http(s) 一律不进入浏览器。文档/代码冲突（以代码为准）：`docs/hosplayer-integration-prototype.md:5,31` 记的是 `openLink()`，代码实际用 `startAbility` 提交同一 `hosplayer://server/import` 的 viewData Want——判据写的是后者。"
       ],
@@ -3505,7 +3580,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-14",
@@ -3554,7 +3630,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-17",
@@ -3602,7 +3679,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-15",
@@ -3646,7 +3724,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-16",
@@ -3684,7 +3763,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-01",
@@ -3718,7 +3798,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-02",
@@ -3751,7 +3832,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-03",
@@ -3784,7 +3866,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-04",
@@ -3816,7 +3899,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-05",
@@ -3848,7 +3932,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-06",
@@ -3881,7 +3966,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-07",
@@ -3914,7 +4000,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-08",
@@ -3945,7 +4032,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-09",
@@ -3977,7 +4065,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-10",
@@ -4010,7 +4099,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-11",
@@ -4043,7 +4133,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-12",
@@ -4076,7 +4167,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-13",
@@ -4110,7 +4202,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-14",
@@ -4142,7 +4235,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BGTASK-15",
@@ -4175,7 +4269,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-01",
@@ -4208,7 +4303,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-02",
@@ -4240,7 +4336,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-03",
@@ -4272,7 +4369,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-04",
@@ -4305,7 +4403,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-05",
@@ -4336,7 +4435,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-06",
@@ -4367,7 +4467,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-07",
@@ -4398,7 +4499,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-08",
@@ -4429,7 +4531,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-STATUS-09",
@@ -4460,7 +4563,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-01",
@@ -4494,7 +4598,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-02",
@@ -4527,7 +4632,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-03",
@@ -4559,7 +4665,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-04",
@@ -4591,7 +4698,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-05",
@@ -4623,7 +4731,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-06",
@@ -4656,7 +4765,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-07",
@@ -4690,7 +4800,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-08",
@@ -4722,7 +4833,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-09",
@@ -4756,7 +4868,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NETMON-10",
@@ -4789,7 +4902,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-01",
@@ -4798,11 +4912,11 @@
       "title": "后台静置足够久后的掉线触发一次恢复",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10",
-        "O-SEAM-11"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05"
       ],
       "trigger": "上一次采样为 connected；onBackground 之后已过 BACKGROUND_SETTLE_MS=10000（测试取 60000）；本次采样为 disconnected",
@@ -4823,7 +4937,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-02",
@@ -4832,10 +4947,11 @@
       "title": "前台可见或刚进入后台的掉线视为用户主动",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-06"
       ],
       "trigger": "掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）",
@@ -4854,7 +4970,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-03",
@@ -4863,10 +4980,11 @@
       "title": "用户已请求停止后的掉线不被恢复撤销",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-06"
       ],
       "trigger": "noteRequestedStop() 之后，后台静置足够久，再读到掉线",
@@ -4886,7 +5004,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-04",
@@ -4895,10 +5014,11 @@
       "title": "显式重新连接重置停止意图并重新武装恢复",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05"
       ],
       "trigger": "noteRequestedStop() 之后调用 noteRequestedStart()",
@@ -4917,7 +5037,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-05",
@@ -4926,10 +5047,11 @@
       "title": "恢复尝试有上限，耗尽后放弃",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05"
       ],
       "trigger": "连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed",
@@ -4949,7 +5071,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-06",
@@ -4958,10 +5081,11 @@
       "title": "重试按指数退避，不按每次采样触发",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05"
       ],
       "trigger": "后台掉线后，反复 connected↔disconnected 采样五轮（时间几乎不推进）",
@@ -4981,7 +5105,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-07",
@@ -4990,8 +5115,8 @@
       "title": "未知状态不当作掉线",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-03",
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
         "H-C-03",
@@ -5013,7 +5138,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-08",
@@ -5022,10 +5148,11 @@
       "title": "回到前台清零重试阶梯",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05",
         "R-CONN-06"
       ],
@@ -5045,7 +5172,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-09",
@@ -5054,10 +5182,11 @@
       "title": "连接稳定 60 s 才清零重试计数",
       "status": "ready",
       "parent_ids": [
-        "O-SEAM-10"
+        "O-SEAM-11",
+        "O-SEAM-03"
       ],
       "design_ids": [
-        "H-C-10",
+        "H-C-11",
         "R-CONN-05"
       ],
       "trigger": "一次恢复成功使状态回到 connected，并保持超过 STABLE_MS=60000",
@@ -5077,7 +5206,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-RECONN-10",
@@ -5112,7 +5242,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-01",
@@ -5147,7 +5278,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-02",
@@ -5184,7 +5316,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-03",
@@ -5219,7 +5352,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-04",
@@ -5256,7 +5390,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-05",
@@ -5289,7 +5424,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-06",
@@ -5324,14 +5460,15 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-07",
       "level": "point",
       "introduced_at": "hld",
       "title": "交接应答的轮询预算必须覆盖扩展的等待预算",
-      "status": "draft",
+      "status": "ready",
       "parent_ids": [
         "O-SEAM-02",
         "O-SEAM-10"
@@ -5347,19 +5484,20 @@
         "正常：本侧的应答窗口不短于扩展的等待预算，使扩展不会在应答到达前销毁 VPN",
         "边界：改小任一侧常量都应使这条判据失败，而不是静默失效",
         "失败与恢复：若窗口短于预算，扩展记 `vpn_backend_handoff_timeout` 并销毁 VPN（`docs/background-vpn-reliability.md` Milestone 3 的第二次真实故障）",
-        "安全与质量：两个常量分处两进程、没有共享定义，判据要求以断言把关系钉死"
+        "安全与质量：两个常量分处两进程、没有共享定义，所以这条关系由一条用例直接读两个源文件来钉死（`scripts/test-vpn-session-controller.mjs`），任一侧单独调小都会让用例失败——已实测：把应答预算从 250 ms × 60 改成 250 ms × 20，用例报「answer window 5000 ms is shorter than the extension wait 15000 ms」"
       ],
       "failure_message": "期望「本侧轮询窗口 ≥ 扩展等待预算，且该关系被一条用例守住」，实际「只靠注释声明两个 15 s『恰好相等』，任一侧改动后无人发现」",
       "sources": [
         "entry/src/main/ets/services/VpnSessionController.ets:27-30（注释与两个常量）",
         "vpnextensionability/TailscaleVpnExtensionAbility.ets 的交接等待（100 ms × 150，见架构 §五责任空洞检查第 1 条与需求 R-CONN-03 行）",
         "docs/architecture/architecture.md 第五节责任空洞检查第 1 条",
-        "scripts/test-vpn-session-controller.mjs（现有 6 条用例全部手动放行 sleep，未断言常量关系）",
+        "scripts/test-vpn-session-controller.mjs（用例 the handoff answer window covers the extension wait budget 直接读两个源文件里的四个常量并断言关系）",
         "docs/oracles/points/P3-session.md"
       ],
-      "oracle_state": "pending-test",
-      "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-单元"
+      "oracle_state": "closed",
+      "uncertainty": "none",
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SESSION-08",
@@ -5391,7 +5529,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-01",
@@ -5425,7 +5564,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-02",
@@ -5458,7 +5598,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-03",
@@ -5490,7 +5631,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-04",
@@ -5522,7 +5664,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-05",
@@ -5557,7 +5700,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-06",
@@ -5592,7 +5736,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-07",
@@ -5627,7 +5772,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-08",
@@ -5662,7 +5808,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-09",
@@ -5696,7 +5843,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-10",
@@ -5733,7 +5881,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PEER-11",
@@ -5768,7 +5917,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-LOCALSEND-01",
@@ -5801,7 +5951,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-LOCALSEND-02",
@@ -5836,7 +5987,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-BUILD-01",
@@ -5845,10 +5997,9 @@
       "title": "补丁应用幂等：全新与已打过补丁的 checkout 都能构建成功",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-01",
         "R-BUILD-02"
       ],
@@ -5869,7 +6020,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-02",
@@ -5878,10 +6030,9 @@
       "title": "构建产物被复制进 HAP 的库目录",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-01"
       ],
       "trigger": "`build-go.sh` 走完补丁与 `go build` 步骤",
@@ -5902,7 +6053,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-03",
@@ -5911,10 +6063,9 @@
       "title": "引擎版本戳经 ldflags 注入且与依赖声明一致",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-01"
       ],
       "trigger": "`build-go.sh` 调用 `go build`",
@@ -5934,7 +6085,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-04",
@@ -5943,10 +6095,9 @@
       "title": "无关的本地改动不阻止必需补丁，也不被覆盖",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-02"
       ],
       "trigger": "`third_party/tailscale` 里有一个与补丁无关的文件被本地修改（如 `notes.txt`），补丁本身尚未应用",
@@ -5965,7 +6116,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-05",
@@ -5974,10 +6126,9 @@
       "title": "补丁冲突在编译前失败并保留源码原状",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-02"
       ],
       "trigger": "补丁触及的文件已被改成与上下文冲突的内容（`source.txt` 为 `conflict`），补丁既不能应用也不能被 reverse-check",
@@ -5998,7 +6149,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-06",
@@ -6007,10 +6159,9 @@
       "title": "Release 与未知产品在构建或签名前被拒绝",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-02"
       ],
       "trigger": "以非 default 的产品名调用 `build.sh`——用例覆盖 `release` 与 `unknown`（含多于一个参数时同样走这条门）",
@@ -6029,7 +6180,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     },
     {
       "id": "O-BUILD-07",
@@ -6038,10 +6190,9 @@
       "title": "Debug 装配用项目目录与 hvigor wrapper，并传显式 debug 参数",
       "status": "draft",
       "parent_ids": [
-        "O-SEAM-05"
+        "O-BUILD-00"
       ],
       "design_ids": [
-        "H-C-05",
         "R-BUILD-02"
       ],
       "trigger": "default 产品、`build-profile.json5` 存在、DevEco 下同时有 `hvigor/bin/hvigorw.js` 与两个 hvigor 包的 package.json；从**工程目录之外**的目录调用 `build.sh`",
@@ -6063,7 +6214,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": "构建不是两个运行时模块之间的边界，所以没有接缝判据能覆盖它。"
     }
   ],
   "tests": [
@@ -6347,6 +6499,15 @@
       "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN"
     },
     {
+      "id": "T-O-BUILD-00",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-BUILD-00"
+      ],
+      "evidence": "未建：scripts/e2e/build-journey.mjs::开发者从仓库根运行构建脚本得到可装配的 AArch64 产物"
+    },
+    {
       "id": "T-O-SEAM-01",
       "level": "e2e",
       "status": "not_evaluated",
@@ -6382,9 +6543,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -6485,9 +6646,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -6507,9 +6668,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -6529,9 +6690,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-02-uni",
@@ -6542,9 +6703,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::stale heartbeat and read errors retain acquired protection for a bounded grace period",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-03-uni",
@@ -6555,9 +6716,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::never starts from stale, future, missing heartbeat or missing TUN evidence",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-04-uni",
@@ -6568,9 +6729,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::explicit disconnect promptly releases the task",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-05-uni",
@@ -6581,9 +6742,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::snapshot failure is uncertain and does not immediately revoke protection",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-06-uni",
@@ -6594,9 +6755,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-07-uni",
@@ -6607,9 +6768,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::system cancellation retries with exponential backoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-08-uni",
@@ -6620,9 +6781,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::unrelated cancellation does not discard the VPN task",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-09-uni",
@@ -6633,9 +6794,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a failed start is throttled instead of retried every second",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-10-uni",
@@ -6646,9 +6807,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-11-uni",
@@ -6659,9 +6820,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::destroy during notification update serializes cleanup after publish",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-12-uni",
@@ -6672,9 +6833,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::reconnect waits for in-flight stop before starting the next task",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-13-uni",
@@ -6685,9 +6846,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-14-uni",
@@ -6698,9 +6859,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::the connect window needs interface evidence, not just an unrecognised status",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BGTASK-15-uni",
@@ -6711,9 +6872,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a stalled connect window still releases protection",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-01-uni",
@@ -6724,9 +6885,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-02-uni",
@@ -6737,9 +6898,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-03-uni",
@@ -6750,9 +6911,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-04-uni",
@@ -6763,9 +6924,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-05-uni",
@@ -6776,9 +6937,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-06-uni",
@@ -6789,9 +6950,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-07-uni",
@@ -6802,9 +6963,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-08-uni",
@@ -6815,9 +6976,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::running without a TUN is not connected",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-STATUS-09-uni",
@@ -6828,9 +6989,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::the connect window reports connecting",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-01-uni",
@@ -6841,9 +7002,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-02-uni",
@@ -6854,9 +7015,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-03-uni",
@@ -6867,9 +7028,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::discards a stale read when default net changes before properties return",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-04-uni",
@@ -6880,9 +7041,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::same interface on a new Wi-Fi network and address renewal both trigger refresh",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-05-uni",
@@ -6893,9 +7054,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::clears the route hint when offline and applies the restored bearer",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-06-uni",
@@ -6906,9 +7067,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::failed native refresh retries without another platform callback",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-07-uni",
@@ -6919,9 +7080,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-08-uni",
@@ -6932,9 +7093,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-09-uni",
@@ -6945,9 +7106,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-NETMON-10-uni",
@@ -6958,9 +7119,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::stop during native work cancels replay and releases the registered listener",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-01-uni",
@@ -6971,9 +7132,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-02-uni",
@@ -6984,9 +7145,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop moments after backgrounding is left alone",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-03-uni",
@@ -6997,9 +7158,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-04-uni",
@@ -7010,9 +7171,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a deliberate reconnect re-arms recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-05-uni",
@@ -7023,9 +7184,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::recovery gives up instead of retrying forever",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-06-uni",
@@ -7036,9 +7197,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::retries back off instead of firing on every sample",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-07-uni",
@@ -7049,9 +7210,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::an unknown state is not treated as a drop",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-08-uni",
@@ -7062,9 +7223,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::returning to the foreground clears the retry ladder",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-09-uni",
@@ -7075,9 +7236,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-RECONN-10-uni",
@@ -7088,9 +7249,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-01-uni",
@@ -7101,9 +7262,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-02-uni",
@@ -7114,9 +7275,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-03-uni",
@@ -7127,9 +7288,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer keeps polling while no request has arrived",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-04-uni",
@@ -7140,9 +7301,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-05-uni",
@@ -7153,9 +7314,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a backend that cannot be stopped still releases the extension",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-06-uni",
@@ -7166,18 +7327,22 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a malformed handoff request is cleared, not answered",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
-      "id": "T-O-SESSION-07",
-      "level": "e2e",
-      "status": "not_evaluated",
+      "id": "T-O-SESSION-07-uni",
+      "level": "unit",
+      "status": "pass",
       "oracle_ids": [
         "O-SESSION-07"
       ],
-      "evidence": "未建：scripts/test-vpn-session-controller.mjs::交接应答窗口覆盖扩展十五秒等待（常量关系断言）"
+      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer window covers the extension wait budget",
+      "command": "scripts/run-checks.sh",
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SESSION-08-uni",
@@ -7188,9 +7353,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-01-uni",
@@ -7201,9 +7366,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-02-uni",
@@ -7214,9 +7379,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-03-uni",
@@ -7227,9 +7392,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::disconnect overrides a previously cached direct path",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-04-uni",
@@ -7240,9 +7405,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-05-uni",
@@ -7253,9 +7418,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-06-uni",
@@ -7266,9 +7431,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-07-uni",
@@ -7279,9 +7444,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-08-uni",
@@ -7292,9 +7457,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a busy old service request does not consume the reconnect discovery attempt",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-09-uni",
@@ -7305,9 +7470,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a slow service response cannot overwrite a more recent recovered path",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-10-uni",
@@ -7318,9 +7483,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::home polling retries an online peer despite an old unreachable path",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-PEER-11-uni",
@@ -7331,9 +7496,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after offline",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-LOCALSEND-01-uni",
@@ -7344,9 +7509,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::a mounted detail sheet reads a fresh LocalSend result despite its captured old peer",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-LOCALSEND-02-uni",
@@ -7357,9 +7522,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::current peer presence and VPN connection override an old available service",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-01-uni",
@@ -7370,9 +7535,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-02-uni",
@@ -7383,9 +7548,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-03-uni",
@@ -7396,9 +7561,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-04-uni",
@@ -7409,9 +7574,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::unrelated dirty files do not suppress the required Tailscale patch",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-05-uni",
@@ -7422,9 +7587,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::conflicting patch stops before compiling and preserves the source",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-06-uni",
@@ -7435,9 +7600,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Release and unknown products are rejected before any build or signing",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-BUILD-07-uni",
@@ -7448,9 +7613,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Debug uses the project directory, wrapper, and explicit debug flags",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     }
   ],
   "open_questions": [

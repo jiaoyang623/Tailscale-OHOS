@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "d270daa",
+  "baseline": "e8f8e1e",
   "stage": "architecture",
   "design": [
     {
@@ -671,17 +671,16 @@
     {
       "id": "R-DRIVE-05",
       "layer": "requirements",
-      "title": "传输暂存 24 小时后清理，残留不无限增长",
+      "title": "每一类传输暂存都写明适用对象与保留期，且不无限增长：Taildrop 出站暂存在 `cacheDir` 且是可丢弃副本（",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：传输暂存 24 小时后清理，残留不无限增长",
+        "规则：每一类传输暂存都写明适用对象与保留期，且不无限增长：Taildrop 出站暂存在 `cacheDir` 且是可丢弃副本（`services/RecoverableCachePaths.ets:10`），扩展侧 Taildrop 缓存保留 7 天（`vpnextensionability/TailscaleVpnExtensionAbility.ets:56`），诊断报告保留 24 h（`services/DiagnosticReportService.ets:10`）；**Taildrive 暂存当前没有清理实现**，`components/TaildriveBrowser.ets:1891` 的 24 h 只是「yesterday」的分组显示",
         "优先级：低",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "实现状态：Taildrop 与诊断报告已实现；Taildrive 暂存**未实现**（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`TaildriveBrowser.ets` 24h 清理",
-        "`services/RecoverableCachePaths.ets`"
+        "本行原写「24 小时后清理」，来源指 `TaildriveBrowser.ets`，实为显示分组。按 Q-03 决定改写为代码现状"
       ]
     },
     {
@@ -884,16 +883,17 @@
     {
       "id": "R-DIAG-04",
       "layer": "requirements",
-      "title": "诊断报告可导出并分享，报告有保留期，过期清理",
+      "title": "诊断报告可导出并分享，报告有保留期，过期清理（`REPORT_RETENTION_MS = 24 h`，`service",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：诊断报告可导出并分享，报告有保留期，过期清理",
+        "规则：诊断报告可导出并分享，报告有保留期，过期清理（`REPORT_RETENTION_MS = 24 h`，`services/DiagnosticReportService.ets:10`；导出与分享在 `:94-160`）",
         "优先级：低",
         "实现状态：已实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`services/DiagnosticReportService.ets:94-160`"
+        "`services/DiagnosticReportService.ets:10` 保留期常量",
+        "`:94-160` 导出与分享"
       ]
     },
     {
@@ -1635,7 +1635,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-02",
@@ -1670,7 +1671,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-03",
@@ -1699,7 +1701,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SETUP-04",
@@ -1728,7 +1731,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-01",
@@ -1761,7 +1765,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-02",
@@ -1790,7 +1795,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-03",
@@ -1822,7 +1828,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-04",
@@ -1855,7 +1862,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-05",
@@ -1885,7 +1893,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-06",
@@ -1921,7 +1930,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CONN-07",
@@ -1952,7 +1962,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-01",
@@ -1984,7 +1995,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-02",
@@ -2016,7 +2028,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-NET-03",
@@ -2049,7 +2062,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DEV-01",
@@ -2085,7 +2099,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DEV-02",
@@ -2124,7 +2139,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-01",
@@ -2160,7 +2176,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-02",
@@ -2194,7 +2211,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-03",
@@ -2229,7 +2247,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-04",
@@ -2269,7 +2288,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-XFER-05",
@@ -2307,7 +2327,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DRIVE-01",
@@ -2352,7 +2373,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DRIVE-02",
@@ -2382,7 +2404,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-MEDIA-01",
@@ -2428,7 +2451,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-MEDIA-02",
@@ -2468,7 +2492,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PRIV-01",
@@ -2508,7 +2533,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-PRIV-02",
@@ -2544,7 +2570,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-DIAG-01",
@@ -2595,7 +2622,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-UI-01",
@@ -2630,7 +2658,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-UI-02",
@@ -2661,7 +2690,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-VALUE",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-CARD-01",
@@ -2704,7 +2734,40 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E"
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-BUILD-00",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "开发者构建流程：打补丁、编译引擎、装配 HAP",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "R-BUILD-01",
+        "R-BUILD-02"
+      ],
+      "trigger": "开发者在 macOS 或 Linux 上从仓库根目录运行 `scripts/build.sh`。**这是一条开发者旅程，不是用户旅程**。本项目把构建脚本当作第一类流程，所以为它单列旅程判据。审查人裁决 Q16b（2026-10-12）：不为构建另立接缝，7 条构建单点判据直连本条。",
+      "observe": "两次连续执行的退出码与 stdout（Applied patch 与 Patch already applied）、`third_party/tailscale/source.txt` 的内容、传给 `go` 的 argv 里的两个版本戳、`entry/libs/arm64-v8a/libtailscale_go.so` 与 `libtailscale_go.h` 是否落位、传给 node 的工作目录与参数（`hvigorw.js`、`buildMode=debug`、`debuggable=true`、`assembleHap`）、非 default 产品时的 stderr 文案",
+      "expected": [
+        "正常：开发者从仓库根目录运行 `scripts/build.sh`。脚本应用必需的 tailscale 补丁。脚本调用 `go build -buildmode=c-shared` 产出 AArch64 动态库。脚本把 `.so` 与 `.h` 复制进 `entry/libs/arm64-v8a/`。脚本再用 hvigor wrapper 装配 Debug HAP。边界：补丁已应用时判定幂等并继续构建。工程目录含空格时引号处理仍成立。无关的本地脏文件不阻止补丁，也不被覆盖。失败与恢复：补丁冲突时在编译前中止，并保留源码原状。Release 或未知产品在任何构建或签名动作之前被拒。安全与质量：构建脚本对参数与路径的处理可被测试守住（R-BUILD-02）。"
+      ],
+      "failure_message": "期望「开发者从仓库根跑一次构建就得到可装配的 AArch64 产物」，实际「补丁被跳过、产物缺 .h、在错误目录装配，或 Release 静默产出未评审的包」",
+      "sources": [
+        "scripts/build.sh:6-12 产品门",
+        "scripts/build.sh:13 cd 工程根",
+        "scripts/build.sh:53-59 hvigor wrapper 与显式 debug 参数",
+        "scripts/build-go.sh:54-66 apply_patch 幂等",
+        "scripts/build-go.sh:87-92 go build 与产物复制",
+        "scripts/test-macos-build.mjs（5 条用例）",
+        "docs/oracles/points/P5-build.md",
+        "docs/oracles/90-journeys/11-build.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-01",
@@ -2746,7 +2809,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "NOT-EVALUATED",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-02",
@@ -2787,7 +2851,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-03",
@@ -2834,7 +2899,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-04",
@@ -2871,7 +2937,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-05",
@@ -2910,7 +2977,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-06",
@@ -2951,7 +3019,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-07",
@@ -2992,7 +3061,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-PLATFORM",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-08",
@@ -3027,7 +3097,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-09",
@@ -3067,7 +3138,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-10",
@@ -3112,7 +3184,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-11",
@@ -3159,7 +3232,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-12",
@@ -3200,7 +3274,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-13",
@@ -3230,7 +3305,7 @@
         "HosPlayer 的深链只含 `protocolVersion`/`type`/`endpoint`/`name` 四个字段，经 `validate` 通过后才拼装为 `hosplayer://server/import` 的 Want，凭据由播放器自取",
         "外部 LocalSend 只按显式 Want（bundleName/moduleName/abilityName）拉起，不做跨应用包名查询",
         "系统认证统一 `ATL2`，只接受已录入的 `FACE`/`FINGERPRINT`/`PIN`。边界：契约未定的外部目标不得猜测——`MOONLIGHT_INTEGRATION_CONFIG` 的 bundleName/abilityName/moduleName 在基线中是**空串**（`services/MoonlightIntegrationConfig.ets:10-15`），故 `MoonlightLauncher.isAvailable()` 恒返回 false，串流成功路径当前不可达，只能走到「未安装 MoonlightOH」分支",
-        "`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` 是未验证的猜测（未决 Q4），判据不据此断言契约成立。失败与恢复：非法参数在拼装深链前就被拒——HosPlayer 的 `unsafe_server_url`（非 http(s)、超长、含 userinfo 或 fragment）与 `invalid_server_name`（空或 >96 字符）直接抛出，不生成深链、不拉起",
+        "`LOCAL_SEND_APP_TARGETS` 的 `cn.biandangroup.bcshare` **已查证：没有可依赖的公开契约**（2026-10-13 按 Q4 查证：官方 OpenHarmony 移植 `org.localsend.localsend_app` 明写「鸿蒙未接入 share intent」，第三方 AloeSend `com.aloereed.aloesend` 也未记录导出的 Want 或 URI scheme），判据不据此断言契约成立。失败与恢复：非法参数在拼装深链前就被拒——HosPlayer 的 `unsafe_server_url`（非 http(s)、超长、含 userinfo 或 fragment）与 `invalid_server_name`（空或 >96 字符）直接抛出，不生成深链、不拉起",
         "没有可用认证方式时既不放过也不误报成功，认证失败停在锁定层可重试、不清除锁定标志。安全与质量：凭据（用户名/密码/token）一律不进深链、不进 Want",
         "三种浏览器回退都只接受 http(s) 登录 URL，非 http(s) 一律不进入浏览器。文档/代码冲突（以代码为准）：`docs/hosplayer-integration-prototype.md:5,31` 记的是 `openLink()`，代码实际用 `startAbility` 提交同一 `hosplayer://server/import` 的 viewData Want——判据写的是后者。"
       ],
@@ -3250,7 +3325,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-14",
@@ -3299,7 +3375,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "UNCERTAIN-CONFLICT",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-17",
@@ -3347,7 +3424,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-15",
@@ -3391,7 +3469,8 @@
       ],
       "oracle_state": "closed",
       "uncertainty": "none",
-      "owner": "—"
+      "owner": "—",
+      "seam_not_applicable": ""
     },
     {
       "id": "O-SEAM-16",
@@ -3429,7 +3508,8 @@
       ],
       "oracle_state": "pending-test",
       "uncertainty": "UNCERTAIN-WIRING",
-      "owner": "owner=项目维护者 接收批次=a01-集成"
+      "owner": "owner=项目维护者 接收批次=a01-集成",
+      "seam_not_applicable": ""
     }
   ],
   "tests": [
@@ -3713,6 +3793,15 @@
       "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN"
     },
     {
+      "id": "T-O-BUILD-00",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-BUILD-00"
+      ],
+      "evidence": "未建：scripts/e2e/build-journey.mjs::开发者从仓库根运行构建脚本得到可装配的 AArch64 产物"
+    },
+    {
       "id": "T-O-SEAM-01",
       "level": "e2e",
       "status": "not_evaluated",
@@ -3748,9 +3837,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3851,9 +3940,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3873,9 +3962,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "d270daa",
-      "environment": "Linux, Node v22.23.2; 108 tests, pass 108, fail 0",
-      "executed_at": "2026-10-13T13:30:19+11:00"
+      "baseline": "e8f8e1e",
+      "environment": "Linux, Node v22.23.2; 110 tests, pass 110, fail 0",
+      "executed_at": "2026-10-13T14:05:47+11:00"
     },
     {
       "id": "T-O-SEAM-16",

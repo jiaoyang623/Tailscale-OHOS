@@ -20,12 +20,10 @@ const DOMAIN = 0x0000;
 const TAG = 'TailscaleVpn';
 const BUNDLE_NAME = 'ren.w2h.mesharc';
 const VPN_EXISTS_ERROR_CODE: number = 2203002;
-const VPN_DESTROY_SETTLE_MS: number = 300;
-const VPN_REPLACE_APPROVAL_POLL_INTERVAL_MS: number = 200;
-const VPN_REPLACE_CREATE_MAX_ATTEMPTS: number = 6;
-const VPN_REPLACE_CREATE_RETRY_MS: number = 500;
-const VPN_REPLACE_APPROVAL_FILE_NAME: string = 'vpn-replace-approved';
-const VPN_REPLACE_APPROVAL_TTL_MS: number = 10000;
+// How often the extension republishes the conflict while the app shows the
+// dialog. There is no approval channel: the app tells the user to disconnect
+// the other VPN in system settings, then stops this extension itself.
+const VPN_CONFLICT_HEARTBEAT_MS: number = 200;
 const VPN_BACKEND_HANDOFF_REQUEST_FILE_NAME: string = 'vpn-backend-handoff-request.json';
 const VPN_BACKEND_HANDOFF_RESPONSE_FILE_NAME: string = 'vpn-backend-handoff-response.json';
 const VPN_BACKEND_HANDOFF_POLL_INTERVAL_MS: number = 100;
@@ -594,51 +592,19 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
       this.writeStatus(`FAILED | VPN conflict | code=${VPN_EXISTS_ERROR_CODE}`);
     }
 
+    // Stay alive and keep publishing the conflict until the app stops us.
+    //
+    // The app process reads this status, tells the user to disconnect the other
+    // VPN in system settings, and then stops this extension itself. The app
+    // never replaces the other VPN, so there is no approval file and no
+    // replacement branch. This loop exists only so the app can still see why
+    // the connect failed.
     while (!this.destroying) {
-      if (this.consumeVpnReplaceApproval()) {
-        return await this.replaceExistingVpn(connection, config);
-      }
-      await this.waitForVpnTransition(VPN_REPLACE_APPROVAL_POLL_INTERVAL_MS);
+      await this.waitForVpnTransition(VPN_CONFLICT_HEARTBEAT_MS);
       if (!this.destroying) {
-        // Refresh the heartbeat while the modal is waiting for the user.
         this.writeStatus(`FAILED | VPN conflict | code=${VPN_EXISTS_ERROR_CODE}`);
       }
     }
-    return -1;
-  }
-
-  private async replaceExistingVpn(connection: vpnExtension.VpnConnection,
-    config: vpnExtension.VpnConfig): Promise<number> {
-    this.recordDiagnosticEvent('vpn_replacement_approved', 'destroy_existing');
-    for (let attempt: number = 0; attempt < VPN_REPLACE_CREATE_MAX_ATTEMPTS; attempt++) {
-      this.writeStatus('Disconnecting existing VPN connection');
-      try {
-        await connection.destroy();
-        this.recordDiagnosticEvent('vpn_existing_destroyed', 'replace');
-      } catch (error) {
-        const businessError = error as BusinessError;
-        this.recordDiagnosticEvent('vpn_existing_destroy_failed', 'replace', businessError.code ?? -1);
-      }
-      await this.waitForVpnTransition(VPN_DESTROY_SETTLE_MS + attempt * VPN_REPLACE_CREATE_RETRY_MS);
-      if (this.destroying) {
-        return -1;
-      }
-      try {
-        return await connection.create(config);
-      } catch (error) {
-        const businessError = error as BusinessError;
-        const errorCode: number = businessError.code ?? -1;
-        if (errorCode !== VPN_EXISTS_ERROR_CODE) {
-          this.recordDiagnosticEvent('vpn_create_failed', 'replace', errorCode);
-          this.writeStatus(`FAILED | VPN probe TUN | code=${errorCode}`);
-          hilog.error(DOMAIN, TAG, 'VPN replacement failed. code=%{public}d', errorCode);
-          return -1;
-        }
-        this.recordDiagnosticEvent('vpn_replace_retry', 'create', attempt + 1);
-      }
-    }
-    this.recordDiagnosticEvent('vpn_create_failed', 'replace', VPN_EXISTS_ERROR_CODE);
-    this.writeStatus(`FAILED | VPN conflict | code=${VPN_EXISTS_ERROR_CODE}`);
     return -1;
   }
 
@@ -723,25 +689,6 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
       `hasDefaultIPv4=${hasDefaultIPv4} | hasDefaultIPv6=${hasDefaultIPv6} | ` +
       `ipv4Accepted=${config.isIPv4Accepted} | ipv6Accepted=${config.isIPv6Accepted} | ` +
       `mtu=${config.mtu}`);
-  }
-
-  private vpnReplaceApprovalFilePath(): string {
-    return `${this.context.filesDir}/${VPN_REPLACE_APPROVAL_FILE_NAME}`;
-  }
-
-  private consumeVpnReplaceApproval(): boolean {
-    try {
-      const path: string = this.vpnReplaceApprovalFilePath();
-      if (!fileIo.accessSync(path)) {
-        return false;
-      }
-      const approvedAtMs: number = Number(fileIo.readTextSync(path).trim());
-      this.writeTextFile(path, '');
-      const approvalAgeMs: number = Date.now() - approvedAtMs;
-      return approvedAtMs > 0 && approvalAgeMs >= 0 && approvalAgeMs <= VPN_REPLACE_APPROVAL_TTL_MS;
-    } catch (_error) {
-      return false;
-    }
   }
 
   private async restoreBackendVpnConfig(): Promise<string> {

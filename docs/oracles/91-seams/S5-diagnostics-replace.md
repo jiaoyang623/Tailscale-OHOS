@@ -22,19 +22,22 @@
 - 归属：—
 - 复核：待复核
 
-### O-SEAM-16 VPN 替换批准通道
+### O-SEAM-16 VPN 冲突：扩展存活并把冲突交给应用
 - 层级：接缝
 - 父判据：O-CONN-05
 - 强度：强
-- 设计依据：架构 §2.2 依赖方向规则第 2 条、§四 D4（P2 无法显示界面，每个需用户决定的动作都必须反向请求一个文件命令）、§六 Q-02、§七 SEAM-06 → O-SEAM-16；架构 A-SEAMS、A-D2
-- 触发与前置条件：P2 的扩展建 TUN 撞到 `VPN_EXISTS_ERROR_CODE`(2203002) 时，需要一个来自 P1（人）的批准来决定是否销毁既有 VPN 并重建
-- 可观测点：`filesDir/vpn-replace-approved` 标记的存在与年龄；扩展侧的批准轮询与替换结果；`vpn_conflict` / `vpn_conflict_detected` / `vpn_conflict_acknowledged` 等诊断事件；冲突对话框 `showVpnConflictDialog:4316`；`vpn-probe-status.txt` 的 `FAILED | VPN conflict | code=2203002`
-- 期望：正常（设计意图）：替换必须是「扩展请求—应用应答」的反向文件命令——P2 在 `createTunWithConflictReplacement` 里先读 `filesDir/vpn-replace-approved`，只有标记存在且年龄在 `[0, VPN_REPLACE_APPROVAL_TTL_MS(10000)]` 内才 `consumeVpnReplaceApproval:732` 通过并调 `replaceExistingVpn:610` 销毁既有 VPN 重建；否则每 `VPN_REPLACE_APPROVAL_POLL_INTERVAL_MS`(200 ms) 轮询等待批准，批准标记由 P1 在用户确认后写出。**实际（本基线）**：仓库内**找不到写这个标记的入口**（全仓只有扩展侧 `:27` 常量与 `:729` 路径构造两个引用，没有任何写入调用），因此批准的写方缺失、approved-replace 路径**不可达**；真正在跑的是 UI 冲突对话框：`BridgeStatus.showVpnConflictDialog:4316` 先停掉本应用自己的扩展以清掉半建 VPN，再提示用户「请先断开其它 VPN」，用户点确定后清理并恢复后端——责任落在用户侧，而不是应用侧的批准通道。边界：批准标记 TTL 只有 10 s，若对话框出现时用户正好切走，标记是否仍有效、扩展是否重问**未验证**（未决 Q-02）。失败与恢复：用户不批准即无法连接，扩展按冲突状态收尾；P2 记 `vpn_conflict`，P1 负责把它翻成人能读的提示。安全与质量：不得在用户批准前静默替换或销毁另一个 VPN——当前没有静默风险，因为批准通道断了；但判据要求任何将来接上写方的实现都必须先有用户批准、且 TTL 语义明确（批准过期即视为未批准并重新征求），不得以「标记存在即替换」的宽松读法绕过用户。
-- 失败信息：期望「替换只在用户批准（10 s 内有效）后发生，未批准即给出可理解的冲突提示且不销毁其它 VPN」，实际「本基线批准的写方缺失使替换路径不可达（只能走提示用户先断开其它 VPN），或将来接上写方后未经批准即销毁其它 VPN」
-- 来源：entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:24 轮询间隔；:27-28 标记文件名与 10 s TTL；:598-601 尝试消费并轮询等待；:610 replaceExistingVpn；:729-741 consumeVpnReplaceApproval 与年龄判定；entry/src/main/ets/components/BridgeStatus.ets:4316 showVpnConflictDialog；docs/architecture/architecture.md 第二节依赖方向规则第 2 条与第六节 Q-02
+- 设计依据：需求 R-CONN-07「给出可理解的冲突提示，经用户批准才替换」；架构 §2.2 依赖方向规则第 2 条、§四 D4（P2 无法显示界面）、§六 Q-02、§七 SEAM-06 对照；架构 A-SEAMS、A-D2
+- 触发与前置条件：P2 的扩展建 TUN 撞到 `VPN_EXISTS_ERROR_CODE`(2203002)，即有另一个 VPN 占着通道
+- 可观测点：`vpn-probe-status.txt` 的 `FAILED | VPN conflict | code=2203002`；扩展的冲突心跳（每 `VPN_CONFLICT_HEARTBEAT_MS` 200 ms 重发一次）；诊断事件 `vpn_conflict`（P2），以及 `vpn_conflict_detected` / `vpn_conflict_acknowledged` / `vpn_conflict_self_disconnect_requested` / `vpn_conflict_self_disconnect_completed`（P1）；冲突对话框 `BridgeStatus.showVpnConflictDialog`
+- 期望：正常：扩展在冲突时不销毁任何东西，只把冲突状态反复写进状态文件并保持存活，让应用进程读得到；应用读到后**停掉自己的扩展**（清掉半建的 VPN），弹出对话框告诉用户去系统设置里断开另一个 VPN，用户确认后应用清理并恢复后端，责任落在用户侧。边界：冲突循环没有自己的超时，它只在应用停掉扩展（`destroying`）时结束——这正是应用能把冲突讲清楚的前提，所以循环不能提前返回。失败与恢复：用户不断开另一个 VPN 就连不上，应用停在冲突提示上；扩展记 `vpn_conflict`，应用负责把它翻成人能读的文案。安全与质量：不得静默销毁另一个 VPN。**2026-10-13 按 Q-02 删除**：扩展原先还有一条「等 `vpn-replace-approved` 文件、10 秒内有效就销毁对方 VPN 再重建」的分支，而全仓**没有这个文件的写方**；对话框文案（`app.string.vpn_conflict_message`「请断开其它 VPN」与 `vpn_conflict_confirm_action`「确定」）说明产品的选择是让用户自行处理，所以那条分支不可能有写方。它已连同常量、路径构造函数与 `consumeVpnReplaceApproval` 一并删除。这条保证现在由 `scripts/test-vpn-conflict-contract.mjs` 的结构断言守住：源码里不得再出现批准文件或替换分支，冲突循环必须仍然发布状态，应用的冲突文案必须仍是「请断开其它 VPN」。
+- 失败信息：期望「冲突时扩展不销毁任何 VPN 并保持可被读到，应用把决定交回用户」，实际「未经用户知情就销毁另一个 VPN，或扩展提前退出使应用读不到冲突原因」
+- 来源：entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:22-27 VPN_EXISTS_ERROR_CODE 与 VPN_CONFLICT_HEARTBEAT_MS；:578-610 冲突分支与等待循环；entry/src/main/ets/components/BridgeStatus.ets:4325 showVpnConflictDialog 起的自停与提示；entry/src/main/resources/base/element/string.json 的 vpn_conflict_message；scripts/test-vpn-conflict-contract.mjs
 - 上游：R-CONN-07
-- 待建测试：[集成] scripts/integration/vpn-replace-approval.mjs::无批准标记时不替换且无静默销毁
+- 测试：scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch
+- 测试：scripts/test-vpn-conflict-contract.mjs::the extension republishes the conflict while it waits for the app
+- 测试：scripts/test-vpn-conflict-contract.mjs::the app tells the user to disconnect the other VPN
+- 待建测试：[真机] 真机走查 a01-baseline/device-runbook.md#M-17（冲突提示与用户自行断开的完整路径）
 - 状态：pending-test
-- 不确定特征：UNCERTAIN-WIRING
-- 归属：owner=项目维护者 接收批次=a01-集成
+- 不确定特征：NOT-EVALUATED
+- 归属：owner=项目维护者 接收批次=真机批次（device-runbook.md 的 M-17）
 - 复核：待复核
