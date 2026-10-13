@@ -18,6 +18,11 @@ const REPO_ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 const SOURCE_DIR = 'entry/src/main/ets';
 const REGISTRY_FILE = 'docs/diagnostics/event-names.md';
 const CALL_PATTERN = /\brecordDiagnosticEvent\s*\(/g;
+const MEMBER_METHOD_PATTERN =
+  /(?:(?:private|public|protected)\s+)?(?:static\s+)?(\w*[Rr]ecord\w*)\s*\(/g;
+const MEMBER_FIELD_PATTERN =
+  /(?:(?:private|public|protected)\s+)?readonly\s+(\w*[Rr]ecord\w*)\s*:/g;
+const STATIC_WRITER_PATTERN = /static\s+\w*[Rr]ecord\w*\s*\(/;
 
 // Pure function. It reads no file.
 // It returns the names the registry misses and the registry rows the source misses.
@@ -44,6 +49,7 @@ function normalize(expression) {
 }
 
 // Return the text of one argument of the call that starts at openParenIndex.
+// A position of -1 returns every argument joined by a comma.
 function readArgument(sourceText, openParenIndex, position) {
   const args = [];
   let depth = 0;
@@ -65,6 +71,9 @@ function readArgument(sourceText, openParenIndex, position) {
       args.push(sourceText.slice(start, i));
       start = i + 1;
     }
+  }
+  if (position === -1) {
+    return args.join(',');
   }
   return args[position] === undefined ? '' : args[position].trim();
 }
@@ -118,6 +127,74 @@ function resolveLiteralLeaves(expression) {
   };
 }
 
+// Derive the event-name argument position from a parameter list.
+// The parameter named `event` carries the event name.
+// A member with no `event` parameter is not an event-name entry point.
+function eventPositionOf(params) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < params.length; i++) {
+    const character = params[i];
+    if (character === '(' || character === '[' || character === '{' || character === '<') {
+      depth++;
+    } else if (character === ')' || character === ']' || character === '}' || character === '>') {
+      depth--;
+    } else if (character === ',' && depth === 0) {
+      parts.push(params.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(params.slice(start));
+  for (let i = 0; i < parts.length; i++) {
+    const match = parts[i].match(/\b(event)\s*[?:]/);
+    if (match) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// Find every class member named `record` or `recordEvent` in one source text.
+// Two member shapes are entry points.
+//   A private method: `private record(event: string, code: number = 0): void {`.
+//   A callback field: `private readonly record: (event: string, code: number) => void;`.
+// The static writer of DiagnosticEventStore is not an entry point.
+// Its `event` parameter holds a variable, not a literal name.
+function findEntryPoints(sourceText) {
+  const positions = new Map();
+  MEMBER_METHOD_PATTERN.lastIndex = 0;
+  let match;
+  while ((match = MEMBER_METHOD_PATTERN.exec(sourceText)) !== null) {
+    if (STATIC_WRITER_PATTERN.test(match[0])) {
+      continue;
+    }
+    if (match[1] === 'recordDiagnosticEvent') {
+      continue;
+    }
+    const open = match.index + match[0].length - 1;
+    const position = eventPositionOf(readArgument(sourceText, open, -1));
+    if (position >= 0) {
+      positions.set(match[1], position);
+    }
+  }
+  MEMBER_FIELD_PATTERN.lastIndex = 0;
+  while ((match = MEMBER_FIELD_PATTERN.exec(sourceText)) !== null) {
+    const lineEnd = sourceText.indexOf('\n', match.index);
+    const fieldLine = sourceText.slice(match.index, lineEnd === -1 ? sourceText.length : lineEnd);
+    const arrowIndex = fieldLine.indexOf('=>');
+    if (arrowIndex === -1) {
+      continue;
+    }
+    const colonIndex = fieldLine.indexOf(':');
+    const position = eventPositionOf(fieldLine.slice(colonIndex + 1, arrowIndex));
+    if (position >= 0) {
+      positions.set(match[1], position);
+    }
+  }
+  return positions;
+}
+
 // Read every literal event name in one source text.
 // A call site with no literal event name is a non-literal call site.
 export function extractEventNames(sourceText) {
@@ -132,13 +209,31 @@ export function extractEventNames(sourceText) {
     }
     const open = match.index + match[0].length - 1;
     const resolved = resolveLiteralLeaves(readArgument(sourceText, open, 0));
-    if (resolved.literal && resolved.values.length > 0) {
+    if (resolved.values.length > 0) {
       names.push(...resolved.values);
-    } else {
+    }
+    if (!resolved.literal) {
       nonLiteral.push({
         line: lineNumberAt(sourceText, match.index),
         expression: normalize(readArgument(sourceText, open, 0))
       });
+    }
+  }
+  const entryPoints = findEntryPoints(sourceText);
+  for (const [member, position] of entryPoints) {
+    const callPattern = new RegExp(`\\bthis(?:\\.[A-Za-z_]\\w*)*\\.${member}\\s*\\(`, 'g');
+    while ((match = callPattern.exec(sourceText)) !== null) {
+      const open = match.index + match[0].length - 1;
+      const resolved = resolveLiteralLeaves(readArgument(sourceText, open, position));
+      if (resolved.values.length > 0) {
+        names.push(...resolved.values);
+      }
+      if (!resolved.literal) {
+        nonLiteral.push({
+          line: lineNumberAt(sourceText, match.index),
+          expression: normalize(readArgument(sourceText, open, position))
+        });
+      }
     }
   }
   return { names, nonLiteral };
