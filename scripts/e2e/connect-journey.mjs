@@ -26,6 +26,9 @@ const EVIDENCE = join(OUT, `connect-journey-${new Date().toISOString().replace(/
 const log = new LogStream();
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let configured = false;
+// 连接动作的日志分界。启动时的自动恢复也会写 vpn_connected，
+// 整份日志扫描会把上一次的事件当成这一次的结果。
+let connectMark = 0;
 
 before(async () => {
   log.start();
@@ -73,12 +76,14 @@ test('连接旅程：从首页连接后进入可用隧道', async (t) => {
     t.skip('未登录，跳过');
     return;
   }
+  connectMark = log.mark();
   clickId('vpn-connect');
 
-  const connected = await log.waitFor(/vpn_connected/, 60000);
+  const connected = await log.waitForAfter(connectMark, /vpn_connected/, 60000);
   screenshot('connect-journey-connected');
   assert.ok(connected, '点了连接之后，设备日志里没有出现 vpn_connected');
 
+  await pause(2000);
   const texts = layoutTexts();
   assert.ok(texts.some((line) => line.includes('已连接')),
     `隧道可用但界面没有显示已连接。界面文本：${JSON.stringify(texts.slice(0, 15))}`);
@@ -89,8 +94,8 @@ test('连接旅程：QG-02 长时任务先于隧道可用', async (t) => {
     t.skip('未登录，跳过');
     return;
   }
-  const started = await log.waitFor(/background_started/, 5000);
-  const connected = await log.waitFor(/vpn_connected/, 5000);
+  const started = await log.waitForAfter(connectMark, /background_started/, 5000);
+  const connected = await log.waitForAfter(connectMark, /vpn_connected/, 5000);
   assert.ok(started, '连接期没有出现 background_started，长时任务没有覆盖连接窗口');
   assert.ok(connected, '没有再找到 vpn_connected');
   assert.ok(log.lines.indexOf(started) < log.lines.indexOf(connected),
