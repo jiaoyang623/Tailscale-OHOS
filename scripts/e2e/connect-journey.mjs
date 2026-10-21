@@ -94,12 +94,28 @@ test('连接旅程：QG-02 长时任务先于隧道可用', async (t) => {
     t.skip('未登录，跳过');
     return;
   }
-  const started = await log.waitForAfter(connectMark, /background_started/, 5000);
   const connected = await log.waitForAfter(connectMark, /vpn_connected/, 5000);
-  assert.ok(started, '连接期没有出现 background_started，长时任务没有覆盖连接窗口');
   assert.ok(connected, '没有再找到 vpn_connected');
-  assert.ok(log.lines.indexOf(started) < log.lines.indexOf(connected),
-    'background_started 出现在 vpn_connected 之后，连接窗口没有被长时任务覆盖');
+  // 长时任务可以在点击之前就取得：启动时意图仍是 connected，保护会提前建立。
+  // QG-02 要的是「隧道可用那一刻任务已持有」，所以找连接前最近一次 start，
+  // 并确认中间没有 stop。
+  const connectIndex = log.lines.indexOf(connected);
+  let lastStart = -1;
+  for (let i = connectIndex - 1; i >= 0; i--) {
+    if (/background_started/.test(log.lines[i])) {
+      lastStart = i;
+      break;
+    }
+  }
+  let lastStop = -1;
+  for (let i = connectIndex - 1; i > lastStart; i--) {
+    if (/background_stopped/.test(log.lines[i])) {
+      lastStop = i;
+      break;
+    }
+  }
+  assert.ok(lastStart >= 0, '连接期没有出现 background_started，长时任务没有覆盖连接窗口');
+  assert.ok(lastStop < lastStart, '长时任务在隧道可用前被释放，连接窗口没有被覆盖');
 });
 
 test('连接旅程：M-13 扩展自己起一份引擎并记录生命周期', async (t) => {
