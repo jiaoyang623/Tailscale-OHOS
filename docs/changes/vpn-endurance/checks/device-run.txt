@@ -1,0 +1,230 @@
+# 设备执行记录（vpn-endurance，2026-10-20）
+
+- 设备：Pura X / 56T0225330000021 / HarmonyOS 7.0.0.105
+- 2026-10-20 深夜用户换机。最终 HAP 复跑到新设备 2LQGK24828000076
+  （HUAWEI ALN-AL00，API 26）。旧设备随后离线。新设备的记录见文末。
+- 基线：ec64476 + 工作树改动
+- 已安装 HAP：`entry-default-signed.hap`，35917648 字节，2026-10-20T21:53 构建，21:55 安装。
+  保留应用数据。
+- 此前构建：35910941 字节（20:10），35910808 字节（21:12）。它们不是最终对象。
+
+## endurance-recovery.mjs
+
+- 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/endurance-recovery.mjs`
+- 结果：跳过。设备 shell 的 uid 是 2000，不能向应用进程发信号。
+  `hdc shell -b` 不切换 uid，应用私有目录也不能写。主机没有「只结束扩展」的通道。
+- 失败输出：`endurance-recovery.mjs` 第一次运行在 120 秒后失败（没有恢复事件）。
+  原因是 `hdc shell` 对失败的 kill 仍返回 0，测试误以为进程已结束。
+  修正后按通道缺失跳过。
+- 证据：`e2e-run/endurance-recovery-skip.log`。
+
+## network-recovery.mjs
+
+- 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/network-recovery.mjs`
+- 结果：跳过。`svc wifi disable` 返回成功，但设备仍能上网。
+  设备还有其它数据通道，主机无法造出离线条件。`svc data` 在本机不支持。
+- 证据：`e2e-run/network-recovery-skip.log`。
+
+## screen-off-survival.mjs
+
+- 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/screen-off-survival.mjs`
+- 时长：720 秒锁屏静置，`power-shell suspend` / `wakeup`。
+
+### 第一次运行
+
+- 结果：失败。最大心跳间隔 18.3 秒，超过 15 秒阈值。
+- 定位：该间隔落在「先连上隧道」阶段，跨越扩展进程从 22588 到 23334 的重启。
+  第二次运行前的统计窗口包含了连接阶段，不是锁屏期的间隔。
+- 锁屏期事实：档位在 17:27:39 进入 `background`，在 17:28:09 进入 `screen-off`。
+  锁屏期的稳态心跳间隔是 5 秒，档位切换处最大 6.9 秒。
+- 处置：`screen-off-survival.mjs` 的统计改为只取 `beatsBefore` 之后的心跳。
+- 证据：`e2e-run/screen-off-survival-run1.log`。
+
+### 第二次运行
+
+- 结果：通过 3/3。
+- 心跳：580 个，跨度 738 秒，最大间隔 6.9 秒。
+- 进程：全程只有一个扩展进程。
+- 证据：`e2e-run/screen-off-survival-run2.log`（设备日志），`e2e-run/screen-off-survival-run2.tap.log`（TAP 输出）。
+
+## 安装重启恢复（手工检查）
+
+- 场景：应用已连接，意图为 `connected`。安装 HAP 结束应用与扩展进程。随后启动应用。
+- 预期：新进程发现旧会话结束，记录原因，并按意图恢复隧道。
+- 构建：35910808 字节，2026-10-20T21:12。安装时间 21:13。
+- 结果：通过。
+- 事件顺序（设备时间 18:13）：
+
+| 顺序 | 事件 | 代码 |
+| --- | --- | --- |
+| 1 | `vpn_session_end_observed` | 0 |
+| 2 | `vpn_session_recovery_attempt` | 1 |
+| 3 | `vpn_session_recovery_started` | 1 |
+| 4 | `vpn_session_recovered` | 1 |
+
+- 会话：旧 `sessionId=1792489298419`，新 `sessionId=1792491192925`。
+- 状态：`state=Running`。
+- 账本：保留一条旧会话记录 `observed / extension_crash / heartbeat_expired`。
+  同一 `sessionId + kind` 不重复追加，因此本次没有新增行。
+
+### 修正前的故障
+
+- 现象：每次尝试在 3 到 12 毫秒内返回 `vpn_session_recovery_cancelled`。扩展没有启动。
+- 原因：控制器把令牌读成「已取消」，监督器传的是「仍有授权」。两侧语义相反。
+- 漏检原因：两侧测试各按本侧语义写。接缝没有测试。
+- 处置：控制器参数改为正向 `authorised`。监督器测试桩按控制器真实语义判定。
+  新增一条用例，覆盖「后端等待后失去授权」。
+
+## 判读
+
+- 设备上恢复了安装重启场景的隧道。
+- 锁屏 720 秒的存活测量通过。
+- 两个 E2E 用例按通道缺失跳过，理由见上。
+
+## 结构化 E2E 批次（2026-10-20 21:27）
+
+- 命令：`scripts/e2e/run-batch.sh install-restart-recovery endurance-recovery network-recovery background-reconnect screen-off-survival`
+- 结果：
+
+| 文件 | 通过 | 失败 | 跳过 | 秒 |
+| --- | --- | --- | --- | --- |
+| install-restart-recovery | 1 | 0 | 0 | 48 |
+| endurance-recovery | 0 | 0 | 1 | 41 |
+| network-recovery | 0 | 0 | 1 | 72 |
+| background-reconnect | 2 | 0 | 2 | 55 |
+| screen-off-survival | 0 | 0 | 3 | 29 |
+
+- 安装重启用例在最终构建上通过。步骤为确认安装前状态、安装、启动、
+  等待记录与恢复、校验账本。截图见 `checks/e2e-run/shots/`。
+- 存活用例第一次跳过：应用恢复了上次的「传输」页签，界面文本里没有「未连接」。
+  处置：新增 `clickBottomTab`，启动后先回到「设备」页。存活用例随后重跑。
+- 合并日志第一次没有生成：`run-batch.sh` 在脚本移动到 `lib/` 之前已解析旧路径。
+  处置：路径已改；合并工具是机械合并，不改写用例内容。
+
+## 最终结构化 E2E 批次（2026-10-20 21:54）
+
+- 命令：`scripts/e2e/run-batch.sh install-restart-recovery endurance-recovery network-recovery background-reconnect screen-off-survival`
+- HAP：35917648 字节，21:53 构建。批次开始时安装并重启应用。
+- 结果：
+
+| 文件 | 通过 | 失败 | 跳过 | 秒 |
+| --- | --- | --- | --- | --- |
+| install-restart-recovery | 1 | 0 | 0 | 50 |
+| endurance-recovery | 0 | 0 | 1 | 40 |
+| network-recovery | 0 | 0 | 1 | 72 |
+| background-reconnect | 2 | 0 | 2 | 54 |
+| screen-off-survival | 3 | 0 | 0 | 787 |
+
+- 用例合计 10 条：通过 6，失败 0，跳过 4。步骤合计 21 条：通过 15，跳过 6，失败 0。
+- 结构化日志：`checks/e2e-steps.json`。截图：`checks/e2e-run/shots/`。
+- 锁屏存活：心跳 1173 个，跨度 742 秒，最大间隔 7.0 秒。
+  全程只有一个扩展进程：`vpn_extension_created` 1 次，`vpn_extension_destroyed` 0 次。
+- 安装重启恢复：安装前 `state=Running`。启动后新会话建立，账本记录
+  `observed / extension_crash / heartbeat_expired`。步骤截图见 `shots/02-install-restart-recovered.png`。
+- 前台主动断开：`vpn_session_recovery_attempt` 0 次，`vpn_session_recovery_started` 0 次。
+- 跳过项与原因：
+  - `endurance-recovery`：设备 shell 无向应用进程发信号的权限。
+  - `network-recovery`：关闭 Wi-Fi 后设备仍有蜂窝通道，无法造出断网。
+  - `background-reconnect` 的后台掉线与卡片停止：缺非主动掉线通道与卡片点击通道。
+- 报告：`checks/e2e/index.html`，发布记录见 `checks/e2e-published.txt`。
+## 最终 HAP 批次（2026-10-20 22:45，设备锁定）
+
+- 命令：`scripts/e2e/run-batch.sh install-restart-recovery endurance-recovery network-recovery background-reconnect screen-off-survival`
+- HAP：35928034 字节，22:45 构建。账本改为每个写者一个文件。
+- 结果：5 个文件，10 条用例全部失败。失败点都在启动应用：`启动后没有出现 ui_opened`。
+  设备没有产生任何新的通过证据。
+- 原因：设备停在锁屏。上一批 `screen-off-survival` 用 `power-shell suspend` 锁屏，批次结束后设备保持锁定。
+  `aa start -a EntryAbility` 返回 `10106102`：`The device screen is locked during the application launch,
+  unlock screen failed. The current mode is developer mode, and the screen cannot be unlocked automatically`。
+- 已试解锁：`power-shell wakeup`、`setmode 602`、`uitest uiInput swipe`、`dircFling`、`uitest uiInput drag`、
+  `uinput -T -g`（含屏幕底边上滑）。锁屏界面（时间、日期、电量）可见，但没有出现密码键盘，触摸注入不生效。
+  设备需要人工解锁（指纹或锁屏密码）。
+- 结构化日志：`checks/.e2e-steps-*.json` 已由本批次覆盖；`checks/e2e-steps.json` 是这次失败批次的合并结果。
+  它不能作为最终代码的 E2E 证据。
+- 旧报告：`checks/e2e/index.html` 与 `checks/e2e-published.txt` 仍是 HAP 35917648 的批次。
+  它不覆盖账本按写者分文件的改动，因此不能把最终 HAP 记为 E2E 通过。
+- 失败详情：`/home/w2h/mesharc-e2e/batch-20261020T224558.txt` 与
+  `/home/w2h/mesharc-e2e/e2e-*-20261020T224558.log`。
+
+## 最终 HAP 复跑批次（2026-10-20 23:33，设备已解锁）
+
+- 命令：`scripts/e2e/run-batch.sh install-restart-recovery endurance-recovery network-recovery background-reconnect screen-off-survival`
+- HAP：35928034 字节，22:45 构建。账本按写者分文件。
+- 结果：
+
+| 文件 | 通过 | 失败 | 跳过 | 秒 |
+| --- | --- | --- | --- | --- |
+| install-restart-recovery | 1 | 0 | 0 | 48 |
+| endurance-recovery | 0 | 0 | 1 | 44 |
+| network-recovery | 0 | 0 | 1 | 71 |
+| background-reconnect | 2 | 0 | 2 | 54 |
+| screen-off-survival | 3 | 0 | 0 | 786 |
+
+- 用例合计 10 条：通过 6，失败 0，跳过 4。步骤合计 21 条：通过 15，跳过 6，失败 0。
+- 锁屏存活：心跳 218 个，跨度 739 s，最大间隔 7.0 s。扩展进程创建 1 次、销毁 0 次。
+  心跳数从上一批的 1173 降到 218，原因是 `screen-off` 档把状态环放慢到 5 s；
+  跨度与最大间隔不变。
+- 安装重启恢复：旧会话 1792499602521 写入 `observed / extension_crash / heartbeat_expired`。
+  新会话 1792499660492 为 `state=Running`。本次没有 `user_stop`。
+  账本记录由按写者分文件的读取器合并读出，说明升级路径可用。
+- 跳过 4 条：扩展被杀无信号权限、断网后仍有蜂窝、后台掉线无通道、卡片点击无通道。
+- 结构化日志：`checks/e2e-steps.json`。报告：`checks/e2e/index.html`。
+  发布链接见 `checks/e2e-published.txt`，HTTP 200。
+- 批次最后一条 `screen-off-survival` 再次锁屏。后续批次需要先人工解锁。
+
+## 新设备最终批次（2026-10-21 00:02）
+
+- 设备：`2LQGK24828000076` / HUAWEI ALN-AL00 / API 26。
+  用户于 2026-10-20 深夜通过登录链接完成 Tailscale 登录。登录后界面显示 6 台在线、共 11 台。
+- HAP：35928034 字节，22:45 构建。新设备于 23:56 安装并首次启动。
+- 批次前状态：`state=Running`，`sessionId=1792501348074`，意图 `connected`。
+- 结果：
+
+| 文件 | 通过 | 失败 | 跳过 | 秒 |
+| --- | --- | --- | --- | --- |
+| install-restart-recovery | 1 | 0 | 0 | 47 |
+| endurance-recovery | 0 | 0 | 1 | 42 |
+| network-recovery | 0 | 0 | 1 | 72 |
+| background-reconnect | 2 | 0 | 2 | 55 |
+| screen-off-survival | 3 | 0 | 0 | 788 |
+
+- 用例合计 10 条：通过 6，失败 0，跳过 4。步骤合计 21 条：通过 15，跳过 6，失败 0。
+- 锁屏存活：心跳 221 个，跨度 740 s，最大间隔 6.9 s。扩展进程创建 1 次、销毁 0 次。
+- 安装重启恢复：旧会话 1792501348074 记录结束原因。新会话 1792501414003 为 `state=Running`。
+  本次没有 `user_stop`。
+- 跳过 4 条与原因：扩展被杀无信号权限、断网后仍有蜂窝、后台掉线无通道、卡片点击无通道。
+- 报告：`checks/e2e/index.html`，发布记录见 `checks/e2e-published.txt`，HTTP 200。
+- 元数据更正：`deviceEnvironment` 原先硬编码旧设备机型 `Pura X` 与 `HarmonyOS 7.0.0.105`。
+  本次记录的 `environment` 字段已按设备参数更正为 `ALN-AL00`、`API 26`。
+  用例、步骤、截图与时间戳未改动。生成器已改为查询设备参数，后续批次不再硬编码。
+- 批次最后一条 `screen-off-survival` 再次锁屏。后续批次需要先人工解锁。
+
+## 新设备首次运行用例（2026-10-21 00:20）
+
+- 登录前：`first-run.mjs` 通过 1，失败 3，跳过 1。失败原因是应用处于「需要登录」状态，
+  而用例的 `configured` 判定只认「未连接 / 已连接」，于是仍按「未配置服务器」断言。
+  这是用例的状态判定缺口，不是产品缺陷。
+- 修正：`configured` 增加「需要登录」。后端提示类断言只适用于未配置服务器的设备。
+- 登录后复跑：通过 1，失败 0，跳过 4。首次运行旅程不适用于已配置设备，跳过理由正确。
+- 证据：`/home/red/first-run-newdevice.log`（登录前）、
+  `/home/red/first-run-newdevice-2.log`（登录后）。
+
+## 12 小时锁屏存活尝试（2026-10-21 03:24 至 15:24）
+
+- 命令：`DEVICE=2LQGK24828000076 SURVIVAL_MS=43200000 node --test scripts/e2e/screen-off-survival.mjs`
+- 设备：`2LQGK24828000076` / ALN-AL00 / API 26。HAP 35928034。
+- 结果：用例 3 条，通过 2，失败 1。失败项是心跳跨度：34,826 s，未到 43,200 s。
+- 锁屏期数据：心跳 9,294 个，最大间隔 6.9 s，扩展进程创建 1 次。
+- 结束原因：13:07:14 设备电源档位变为 `active`，屏幕被点亮。13:07:15 界面写入
+  `vpn_session_end / user_stop` 与 `disconnect_requested / user`，意图变为
+  `{"desired":"stopped","by":"ui"}`。扩展随后销毁，监督器没有发起恢复。
+  这是用户主动停止，不是应用自行断连。用例的前提「锁屏期间无人操作」被破坏。
+- 状态文件：`VPN extension destroyed | heartbeatMs=1792548435682 | sessionId=1792513478684`。
+  会话 ID 与锁屏开始时相同。
+- 日志采集：hilog 流在 13:05 停止，比停止动作早约 2 分钟。诊断文件完整记录了停止序列。
+  以后跑 12 小时用例时，应同时轮询状态文件，或让日志流断线后自动重连。
+- 结论：12 小时连续存活未取得。连续锁屏心跳覆盖 9 小时 42 分，最大间隔 6.9 秒。
+  O-CONN-06 不记通过。需要一次全程无人操作的 12 小时复跑。
+- 证据：`/home/w2h/mesharc-e2e/screen-off-survival-2026-10-20T16-24-13-336Z.log`（16,713 行）、
+  `checks/screen-off-12h-steps.json`、设备上的 `diagnostic-ui-events.ndjson` 与
+  `diagnostic-vpn-events.ndjson`。

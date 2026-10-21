@@ -1,0 +1,12 @@
+# A01 E2E 报告发布记录
+链接：http://100.111.99.60/proj/mesharc-ui/e2e/vpn-endurance/index.html
+时间：2026-10-20T22:10:51+11:00
+HTTP 状态：200
+基线：ec64476
+用例数：1
+通过：0
+失败：0
+跳过：0
+阻塞：0
+报告：/opt/git/github/mesharc/docs/changes/vpn-endurance/checks/ui-restoration
+发布目录：/var/www/html/proj/mesharc-ui/e2e/vpn-endurance

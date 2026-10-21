@@ -1,8 +1,11 @@
 # MeshArc 单点判据 · 无 UI VPN 控制器与后端交接（O-SESSION）
 
-本文件覆盖 `scripts/test-vpn-session-controller.mjs` 的 6 条用例，守的是 headless 连接路径
-（桌面卡片 `call` 事件、后台恢复）与它应答扩展后端交接的那半环。父判据是接缝
-`O-SEAM-02`（后端交接）、`O-SEAM-01`（生命周期命令通道）、`O-SEAM-10`（编排分叉）、`O-SEAM-03`（状态与心跳）。
+本文件覆盖 `scripts/test-vpn-session-controller.mjs` 的 headless 连接路径
+（桌面卡片 `call` 事件、后台恢复）与它应答扩展后端交接的那半环。
+2026-10-20 起，它还覆盖意图文件（`scripts/test-vpn-session-intent.mjs`）
+与会话账本（`scripts/test-session-ledger.mjs`）的 O-SESSION-09…13。
+父判据是接缝 `O-SEAM-02`（后端交接）、`O-SEAM-01`（生命周期命令通道）、
+`O-SEAM-10`（编排分叉）、`O-SEAM-03`（状态与心跳）、`O-SEAM-19`（会话结束事件与原因分类）。
 
 **口径说明（本文件通篇适用）**：这些用例不用桩件替身，而是把真实的
 `entry/src/main/ets/services/VpnSessionController.ets` 与 `VpnStatusReader.ets` 读进来，
@@ -12,18 +15,21 @@
 因此**决策逻辑是真的，平台边界是桩**：一条通过只说明「给定这组桩，决策正确」，
 不证明真机上的文件协议、扩展存活、15 s 预算或系统拉起。凡结论依赖桩的地方在 `期望` 里写明。
 
-### O-SESSION-01 已连接态下无 UI 连接判为 unchanged
+### O-SESSION-01 已连接或正在连接时无 UI 连接判为 unchanged
 - 层级：单点
 - 父判据：O-SEAM-03、O-SEAM-10
 - 强度：强
 - 设计依据：需求 R-CONN-08「无 UI 的入口（桌面卡片、后台恢复）也能独立完成连接」；架构 §五 O-CONN-07 行（无 UI 连接与 O-CONN-01 同一预算）、§七 SEAM-03 对照行；HLD 契约 C-03
-- 触发与前置条件：`VpnSessionController.connect(filesDir)` 被调用，`VpnStatusReader.read` 读到 state=connected
-- 可观测点：connect 的返回值、`VpnCommandGateway.startVpnExtension` 的调用次数、后端 stop 次数、应答循环是否入队了 sleep 句柄
-- 期望：正常：状态已是 connected 时立即返回 `VpnActionResult.UNCHANGED`；边界：不得调用 `startVpnExtension`，也不得启动交接应答轮询（sleep 队列为空）——「已经连上」不是一次新连接；失败与恢复：状态文件读不到或缺心跳时 `VpnStatusReader` 报 unknown 而不是 connected，由此走的是正常连接流程（O-SESSION-02）而不是这条早退
-- 失败信息：期望「已连接时 connect 返回 unchanged 且不起扩展、不轮询」，实际「重复拉起扩展，或为空转的应答循环排入轮询」
-- 来源：entry/src/main/ets/services/VpnSessionController.ets:80 connect；:81-84 读状态并在 connected 时早退；:104 startVpnExtension；:108 answerBackendHandoff（未 await）；entry/src/main/ets/services/VpnStatusReader.ets:37-44 read 与 :43 新鲜度判定；scripts/test-vpn-session-controller.mjs
+- 触发与前置条件：`VpnSessionController.connect(filesDir)` 被调用，`VpnStatusReader.read` 读到 state=connected、connecting，或 unknown 且意图在 30 秒内刚写为 connected
+- 可观测点：connect 的返回值、`VpnCommandGateway.startVpnExtension` 的调用次数、后端 stop 次数、应答循环是否入队了 sleep 句柄、`VpnSessionIntent.read` 的 `changedAtMs`
+- 期望：正常：状态已是 connected 时立即返回 `VpnActionResult.UNCHANGED`；边界：状态为 connecting 时同样返回 unchanged，不启动第二个扩展，但用户连接仍写意图 connected；状态为 unknown 但意图在 30 秒内刚写为 connected 时也返回 unchanged，因为原连接可能仍在后端或配置阶段；失败与恢复：unknown 且意图陈旧时走正常连接流程（O-SESSION-02），状态文件读不到或缺心跳不得被当成「正在连」
+- 失败信息：期望「已连接或正在连接时 connect 返回 unchanged 且不起扩展」，实际「重复拉起扩展，或为空转的应答循环排入轮询」
+- 来源：entry/src/main/ets/services/VpnSessionController.ets connect 的 connected、connecting 与 unknown 早退；CONNECT_REQUEST_FRESH_MS；VpnStatusReader.read 与新鲜度判定；scripts/test-vpn-session-controller.mjs
 - 上游：R-CONN-08
 - 测试：scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything
+- 测试：scripts/test-vpn-session-controller.mjs::a connect during the connect window does not start a second extension
+- 测试：scripts/test-vpn-session-controller.mjs::a second connect during an uncertain status does not start again
+- 测试：scripts/test-vpn-session-controller.mjs::an old connected intent does not block a connect during an uncertain status
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -147,6 +153,97 @@
 - 测试：scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded
 - 测试：scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting a timeout
 - 测试：scripts/test-vpn-command-state-machine.mjs::a late timeout cannot move the state after a destroyed lifecycle
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SESSION-09 意图文件是唯一的状态意图来源
+- 层级：单点
+- 父判据：O-SEAM-11、O-SEAM-19
+- 强度：强
+- 设计依据：需求 R-CONN-11「用户没有点击停止时，连接不得停止」；架构 §2.6 横切约束 1「意图优先于观测」；HLD 契约 C-11、C-19
+- 触发与前置条件：`VpnSessionIntent` 读、写 `filesDir/vpn-intent.json`；状态判读、长时任务、恢复三者读取同一份意图
+- 可观测点：意图文件的 `desired`、`changedAtMs` 与 `by` 字段；`VpnSessionIntent.read` 的返回值；诊断事件 `vpn_intent_write_failed`、`vpn_intent_missing`
+- 期望：正常：用户连接写 `desired=connected`，用户停止写 `desired=stopped`，`by` 取 `ui` 或 `card`；恢复连接不重写文件（意图已是 `connected`），恢复撤销只停扩展，不写意图、不记账本 `user_stop`。边界：文件缺失、空文件、非法 JSON、`desired` 不在词表内，一律读成 `stopped` 并记 `vpn_intent_missing`；一次状态判读不得写意图。失败与恢复：用户连接的意图写失败时，连接在下一个检查点取消，不启动扩展；写失败记 `vpn_intent_write_failed`；读方按 `stopped` 处理。安全与质量：意图文件只含这三个字段，不含地址、账号或令牌。判定在宿主侧桩边界（`fileIo` 为内存文件系统）下成立
+- 失败信息：期望「意图只由用户动作与恢复写」，实际「状态判读顺带改了意图，用户停止后被打回 connected」
+- 来源：entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-session-intent.mjs
+- 上游：R-CONN-11
+- 测试：scripts/test-vpn-session-intent.mjs::intent is the only writer that changes the desired state、scripts/test-vpn-session-controller.mjs::a recovery connect leaves the user intent untouched
+- 测试：scripts/test-vpn-session-controller.mjs::a recovery undo leaves the user intent and the stop ledger alone
+- 测试：scripts/test-vpn-session-controller.mjs::a user stop writes the intent and one user stop record
+- 测试：scripts/test-vpn-session-controller.mjs::a user connect cancels when its intent write fails
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SESSION-10 非用户结束按受控原因词记录
+- 层级：单点
+- 父判据：O-SEAM-19
+- 强度：强
+- 设计依据：需求 R-CONN-12「非用户原因的断连都要落盘留证」；HLD 契约 C-19
+- 触发与前置条件：`SessionLedger.recordEnd()` 收到一条结束记录；`reason` 来自任一写方
+- 可观测点：账本文件的行内容（按写者分文件）；`SessionLedger` 的返回值；诊断事件 `vpn_session_end`、`vpn_session_end_observed`
+- 期望：正常：记录写入 `sessionId`、`writer`、`kind`、`reason`、`phase`、`code` 与时间戳。`reason` 在词表内时原样保留。词表的七个原因各有写入方或明确的不适用理由：`user_stop` 由用户停止写，`extension_destroyed` 与 `handoff_timeout` 由扩展写，`extension_crash` 由心跳失效写，`network_lost` 由离线掉线写，`system_stopped` 由 VPN 冲突写，`unknown` 兜底。边界：词表外的 `reason` 替换为 `unknown`，`phase` 写明缺哪条证据。空 `sessionId` 的行不写。失败与恢复：写入失败返回 false，不抛异常。同一 `sessionId + kind` 第二次写入返回 false 且不追加。安全与质量：记录不含地址、账号、令牌与设备标识。判定在宿主侧桩边界（`fileIo` 为内存文件系统）下成立
+- 失败信息：期望「每次非用户结束都有受控原因」，实际「原因缺失、拼写漂移或出现自由文本」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；scripts/test-session-ledger.mjs
+- 上游：R-CONN-12
+- 测试：scripts/test-session-ledger.mjs::every non-user end is recorded with a controlled reason
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::network loss defers recovery until the network returns
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a VPN conflict is recorded as a system stop and does not retry
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SESSION-11 账本有上限且不受探测噪声影响
+- 层级：单点
+- 父判据：O-SEAM-19、O-SEAM-15
+- 强度：强
+- 设计依据：需求 R-CONN-12、R-DIAG-03「诊断事件有按文件条数与字节的上限」；HLD 契约 C-19
+- 触发与前置条件：连续写入超过 512 条结束记录，或单条记录使文件超过 64 KB
+- 可观测点：账本文件的行数与字节数；保留下来的最早一条记录
+- 期望：正常：每个写者的账本文件最多保留 512 行。边界：写入使该文件字节数超过 64 KB 时从最旧开始淘汰，直到回到上限内，至少保留 1 条。压缩只改本写者的文件。失败与恢复：结束记录与诊断事件分文件，探测噪声写满 `diagnostic-*-events.ndjson` 不影响账本。安全与质量：淘汰只按时间顺序，不按原因分类丢弃。判定在宿主侧桩边界下成立
+- 失败信息：期望「账本有固定上限且不被探测事件挤掉」，实际「账本无限增长，或结束记录被诊断事件挤出」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；scripts/test-session-ledger.mjs
+- 上游：R-CONN-12、R-DIAG-03
+- 测试：scripts/test-session-ledger.mjs::the ledger survives probe noise and bounds itself
+- 测试：scripts/test-session-ledger.mjs::a writer compacts only its own file
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SESSION-12 同一会话的同一类记录只写一次
+- 层级：单点
+- 父判据：O-SEAM-19
+- 强度：强
+- 设计依据：HLD 契约 C-19「同一 sessionId 的 end 记录只写一次」；架构 §2.6
+- 触发与前置条件：P1 读到 P2 的结束记录后补写观测；P1 与 P2 都可能写 `end`
+- 可观测点：账本中同一 `sessionId + kind` 的行数；`SessionLedger.recordEnd()` 的返回值
+- 期望：正常：同一 `sessionId` 的 `end` 与 `observed` 各只有一行。边界：进程重启后以全部写者文件的内容为准，不重复写。失败与恢复：文件最后一行不完整时忽略该行，写入前截断到最后一个完整行。安全与质量：去重不依赖内存集合单独成立，也不依赖共享可写文件。判定在宿主侧桩边界下成立
+- 失败信息：期望「一次结束只有一条记录」，实际「两个进程各写一遍，统计时重复计数」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；scripts/test-session-ledger.mjs
+- 上游：R-CONN-12
+- 测试：scripts/test-session-ledger.mjs::duplicate end records are written once
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SESSION-13 恢复后界面与快照回到一致状态
+- 层级：单点
+- 父判据：O-SEAM-11、O-SEAM-03
+- 强度：强
+- 设计依据：需求 R-CONN-11、R-CONN-13；架构 §2.6；HLD 契约 C-11
+- 触发与前置条件：`VpnSessionController.connect` 返回 `STARTED`，随后状态文件进入 `state=Running | tun=true`
+- 可观测点：`trafficSession` 的变化；`refreshPeerSnapshot` 的调用；`vpn_session_recovered` 的写入；界面状态文案
+- 期望：正常：恢复成功后立即刷新一次对端快照。`trafficSession` 与上一次不同则清零流量计量与图表样本。连接稳定 60 s 写 `vpn_session_recovered`。边界：恢复返回 `NEEDS_UI` 时不做上述刷新，写 `vpn_session_recovery_needs_ui`。恢复与前台连接同时进行时，后发起者由 `VpnCommandStateMachine.begin` 拒绝，恢复改为退避，不并发建隧道。失败与恢复：恢复失败不刷新快照，界面保持断开态。安全与质量：界面不得在恢复成功前显示已连接。判定在宿主侧桩边界下成立
+- 失败信息：期望「恢复后快照与流量回到一致状态」，实际「恢复成功但界面仍显示旧流量与旧对端状态」
+- 来源：entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/components/BridgeStatus.ets；scripts/test-vpn-session-controller.mjs
+- 上游：R-CONN-11、R-CONN-13
+- 测试：scripts/test-vpn-session-controller.mjs::a recovered session refreshes the snapshot and clears stale traffic
 - 状态：closed
 - 不确定特征：none
 - 归属：—

@@ -1,0 +1,218 @@
+{
+  "skill": "a01",
+  "baseline": "ec64476",
+  "authorizedLayer": "implement",
+  "ruleset": "2026-10-20",
+  "reviewBrief": {
+    "enabled": true
+  },
+  "currentStep": "C-01",
+  "done": [
+    {
+      "step": "L-00",
+      "outputs": [
+        "docs/changes/vpn-endurance/record.md"
+      ],
+      "summary": "开工取证、确认用户报告、登记范围与非目标；回读上一批次缺口",
+      "at": "2026-10-20T17:40:00+11:00"
+    },
+    {
+      "step": "L-01",
+      "outputs": [
+        "docs/requirements/requirements.md",
+        "docs/oracles/90-journeys/02-connection.md",
+        "docs/oracles/90-journeys/03-network.md",
+        "docs/oracles/90-journeys/09-diagnostics.md",
+        "docs/review/requirements/snapshot.json",
+        "docs/review/requirements/index.html",
+        "docs/review/requirements/oracles.html",
+        "docs/review/requirements/review-brief.json",
+        "docs/changes/vpn-endurance/checks/design-check.txt"
+      ],
+      "summary": "需求增量与旅程判据。快照 121 条。人工结论待审核",
+      "at": "2026-10-20T17:55:00+11:00"
+    },
+    {
+      "step": "L-02",
+      "outputs": [
+        "docs/architecture/architecture.md",
+        "docs/oracles/91-seams/S3-orchestration-system.md",
+        "docs/review/architecture/snapshot.json",
+        "docs/review/architecture/index.html",
+        "docs/review/architecture/oracles.html",
+        "docs/review/architecture/review-brief.json"
+      ],
+      "summary": "架构 §2.6 与 O-SEAM-19。快照 156 条。人工结论待审核",
+      "at": "2026-10-20T18:00:00+11:00"
+    },
+    {
+      "step": "L-03",
+      "outputs": [
+        "docs/hld/hld.md",
+        "docs/oracles/points/P1-background-status.md",
+        "docs/review/hld/snapshot.json",
+        "docs/review/hld/index.html",
+        "docs/review/hld/oracles.html",
+        "docs/review/hld/review-brief.json"
+      ],
+      "summary": "HLD C-03/C-11/C-15/C-19 与单点修订。快照 258 条。人工结论待审核",
+      "at": "2026-10-20T18:05:00+11:00"
+    },
+    {
+      "step": "L-04",
+      "outputs": [
+        "docs/lld/lld.md",
+        "docs/oracles/points/P2-network-reconnect.md",
+        "docs/oracles/points/P3-session.md",
+        "docs/oracles/points/P6-power.md",
+        "docs/oracles/_ref-index.md",
+        "docs/review/lld/snapshot.json",
+        "docs/review/lld/index.html",
+        "docs/review/lld/oracles.html",
+        "docs/review/lld/review-brief.json",
+        "docs/changes/vpn-endurance/checks/review-check.txt"
+      ],
+      "summary": "LLD VM-5/VM-6、账本不变量与计划测试。判据 P0 为 0。人工结论待审核",
+      "at": "2026-10-20T18:10:00+11:00"
+    },
+    {
+      "step": "I-01",
+      "outputs": [
+        "scripts/integration/session-ledger-seam.mjs",
+        "scripts/integration/power-stage-seam.mjs"
+      ],
+      "summary": "两条跨进程接缝用例：账本双向追加与原因词表一致、档位文件两进程一致",
+      "at": "2026-10-20T19:20:00+11:00"
+    },
+    {
+      "step": "I-02",
+      "outputs": [
+        "scripts/test-vpn-session-intent.mjs",
+        "scripts/test-session-ledger.mjs",
+        "scripts/test-vpn-power-policy.mjs",
+        "scripts/test-vpn-reconnect-supervisor.mjs",
+        "scripts/test-vpn-background-task.mjs",
+        "scripts/test-vpn-session-controller.mjs",
+        "scripts/test-vpn-special-scenario.mjs",
+        "scripts/lib/memory-fs.mjs"
+      ],
+      "summary": "单元用例覆盖意图、账本、档位、恢复状态机、长时任务、控制器与快照跟踪",
+      "at": "2026-10-20T19:30:00+11:00"
+    },
+    {
+      "step": "I-03",
+      "outputs": [
+        "docs/changes/vpn-endurance/checks/red.txt"
+      ],
+      "summary": "实现前 27 条失败，失败原因与计划一致",
+      "at": "2026-10-20T19:08:00+11:00"
+    },
+    {
+      "step": "I-04",
+      "outputs": [
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/AppLifecycleEvents.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+      ],
+      "summary": "意图文件、会话账本、省电档位、意图驱动的恢复状态机、长时任务意图守卫、网络回调",
+      "at": "2026-10-20T19:50:00+11:00"
+    },
+    {
+      "step": "I-05",
+      "outputs": [
+        "docs/changes/vpn-endurance/checks/tests.txt"
+      ],
+      "summary": "宿主侧 172 条用例全部通过；Debug HAP 35928034 构建成功",
+      "at": "2026-10-20T22:56:00+11:00"
+    },
+    {
+      "step": "I-06",
+      "outputs": [
+        "docs/changes/vpn-endurance/checks/e2e-steps.json",
+        "docs/changes/vpn-endurance/checks/e2e/index.html",
+        "docs/changes/vpn-endurance/checks/e2e-published.txt",
+        "docs/changes/vpn-endurance/checks/ui-restoration.json",
+        "docs/changes/vpn-endurance/checks/ui-restoration/index.html",
+        "docs/changes/vpn-endurance/checks/ui-restoration-published.txt",
+        "docs/changes/vpn-endurance/checks/device-run.txt",
+        "docs/changes/vpn-endurance/checks/run-checks.txt"
+      ],
+      "summary": "新设备 2LQGK24828000076（ALN-AL00 / API 26）设备批次：10 条用例通过 6、跳过 4、失败 0；步骤 21 条通过 15、跳过 6。锁屏 720 秒通过。E2E 报告与发布记录已更新",
+      "at": "2026-10-21T00:15:00+11:00"
+    },
+    {
+      "step": "I-07",
+      "outputs": [
+        "docs/changes/vpn-endurance/checks/final.txt",
+        "docs/changes/vpn-endurance/checks/high-level-review.json",
+        "docs/changes/vpn-endurance/checks/high-level-review/index.html",
+        "docs/changes/vpn-endurance/checks/high-level-review-published.txt",
+        "docs/changes/vpn-endurance/checks/high-level-review-gate.json"
+      ],
+      "summary": "最终基线重跑 172 条宿主用例全绿。新设备批次 6 通过 4 跳过。高层次复查 49 条漏项、8 项覆盖、1 条强项未处置，门禁 blocking",
+      "at": "2026-10-21T00:15:00+11:00"
+    }
+  ],
+  "gates": [],
+  "branches": [],
+  "openItems": [
+    {
+      "id": "O-1",
+      "item": "四层人工结论",
+      "detail": "决策页已生成，门禁因缺少人工结论判 fail。审查者需从页面导出 a01-review-decisions/2 格式的记录",
+      "owner": "项目维护者",
+      "receive": "vpn-endurance",
+      "question": "四层人工结论由谁签署，何时签？"
+    },
+    {
+      "id": "O-2",
+      "item": "设备侧 E2E 有 4 条跳过",
+      "detail": "最终 HAP 批次 10 条用例通过 6 条、跳过 4 条、失败 0。跳过原因：设备 shell 无信号权限；关闭 Wi-Fi 后仍有蜂窝通道；缺后台非主动掉线通道；缺卡片点击通道。跳过不算通过",
+      "owner": "项目维护者",
+      "receive": "vpn-endurance",
+      "question": "设备侧 4 条跳过用例如何补主机通道？"
+    },
+    {
+      "id": "O-3",
+      "item": "12 小时锁屏存活未取得",
+      "detail": "已尝试 12 小时。连续锁屏心跳覆盖 9 小时 42 分，9,294 个心跳，最大间隔 6.9 秒，扩展未重启。13:07:14 屏幕被点亮，13:07:15 界面写入 user_stop 并把意图置为 stopped，运行提前结束。需要一次全程无人操作的 12 小时复跑",
+      "owner": "项目维护者",
+      "receive": "vpn-endurance",
+      "question": "12 小时锁屏存活何时复跑？复跑期间不要解锁或操作手机。"
+    },
+    {
+      "id": "O-4",
+      "item": "审核快照已过期",
+      "detail": "判据文档在本轮实现后再次修改，docs/review/<层>/snapshot.json 与当前文档不一致。重新生成要求工作树干净或新提交，用户未授权提交",
+      "owner": "项目维护者",
+      "receive": "vpn-endurance",
+      "question": "审核快照在哪个提交上重建？"
+    },
+    {
+      "id": "O-5",
+      "item": "高层次复查门禁 blocking（1 条强漏项）",
+      "detail": "清单 49 条、8 项覆盖、4 个独立子 agent。9 条强项的 8 条已修复并补判据：新鲜意图提前保护、前台取消后重新武装、UNKNOWN 重复启动、原因生产者、熄屏快照窗口、后台剩余定时器、后台探测、账本并发压缩（3 条同锚点）。剩余 1 条：P1 被冻结或死亡时没有子系统负责恢复。P2 没有启动连接的恢复入口，平台无进程死亡后的扩展自恢复回调。门禁退出码 1",
+      "owner": "项目维护者",
+      "receive": "vpn-endurance",
+      "question": "P1 冻结或死亡时的恢复责任空洞，是补平台入口，还是接受残余风险？"
+    }
+  ],
+  "next": {
+    "step": "C-01",
+    "reads": [
+      "docs/changes/vpn-endurance/checks/final.txt",
+      "docs/changes/vpn-endurance/completion.md",
+      "docs/changes/vpn-endurance/checks/high-level-review.json",
+      "docs/changes/vpn-endurance/checks/high-level-review-gate.json"
+    ]
+  }
+}

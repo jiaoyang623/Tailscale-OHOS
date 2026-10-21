@@ -1,0 +1,54 @@
+{
+ "skill_version": "a01",
+ "title": "断网再恢复后的自动重连",
+ "change_id": "vpn-endurance",
+ "baseline": "ec64476（工作树有本批次未提交改动）",
+ "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+ "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/network-recovery.mjs",
+ "executed_at": "2026-10-20T13:04:26.121Z",
+ "target": "mobile",
+ "notice": "Wi-Fi 是唯一数据通道时才能造出断网。设备仍有其它通道时用例按原因跳过。",
+ "cases": [
+  {
+   "id": "NET-RECOVERY",
+   "title": "断网后恢复网络自动重连",
+   "oracle_ids": [
+    "O-NET-04",
+    "O-CONN-09",
+    "O-RECONN-11"
+   ],
+   "status": "skip",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "断开网络",
+     "operation": "hdc shell svc wifi disable 并等待 ping 失败",
+     "expected": [
+      "命令成功",
+      "设备不再能访问 1.1.1.1"
+     ],
+     "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
+     }
+    },
+    {
+     "id": "S2",
+     "name": "跳过原因",
+     "operation": "检查前置条件",
+     "expected": [
+      "前置条件满足"
+     ],
+     "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
+     }
+    }
+   ]
+  }
+ ]
+}

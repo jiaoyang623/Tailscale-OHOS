@@ -6,11 +6,12 @@ import { enumToObject, runModules } from './lib/arkts-module.mjs';
 // Run the real lifecycle coordinator with deterministic platform boundaries.
 // ArkTS compilation is verified separately by the repository debug build.
 //
-// The coordinator reads vpn-probe-status.txt through VpnStatusReader, so the
-// reader loads first. Loading the real reader is deliberate: the two used to
-// rank the same status markers differently.
+// 2026-10-20: protection now follows the user's intent, not one uncertain
+// status read. A missing tunnel reading does not release the task while the
+// intent says connected; only a stopped intent does.
 const source = readFileSync(new URL('../entry/src/main/ets/services/VpnBackgroundTaskManager.ets', import.meta.url), 'utf8');
 const readerSource = readFileSync(new URL('../entry/src/main/ets/services/VpnStatusReader.ets', import.meta.url), 'utf8');
+const intentSource = readFileSync(new URL('../entry/src/main/ets/services/VpnSessionIntent.ets', import.meta.url), 'utf8');
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
 function deferred() {
   let resolve;
@@ -22,7 +23,7 @@ function fixture() {
   const f = {
     now: 1000000, status: '', starts: [], stops: 0, notifications: [], events: [],
     callbacks: new Map(), startGate: null, publishGate: null, startError: null,
-    stopGate: null, readError: false
+    stopGate: null, readError: false, intent: 'connected', intentChangedAtMs: 0
   };
   const context = { filesDir: '/files', resourceManager: { getStringByNameSync: () => 'VPN connected' } };
   const sandbox = {
@@ -41,7 +42,14 @@ function fixture() {
       stopBackgroundRunning: async () => { f.stops++; if (f.stopGate) await f.stopGate.promise; }
     },
     fileIo: { readTextSync: () => { if (f.readError) throw Error('temporary I/O'); return f.status; } },
-    StoragePaths: { vpnStatusPath: dir => dir + '/vpn-probe-status.txt' },
+    StoragePaths: {
+      vpnStatusPath: dir => dir + '/vpn-probe-status.txt',
+      vpnIntentPath: dir => dir + '/vpn-intent.json'
+    },
+    VpnIntentDesired: { CONNECTED: 'connected', STOPPED: 'stopped' },
+    VpnSessionIntent: {
+      read: () => ({ desired: f.intent, present: true, changedAtMs: f.intentChangedAtMs, by: 'ui' })
+    },
     notificationManager: {
       SlotType: { LIVE_VIEW: 4 }, ContentType: { NOTIFICATION_CONTENT_SYSTEM_LIVE_VIEW: 5 },
       publish: async request => { f.notifications.push(request); if (f.publishGate) await f.publishGate.promise; }
@@ -60,6 +68,7 @@ function fixture() {
   f.disconnected = () => { f.status = `VPN extension destroyed | heartbeatMs=${f.now}`; };
   f.tick = async () => { await f.manager.reconcile(context); await flush(); };
   f.start = async () => { f.live(); f.manager.register(context); await flush(); };
+  f.stopIntent = () => { f.intent = 'stopped'; };
   f.cancel = (reason, id = 7) => f.callbacks.get('continuousTaskCancel')({ id, reason });
   f.context = context;
   return f;
@@ -81,12 +90,33 @@ test('acquires protection in foreground and updates the same system live view wi
   assert.equal(f.notifications[1].id, 42);
 });
 
-test('stale heartbeat and read errors retain acquired protection for a bounded grace period', async () => {
+test('protection follows intent, not a single uncertain status read', async () => {
   const f = fixture(); await f.start();
+  assert.equal(f.starts.length, 1);
+
+  // Stale heartbeat, then a read error, then more than the old grace window.
   f.now += 16000; await f.tick(); assert.equal(f.stops, 0);
   f.readError = true; f.now += 20000; await f.tick(); assert.equal(f.stops, 0);
-  f.now += 25000; await f.tick(); assert.equal(f.stops, 1);
-  f.readError = false; f.live(); await f.tick(); assert.equal(f.starts.length, 2);
+  f.readError = false; f.now += 25000; await f.tick(); assert.equal(f.stops, 0);
+  assert.ok(f.events.some(args => args[2] === 'background_status_timeout'),
+    'uncertain telemetry was not visible in diagnostics');
+
+  // Only the user's stop releases it.
+  f.stopIntent(); await f.tick(); assert.equal(f.stops, 1);
+});
+
+test('a disconnect while the intent is connected keeps protection', async () => {
+  const f = fixture(); await f.start();
+  f.disconnected(); await f.tick();
+  assert.equal(f.stops, 0, 'a disconnect revoked protection while the user still wanted it');
+  assert.notEqual(f.manager.task, undefined, 'the task was discarded');
+});
+
+test('a stopped intent releases protection promptly', async () => {
+  const f = fixture(); await f.start();
+  f.stopIntent(); await f.tick();
+  assert.equal(f.stops, 1);
+  assert.equal(f.manager.task, undefined);
 });
 
 test('never starts from stale, future, missing heartbeat or missing TUN evidence', async () => {
@@ -99,24 +129,26 @@ test('never starts from stale, future, missing heartbeat or missing TUN evidence
   }
 });
 
-test('explicit disconnect promptly releases the task', async () => {
-  const f = fixture(); await f.start(); f.disconnected(); await f.tick();
-  assert.equal(f.stops, 1);
-  assert.equal(f.manager.task, undefined);
-});
-
 test('snapshot failure is uncertain and does not immediately revoke protection', async () => {
   const f = fixture(); await f.start();
   f.status = `FAILED | VPN backend | status unavailable | heartbeatMs=${f.now}`;
   await f.tick(); assert.equal(f.stops, 0);
 });
 
-test('user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect', async () => {
+test('user dismissed notification keeps the vpn and re-arms on foreground', async () => {
   const f = fixture(); await f.start(); f.cancel(1);
-  f.now += 90000; await f.tick(); f.live();
-  f.manager.onForeground(f.context); await flush(); assert.equal(f.starts.length, 1);
-  f.disconnected(); await f.tick(); f.live(); await f.tick();
-  assert.equal(f.starts.length, 2);
+  assert.equal(f.stops, 0, 'cancelling the notification stopped the tunnel');
+  assert.ok(f.events.some(args => args[2] === 'background_user_cancelled_kept_vpn'),
+    'the decision to keep the tunnel was not recorded');
+
+  // Backgrounded, the app does not fight the system for the task.
+  f.now += 90000; f.live(); await f.tick();
+  assert.equal(f.starts.length, 1, 'the app re-acquired the task in the background');
+
+  // Back in the foreground, the intent still stands, so protection returns.
+  f.manager.onForeground(f.context); await flush();
+  assert.equal(f.starts.length, 2, 'foreground did not re-arm protection');
+  assert.ok(f.events.some(args => args[2] === 'background_protection_restored'));
 });
 
 test('system cancellation retries with exponential backoff', async () => {
@@ -146,10 +178,12 @@ test('cancellation received during start cannot be overwritten by its late resul
   await f.tick(); assert.equal(f.starts.length, 1);
 });
 
-test('disconnect during start cleans up the late successful task without publishing', async () => {
-  const f = fixture(); f.startGate = deferred(); await f.start(); f.disconnected();
+test('a stopped intent during start cleans up the late task without publishing', async () => {
+  const f = fixture(); f.startGate = deferred(); await f.start();
+  f.stopIntent();
   f.startGate.resolve(); await flush();
-  assert.equal(f.stops, 1); assert.equal(f.notifications.length, 0);
+  assert.equal(f.stops, 1, 'the late task was left in place');
+  assert.equal(f.notifications.length, 0, 'the late task published a notification');
 });
 
 test('destroy during start cleans up the late successful task', async () => {
@@ -166,8 +200,8 @@ test('destroy during notification update serializes cleanup after publish', asyn
 });
 
 test('reconnect waits for in-flight stop before starting the next task', async () => {
-  const f = fixture(); await f.start(); f.stopGate = deferred(); f.disconnected();
-  const stopping = f.tick(); await flush(); f.live(); await f.tick();
+  const f = fixture(); await f.start(); f.stopGate = deferred(); f.stopIntent();
+  const stopping = f.tick(); await flush(); f.intent = 'connected'; f.live(); await f.tick();
   assert.equal(f.starts.length, 1);
   f.stopGate.resolve(); await stopping; await f.tick(); assert.equal(f.starts.length, 2);
 });
@@ -198,17 +232,49 @@ test('the connect window needs interface evidence, not just an unrecognised stat
   }
 });
 
-test('a stalled connect window still releases protection', async () => {
+test('a fresh connected intent holds protection before any interface evidence', async () => {
+  // The page writes the intent before it stages a command. The extension can
+  // spend up to 20 s in backend and config work, so the process must already
+  // own the task when the handoff request arrives.
+  const f = fixture();
+  f.status = '';
+  f.intentChangedAtMs = f.now;
+  f.manager.register(f.context); await flush();
+  assert.equal(f.starts.length, 1);
+  f.manager.onBackground(f.context); await flush();
+  assert.equal(f.stops, 0);
+  // The window ages out without interface evidence. The task that exists is
+  // kept while the intent stands, so recovery can still run.
+  f.now += 61000; await f.tick();
+  assert.equal(f.stops, 0);
+});
+
+test('an old connected intent does not start protection on its own', async () => {
+  const f = fixture();
+  f.status = '';
+  f.intentChangedAtMs = f.now - 61000;
+  f.manager.register(f.context); await flush();
+  assert.equal(f.starts.length, 0);
+});
+
+test('dismissing the notification in the foreground re-arms protection at once', async () => {
+  const f = fixture(); await f.start();
+  f.manager.onForeground(f.context); await flush();
+  f.cancel(1);
+  assert.equal(f.stops, 0, 'cancelling the notification stopped the tunnel');
+  f.now += 1000; f.live(); await f.tick();
+  assert.equal(f.starts.length, 2, 'the foreground did not re-acquire the task');
+  f.manager.onBackground(f.context); await flush();
+  assert.equal(f.starts.length, 2, 'the re-acquired task was not kept in the background');
+});
+
+test('a stalled connect window keeps protection while the intent stands', async () => {
   const f = fixture(); f.connecting(); f.manager.register(f.context); await flush();
   assert.equal(f.starts.length, 1);
   // The extension stops writing heartbeats: uncertain, not live.
   f.now += 20000; await f.tick(); assert.equal(f.stops, 0);
-  f.now += 50000; await f.tick(); assert.equal(f.stops, 1);
-});
-
-test('an explicit disconnect during the connect window releases promptly', async () => {
-  const f = fixture(); f.connecting(); f.manager.register(f.context); await flush();
-  assert.equal(f.starts.length, 1);
-  f.disconnected(); await f.tick();
-  assert.equal(f.stops, 1);
+  f.now += 50000; await f.tick(); assert.equal(f.stops, 0,
+    'a stalled connect window released protection');
+  // Only the user's stop releases it.
+  f.stopIntent(); await f.tick(); assert.equal(f.stops, 1);
 });

@@ -27,13 +27,13 @@
 | M-13 | 两个进程里同一份 `.so` 是几个运行时 | 通过（本轮真机，两个独立运行时） |
 | M-14 | 桌面卡片开关 | 未执行（待本轮真机） |
 | M-15 | Taildrive 真机共享节点 | 未执行（待本轮真机） |
-| M-16 | special-scenario 长时任务 | 未执行（待本轮真机） |
-| M-17 | VPN 冲突路径是否收敛 | 未执行（待本轮真机） |
-| M-18 | 蜂窝下的长时间存活与连接期保活复跑 | 未执行（待本轮真机） |
-| M-19 | 冷启动到可用的耗时 | 未执行（待本轮真机） |
+| M-16 | special-scenario 长时任务 | 部分（回落分支已测；正常路径缺 ACL 与子类型定值） |
+| M-17 | VPN 冲突路径是否收敛 | 部分（第三条已测，前两条缺第二个 VPN 应用） |
+| M-18 | 蜂窝下的长时间存活与连接期保活复跑 | 部分（Wi-Fi + USB 供电下通过；蜂窝记为 M-11，未完成） |
+| M-19 | 冷启动到可用的耗时 | 通过（实测，定 ≤ 200 ms） |
 
-M-14 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/device-run.sh` 在一次上机里跑完。
-**未执行不等于通过。** 回填前，这六条一律不计入任何通过证据。M-18 已在本轮执行。
+M-14 到 M-17 的步骤与判定见 `device-runbook.md`。它们由 `scripts/device-run.sh` 在一次上机里跑完。
+**未执行不等于通过。** 回填前，这几条不计入任何通过证据。M-18 与 M-19 已在本轮执行，见下文各节。
 
 ---
 
@@ -177,10 +177,25 @@ M-14 到 M-19 的步骤与判定见 `device-runbook.md`。它们由 `scripts/dev
 - 命令：`DEVICE=56T0225330000021 node --test scripts/e2e/screen-off-survival.mjs`
 - 来源：本轮真机（非转抄）。
 
-## M-14 到 M-19
+## M-14 到 M-17
 
-M-13 已在本轮真机执行，见上。这六条由 `device-run.sh` 在一次上机里跑完，步骤见 `device-runbook.md`。
-**全部未执行。** 执行后逐条回填本节，并把结论写进上面的表。回填前它们不计入任何通过证据。
+这四条由 `device-run.sh` 在一次上机里跑完，步骤见 `device-runbook.md`，操作步骤见 `operator-sheet.md`。
+M-16 与 M-17 已部分执行，见下文。**M-14、M-15 全部未执行**，不计入任何通过证据。
+
+## M-16 special-scenario 长时任务
+
+- 阈值：连接后长时任务起来，且 `background_special_scenario_*` 的原因记录与走哪条路一致。
+- **已实测的部分（2026-10-13，Pura X）**：回落分支走通了。一次冷启动到连接的旅程里，
+  `background_special_scenario_unconfigured` 出现 2 次，长时任务照常由 `DATA_TRANSFER` 起。
+  这说明「尝试 special-scenario → 判为未配置 → 回落」这条链是活的，且原因被记了下来。
+- 证据：`~/mesharc-e2e/m17-probe-2026-10-13T07-23-31-874Z.log`。
+- 未执行的部分：special-scenario 真正起来的正常路径。它卡在两个前置上，
+  两个都不是本轮能决定的：
+  1. 受限权限的 ACL 未获批。声明这行权限会导致安装失败，所以默认关着。
+  2. 子类型常量 `SPECIAL_SCENARIO_SUBMODE` 仍是 `0`（整条路径故意不启用）。
+     选哪个子类型等于向华为申明本应用的用途，要提交方决定。
+- 本条不新增诊断埋点也能测：`background_special_scenario_unconfigured` 是本轮新加的记录。
+- 来源：本轮真机（非转抄）。
 
 ## M-19 冷启动到可用的耗时
 
@@ -202,7 +217,17 @@ M-13 已在本轮真机执行，见上。这六条由 `device-run.sh` 在一次�
   `vpn_conflict_acknowledged`、`vpn_create_failed` 这些诊断事件经 hilog 镜像到达主机。
   在 `device-run.sh` 的采集文件里找（`03-log*.txt`）。
   `devecocli log --from` 与 `devecocli log --keyword` 在这台设备上返回 0 行（设备时钟与主机差 3 小时），不要用。
-- 状态：**未执行**。执行后填结论、测得数值与未闭环的部分。
+- 状态：**部分执行**（2026-10-13，Pura X）。第三条已测得；前两条被阻塞，原因见下。
+- 已测结果（第三条）：
+  - 操作：`aa force-stop ren.w2h.mesharc` 杀掉应用进程，此时设备上没有其它 VPN，再冷启动并点连接。
+  - 观测：冲突相关事件命中 **0** 条。日志里是干净的 `vpn_extension_created` → `vpn_tun_created` → `vpn_connected`，三步的 `code` 都是 0。
+  - 证据：`~/mesharc-e2e/m17-probe-2026-10-13T07-23-31-874Z.log`（154 行）。
+  - 结论：判据第三条成立。强杀应用进程不会留下占位的 VPN 注册，重连不报冲突。
+- 边界：本次强杀同时结束了 UI 进程与 `:vpn` 扩展进程，槽位被系统一并释放。
+  「只死 UI、扩展活着占槽位」那种更严的情况没有测到，因为 `kill -9 <UI 进程>` 返回 `Operation not permitted`。
+- 前两条为什么阻塞：设备上没有第三方 VPN 应用（`bm dump -a` 只有系统包 `com.huawei.hmos.vpndialog`），
+  触发不了 `VPN_EXISTS_ERROR_CODE`(2203002)。
+- 来源：本轮真机（非转抄）。
 - 为什么这么判：冲突循环没有次数上限，也没有自杀超时（`TailscaleVpnExtensionAbility.ets:602`），
   只在应用停掉扩展时结束。应用在检测到冲突时自停（`BridgeStatus.ets:4339`），
   所以只有应用进程死掉时才无人停它。最后一步就是打这个空洞。

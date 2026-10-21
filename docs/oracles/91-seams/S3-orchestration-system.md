@@ -1,6 +1,6 @@
-# MeshArc 接缝判据 · 编排与系统边界（O-SEAM-10 … O-SEAM-12）
+# MeshArc 接缝判据 · 编排与系统边界（O-SEAM-10 … O-SEAM-12、O-SEAM-19）
 
-本文件覆盖「编排分叉」「长时任务与实况窗」「网络回调与重绑」三条接缝。
+本文件覆盖「编排分叉」「长时任务与实况窗」「网络回调与重绑」「会话结束事件与原因分类」四条接缝。
 它们分别是架构决策 D1 本身、D4/D5 的系统对端，以及 R-NET-03 逼出的扩展内重绑。
 `期望` 只写数据/控制/责任怎么交出去，不写用户看到什么。
 
@@ -28,7 +28,7 @@
 - 设计依据：架构 §三 3.1、§四 D4（长生命周期服务端放扩展进程）与 D5（连接窗口也算 live）、§五 责任空洞检查第 3 条；`module.json5` 声明 `backgroundModes ["dataTransfer"]`；架构 A-SEAMS、A-D5、A-D4
 - 触发与前置条件：P1 进入前台并开始监测 VPN 状态；`VpnBackgroundTaskManager` 每 1000 ms（`CONNECTION_CHECK_INTERVAL_MS`）读 `vpn-probe-status.txt`，据此决定向系统申请或释放 DATA_TRANSFER 长时任务
 - 可观测点：长时任务通知与 `background_started` / `background_stopped` / `background_status_timeout` / `background_started_special_scenario` 事件；UI 与 VPN 进程的存活、进程 ID、心跳龄（走查 M-01）；TUN 双向读写计数（走查 M-02）；`vpn-probe-status.txt` 的 state 词表
-- 期望：正常：P1 把「系统长时任务」当作对 P2 存活窗口的承诺——只要读到 live 状态（`connected`，或含 `vpn interface established` 的新鲜心跳被解析为 `connecting`）且心跳龄 ≤ `VPN_STATUS_FRESH_MS`(15000 ms)，就持有 `dataTransfer` 长时任务，并把 txBytes/rxBytes 以 `SlotType.LIVE_VIEW` 的实况窗通知（`typeCode 8`）按 `NOTIFICATION_UPDATE_INTERVAL_MS` 刷新；start/stop 经 `operationInFlight` 串行化，一次只允许一个在途操作，生命周期代际（generation/cancellationRevision）保证销毁期间的迟到操作被丢弃。边界：心跳陈旧或缺失（>15 s）判为**不确定**而不是 connected，已持有的任务在 `VPN_STATUS_GRACE_MS`(60000 ms) 宽限后才释放并记 `background_status_timeout`，且从不凭旧证据新建任务；用户主动取消保活通知（`USER_CANCEL` / `USER_CANCEL_REMOVE_NOTIFICATION`）后 `suppressedUntilDisconnect` 置真，同一会话内不自行恢复。失败与恢复：只有系统侧取消（非用户）才由 `scheduleRetry` 安排退避重试（`START_RETRY_BASE_MS` 30000 起、指数、`START_RETRY_MAX_MS` 300000 封顶）；读到 `disconnected` 时立即清零重试态并释放任务。**责任空洞（本层确认的唯一空洞，必须写在此处）**：P1 在后台且未持有长时任务时会被系统冻结，此时若 P2 被杀导致掉线，没有任何子系统承诺「P1 被冻结期间的掉线恢复」——恢复责任在 `VpnReconnectSupervisor`，而它恰恰是可能已被冻结的一方；用户回到应用之前会一直保持断开（`docs/background-vpn-reliability.md` Milestone 2「stayed disconnected until the user noticed」，D4 风险）。安全与质量：把连接窗口与稳定连接等重持有不得放松 Milestone 1 的收紧原则——无法识别的状态（`state=Running | tun=false`、裸 lifecycle 行、陈旧心跳）仍不持有任务；实况窗只回显字节数与本地化标题，不含地址或凭据。用户请求停止后，在途重连必须作废：`VpnReconnectSupervisor` 给 `VpnSessionController.connect` 传一个取消令牌（`services/VpnReconnectSupervisor.ets` 的 `stillAuthorised`），连接在后端就绪之后与启动扩展之前各查一次；若窗口落在两次检查之间，完成时按令牌撤销自己刚建起的那条隧道。已知局限：M-01/M-02 在 USB/HDC 连接且充电下完成，通过一次不代表电池深度休眠、拔线、强杀或重启仍成立；M-11 的 720 s 连续蜂窝锁屏未完成，不得据此宣称蜂窝下的长时间后台存活。
+- 期望：正常：P1 把「系统长时任务」当作对 P2 存活窗口的承诺——只要读到 live 状态（`connected`，或含 `vpn interface established` 的新鲜心跳被解析为 `connecting`）且心跳龄 ≤ `VPN_STATUS_FRESH_MS`(15000 ms)，就持有 `dataTransfer` 长时任务，并把 txBytes/rxBytes 以 `SlotType.LIVE_VIEW` 的实况窗通知（`typeCode 8`）按 `NOTIFICATION_UPDATE_INTERVAL_MS` 刷新；start/stop 经 `operationInFlight` 串行化，一次只允许一个在途操作，生命周期代际（generation/cancellationRevision）保证销毁期间的迟到操作被丢弃。边界：心跳陈旧或缺失（>15 s）判为**不确定**而不是 connected，已持有的任务在 `VPN_STATUS_GRACE_MS`(60000 ms) 宽限后才释放并记 `background_status_timeout`，且从不凭旧证据新建任务；用户主动取消保活通知（`USER_CANCEL` / `USER_CANCEL_REMOVE_NOTIFICATION`）后 `suppressedUntilDisconnect` 置真，同一会话内不自行恢复。失败与恢复：只有系统侧取消（非用户）才由 `scheduleRetry` 安排退避重试（`START_RETRY_BASE_MS` 30000 起、指数、`START_RETRY_MAX_MS` 300000 封顶）；读到 `disconnected` 时立即清零重试态并释放任务。**责任空洞（本层确认的唯一空洞，必须写在此处）**：P1 在后台且未持有长时任务时会被系统冻结，此时若 P2 被杀导致掉线，没有任何子系统承诺「P1 被冻结期间的掉线恢复」——恢复责任在 `VpnReconnectSupervisor`，而它恰恰是可能已被冻结的一方；用户回到应用之前会一直保持断开（`docs/background-vpn-reliability.md` Milestone 2「stayed disconnected until the user noticed」，D4 风险）。安全与质量：把连接窗口与稳定连接等重持有不得放松 Milestone 1 的收紧原则——无法识别的状态（`state=Running | tun=false`、裸 lifecycle 行、陈旧心跳）仍不持有任务；实况窗只回显字节数与本地化标题，不含地址或凭据。用户请求停止后，在途重连必须作废：`VpnReconnectSupervisor` 给 `VpnSessionController.connect` 传一个授权令牌（`services/VpnReconnectSupervisor.ets` 的 `authorised`，true 表示仍有授权），连接在写意图之前、后端就绪之后与启动扩展之前各查一次；若窗口落在最后一次检查之后，完成时按令牌撤销自己刚建起的那条隧道。已知局限：M-01/M-02 在 USB/HDC 连接且充电下完成，通过一次不代表电池深度休眠、拔线、强杀或重启仍成立；M-11 的 720 s 连续蜂窝锁屏未完成，不得据此宣称蜂窝下的长时间后台存活。
 - 失败信息：期望「连接窗口与稳定连接期都持有 dataTransfer 长时任务、心跳陈旧按不确定有界宽限释放」，实际「窗口期 P1 被冻结、无人应答交接；或拿到陈旧证据就新建任务、用户取消后自行恢复；或后台掉线在 P1 被冻结期间无人恢复」
 - 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:14-16 新鲜度/宽限/1 s 节拍；:66-71 USER_CANCEL 判定；:151-198 reconcile；:171 与 :202 live 判定；:205-239 start 与串行化；:309-330 LIVE_VIEW 实况窗；:392-396 scheduleRetry 退避；entry/src/main/module.json5:29-30 backgroundModes [dataTransfer]；docs/background-vpn-reliability.md:56-67 Milestone 2 的恢复空洞；docs/architecture/architecture.md 第四节 D4/D5、第五节责任空洞检查第 3 条
 - 上游：R-CONN-04、R-CONN-10
@@ -52,6 +52,23 @@
 - 上游：R-NET-03、R-NET-04
 - 测试：真机走查 a01-baseline/manual-checks.md#M-03
   真机走查 a01-baseline/manual-checks.md#M-04
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-SEAM-19 会话结束事件与原因分类：两个进程都可能先退出
+- 层级：接缝
+- 父判据：O-CONN-08
+- 强度：强
+- 设计依据：需求 R-CONN-12「非用户原因的断连都要落盘留证」；架构 §2.6、§五 O-CONN-08 行、§七 O-SEAM-19 对照行、A-SEAMS；HLD 契约 C-19
+- 触发与前置条件：一次 VPN 会话结束。结束由任一进程先感知——用户停止（P1）、扩展 onDestroy（P2）、后端交接超时（P2）、系统停止或网络失效。两个进程都可能先退出。
+- 可观测点：账本文件的行（按写者分文件）；`vpn-intent.json`；写者各自的 `vpn-session-end-{ui|vpn}.json`；`vpn-probe-status.txt` 的 `sessionId`；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered`、`vpn_session_recovery_deferred` 事件
+- 期望：正常：先退出的进程写 `kind=end`，`reason` 在受控词表内。后感知的进程按同一 `sessionId` 补写 `kind=observed`，不重复写 `end`。边界：用户停止时 P1 先写 `user_stop`，意图随后为 stopped，P2 的 onDestroy 不再写第二条 `end`。交接超时由 P2 写 `handoff_timeout`。P1 读到心跳停止且账本没有 `end` 记录时写 `extension_crash` 或 `unknown`，并在 `phase` 说明缺哪条证据。每个写者只改自己的文件，压缩不会重写对方的文件。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。读取按时间合并并去重。安全与质量：同一 `sessionId + kind` 只写一次；记录只含受控字段，不含地址、账号、令牌或设备标识；意图文件是唯一意图来源，账本不得反向改写意图。判定在宿主侧桩边界（两个沙箱共享一个内存文件系统）下成立
+- 失败信息：期望「谁先退出谁写原因，后感知的一方补写观测且不重复」，实际「两个进程各写一条或多条，原因拼写不一致，无法统计」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy；entry/src/main/ets/entryability/EntryAbility.ets；scripts/integration/session-ledger-seam.mjs
+- 上游：R-CONN-12
+- 测试：[集成] scripts/integration/session-ledger-seam.mjs::two writers append to one ledger and neither rewrite drops the other record
 - 状态：closed
 - 不确定特征：none
 - 归属：—

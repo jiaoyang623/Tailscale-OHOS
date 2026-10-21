@@ -1,0 +1,57 @@
+{
+  "schema": "a01.ui-restoration/1",
+  "change_id": "vpn-endurance",
+  "baseline": "ec64476",
+  "mode": "not-applicable",
+  "not_applicable_reason": "本批次只改运行行为：恢复状态机、意图文件、会话账本、长时任务守护与省电档位的定时器节拍。没有改布局、颜色、字体、图标、控件结构或页面跳转。界面可见的变化只有刷新时机变慢，截图像素比对不能检出节拍变化。项目声明也没有配置 UI 还原适配器与设计稿来源。",
+  "design_source": {
+    "kind": "baseline",
+    "baseline_ref": "ec64476"
+  },
+  "environment": {
+    "device": "Pura X / 56T0225330000021",
+    "renderer": "ArkUI",
+    "density": 3.25,
+    "status_bar_px": 0
+  },
+  "thresholds": {
+    "text_px": 2,
+    "non_text_px": 4,
+    "calibrated": false
+  },
+  "coverage": {
+    "overall": 0,
+    "floor": 0,
+    "uncovered_count": 0,
+    "by_type": {
+      "none": 0
+    }
+  },
+  "identity": {
+    "mapped": 0,
+    "unmapped": 0,
+    "ambiguous": 0,
+    "tiers": {}
+  },
+  "gate": {
+    "state": "clear",
+    "verdict": "not-applicable",
+    "blocking_findings": 0,
+    "failed_blocks": []
+  },
+  "findings": [],
+  "elements": {
+    "design_count": 0,
+    "device_count": 0,
+    "compared": 0,
+    "rows": []
+  },
+  "calibration": {
+    "samples": 0,
+    "noise_floor": {
+      "text_px": 0,
+      "non_text_px": 0
+    },
+    "last_run": ""
+  }
+}

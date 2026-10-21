@@ -90,7 +90,17 @@ test('an explicit stop reports disconnected', () => {
 test('a failed extension reports disconnected', () => {
   const f = fixture();
   f.at('FAILED | VPN start | code=1');
-  assert.equal(f.read().state, 'disconnected');
+  const snapshot = f.read();
+  assert.equal(snapshot.state, 'disconnected');
+  assert.equal(snapshot.conflict, false);
+});
+
+test('a VPN conflict is flagged on the snapshot', () => {
+  const f = fixture();
+  f.at('FAILED | VPN start | code=2203002');
+  const snapshot = f.read();
+  assert.equal(snapshot.state, 'disconnected');
+  assert.equal(snapshot.conflict, true);
 });
 
 test('a failed snapshot read is not treated as a stopped tunnel', () => {

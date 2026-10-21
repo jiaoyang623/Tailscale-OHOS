@@ -1,0 +1,783 @@
+# Red 记录（实现前）
+
+- 命令：node --test scripts/test-*.mjs scripts/integration/*.mjs
+- 时间：2026-10-20T19:08:00+1100
+- 基线：ec64476（工作树有本批次未提交改动）
+- 结果：27 条失败，失败原因符合计划（新服务不存在、旧行为与新判据冲突）
+
+```text
+TAP version 13
+# node:fs:440
+#     return binding.readFileUtf8(path, stringToFlags(options.flag));
+#                    ^
+# Error: ENOENT: no such file or directory, open '/opt/git/github/mesharc/entry/src/main/ets/services/VpnPowerPolicy.ets'
+#     at readFileSync (node:fs:440:20)
+#     at file:///opt/git/github/mesharc/scripts/integration/power-stage-seam.mjs:13:22
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/opt/git/github/mesharc/entry/src/main/ets/services/VpnPowerPolicy.ets'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/integration/power-stage-seam.mjs
+not ok 1 - scripts/integration/power-stage-seam.mjs
+  ---
+  duration_ms: 41.575092
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/integration/power-stage-seam.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# node:fs:440
+#     return binding.readFileUtf8(path, stringToFlags(options.flag));
+#                    ^
+# Error: ENOENT: no such file or directory, open '/opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets'
+#     at readFileSync (node:fs:440:20)
+#     at file:///opt/git/github/mesharc/scripts/integration/session-ledger-seam.mjs:13:16
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/integration/session-ledger-seam.mjs
+not ok 2 - scripts/integration/session-ledger-seam.mjs
+  ---
+  duration_ms: 34.098473
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/integration/session-ledger-seam.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# node:fs:440
+#     return binding.readFileUtf8(path, stringToFlags(options.flag));
+#                    ^
+# Error: ENOENT: no such file or directory, open '/opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets'
+#     at readFileSync (node:fs:440:20)
+#     at file:///opt/git/github/mesharc/scripts/test-session-ledger.mjs:14:16
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/test-session-ledger.mjs
+not ok 3 - scripts/test-session-ledger.mjs
+  ---
+  duration_ms: 31.262261
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-session-ledger.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# (node:3770155) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: acquires protection in foreground and updates the same system live view with real traffic
+ok 4 - acquires protection in foreground and updates the same system live view with real traffic
+  ---
+  duration_ms: 28.597232
+  type: 'test'
+  ...
+# Subtest: protection follows intent, not a single uncertain status read
+not ok 5 - protection follows intent, not a single uncertain status read
+  ---
+  duration_ms: 2.664566
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:91:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:98:63)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a disconnect while the intent is connected keeps protection
+not ok 6 - a disconnect while the intent is connected keeps protection
+  ---
+  duration_ms: 2.18842
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:106:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    a disconnect revoked protection while the user still wanted it
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:109:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a stopped intent releases protection promptly
+not ok 7 - a stopped intent releases protection promptly
+  ---
+  duration_ms: 1.541131
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:113:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:116:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: never starts from stale, future, missing heartbeat or missing TUN evidence
+ok 8 - never starts from stale, future, missing heartbeat or missing TUN evidence
+  ---
+  duration_ms: 5.13215
+  type: 'test'
+  ...
+# Subtest: snapshot failure is uncertain and does not immediately revoke protection
+ok 9 - snapshot failure is uncertain and does not immediately revoke protection
+  ---
+  duration_ms: 1.501493
+  type: 'test'
+  ...
+# Subtest: user dismissed notification keeps the vpn and re-arms on foreground
+not ok 10 - user dismissed notification keeps the vpn and re-arms on foreground
+  ---
+  duration_ms: 1.532119
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:136:1'
+  failureType: 'testCodeFailure'
+  error: 'the decision to keep the tunnel was not recorded'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:139:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: system cancellation retries with exponential backoff
+ok 11 - system cancellation retries with exponential backoff
+  ---
+  duration_ms: 1.628606
+  type: 'test'
+  ...
+# Subtest: unrelated cancellation does not discard the VPN task
+ok 12 - unrelated cancellation does not discard the VPN task
+  ---
+  duration_ms: 2.044171
+  type: 'test'
+  ...
+# Subtest: a failed start is throttled instead of retried every second
+ok 13 - a failed start is throttled instead of retried every second
+  ---
+  duration_ms: 4.213421
+  type: 'test'
+  ...
+# Subtest: cancellation received during start cannot be overwritten by its late result
+ok 14 - cancellation received during start cannot be overwritten by its late result
+  ---
+  duration_ms: 1.734387
+  type: 'test'
+  ...
+# Subtest: a stopped intent during start cleans up the late task without publishing
+not ok 15 - a stopped intent during start cleans up the late task without publishing
+  ---
+  duration_ms: 1.45492
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:179:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    the late task was left in place
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:183:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: destroy during start cleans up the late successful task
+ok 16 - destroy during start cleans up the late successful task
+  ---
+  duration_ms: 1.414563
+  type: 'test'
+  ...
+# Subtest: destroy during notification update serializes cleanup after publish
+ok 17 - destroy during notification update serializes cleanup after publish
+  ---
+  duration_ms: 1.502467
+  type: 'test'
+  ...
+# Subtest: reconnect waits for in-flight stop before starting the next task
+not ok 18 - reconnect waits for in-flight stop before starting the next task
+  ---
+  duration_ms: 1.431474
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:200:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:204:64)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: holds protection through the connect window so the handoff can be answered
+ok 19 - holds protection through the connect window so the handoff can be answered
+  ---
+  duration_ms: 1.894758
+  type: 'test'
+  ...
+# Subtest: the connect window needs interface evidence, not just an unrecognised status
+ok 20 - the connect window needs interface evidence, not just an unrecognised status
+  ---
+  duration_ms: 3.487375
+  type: 'test'
+  ...
+# Subtest: a stalled connect window keeps protection while the intent stands
+not ok 21 - a stalled connect window keeps protection while the intent stands
+  ---
+  duration_ms: 1.384091
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:233:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    a stalled connect window released protection
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-background-task.mjs:238:42)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# node:fs:440
+#     return binding.readFileUtf8(path, stringToFlags(options.flag));
+#                    ^
+# Error: ENOENT: no such file or directory, open '/opt/git/github/mesharc/entry/src/main/ets/services/VpnPowerPolicy.ets'
+#     at readFileSync (node:fs:440:20)
+#     at file:///opt/git/github/mesharc/scripts/test-vpn-power-policy.mjs:12:16
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/opt/git/github/mesharc/entry/src/main/ets/services/VpnPowerPolicy.ets'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/test-vpn-power-policy.mjs
+not ok 5 - scripts/test-vpn-power-policy.mjs
+  ---
+  duration_ms: 41.550494
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-power-policy.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# (node:3770203) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a tunnel that drops well after backgrounding is brought back
+not ok 23 - a tunnel that drops well after backgrounding is brought back
+  ---
+  duration_ms: 4.531741
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:102:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(f.events.includes('vpn_session_recovery_attempt'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:111:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: a foreground drop is recovered without the ten second settle
+not ok 24 - a foreground drop is recovered without the ten second settle
+  ---
+  duration_ms: 0.682212
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:114:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    a foreground drop was not recovered
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:122:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a drop moments after backgrounding is recovered
+not ok 25 - a drop moments after backgrounding is recovered
+  ---
+  duration_ms: 0.555561
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:126:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:134:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a drop after the user asked to disconnect is not undone
+not ok 26 - a drop after the user asked to disconnect is not undone
+  ---
+  duration_ms: 0.50345
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:137:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:146:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a deliberate reconnect re-arms recovery
+not ok 27 - a deliberate reconnect re-arms recovery
+  ---
+  duration_ms: 0.523477
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:150:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:159:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: recovery never exhausts while the user keeps the intent
+not ok 28 - recovery never exhausts while the user keeps the intent
+  ---
+  duration_ms: 0.621817
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:169:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    the supervisor gave up while the intent stayed connected
+    
+    3 !== 6
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 6
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:182:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: retries back off instead of firing on every sample
+ok 29 - retries back off instead of firing on every sample
+  ---
+  duration_ms: 0.558854
+  type: 'test'
+  ...
+# Subtest: an unknown state is not treated as a drop
+ok 30 - an unknown state is not treated as a drop
+  ---
+  duration_ms: 0.831961
+  type: 'test'
+  ...
+# Subtest: sustained unknown after a connection is a drop
+not ok 31 - sustained unknown after a connection is a drop
+  ---
+  duration_ms: 0.679115
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:215:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    a sustained unknown never became a drop
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:228:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: returning to the foreground clears the retry ladder
+ok 32 - returning to the foreground clears the retry ladder
+  ---
+  duration_ms: 0.649877
+  type: 'test'
+  ...
+# Subtest: a connection held past the stability window records a recovery
+not ok 33 - a connection held past the stability window records a recovery
+  ---
+  duration_ms: 0.522492
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:254:1'
+  failureType: 'testCodeFailure'
+  error: 'stability window did not record the recovery: vpn_reconnect_attempt, vpn_reconnect_started, vpn_reconnect_succeeded'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:276:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a stop requested while a reconnect is in flight undoes the connect
+not ok 34 - a stop requested while a reconnect is in flight undoes the connect
+  ---
+  duration_ms: 0.815387
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:280:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(f.events.includes('vpn_session_recovery_superseded'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:295:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a connect that cancelled itself is not undone
+not ok 35 - a connect that cancelled itself is not undone
+  ---
+  duration_ms: 0.594512
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:298:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(f.events.includes('vpn_session_recovery_cancelled'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:312:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a reconnect that finishes with no stop is left alone
+not ok 36 - a reconnect that finishes with no stop is left alone
+  ---
+  duration_ms: 0.54405
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:315:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(f.events.includes('vpn_session_recovery_started'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:327:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the supervisor hands the controller a cancellation token
+ok 37 - the supervisor hands the controller a cancellation token
+  ---
+  duration_ms: 0.404926
+  type: 'test'
+  ...
+# Subtest: network loss defers recovery until the network returns
+not ok 38 - network loss defers recovery until the network returns
+  ---
+  duration_ms: 0.501604
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:346:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    an offline device still tried to connect
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:359:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: an intent that is stopped never recovers on a network callback
+not ok 39 - an intent that is stopped never recovers on a network callback
+  ---
+  duration_ms: 0.428207
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:376:1'
+  failureType: 'testCodeFailure'
+  error: 'f.supervisor.onNetworkAvailable is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-reconnect-supervisor.mjs:385:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:3770211) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a headless connect answers the extension backend handoff
+ok 40 - a headless connect answers the extension backend handoff
+  ---
+  duration_ms: 1.962208
+  type: 'test'
+  ...
+# Subtest: the handoff answer keeps polling while no request has arrived
+ok 41 - the handoff answer keeps polling while no request has arrived
+  ---
+  duration_ms: 1.090865
+  type: 'test'
+  ...
+# Subtest: a backend that cannot be stopped still releases the extension
+ok 42 - a backend that cannot be stopped still releases the extension
+  ---
+  duration_ms: 0.609835
+  type: 'test'
+  ...
+# Subtest: a malformed handoff request is cleared, not answered
+ok 43 - a malformed handoff request is cleared, not answered
+  ---
+  duration_ms: 0.537429
+  type: 'test'
+  ...
+# Subtest: a stale request id is refused instead of confirming the handoff
+ok 44 - a stale request id is refused instead of confirming the handoff
+  ---
+  duration_ms: 0.489994
+  type: 'test'
+  ...
+# Subtest: a connect that is already up never starts or stops anything
+ok 45 - a connect that is already up never starts or stops anything
+  ---
+  duration_ms: 0.43534
+  type: 'test'
+  ...
+# Subtest: a cancelled connect never starts the extension
+ok 46 - a cancelled connect never starts the extension
+  ---
+  duration_ms: 0.491432
+  type: 'test'
+  ...
+# Subtest: a connect that keeps its authority still starts the extension
+ok 47 - a connect that keeps its authority still starts the extension
+  ---
+  duration_ms: 0.452958
+  type: 'test'
+  ...
+# Subtest: a headless connect records the user intent before the command
+not ok 48 - a headless connect records the user intent before the command
+  ---
+  duration_ms: 1.473222
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-session-controller.mjs:200:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    the connect did not leave the intent the supervisor and the task manager read
+    + actual - expected
+    
+    + []
+    - [
+    -   {
+    -     by: 'card',
+    -     desired: 'connected'
+    -   }
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      desired: 'connected'
+      by: 'card'
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-session-controller.mjs:203:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a recovered session refreshes the snapshot and clears stale traffic
+not ok 49 - a recovered session refreshes the snapshot and clears stale traffic
+  ---
+  duration_ms: 1.450393
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-session-controller.mjs:208:1'
+  failureType: 'testCodeFailure'
+  error: 'VpnSnapshotTracker is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    evalmachine.<anonymous>:114:33
+    evalmachine.<anonymous>:115:3
+    Script.runInContext (node:vm:149:12)
+    Object.runInContext (node:vm:301:6)
+    runModules (file:///opt/git/github/mesharc/scripts/lib/arkts-module.mjs:46:8)
+    TestContext.<anonymous> (file:///opt/git/github/mesharc/scripts/test-vpn-session-controller.mjs:215:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+  ...
+# Subtest: the handoff answer window covers the extension wait budget
+ok 50 - the handoff answer window covers the extension wait budget
+  ---
+  duration_ms: 0.872968
+  type: 'test'
+  ...
+# node:fs:440
+#     return binding.readFileUtf8(path, stringToFlags(options.flag));
+#                    ^
+# Error: ENOENT: no such file or directory, open '/opt/git/github/mesharc/entry/src/main/ets/services/VpnSessionIntent.ets'
+#     at readFileSync (node:fs:440:20)
+#     at file:///opt/git/github/mesharc/scripts/test-vpn-session-intent.mjs:12:16
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/opt/git/github/mesharc/entry/src/main/ets/services/VpnSessionIntent.ets'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/test-vpn-session-intent.mjs
+not ok 8 - scripts/test-vpn-session-intent.mjs
+  ---
+  duration_ms: 28.359399
+  type: 'test'
+  location: '/opt/git/github/mesharc/scripts/test-vpn-session-intent.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 24
+# fail 27
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 120.524455
+```

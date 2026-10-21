@@ -1,0 +1,393 @@
+10-20 17:26:12.368 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488372366
+10-20 17:26:13.259  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab432ffbf3fd 0 0]NumBadgeManager --> handleSubscribeCallbackData ren.w2h.mesharc, 20020231 badge change number is 0
+10-20 17:26:13.261  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab432ffbf3fd 0 0]NotificationParserFactory: Parse notification __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140 end: {"key":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140-289","groupKey":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140_20","category":20,"slotType":4,"appLabel":"MeshArc","isAutoDelete":false,"isHeadsUp":false,"isHeadsUpStick":false,"isShowStatusBarIcon":true,"isClearAllowed":false,"isRemoveAllowed":true,"isSettingIgnore":true,"isVibrationEnable":false,"isSoundEnable":false,"agentBundle":{"bundle":"","uid":1096},"isFromSystemApp":true,"remindFlags":59,"controlFlags":0,"isAlertOnce":false,"wantAgentId":7898,"deliveryTime":1792488191784,"isFromOtherDevices":false,"aggregationType":"NONE"}
+10-20 17:26:13.261  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab432ffbf3fd 0 0]NotificationDataManager: SaveNtf __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140, isUpdate: true, role: 2
+10-20 17:26:13.369 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488373366
+10-20 17:26:13.426 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488373424
+10-20 17:26:14.368 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488374366
+10-20 17:26:14.426 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488374423
+10-20 17:26:15.373 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488375371
+10-20 17:26:15.433 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488375431
+10-20 17:26:16.371 19128 19128 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488376369
+10-20 17:26:16.508 16862 16862 W C01317/ren.w2h.mesharc/AppKit: [JAS292]Not found AbilityStage.js
+10-20 17:26:16.508 19128 19128 W C01317/ren.w2h.mesharc:vpn/AppKit: [JAS292]Not found AbilityStage.js
+10-20 17:26:16.508 16862 16862 W C01321/ren.w2h.mesharc/JsRuntime: [js_runtime.cpp1728]invalid nativeRef
+10-20 17:26:16.508 19128 19128 W C01321/ren.w2h.mesharc:vpn/JsRuntime: [js_runtime.cpp1728]invalid nativeRef
+10-20 17:26:16.509 16862 16862 E C01317/ren.w2h.mesharc/AppKit: [MTHRD4427]null assertThread
+10-20 17:26:16.510 19128 19128 E C01317/ren.w2h.mesharc:vpn/AppKit: [MTHRD4427]null assertThread
+10-20 17:26:16.532  1560 22276 W C01311/foundation/AppMS: [AMSI6509]hisysevent write result=0, send event [FRAMEWORK,PROCESS_KILL], pid=16862, processName=ren.w2h.mesharc, msg=, reason=InvalidKillId, FOREGROUND=1, appRunningUniqueId=9592057452720321466, killId=-1
+10-20 17:26:16.538   843  2626 W C02801/multimodalinput/MMIService: [|811]Enter, session desc:fd = 53, programName = ren.w2h.mesharc, moduleType = 0, opened, uid = 20020231, pid = 16862, tokenType = -1
+10-20 17:26:16.539  4088  4088 W A01B01/com.ohos.sceneboard/HOME: SCBSPVM: [SCBMain]onTerminateScene EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157), isActive=true callerPersistentId=0 isFloat=false isSplit=false isMidScene=false needRemoveSession=false isForceClean=false
+10-20 17:26:16.542  1560 22276 W C01311/foundation/AppMS: [AMSI6509]hisysevent write result=0, send event [FRAMEWORK,PROCESS_KILL], pid=19128, processName=ren.w2h.mesharc:vpn, msg=, reason=InvalidKillId, FOREGROUND=0, appRunningUniqueId=3806331539790544453, killId=-1
+10-20 17:26:16.546  4088  4088 E A01C06/com.ohos.sceneboard/ICON: CloseAppManager --> AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0 is not touched card
+10-20 17:26:16.546  4088  4088 W A01B01/com.ohos.sceneboard/HOME: PageDesktopModel: getExitAppData bundleName: ren.w2h.mesharc, abilityName: EntryAbility, startType: 0, formCardId: undefined, cardId: undefined, extraId: undefined, appIndex: 0, shortcutId: undefined
+10-20 17:26:16.547  4088  4088 W A04444/com.ohos.sceneboard/WMSOTHER: SCBTM --> Find controller success ? true, findData: {"bundleName":"ren.w2h.mesharc","abilityName":"EntryAbility","appIndex":0,"appIconId":"","iconRadius":0,"appIconNumber":0,"startAppType":0}
+10-20 17:26:16.547  4088  4088 W A01B01/com.ohos.sceneboard/HOME: SCBSPVM: setTransitionAnimCancel reason: requestSceneContainerDestructionWithTransition, appIconId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:16.547   573   573 W C02C11/appspawn/APPSPAWN: [appspawn_service.c:144]ren.w2h.mesharc with pid 16862 exit with code:0
+10-20 17:26:16.548  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] border radius from topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0 to 31. reason: requestSceneContainerDestructionWithTransition, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:16.549  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> initCompanionIconInfo companionIconInfo: ren.w2h.mesharc, EntryAbility, entry, iconId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0; persistentId: 1911
+10-20 17:26:16.549  4088  4088 W A01B01/com.ohos.sceneboard/HOME: QuitAppRectViewModel --> buildAppExitInfoInExit iconId AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:16.549  4088  4088 W A01B01/com.ohos.sceneboard/HOME: QuitAppRectViewModel --> startAppType 0, iconId AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:16.549  4088  4088 W A01B01/com.ohos.sceneboard/HOME: PageDesktopModel: findAppInCurrentShowingPage bundleName: ren.w2h.mesharcabilityName: EntryAbility, moduleName: entry;startAppType: 0; cardId: undefined appIndex: 0, shortcutId: 
+10-20 17:26:16.550  4088  4088 W A01B01/com.ohos.sceneboard/HOME: PageDesktopModel: isFoundApp bundleName: ren.w2h.mesharc abilityName: EntryAbility, moduleName: entry; appIconId: 33554433; cardId: undefined appIndex: 0, shortcutId: 
+10-20 17:26:16.550  4088  4088 W A01B01/com.ohos.sceneboard/HOME: PageDesktopModel: findAppInCurrentPage icon 33554433, 33554433,undefined, ren.w2h.mesharc
+10-20 17:26:16.550  4088  4088 W A01B01/com.ohos.sceneboard/HOME: PageDesktopModel: buildAppExitInfo iconId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0, isInScreen: true
+10-20 17:26:16.555   573   573 W C02C11/appspawn/APPSPAWN: [appspawn_service.c:144]ren.w2h.mesharc with pid 19128 exit with code:0
+10-20 17:26:16.561  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> onTransitionActiveToRect, bundleName:ren.w2h.mesharc, isAdaptive:false
+10-20 17:26:16.562  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] setTranslateXWithDfx from 0 to 147. reason: startCard, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:16.562  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] setTranslateYWithDfx from 0 to 176. reason: startCard, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:16.562  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] border radius from topLeft: 31, topRight: 31, bottomLeft: 31, bottomRight: 31 to 114.07407407407409. reason: startCard, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:16.567  4088  4088 W A0420A/com.ohos.sceneboard/WMSLife: Request scene container session destruction, name: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) delete: false needClearData: false isSaveSnapshot: true isForceClean: false
+10-20 17:26:16.567  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: QuickBackIconVm --> callback: e:2-from:-fw:0-tw: 1,to:ren.w2h.mesharc frompId: 0-topId: 1911-fromIdx: 0-toidx: 0-reason:0-isback:false
+10-20 17:26:16.572  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconCommonEvent --> onActive bundleName:ren.w2h.mesharc, [SCBTM] set icon from show to [hidden], caller: notifySceneTransitionOut, extra info: undefined.
+10-20 17:26:16.572  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconData --> [SCBTM] set icon opacity from [1] to [0], caller: notifySceneTransitionOut, extra: undefined, iconId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:16.576  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBScenePanelViewModel] sceneAlpha from 1 to 0. reason: requestSceneContainerDestructionWithTransition, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:16.582  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: AppLifeCycleManager: Ability state trtminated, uid: 20020231, key: ren.w2h.mesharc_entry_EntryAbility_16862
+10-20 17:26:16.582  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: LiveCapsuleListVm: onAppForegroundStateChange foreground: false, uid: 20020231, bundleName: ren.w2h.mesharc, orientation: 0
+10-20 17:26:16.582  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: AppLifeCycleManager: onProcessDied, uid: 20020231, bundleName: ren.w2h.mesharc, pid: 16862
+10-20 17:26:16.582  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: AppLifeCycleManager: onProcessDied, uid: 20020231, bundleName: ren.w2h.mesharc, pid: 19128
+10-20 17:26:16.587  4088  4088 W A01A01/com.ohos.sceneboard/NC: NotificationDataManager: remove local ntf list __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140
+10-20 17:26:16.587  4088  4088 W A01A01/com.ohos.sceneboard/NC: NotificationDataManager: Remove ntf __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140, exist duration: 3332 ms
+10-20 17:26:16.588  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: LiveHeadsUpVm: Hide return, current live is undefined, remove live is __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140 false
+10-20 17:26:16.588  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: BaseLiveVmInjector: delete live vm: __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140-289
+10-20 17:26:16.588   571  2509 E C02DA0/hiview/FaultLeakDetectorManager: ReportKillReason: uid: 20020231, bundleName: ren.w2h.mesharc, reason: InvalidKillId, appRunningUniqueId: 9592057452720321466
+10-20 17:26:16.588  4088  4088 W A01A01/com.ohos.sceneboard/NC: NotificationSubscribeManager: onCancel end, hashCode: __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140
+10-20 17:26:16.596   571  2509 E C02DA0/hiview/FaultLeakDetectorManager: ReportKillReason: uid: 20020231, bundleName: ren.w2h.mesharc, reason: InvalidKillId, appRunningUniqueId: 3806331539790544453
+10-20 17:26:17.287  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconCommonEvent --> onInactive bundleName:ren.w2h.mesharc, [SCBTM] set icon from hidden to [show], caller: reduceStartExitAnimationCount, extra info: undefined.
+10-20 17:26:17.287  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconData --> [SCBTM] set icon opacity from [0] to [1], caller: reduceStartExitAnimationCount, extra: undefined, iconId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:17.298  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] setTranslateXWithDfx from 147 to 0. reason: init, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:17.298  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] setTranslateYWithDfx from 176 to 0. reason: init, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:17.299  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] border radius from topLeft: 114.07407407407409, topRight: 114.07407407407409, bottomLeft: 114.07407407407409, bottomRight: 114.07407407407409 to 31. reason: init, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:17.299  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBSCS] sceneAlpha from 0 to 1. reason: init, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:17.299  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconCommonEvent --> onInactive bundleName:ren.w2h.mesharc, [SCBSPVM] set icon from show to [show], caller: inactiveController, extra info: undefined.
+10-20 17:26:17.300  4088  4088 E A01C06/com.ohos.sceneboard/ICON: CloseAppManager --> deleteCardCache AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0 is not touched card
+10-20 17:26:17.300  4088  4088 W A01C06/com.ohos.sceneboard/ICON: AppIconCommonEvent --> onInactive bundleName:ren.w2h.mesharc, [SCBScenePanelViewModel] set icon from show to [show], caller: requestSceneContainerDestructionWithTransition, extra info: undefined.
+10-20 17:26:17.301  4088  4088 W A01B01/com.ohos.sceneboard/HOME: SCBSceneContainer: [SCBMain] EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) enableShow change from true to false. Detail:isPrebuildStageEnableShow:false, showInRecent:false, sceneContainerSession.enableShow:false, showInScrolling:false
+10-20 17:26:17.301  4088  4088 W A01A01/com.ohos.sceneboard/NC: [Dropdown]NotificationDataVm --> Delete ntf __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140, existNtf groupKey: __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140_20
+10-20 17:26:17.301  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: BaseLiveVmInjector: delete live vm: __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14508_140-289
+10-20 17:26:17.321  4088  4088 W C0393B/com.ohos.sceneboard/AceWindowScene: [(100000:100000:scope)] OnDetachFromFrameNode id: 1911, node id: 787059, type: 1, name: ren.w2h.mesharc
+10-20 17:26:19.272  1560  7701 E C01120/foundation/BMS: [a92ab133bb4180a 2d9125c 0]GetAppClonePreference no record for bundle ren.w2h.mesharc userId 100
+10-20 17:26:19.299  4088  4088 W A04223/com.ohos.sceneboard/SCBMain: [a92ab133bb4180a 286e83 9e893f]startSceneFromOther:{persistentId:1911, screenId: 0, bundleInfo:EntryAbility/ren.w2h.mesharc/entry/0, unclearableSession:undefined, callerPersistentId:0, callerAbilityName: , toPersistentId:0, launchType:0, isNewInstance:false, fullScreenStart:false, _windowMode:1, isAppUseControl:undefined, isUnclearableInRecent:undefined, focusedOnShow:true, isAtomicService:falseisStartupInstallFree:false, isNewAppInstance:false, appInstanceKey:}, startMode:1, forceStart:null, forceNewWant:null
+10-20 17:26:19.299  4088  4088 W A04204/com.ohos.sceneboard/WMSScb: [a92ab133bb4180a 286e83 9e893f]ExclusiveChecker --> Check exclusive for bundleName: ren.w2h.mesharc, mode: FULL_SCREEN
+10-20 17:26:19.302  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]SCBSPVM: [SCBMain][id:1911][sceneInfo:ren.w2h.mesharc/entry/EntryAbility/0][screenId:0]onStartSceneFromOther.
+10-20 17:26:19.333  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController shortcutId empty bundleName:ren.w2h.mesharc
+10-20 17:26:19.333  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController bundleName: ren.w2h.mesharc, abilityName: EntryAbility, startType: 0, formCardId: undefined, cardId: undefined, extraId: undefined, appIndex: 0, shortcutId: undefined, appInstanceKey: %{public}s
+10-20 17:26:19.333  4088  4088 W A04444/com.ohos.sceneboard/WMSOTHER: [a92ab133bb4180a 286e83 9e893f]SCBTM --> Find controller success ? true, findData: {"bundleName":"ren.w2h.mesharc","abilityName":"EntryAbility","appIndex":0,"appIconId":"","iconRadius":0,"appIconNumber":0,"startAppType":0,"isOpenFolder":false}
+10-20 17:26:19.336  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]SCBSPVM: [SCBMain]onStartSceneFromOther isNewWant false. StartApp:ren.w2h.mesharc
+10-20 17:26:19.346  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController shortcutId empty bundleName:ren.w2h.mesharc
+10-20 17:26:19.346  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController bundleName: ren.w2h.mesharc, abilityName: EntryAbility, startType: 0, formCardId: undefined, cardId: undefined, extraId: undefined, appIndex: 0, shortcutId: undefined, appInstanceKey: %{public}s
+10-20 17:26:19.346  4088  4088 W A04444/com.ohos.sceneboard/WMSOTHER: [a92ab133bb4180a 286e83 9e893f]SCBTM --> Find controller success ? true, findData: {"bundleName":"ren.w2h.mesharc","abilityName":"EntryAbility","appIndex":0,"appIconId":"","iconRadius":0,"appIconNumber":0,"startAppType":0,"isOpenFolder":false}
+10-20 17:26:19.346  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController shortcutId empty bundleName:ren.w2h.mesharc
+10-20 17:26:19.346  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]PageDesktopModel: findTransitionController bundleName: ren.w2h.mesharc, abilityName: EntryAbility, startType: 0, formCardId: undefined, cardId: undefined, extraId: undefined, appIndex: 0, shortcutId: undefined, appInstanceKey: %{public}s
+10-20 17:26:19.346  4088  4088 W A04444/com.ohos.sceneboard/WMSOTHER: [a92ab133bb4180a 286e83 9e893f]SCBTM --> Find controller success ? true, findData: {"bundleName":"ren.w2h.mesharc","abilityName":"EntryAbility","appIndex":0,"appIconId":"","iconRadius":0,"appIconNumber":0,"startAppType":0,"isOpenFolder":false}
+10-20 17:26:19.347  4088  4088 W A0421D/com.ohos.sceneboard/WMSRotation: [a92ab133bb4180a 286e83 9e893f][getTargetRotation] bundleName:ren.w2h.mesharc requestOrientation:0 isScreenLocked:true isPlacedRotateFriendlyDevicePlaced:false fixedRotation: -1 rotationCommand: {"screenId":-1,"isIgnorePlacedState":false,"isFromDropDown":false}
+10-20 17:26:19.347  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]SCBSPVM: [SCBMain]onStartSceneFromOther EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) isActive:false isStartCard:false needBlurAnimation:true scenePanelState:0
+10-20 17:26:19.348  4088  4088 W A04202/com.ohos.sceneboard/WMSMain: [a92ab133bb4180a 286e83 9e893f]add failed. EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) already existed in array
+10-20 17:26:19.348  4088  4088 W A0420A/com.ohos.sceneboard/WMSLife: [a92ab133bb4180a 286e83 9e893f]Request scene container session activation, name: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) isNewActive: false, isPersist: true, reason: undefined
+10-20 17:26:19.348  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: [a92ab133bb4180a 286e83 9e893f]QuickBackIconVm --> callback: e:0-from:-fw:0-tw: 1,to:ren.w2h.mesharc frompId: 0-topId: 1911-fromIdx: 0-toidx: 0-reason:0-isback:false
+10-20 17:26:19.353  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab133bb4180a 275efbc 286e83]DropdownPanelView: onStartSceneFromOtherEvent return. event: ren.w2h.mesharc isViewShowing:false
+10-20 17:26:19.355  4088  4088 W A01B01/com.ohos.sceneboard/HOME: [a92ab133bb4180a 286e83 9e893f]SCBSceneContainer: [SCBMain] EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) enableShow change from false to true. Detail:isPrebuildStageEnableShow:false, showInRecent:false, sceneContainerSession.enableShow:true, showInScrolling:false
+10-20 17:26:19.360  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab133bb4180a 286e83 9e893f]CompanionIcon: loadIconWithCache {"bundleName":"ren.w2h.mesharc","abilityName":"EntryAbility","moduleName":"entry","iconId":"AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0","iconNumber":33554433,"iconRadius":15.037037037037038,"startAppType":0,"appIndex":0,"shortcutId":"","isSameLocation":false,"iconRect":{"left":338,"top":367,"right":396,"bottom":425,"height":58,"width":58}}
+10-20 17:26:19.360  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab133bb4180a 286e83 9e893f]CompanionIcon: checkIsAdaptiveIcon, bundleName:ren.w2h.mesharc, isAdaptive:false
+10-20 17:26:19.360  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab133bb4180a 286e83 9e893f]CompanionIcon: checkIsAdaptiveIcon, bundleName:ren.w2h.mesharc, isAdaptive:false
+10-20 17:26:19.360  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab133bb4180a 286e83 9e893f]CompanionIcon: start calcCardAnimParams componentId: AppIcon_Image_ren.w2h.mesharcEntryAbilityentry0_undefined_0
+10-20 17:26:19.365 22470 22470 W C02C11/ren.w2h.mesharc/APPSPAWN: errno:13 private mount to /mnt/sandbox/100/ren.w2h.mesharc/chip_prod/lib64/passthrough '524288' failed
+10-20 17:26:19.365  4088  4088 W C0393B/com.ohos.sceneboard/AceWindowScene: [a92ab133bb4180a 286e83 9e893f][(100000:100000:scope)] OnAttachToFrameNode id: 1911, node id: 787250, name: ren.w2h.mesharc, state: 0, in recents: 0, appLockControl: 0, prelaunch: 0, isGamePrelaunch: 0, sessionHasPersistentSnapshot: 0
+10-20 17:26:19.366 22470 22470 W C02C11/ren.w2h.mesharc/APPSPAWN: check dir /data/app/el1/public/aot_compiler/ark_cache/ren.w2h.mesharc failed,strerror:No such file or directory
+10-20 17:26:19.367 22470 22470 W C02C11/ren.w2h.mesharc/APPSPAWN: errno:2 bind mount /data/preload/app to /mnt/sandbox/100/ren.w2h.mesharc/data/preload/app
+10-20 17:26:19.368  4088  4088 W A04200/com.ohos.sceneboard/WMS: [a92ab133bb4180a 286e83 9e893f]SCBSCS --> [SCBScenePanelViewModel] sceneAlpha from 1 to 0. reason: sceneContainerZoomIn, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:19.368  4088  4088 W A04202/com.ohos.sceneboard/WMSMain: [a92ab133bb4180a 286e83 9e893f]add failed. EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157) already existed in array
+10-20 17:26:19.370 22470 22470 E C05A06/ren.w2h.mesharc/CODE_SIGN: [XpmIoctl]:Ioctl cmd 40087803 failed: Invalid argument (ignore)
+10-20 17:26:19.371  4088  4088 W A0421D/com.ohos.sceneboard/WMSRotation: [a92ab133bb4180a 286e83 9e893f][getTargetRotation] bundleName:ren.w2h.mesharc requestOrientation:0 isScreenLocked:true isPlacedRotateFriendlyDevicePlaced:false fixedRotation: -1 rotationCommand: {"screenId":-1,"isIgnorePlacedState":false,"isFromDropDown":false}
+10-20 17:26:19.372  4088  4088 W A04200/com.ohos.sceneboard/WMS: [a92ab133bb4180a 286e83 9e893f]SCBSCS --> [SCBSCS] setTranslateYWithDfx from 0 to -141.33333333333334. reason: startOther, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:19.372  4088  4088 W A04200/com.ohos.sceneboard/WMS: [a92ab133bb4180a 286e83 9e893f]SCBSCS --> [SCBSCS] setTranslateYWithDfx from -141.33333333333334 to 0. reason: onTransitionInactive, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:19.374  4088  4088 W A04200/com.ohos.sceneboard/WMS: [a92ab133bb4180a 286e83 9e893f]SCBSCS --> [SCBScenePanelViewModel] sceneAlpha from 0 to 1. reason: sceneContainerZoomIn, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:19.374 22470 22585 W C057C1/ren.w2h.mesharc/IPCWorkThread: ThreadHandler: proto:0 policy:1 name:OS_IPC_0_22585 invoker:808555520
+10-20 17:26:19.374 22470 22586 W C057C1/ren.w2h.mesharc/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_1_22586 invoker:746311552
+10-20 17:26:19.385 22470 22590 W C057C1/ren.w2h.mesharc/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_2_22590 invoker:808561920
+10-20 17:26:19.392 22470 22470 W C01321/ren.w2h.mesharc/JsRuntime: [CSM161]disCon
+10-20 17:26:19.394 22470 22470 W C01E00/ren.w2h.mesharc/ResourceManager: update userId, currentUserId_= 0, userId= 100
+10-20 17:26:19.396 22470 22592 W C01653/ren.w2h.mesharc/NativePreferences: LoadFromDisk: The settingXml /***/el1/***/i18*** load failed.
+10-20 17:26:19.397 22470 22470 E C01301/ren.w2h.mesharc/CompatiblePolicyDeviceType: [calculateResourceType:81]deviceType is empty.
+10-20 17:26:19.404 22470 22470 W C01317/ren.w2h.mesharc/AppKit: [JAS1032]null stage
+10-20 17:26:19.404 22470 22470 W C01317/ren.w2h.mesharc/AppKit: [JAS254]Not found AbilityStage.js
+10-20 17:26:19.404 22470 22470 W C01317/ren.w2h.mesharc/AppKit: [JAS349]Not found AbilityStage.js
+10-20 17:26:19.442 22470 22470 W C01711/ren.w2h.mesharc/CONTINUOUS_TASK: [GetObserverObject:516] null callback Type: continuousTaskCancel
+10-20 17:26:19.442 22470 22470 W C01711/ren.w2h.mesharc/CONTINUOUS_TASK: [GetObserverObject:516] null callback Type: continuousTaskSuspend
+10-20 17:26:19.446 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui vpn_power_stage_missing power code=0
+10-20 17:26:19.447 22470 22470 I A00000/ren.w2h.mesharc/TailscaleOHOS: EntryAbility onCreate. ability=EntryAbility reason=1
+10-20 17:26:19.447 22470 22470 E C01332/ren.w2h.mesharc/UIAbility: [ui_ability_impl.cpp364]hasSaveData_: false
+10-20 17:26:19.447 22470 22470 W C01332/ren.w2h.mesharc/UIAbility: [JUA1352]formatRegex: []
+10-20 17:26:19.447 22470 22586 W C01C41/ren.w2h.mesharc/CL: OnAddSystemAbility# recoverTimer count:0
+10-20 17:26:19.449 22470 22470 E C04200/ren.w2h.mesharc/WMS: SetWindowType: permission denied!
+10-20 17:26:19.449 22470 22470 W C0420A/ren.w2h.mesharc/WMSLife: IsWindowSessionInvalid: id: 0 state_: 0
+10-20 17:26:19.449 22470 22470 W C04200/ren.w2h.mesharc/WindowSceneSessionImpl: AdjustWindowAnimationFlag: session invalid!
+10-20 17:26:19.450  4088  4088 W A01A00/com.ohos.sceneboard/SYS_UI: LiveCapsuleListVm: onAppForegroundStateChange foreground: true, uid: 20020231, bundleName: ren.w2h.mesharc, orientation: 0
+10-20 17:26:19.452 22470 22470 E C0421C/ren.w2h.mesharc/WMSCompat: ReadCombinedCompatibleConfig: combinedConfigSize: 0 fail to meet the conditions
+10-20 17:26:19.453 22470 22640 W C057C1/ren.w2h.mesharc/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_3_22640 invoker:808568320
+10-20 17:26:19.453 22470 22586 W C04208/ren.w2h.mesharc/WMSLayout: NotifySingleHandTransformChange: id:1911, uiContent is nullptr
+10-20 17:26:19.454 22470 22470 E C0421C/ren.w2h.mesharc/WMSCompat: SendCombinedCompatibleConfigToArkUI: Combined compatible config size is less than 2!
+10-20 17:26:19.460 22470 22643 W C04732/ren.w2h.mesharc/GameController: [(ReadJsonFromFile:224)]realpath failed for [/data/service/el1/public/for-all-app/gamecontroller_server/game_support_key_mapping.json]
+10-20 17:26:19.463 22470 22470 W C04217/ren.w2h.mesharc/WMSAttribute: RegisterGetWMSWindowListCallback: callback has registered
+10-20 17:26:19.463 22470 22470 W C04218/ren.w2h.mesharc/WMSPc: UpdateSidebarBlurStyleWhenColorModeChange: RSAnimatableProperty is null
+10-20 17:26:19.463 22470 22470 E C04200/ren.w2h.mesharc/WMS: singleton_container.cpp GetSingleton: cant get OHOS::Rosen::WindowInfoReporter
+10-20 17:26:19.463 22470 22470 I A00000/ren.w2h.mesharc/TailscaleOHOS: EntryAbility onWindowStageCreate
+10-20 17:26:19.465 22470 22470 W C04200/ren.w2h.mesharc/JsWindow: OnGetUIContext: uicontent is nullptr
+10-20 17:26:19.465 22470 22470 W A00000/ren.w2h.mesharc/TailscaleOHOS: WindowEnvironment UI context unavailable. category=native_error code=0 retryable=true
+10-20 17:26:19.466 22470 22470 W C04200/ren.w2h.mesharc/WindowSessionImpl: UpdateViewportConfig: uiContent is null!
+10-20 17:26:19.469 22470 22470 W C04201/ren.w2h.mesharc/DMS: OnDisplayInfoChange: data is not changed.
+10-20 17:26:19.469 22470 22470 I A00000/ren.w2h.mesharc/TailscaleOHOS: EntryAbility onForeground
+10-20 17:26:19.470 22470 22640 E C0420A/ren.w2h.mesharc/WMSLife: NotifyUIExtHostRectChangeInGlobalDisplayListeners: uiContent is null
+10-20 17:26:19.470 22470 22640 W C04208/ren.w2h.mesharc/WMSLayout: NotifySingleHandTransformChange: id:1911, uiContent is nullptr
+10-20 17:26:19.470 22470 22647 W C057C1/ren.w2h.mesharc/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_4_22647 invoker:809402752
+10-20 17:26:19.471 22470 22470 E C01651/ren.w2h.mesharc/data_share_manager_impl: RegisterClientDeathObserver: RegisterClientDeathObserver failed, bundleName is ren.w2h.mesharc
+10-20 17:26:19.471 22470 22470 E C01651/ren.w2h.mesharc/data_share_manager_impl: GetDataShareServiceProxy: RegisterClientDeathObserver failed
+10-20 17:26:19.472 22470 22647 E C01651/ren.w2h.mesharc/data_share_manager_impl: RegisterClientDeathObserver: RegisterClientDeathObserver failed, bundleName is ren.w2h.mesharc
+10-20 17:26:19.472 22470 22647 E C01651/ren.w2h.mesharc/data_share_manager_impl: GetDataShareServiceProxy: RegisterClientDeathObserver failed
+10-20 17:26:19.474 22470 22470 E C01301/ren.w2h.mesharc/Ability: [page_config_manager.cpp62]configJson_ is empty
+10-20 17:26:19.475  1560  7247 W C01336/foundation/AMS: [multi_app_utils.cpp37]fail:ren.w2h.mesharc
+10-20 17:26:19.476 22470 22470 I A00000/ren.w2h.mesharc/VpnBackgroundTask: background_special_scenario_unconfigured code=0
+10-20 17:26:19.477 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui background_special_scenario_unconfigured background code=0
+10-20 17:26:19.481 22470 22470 W C01409/ren.w2h.mesharc/APS_MANAGER: redo Connect
+10-20 17:26:19.483 22470 22470 E C03900/ren.w2h.mesharc/Ace: [(-2:-1:undefined)] ConfigParserBase read system UI correction config file failed
+10-20 17:26:19.483 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(-2:-1:undefined)] ArkUiFeatureParamManager failed to load UI correction config file
+10-20 17:26:19.497 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(-2:-1:undefined)] FeatureManager get config failed, key:UICorrectionStrategy ret:1
+10-20 17:26:19.497 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(-2:-1:undefined)] FeatureParamManager get UICorrectionStrategy from FeatureManager failed
+10-20 17:26:19.504 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(100000:100000:scope)] Invalid config:zh_CN-long-notround-vertical-dark-phone-xxhdpi
+10-20 17:26:19.506 22470 22470 E C03934/ren.w2h.mesharc/AceUIEvent: [(100000:100000:scope)] AceTransform load failed: Error loading shared library /system/lib64/libtransform_interaction_ext.z.so: No such file or directory
+10-20 17:26:19.506 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(100000:100000:scope)] not found systemTheme in HapModuleInfo, loading default OHOS_THEME
+10-20 17:26:19.506 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(100000:100000:scope)] GetAsset failed: resources/styles/default.json
+10-20 17:26:19.518 22470 22470 E C04200/ren.w2h.mesharc/IMockSessionManager: [nodict]Read result failed, code is: 4.
+10-20 17:26:19.519 22470 22470 E C04200/ren.w2h.mesharc/IMockSessionManager: [nodict]Read result failed, code is: 4.
+10-20 17:26:19.522 22470 22470 W C03900/ren.w2h.mesharc/Ace: [(100000:100000:scope)] GetAsset failed: manifest.json
+10-20 17:26:19.525 22470 22470 W C01320/ren.w2h.mesharc/JsEnv: [source_map.cpp145]the stack without line info
+10-20 17:26:19.525 22470 22470 I A00000/ren.w2h.mesharc/TailscaleOHOS: pages/Index loaded
+10-20 17:26:19.526 22470 22470 I A00000/ren.w2h.mesharc/VpnBackgroundTask: background_started code=0
+10-20 17:26:19.528 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui background_started background code=0
+10-20 17:26:19.528 22470 22470 I A00000/ren.w2h.mesharc/VpnBackgroundTask: VPN DATA_TRANSFER background task started. id=181
+10-20 17:26:19.529 22470 22470 W C0391C/ren.w2h.mesharc/AceFocus: [(100000:100000:scope)] Current focus view can not found!
+10-20 17:26:19.535 22470 22470 W C03F04/ren.w2h.mesharc/MMG: [NMM:1466] Name mismatch: file.photoAccessHelperNative != file.photoAccessHelper
+10-20 17:26:19.540  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab333bb75086 0 0]NumBadgeManager --> handleSubscribeCallbackData ren.w2h.mesharc, 20020231 badge change number is 0
+10-20 17:26:19.547  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab333bb75086 0 0]NotificationParserFactory: Parse notification __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141 end: {"key":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141-290","groupKey":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141_20","category":20,"slotType":4,"appLabel":"MeshArc","isAutoDelete":false,"isHeadsUp":false,"isHeadsUpStick":false,"isShowStatusBarIcon":true,"isClearAllowed":false,"isRemoveAllowed":true,"isSettingIgnore":true,"isVibrationEnable":false,"isSoundEnable":false,"agentBundle":{"bundle":"","uid":1096},"isFromSystemApp":true,"remindFlags":59,"controlFlags":0,"isAlertOnce":false,"wantAgentId":7899,"deliveryTime":1792488379481,"isFromOtherDevices":false,"aggregationType":"NONE"}
+10-20 17:26:19.547  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab333bb75086 0 0]NotificationDataManager: SaveNtf __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141, isUpdate: false, role: 2
+10-20 17:26:19.547 22470 22470 W C03F04/ren.w2h.mesharc/MMG: [NMM:1466] Name mismatch: hms.hds.HdsBaseComponentNapi != hds.HdsBaseComponentNapi
+10-20 17:26:19.550 22470 22470 W C03F04/ren.w2h.mesharc/MMG: [NMM:1466] Name mismatch: hms.hds.HdsVisualEffectsNapi != hds.HdsVisualEffectsNapi
+10-20 17:26:19.553 22470 22470 W C03F04/ren.w2h.mesharc/MMG: [NMM:1466] Name mismatch: hms.hds.HdsMaterialNapi != hds.HdsMaterialNapi
+10-20 17:26:19.566 22470 22592 W C01653/ren.w2h.mesharc/NativePreferences: LoadFromDisk: The settingXml /***/el2/***/mesh***yout load failed.
+10-20 17:26:19.566 22470 22592 W C01653/ren.w2h.mesharc/NativePreferences: LoadFromDisk: The settingXml /***/el2/***/mesh***rity load failed.
+10-20 17:26:19.566 22470 22592 W C01653/ren.w2h.mesharc/NativePreferences: LoadFromDisk: The settingXml /***/el2/***/mesh***tion load failed.
+10-20 17:26:19.566 22470 22592 W C01653/ren.w2h.mesharc/NativePreferences: LoadFromDisk: The settingXml /***/el2/***/mesh***sfer load failed.
+10-20 17:26:19.568 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui ui_opened lifecycle code=0
+10-20 17:26:19.569 22470 22470 I A00000/ren.w2h.mesharc/FeatureDiagnostics: service snapshot localAvailable=0 localChecking=0 mediaPeers=0 mediaServices=0 sunshine=0 receiver=failed taildrop=disconnected
+10-20 17:26:19.570 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui service_status_changed failed code=0
+10-20 17:26:19.571 22470 22470 I A00000/ren.w2h.mesharc/FeatureDiagnostics: service snapshot localAvailable=0 localChecking=0 mediaPeers=0 mediaServices=0 sunshine=0 receiver=failed taildrop=ready
+10-20 17:26:19.572 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui service_status_changed failed code=0
+10-20 17:26:19.573 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains tab_pattern!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern get attr dialog_radius_level10 error!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern get attr dialog_icon_primary error!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern get attr dialog_font_primary error!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains default_tab_bar_name!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains interactive_focus!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains outline_extra_larger!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains icon_emphasize!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains icon_primary!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains font_emphasize!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style tab_pattern not contains font_primary!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains swiper_pattern!
+10-20 17:26:19.574 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style swiper_pattern get attr swiper_focus_style_type error!
+10-20 17:26:19.575 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style swiper_pattern not contains swiper_indicator_dot_item_space!
+10-20 17:26:19.575 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style swiper_pattern not contains swiper_indicator_drag_min_angle!
+10-20 17:26:19.575 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style swiper_pattern not contains swiper_indicator_drag_max_angle!
+10-20 17:26:19.576 22470 22470 W C03960/ren.w2h.mesharc/HDS_tabs: [245]ParseProp failed parse property barSideMargin
+10-20 17:26:19.576 22470 22470 W C03960/ren.w2h.mesharc/HDS_tabs: [245]ParseProp failed parse property barBottomMargin
+10-20 17:26:19.576 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.576 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains hmos_hds_tab_pattern!
+10-20 17:26:19.576 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: GetPatternByName error name = ohos_hmos_hds_tab_pattern
+10-20 17:26:19.576 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] Get pattern by name error, name=hmos_hds_tab_pattern, bundleName: ren.w2h.mesharc, moduleName: entry
+10-20 17:26:19.576 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style hmos_hds_tab_pattern get attr tab_bar_mask_color_default error!
+10-20 17:26:19.577 22470 22470 E C03960/ren.w2h.mesharc/HDS_tabs: [267]HdsTabsPattern Pop -> enter
+10-20 17:26:19.577 22470 22470 E C03960/ren.w2h.mesharc/HDS_tabs: [284]HdsTabsPattern Pop -> IsTabBarUpdateFloatingStyleEnabled
+10-20 17:26:19.577 22470 22470 E C03960/ren.w2h.mesharc/HDS_tabs: [286]HdsTabsPattern Pop -> !fsTabBarHandler_
+10-20 17:26:19.582 22470 22470 E C03960/ren.w2h.mesharc/HDS_tabs: [302]HdsTabsPattern Pop <- out
+10-20 17:26:19.582 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains sheet_pattern!
+10-20 17:26:19.583 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style sheet_pattern not contains corner_radius_none!
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.583 22470 22470 E C03949/ren.w2h.mesharc/AceSheet: [(100000:100000:scope)] radius is not correct type
+10-20 17:26:19.584 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains focus_animation_pattern!
+10-20 17:26:19.584 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains aging_adapation_dialog_pattern!
+10-20 17:26:19.586   943 22291 W C01727/resource_schedule_service/SceneRecognizeExt: [a92abc33bb8f345 0 0][HandlePageReport]smart scan get config page info error, bundleName: ren.w2h.mesharc
+10-20 17:26:19.590 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_pattern not contains linear_split_child_min_size!
+10-20 17:26:19.590 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_pattern not contains menu_celia_ask_is_support!
+10-20 17:26:19.591 22470 22470 E C02D34/ren.w2h.mesharc/HistogramClient: [nodict]ArkGraphics2d.Text.OH_Drawing_TextStyleAddFontVariation is not in metadata.
+10-20 17:26:19.593 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains divider_pattern!
+10-20 17:26:19.594 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains navigation_bar_pattern!
+10-20 17:26:19.597 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1022][Navigation Napi] ParseTitleBarPadding: start resource parsed FAILED
+10-20 17:26:19.597 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1031][Navigation Napi] ParseTitleBarPadding: end resource parsed FAILED
+10-20 17:26:19.597 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [183][Navigation Napi] ParseScrollEffect: blurEffectiveStartOffset resource parsed FAILED
+10-20 17:26:19.597 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [200][Navigation Napi] ParseScrollEffect: blurEffectiveEndOffset resource parsed FAILED
+10-20 17:26:19.597 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.597 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.597 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.597 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.597 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.597 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains scroll_bar_pattern!
+10-20 17:26:19.598 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style scroll_bar_pattern get attr scroll_bar_interactive error!
+10-20 17:26:19.598 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style scroll_bar_pattern not contains arc_scroll_bar_normal_background_width!
+10-20 17:26:19.600 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains app_theme_pattern!
+10-20 17:26:19.600 22470 22470 W C01E00/ren.w2h.mesharc/ResourceManager: by id=125835722 limitPaths is empty
+10-20 17:26:19.600 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: ref <private> id not found
+10-20 17:26:19.600 22470 22470 W C01E00/ren.w2h.mesharc/ResourceManager: by id=125835722 limitPaths is empty
+10-20 17:26:19.600 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: ref <private> id not found
+10-20 17:26:19.600 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] Get pattern by name error, name=app_theme_pattern, bundleName: ren.w2h.mesharc, moduleName: entry
+10-20 17:26:19.600 22470 22470 W C01E00/ren.w2h.mesharc/ResourceManager: by id=125835722 limitPaths is empty
+10-20 17:26:19.600 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: ref <private> id not found
+10-20 17:26:19.600 22470 22470 W C01E00/ren.w2h.mesharc/ResourceManager: by id=125835722 limitPaths is empty
+10-20 17:26:19.600 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: ref <private> id not found
+10-20 17:26:19.600 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] Get pattern by name error, name=app_theme_pattern
+10-20 17:26:19.600 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style app_theme_pattern not contains app_theme_drag_distancethreshold!
+10-20 17:26:19.600 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains image_pattern!
+10-20 17:26:19.607 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains scrollable_pattern!
+10-20 17:26:19.607 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style scrollable_pattern not contains scroll_able_default_scrolling_distance!
+10-20 17:26:19.610 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style 125829872 not contains hmos_hds_navigation_pattern!
+10-20 17:26:19.610 22470 22470 E C01E00/ren.w2h.mesharc/ResourceManager: GetPatternByName error name = ohos_hmos_hds_navigation_pattern
+10-20 17:26:19.610 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] Get pattern by name error, name=hmos_hds_navigation_pattern, bundleName: ren.w2h.mesharc, moduleName: entry
+10-20 17:26:19.615 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains text_font_family_regular!
+10-20 17:26:19.615 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains menu_default_width!
+10-20 17:26:19.615 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains menu_min_width!
+10-20 17:26:19.615 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains menu_max_width!
+10-20 17:26:19.615 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains menu_max_width_ratio!
+10-20 17:26:19.616 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains sub_menu_show_delay_duration!
+10-20 17:26:19.616 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style select_pattern not contains sub_menu_hide_delay_duration!
+10-20 17:26:19.616 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_button_radius!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains bg_color_disabled_alpha!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains more_or_back_symbol_size!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_copy!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_paste!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_select_all!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_cut!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_max_width!
+10-20 17:26:19.617 22470 22470 W C03926/ren.w2h.mesharc/AceTheme: [(100000:100000:scope)] style text_overlay_pattern not contains text_overlay_menu_horizontal_gap!
+10-20 17:26:19.630 22470 22470 E C02C03/ren.w2h.mesharc/PARAM_WATCHER: [nodict]Read result failed, code is: 1.
+10-20 17:26:19.634 22470 22470 W C01408/ren.w2h.mesharc/Text: generatePaintRegion: Call generatePaintRegion when paragraph is not formatted
+10-20 17:26:19.647 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1022][Navigation Napi] ParseTitleBarPadding: start resource parsed FAILED
+10-20 17:26:19.647 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1031][Navigation Napi] ParseTitleBarPadding: end resource parsed FAILED
+10-20 17:26:19.647 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [183][Navigation Napi] ParseScrollEffect: blurEffectiveStartOffset resource parsed FAILED
+10-20 17:26:19.647 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [200][Navigation Napi] ParseScrollEffect: blurEffectiveEndOffset resource parsed FAILED
+10-20 17:26:19.647 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.647 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.647 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.647 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.647 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:19.979  4088  4088 W A04200/com.ohos.sceneboard/WMS: SCBSCS --> [SCBScenePanelViewModel] border radius from topLeft: 31, topRight: 31, bottomLeft: 31, bottomRight: 31 to 0. reason: sceneContainerZoomIn, extra: EntryAbility/ren.w2h.mesharc/entry/0(persistentId: 1911)(containerId: 157)
+10-20 17:26:22.582 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui backend_recovery_requested vpn_process_lost code=0
+10-20 17:26:22.586 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui backend_start_requested silent code=0
+10-20 17:26:22.608 22470 22470 W C03913/ren.w2h.mesharc/AceText: [(100000:100000:scope)] destroy TxtParagraph with placeholderCnt_ 0, textAlign_ 0, count 0
+10-20 17:26:34.090 22470 22470 W C03905/ren.w2h.mesharc/AceDrag: [(100000:100000:scope)] Drag gesture has been canceled
+10-20 17:26:34.097 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui connect_requested preflight code=0
+10-20 17:26:34.135 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui vpn_config_handoff_staged preflight code=0
+10-20 17:26:34.152 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui vpn_start_requested system code=0
+10-20 17:26:34.163 22588 22588 W C02C11/ren.w2h.mesharc:vpn/APPSPAWN: errno:13 private mount to /mnt/sandbox/100/ren.w2h.mesharc/chip_prod/lib64/passthrough '524288' failed
+10-20 17:26:34.164 22588 22588 W C02C11/ren.w2h.mesharc:vpn/APPSPAWN: check dir /data/app/el1/public/aot_compiler/ark_cache/ren.w2h.mesharc failed,strerror:No such file or directory
+10-20 17:26:34.165 22588 22588 W C02C11/ren.w2h.mesharc:vpn/APPSPAWN: errno:2 bind mount /data/preload/app to /mnt/sandbox/100/ren.w2h.mesharc/data/preload/app
+10-20 17:26:34.169 22588 22588 E C05A06/ren.w2h.mesharc:vpn/CODE_SIGN: [XpmIoctl]:Ioctl cmd 40087803 failed: Invalid argument (ignore)
+10-20 17:26:34.174 22588 22816 W C057C1/ren.w2h.mesharc:vpn/IPCWorkThread: ThreadHandler: proto:0 policy:1 name:OS_IPC_0_22816 invoker:808550400
+10-20 17:26:34.175 22588 22817 W C057C1/ren.w2h.mesharc:vpn/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_1_22817 invoker:746310912
+10-20 17:26:34.185 22588 22822 W C057C1/ren.w2h.mesharc:vpn/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_2_22822 invoker:808562560
+10-20 17:26:34.199 22588 22588 W C01321/ren.w2h.mesharc:vpn/JsRuntime: [CSM161]disCon
+10-20 17:26:34.202 22588 22588 W C01E00/ren.w2h.mesharc:vpn/ResourceManager: update userId, currentUserId_= 0, userId= 100
+10-20 17:26:34.203 22588 22824 W C01653/ren.w2h.mesharc:vpn/NativePreferences: LoadFromDisk: The settingXml /***/el1/***/i18*** load failed.
+10-20 17:26:34.205 22588 22588 E C01301/ren.w2h.mesharc:vpn/CompatiblePolicyDeviceType: [calculateResourceType:81]deviceType is empty.
+10-20 17:26:34.217 22588 22588 W C01317/ren.w2h.mesharc:vpn/AppKit: [JAS1032]null stage
+10-20 17:26:34.217 22588 22588 W C01317/ren.w2h.mesharc:vpn/AppKit: [JAS254]Not found AbilityStage.js
+10-20 17:26:34.217 22588 22588 W C01317/ren.w2h.mesharc:vpn/AppKit: [JAS349]Not found AbilityStage.js
+10-20 17:26:34.263 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_extension_created lifecycle code=0
+10-20 17:26:34.267 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394267
+10-20 17:26:34.267 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: VPN extension created. ability=TailscaleVpnExtensionAbility
+10-20 17:26:34.268 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394267
+10-20 17:26:34.269 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_config_handoff_used preflight code=0
+10-20 17:26:34.270 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394270
+10-20 17:26:34.271 22588 22822 W C01C41/ren.w2h.mesharc:vpn/CL: OnAddSystemAbility# recoverTimer count:0
+10-20 17:26:34.272 22588 22588 I A03D00/ren.w2h.mesharc:vpn/JSAPP: onRequest, want:TailscaleVpnExtensionAbility, startId:1
+10-20 17:26:34.326 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_tun_created create code=0
+10-20 17:26:34.328 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_process_protected network code=0
+10-20 17:26:34.329 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394328
+10-20 17:26:34.413 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui vpn_backend_handoff_stopped vpn_handoff code=0
+10-20 17:26:34.431 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394430
+10-20 17:26:34.435 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394435
+10-20 17:26:34.656 22470 22470 I A00000/ren.w2h.mesharc/FeatureDiagnostics: service snapshot localAvailable=0 localChecking=0 mediaPeers=0 mediaServices=0 sunshine=0 receiver=idle taildrop=ready
+10-20 17:26:34.663 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui service_status_changed idle code=0
+10-20 17:26:34.780 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488394778
+10-20 17:26:35.543 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488395541
+10-20 17:26:35.653 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488395651
+10-20 17:26:36.422 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488396420
+10-20 17:26:39.744 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488399742
+10-20 17:26:41.468 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488401466
+10-20 17:26:41.469 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488401468
+10-20 17:26:41.482 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_connected backend code=0
+10-20 17:26:41.494 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: ui vpn_power_stage_missing power code=0
+10-20 17:26:41.676 22470 22470 E C04388/ren.w2h.mesharc/file_api: [watcher_entity.cpp:189->StopNotify] Failed to stop notify errCode:22
+10-20 17:26:41.676 22470 22470 E C04388/ren.w2h.mesharc/file_api: [watcher_n_exporter.cpp:77->Stop] Failed to stopNotify errno:22
+10-20 17:26:41.682 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1022][Navigation Napi] ParseTitleBarPadding: start resource parsed FAILED
+10-20 17:26:41.682 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [1031][Navigation Napi] ParseTitleBarPadding: end resource parsed FAILED
+10-20 17:26:41.682 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [183][Navigation Napi] ParseScrollEffect: blurEffectiveStartOffset resource parsed FAILED
+10-20 17:26:41.682 22470 22470 E C03960/ren.w2h.mesharc/HDS_NAV: [200][Navigation Napi] ParseScrollEffect: blurEffectiveEndOffset resource parsed FAILED
+10-20 17:26:41.682 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:41.683 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:41.683 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:41.684 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:41.684 22470 22470 W C03937/ren.w2h.mesharc/AceResource: [(100000:100000:scope)] ColorMode exception: SysColorMode[0] | LocalColorMode[-1] | CurColorMode[1]
+10-20 17:26:41.731 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:41.734 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:41.737 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:41.741 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:41.744 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:41.747 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_service_refresh_start requested code=0
+10-20 17:26:42.257 22588 22983 W C057C1/ren.w2h.mesharc:vpn/IPCWorkThread: ThreadHandler: proto:0 policy:0 name:OS_IPC_3_22983 invoker:749009408
+10-20 17:26:42.280 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_network_monitor_started network code=0
+10-20 17:26:42.498 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488402496
+10-20 17:26:42.572 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488402569
+10-20 17:26:42.595 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_started requested code=0
+10-20 17:26:42.595 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe started
+10-20 17:26:43.288 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn vpn_network_rebound_wifi network code=0
+10-20 17:26:43.498 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488403496
+10-20 17:26:43.560 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488403557
+10-20 17:26:43.607 22470 22470 I A00000/ren.w2h.mesharc/FeatureDiagnostics: service snapshot localAvailable=0 localChecking=0 mediaPeers=0 mediaServices=0 sunshine=0 receiver=failed taildrop=ready
+10-20 17:26:43.624 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui service_status_changed failed code=0
+10-20 17:26:43.956 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: VPN probe TUN created. bridge=OK | HarmonyOS TUN fd adapted for wireguard-go
+10-20 17:26:44.499 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488404496
+10-20 17:26:44.569 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488404567
+10-20 17:26:45.125 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_completed no_service code=0
+10-20 17:26:45.125 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe completed. available=false
+10-20 17:26:45.500 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488405497
+10-20 17:26:45.559 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488405557
+10-20 17:26:45.579 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_started requested code=0
+10-20 17:26:45.579 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe started
+10-20 17:26:46.507 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488406505
+10-20 17:26:46.573 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488406570
+10-20 17:26:47.511 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488407505
+10-20 17:26:47.563 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488407561
+10-20 17:26:48.108 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_completed no_service code=0
+10-20 17:26:48.108 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe completed. available=false
+10-20 17:26:48.509 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488408507
+10-20 17:26:49.470 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui peer_path_result peerrelay code=0
+10-20 17:26:49.478 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui sunshine_probe_timeout timeout code=0
+10-20 17:26:49.484 22470 22470 I A00000/ren.w2h.mesharc/MeshArcDiag: ui media_probe_no_service peerrelay code=0
+10-20 17:26:49.509 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488409507
+10-20 17:26:49.544 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488409542
+10-20 17:26:49.560 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_started requested code=0
+10-20 17:26:49.560 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe started
+10-20 17:26:50.510 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488410507
+10-20 17:26:50.551  4088  4088 W A01C06/com.ohos.sceneboard/ICON: [a92ab333bb75086 0 0]NumBadgeManager --> handleSubscribeCallbackData ren.w2h.mesharc, 20020231 badge change number is 0
+10-20 17:26:50.554  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab333bb75086 0 0]NotificationParserFactory: Parse notification __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141 end: {"key":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141-290","groupKey":"__0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141_20","category":20,"slotType":4,"appLabel":"MeshArc","isAutoDelete":false,"isHeadsUp":false,"isHeadsUpStick":false,"isShowStatusBarIcon":true,"isClearAllowed":false,"isRemoveAllowed":true,"isSettingIgnore":true,"isVibrationEnable":false,"isSoundEnable":false,"agentBundle":{"bundle":"","uid":1096},"isFromSystemApp":true,"remindFlags":59,"controlFlags":0,"isAlertOnce":false,"wantAgentId":7900,"deliveryTime":1792488379481,"isFromOtherDevices":false,"aggregationType":"NONE"}
+10-20 17:26:50.554  4088  4088 W A01A01/com.ohos.sceneboard/NC: [a92ab333bb75086 0 0]NotificationDataManager: SaveNtf __0_1096_ren.w2h.mesharc_bgmode_20020231_14017879603748104831_14528_141, isUpdate: true, role: 2
+10-20 17:26:50.571 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488410570
+10-20 17:26:50.715 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_completed no_service code=0
+10-20 17:26:50.716 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe completed. available=false
+10-20 17:26:51.511 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488411508
+10-20 17:26:51.570 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: status heartbeatMs=1792488411567
+10-20 17:26:51.592 22588 22588 I A00000/ren.w2h.mesharc:vpn/MeshArcDiag: vpn media_probe_started requested code=0
+10-20 17:26:51.592 22588 22588 I A00000/ren.w2h.mesharc:vpn/TailscaleVpn: Media service probe started

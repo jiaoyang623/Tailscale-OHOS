@@ -1,0 +1,62 @@
+{
+  "schema_version": "a01-review-brief-gate/1",
+  "layer": "requirements",
+  "verdict": "fail",
+  "exit_code": 1,
+  "checks": [
+    {
+      "id": "brief-exists",
+      "state": "pass",
+      "message": "决策说明存在且可读"
+    },
+    {
+      "id": "brief-check",
+      "state": "pass",
+      "message": "结构与图型检查通过"
+    },
+    {
+      "id": "decision-hashes",
+      "state": "fail",
+      "message": "缺少人工结论"
+    },
+    {
+      "id": "page-current",
+      "state": "pass",
+      "message": "页面与正文同版"
+    },
+    {
+      "id": "invalid-reviews",
+      "state": "pass",
+      "message": "失效记录 0 条，全部已处置"
+    },
+    {
+      "id": "required-figures",
+      "state": "pass",
+      "message": "本层必需图型齐全"
+    },
+    {
+      "id": "viewport-360",
+      "state": "pass",
+      "message": "360px 下无横向滚动，实测 345px"
+    }
+  ],
+  "method": {
+    "renderer": "mermaid+chrome",
+    "browser": "google-chrome",
+    "version": "Google Chrome 155.0.8059.79",
+    "viewport": 360,
+    "scrollWidth": 345
+  },
+  "baseline": "ec64476",
+  "snapshot_sha256": "3c992c1ff313e082c145e94eb16dee715d6c5ffdb2996ee20be99ee501897a2a",
+  "content_sha256": "904293ab63f77a0be644e3c472a9fc3649a503d10bf99610c9ac32d1a073cb1a",
+  "trace_sha256": "b37045ccd545cb304a73908ed47ca58d7a11610b5bb6afec5610219dd2fb40e1",
+  "decisions": {
+    "status": "missing",
+    "valid": [],
+    "stale": [],
+    "trace_updated": false,
+    "detail": "没有人工结论"
+  },
+  "at": "2026-10-20T07:25:00.074Z"
+}

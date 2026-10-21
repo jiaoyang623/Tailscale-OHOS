@@ -7,16 +7,18 @@ import {
 } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, power } from '@kit.BasicServicesKit';
 import { rpc } from '@kit.IPCKit';
 import { notificationManager } from '@kit.NotificationKit';
-import { APP_FOREGROUND_EVENT } from '../services/AppLifecycleEvents';
+import { connection } from '@kit.NetworkKit';
+import { APP_BACKGROUND_EVENT, APP_FOREGROUND_EVENT } from '../services/AppLifecycleEvents';
 import { AppShellFeatureAction, AppShellIntentAdapter } from '../services/AppShellIntentAdapter';
 import { FormCardService } from '../services/FormCardService';
 import { VpnReconnectSupervisor } from '../services/VpnReconnectSupervisor';
 import { VpnActionResult, VpnSessionController } from '../services/VpnSessionController';
 import { VpnLinkSnapshot, VpnLinkState, VpnStatusReader } from '../services/VpnStatusReader';
 import { VpnBackgroundTaskManager } from '../services/VpnBackgroundTaskManager';
+import { VpnPowerPolicy, VpnPowerStage, VpnPowerStageChange } from '../services/VpnPowerPolicy';
 import { DiagnosticPrivacy } from '../services/DiagnosticPrivacy';
 import { WindowEnvironment } from '../services/WindowEnvironment';
 
@@ -32,6 +34,8 @@ const CARD_POLL_INTERVAL_MS: number = 5000;
 const CARD_TRAFFIC_REFRESH_MS: number = 60000;
 /** Re-checking the desktop is far cheaper than reading status every tick. */
 const CARD_PRESENCE_CHECK_TICKS: number = 12;
+/** The screen can change while the app is out of sight. */
+const POWER_STAGE_SAMPLE_INTERVAL_MS: number = 30000;
 
 /** The `call` action requires a Parcelable return value. */
 class CardActionReply implements rpc.Parcelable {
@@ -62,6 +66,18 @@ export default class EntryAbility extends UIAbility {
   private cardRefreshInFlight: boolean = false;
   private lastCardState: string = '';
   private lastCardPushAtMs: number = 0;
+  private powerStageTimer: number = -1;
+  /** The stage this process last wrote. Used to pace the card refresh. */
+  private powerStage: VpnPowerStage = VpnPowerStage.ACTIVE;
+  private netConnection?: connection.NetConnection;
+
+  /**
+   * The default network came back. This is the trigger that makes a deferred
+   * recovery start at once instead of waiting for a retry timer.
+   */
+  private readonly netAvailableCallback = (_net: connection.NetHandle): void => {
+    this.vpnReconnect.onNetworkAvailable(Date.now());
+  };
 
   private applyEdgeToEdge(colorMode?: ConfigurationConstant.ColorMode): void {
     const mainWindow = this.mainWindow;
@@ -94,6 +110,21 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.vpnBackgroundTask.register(this.context);
+    this.applyPowerStage(VpnPowerStage.ACTIVE);
+    try {
+      const monitor: connection.NetConnection = connection.createNetConnection();
+      monitor.on('netAvailable', this.netAvailableCallback);
+      monitor.register((error: BusinessError) => {
+        if (error !== undefined && error.code !== 0) {
+          hilog.warn(DOMAIN, TAG, 'Network availability registration failed. %{public}s',
+            DiagnosticPrivacy.formatLogError(error));
+        }
+      });
+      this.netConnection = monitor;
+    } catch (error) {
+      hilog.warn(DOMAIN, TAG, 'Network availability listener failed. %{public}s',
+        DiagnosticPrivacy.formatLogError(error as BusinessError));
+    }
     this.handleTaildropNotificationWant(want);
     try {
       this.callee.on(CARD_TOGGLE_METHOD, this.toggleVpnFromCard);
@@ -108,6 +139,19 @@ export default class EntryAbility extends UIAbility {
   }
 
   onDestroy(): void {
+    if (this.powerStageTimer >= 0) {
+      clearInterval(this.powerStageTimer);
+      this.powerStageTimer = -1;
+    }
+    const monitor: connection.NetConnection | undefined = this.netConnection;
+    this.netConnection = undefined;
+    if (monitor !== undefined) {
+      try {
+        monitor.unregister((_error: BusinessError) => {});
+      } catch (_error) {
+        // Ability destruction also releases this process's listeners.
+      }
+    }
     if (this.cardTimer >= 0) {
       clearInterval(this.cardTimer);
       this.cardTimer = -1;
@@ -168,6 +212,8 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     this.vpnBackgroundTask.onForeground(this.context);
     this.vpnReconnect.onForeground();
+    this.stopPowerStageSampling();
+    this.applyPowerStage(VpnPowerStage.ACTIVE);
     this.applyEdgeToEdge(this.context.config.colorMode);
     this.context.eventHub.emit(APP_FOREGROUND_EVENT);
     // Coming back is a good moment to reconcile the desktop with reality.
@@ -178,7 +224,34 @@ export default class EntryAbility extends UIAbility {
   onBackground(): void {
     this.vpnBackgroundTask.onBackground(this.context);
     this.vpnReconnect.onBackground(Date.now());
+    this.applyPowerStage(VpnPowerPolicy.stageFor(true));
+    this.startPowerStageSampling();
+    this.context.eventHub.emit(APP_BACKGROUND_EVENT);
     hilog.info(DOMAIN, TAG, 'EntryAbility onBackground');
+  }
+
+  /**
+   * Writes the observation rate the extension reads. A failed write keeps the
+   * previous stage, so a full disk cannot silently slow the extension.
+   */
+  private applyPowerStage(stage: VpnPowerStage): void {
+    this.powerStage = stage;
+    const changes: VpnPowerStageChange[] = [];
+    VpnPowerPolicy.applyStage(this.context.filesDir, stage, changes);
+  }
+
+  private startPowerStageSampling(): void {
+    this.stopPowerStageSampling();
+    this.powerStageTimer = setInterval(() => {
+      this.applyPowerStage(VpnPowerPolicy.stageFor(true));
+    }, POWER_STAGE_SAMPLE_INTERVAL_MS);
+  }
+
+  private stopPowerStageSampling(): void {
+    if (this.powerStageTimer >= 0) {
+      clearInterval(this.powerStageTimer);
+      this.powerStageTimer = -1;
+    }
   }
 
   /**
@@ -212,8 +285,8 @@ export default class EntryAbility extends UIAbility {
       this.vpnReconnect.noteRequestedStart();
     }
     const action: Promise<VpnActionResult> = disconnecting
-      ? controller.disconnect(filesDir)
-      : controller.connect(filesDir);
+      ? controller.disconnect(filesDir, 'card')
+      : controller.connect(filesDir, undefined, 'card');
     action.then((result: VpnActionResult): Promise<number> => {
       hilog.info(DOMAIN, TAG, 'Card toggle result=%{public}s', result);
       if (result === VpnActionResult.NEEDS_UI) {
@@ -249,7 +322,9 @@ export default class EntryAbility extends UIAbility {
     this.cardTimer = setInterval(() => {
       this.cardTicks++;
       this.vpnReconnect.poll(this.context.filesDir, Date.now());
-      if (this.cardTicks % CARD_PRESENCE_CHECK_TICKS === 0 || this.cardPresent) {
+      const cardEvery: number = VpnPowerPolicy.cardRefreshTicks(this.powerStage);
+      const due: boolean = this.cardPresent ? this.cardTicks % cardEvery === 0 : false;
+      if (this.cardTicks % CARD_PRESENCE_CHECK_TICKS === 0 || due) {
         this.refreshCardsIfChanged();
       }
     }, CARD_POLL_INTERVAL_MS);

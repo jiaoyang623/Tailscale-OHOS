@@ -248,7 +248,11 @@ if "$HDC_BIN" -t "$DEVICE" shell "which power-shell" >/dev/null 2>&1; then
   done
   echo
   "$HDC_BIN" -t "$DEVICE" shell power-shell wakeup >/dev/null 2>&1
-  sleep 5
+  sleep 3
+  # 唤醒后停在锁屏界面，设备没设密码，上滑即开。不解开的话，紧接着的 M-19
+  # 冷启动会报 10106102 起不来，五个样本全是空的。
+  "$HDC_BIN" -t "$DEVICE" shell "uitest uiInput swipe 660 2000 660 700 300" >/dev/null 2>&1
+  sleep 2
   note "M-18 锁屏静置 $SURVIVAL_S 秒完成，心跳间隔见 04-analysis.txt"
 else
   echo "设备上没有 power-shell，改人工：锁屏静置 ${SURVIVAL_S} 秒，期间不要碰手机。"

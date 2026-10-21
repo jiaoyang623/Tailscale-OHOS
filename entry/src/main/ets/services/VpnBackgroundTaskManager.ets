@@ -5,6 +5,7 @@ import { fileIo } from '@kit.CoreFileKit';
 import { notificationManager } from '@kit.NotificationKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { StoragePaths } from './StoragePaths';
+import { VpnIntent, VpnIntentDesired, VpnSessionIntent } from './VpnSessionIntent';
 import { VpnLinkSnapshot, VpnLinkState, VpnStatusReader } from './VpnStatusReader';
 import { DiagnosticEventStore } from './DiagnosticEventStore';
 
@@ -17,6 +18,13 @@ const CONNECTION_CHECK_INTERVAL_MS: number = 1000;
 const NOTIFICATION_UPDATE_INTERVAL_MS: number = 30000;
 const START_RETRY_BASE_MS: number = 30000;
 const START_RETRY_MAX_MS: number = 300000;
+/**
+ * How long a fresh `connected` intent counts as evidence that a connect is in
+ * flight. The page writes the intent before it stages any command, so a task
+ * acquired inside this window is held before the extension can report
+ * `connecting`. The window is longer than the controller's backend wait.
+ */
+const CONNECT_REQUEST_FRESH_MS: number = 60000;
 
 /**
  * Sub-mode for the special-scenario continuous task.
@@ -36,6 +44,23 @@ interface VpnRuntimeStatus {
   rxBytes: number;
 }
 
+/**
+ * Holds the continuous task while the user wants the tunnel.
+ *
+ * The task exists so the system does not freeze this process. Whether the
+ * status file says connected, connecting, disconnected or nothing at all does
+ * not decide that: a single uncertain read is not a user stop. Only three
+ * events release the task:
+ *
+ *   1. the intent file says stopped;
+ *   2. the user cancels the notification, and the app does not fight the system
+ *      until the app is in the foreground again;
+ *   3. the ability is destroyed.
+ *
+ * A real disconnect keeps the task, because recovery needs the process awake.
+ * A `connected` intent written in the last minute is positive evidence that a
+ * connect is in flight. The task starts then, before any interface exists.
+ */
 export class VpnBackgroundTaskManager {
   private context?: common.UIAbilityContext;
   private monitoring: boolean = false;
@@ -47,10 +72,12 @@ export class VpnBackgroundTaskManager {
   private monitorTimer: number = -1;
   private task?: backgroundTaskManager.ContinuousTaskNotification;
   private stopping: boolean = false;
-  private suppressedUntilDisconnect: boolean = false;
+  private suppressedUntilForeground: boolean = false;
+  private foreground: boolean = false;
   private nextStartAtMs: number = 0;
   private retryCount: number = 0;
   private lastLiveAtMs: number = 0;
+  private statusTimedOut: boolean = false;
   private nextNotificationAtMs: number = 0;
   private specialScenarioTask: boolean = false;
 
@@ -66,11 +93,17 @@ export class VpnBackgroundTaskManager {
       const userCancelled: boolean =
         info.reason === backgroundTaskManager.ContinuousTaskCancelReason.USER_CANCEL ||
         info.reason === backgroundTaskManager.ContinuousTaskCancelReason.USER_CANCEL_REMOVE_NOTIFICATION;
-      this.suppressedUntilDisconnect = userCancelled;
-      if (!userCancelled) {
+      if (userCancelled) {
+        // Dismissing the notification is not a request to stop the tunnel.
+        // In the foreground the app can ask for the task again at once. In
+        // the background it waits for the next foreground edge, so it does
+        // not fight the system.
+        this.suppressedUntilForeground = !this.foreground;
+        this.record('background_user_cancelled_kept_vpn', info.reason);
+      } else {
         this.scheduleRetry();
+        this.record('background_system_cancelled', info.reason);
       }
-      this.record(userCancelled ? 'background_user_cancelled' : 'background_system_cancelled', info.reason);
       hilog.info(DOMAIN, TAG, 'VPN background task cancelled. id=%{public}d reason=%{public}d',
         info.id, info.reason);
     };
@@ -137,14 +170,22 @@ export class VpnBackgroundTaskManager {
   }
 
   onBackground(context: common.UIAbilityContext): void {
+    this.foreground = false;
     this.record('background_entered');
     this.reconcile(context);
   }
 
   onForeground(context: common.UIAbilityContext): void {
-    // Foreground permits retrying a system failure, not undoing user dismissal.
+    this.foreground = true;
+    const wasSuppressed: boolean = this.suppressedUntilForeground;
+    // Foreground permits retrying a system failure, and it is the only place
+    // where the app asks for the task again after the user dismissed it.
+    this.suppressedUntilForeground = false;
     this.nextStartAtMs = 0;
     this.retryCount = 0;
+    if (wasSuppressed && this.intentConnected(context)) {
+      this.record('background_protection_restored');
+    }
     this.reconcile(context);
   }
 
@@ -159,31 +200,46 @@ export class VpnBackgroundTaskManager {
         await this.stop(context);
         return;
       }
-      const status: VpnRuntimeStatus = this.readStatus(context.filesDir);
-      if (status.state === VpnLinkState.DISCONNECTED) {
-        this.suppressedUntilDisconnect = false;
+      const intent: VpnIntent = VpnSessionIntent.read(context.filesDir);
+      if (intent.desired !== VpnIntentDesired.CONNECTED) {
+        this.suppressedUntilForeground = false;
         this.nextStartAtMs = 0;
         this.retryCount = 0;
         this.lastLiveAtMs = 0;
+        this.statusTimedOut = false;
         await this.stop(context);
         return;
       }
+      const nowMs: number = Date.now();
+      const status: VpnRuntimeStatus = this.readStatus(context.filesDir);
       const live: boolean = VpnBackgroundTaskManager.isLiveState(status.state);
-      if (!live) {
-        // Missing telemetry is uncertain. Retain an acquired task briefly,
-        // but never acquire a new task based on stale connection evidence.
-        if (this.task !== undefined && Date.now() - this.lastLiveAtMs > VPN_STATUS_GRACE_MS) {
-          this.record('background_status_timeout');
-          await this.stop(context);
-        }
-        return;
+      // The page writes the intent before it stages a command. A fresh intent
+      // is positive evidence that a connect is in flight, so the task starts
+      // before the extension can report `connecting`.
+      const connectRequested: boolean = this.connectRequestedRecently(intent, nowMs);
+      if (live) {
+        this.lastLiveAtMs = nowMs;
+        this.statusTimedOut = false;
       }
-      this.lastLiveAtMs = Date.now();
-      if (this.task === undefined && !this.suppressedUntilDisconnect && Date.now() >= this.nextStartAtMs) {
+      if ((live || connectRequested) && this.task === undefined &&
+        !this.suppressedUntilForeground && nowMs >= this.nextStartAtMs) {
         await this.start(context, generation);
       }
-      if (this.monitoring && generation === this.lifecycleGeneration && this.task !== undefined) {
+      if (live && this.monitoring && generation === this.lifecycleGeneration &&
+        this.task !== undefined) {
         await this.updateNotification(context, status);
+      }
+      if (live || connectRequested) {
+        return;
+      }
+      // The tunnel is down or its readings are uncertain, and the user still
+      // wants it. Keep the task so recovery can run, and report a long gap in
+      // telemetry once so a device run can see it.
+      if (status.state === VpnLinkState.UNKNOWN && this.task !== undefined &&
+        !this.statusTimedOut && this.lastLiveAtMs > 0 &&
+        nowMs - this.lastLiveAtMs > VPN_STATUS_GRACE_MS) {
+        this.statusTimedOut = true;
+        this.record('background_status_timeout');
       }
     } catch (error) {
       this.scheduleRetry();
@@ -202,6 +258,15 @@ export class VpnBackgroundTaskManager {
     return state === VpnLinkState.CONNECTED || state === VpnLinkState.CONNECTING;
   }
 
+  private intentConnected(context: common.UIAbilityContext): boolean {
+    return VpnSessionIntent.read(context.filesDir).desired === VpnIntentDesired.CONNECTED;
+  }
+
+  private connectRequestedRecently(intent: VpnIntent, nowMs: number): boolean {
+    return intent.changedAtMs > 0 && nowMs >= intent.changedAtMs &&
+      nowMs - intent.changedAtMs <= CONNECT_REQUEST_FRESH_MS;
+  }
+
   private async start(context: common.UIAbilityContext, generation: number): Promise<void> {
     const revision: number = this.cancellationRevision;
     const info: wantAgent.WantAgentInfo = {
@@ -211,9 +276,12 @@ export class VpnBackgroundTaskManager {
       actionFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     const agent: WantAgent = await wantAgent.getWantAgent(info);
+    const intent: VpnIntent = VpnSessionIntent.read(context.filesDir);
     if (!this.monitoring || generation !== this.lifecycleGeneration ||
       revision !== this.cancellationRevision ||
-      !VpnBackgroundTaskManager.isLiveState(this.readStatus(context.filesDir).state)) {
+      intent.desired !== VpnIntentDesired.CONNECTED ||
+      (!VpnBackgroundTaskManager.isLiveState(this.readStatus(context.filesDir).state) &&
+        !this.connectRequestedRecently(intent, Date.now()))) {
       return;
     }
     if (await this.startSpecialScenario(context, agent, generation, revision)) {
@@ -228,7 +296,7 @@ export class VpnBackgroundTaskManager {
     }
     this.task = task;
     if (!this.monitoring || generation !== this.lifecycleGeneration ||
-      this.readStatus(context.filesDir).state === VpnLinkState.DISCONNECTED) {
+      !this.intentConnected(context)) {
       await this.stop(context);
       return;
     }

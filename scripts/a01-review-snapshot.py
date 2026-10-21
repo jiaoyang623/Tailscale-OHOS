@@ -111,8 +111,22 @@ def load_oracles(stage):
             planned = f.get("待建测试", "") or f.get("待接线测试", "")
             for token in split_values(planned) or ([planned] if planned.strip() else []):
                 token = ANCHOR_RE.sub(r"\1", token.strip()).strip()
-                if token:
-                    notes.append(f"未建：{token}")
+                if not token:
+                    continue
+                # 声明的锚点若已在设备上跑过，就按跑出来的结果记，不再写「未建」。
+                # 结果来自 docs/changes/a01-baseline/e2e-results.json，由 E2E 跑批产出。
+                # 三档：全过记 pass，有跳过记 partial，有失败记 fail。
+                # 跳过不算通过，所以不并进 pass。
+                outcome = e2e_outcome(token)
+                if outcome:
+                    entry = {"id": f"T-{oid}-e2e", "level": "e2e", "status": outcome["status"],
+                             "oracle_ids": [oid], "evidence": outcome["evidence"]}
+                    if outcome["status"] in ("pass", "fail"):
+                        entry.update(outcome["run"])
+                    if entry["id"] not in {t["id"] for t in tests}:
+                        tests.append(entry)
+                    continue
+                notes.append(f"未建：{token}")
             executed = []
             for token in split_values(f.get("测试", "")):
                 token = token.strip()
@@ -129,7 +143,13 @@ def load_oracles(stage):
             for token in executed:
                 # 不要用外层的 level：它在每个文件开头按目录定层，被这里覆盖会让
                 # 同文件后续判据的 level 全变成 integration/unit。
-                test_level = "integration" if "/integration/" in token else "unit"
+                # 三层测试各有各的锚点目录。判错层会让网页把 E2E 记成单元测试。
+                if "/e2e/" in token:
+                    test_level = "e2e"
+                elif "/integration/" in token:
+                    test_level = "integration"
+                else:
+                    test_level = "unit"
                 tlev = test_level[:3]
                 entry = {"id": f"T-{oid}-{tlev}", "level": test_level, "status": "not_evaluated",
                          "oracle_ids": [oid], "evidence": token}
@@ -142,6 +162,51 @@ def load_oracles(stage):
                 if entry["id"] not in {t["id"] for t in tests}:
                     tests.append(entry)
     return oracles, tests
+
+
+# E2E 跑批的结果。设备侧的门禁不在 run-checks.sh 里（CI 上没有设备），
+# 所以它的结论靠一份提交进仓库的结果文件带过来。
+E2E_RESULTS = ROOT / "docs/changes/a01-baseline/e2e-results.json"
+
+
+def load_e2e_results():
+    if not E2E_RESULTS.exists():
+        return {}
+    try:
+        return json.loads(E2E_RESULTS.read_text(encoding="utf-8")).get("files", {})
+    except (OSError, ValueError):
+        return {}
+
+
+_E2E_FILES = load_e2e_results()
+
+
+def e2e_outcome(token):
+    """给一条已跑过的 E2E 锚点产出测试条目内容；没跑过就返回 None。"""
+    match = re.match(r"^(scripts/e2e/[A-Za-z0-9_-]+)\.mjs::", token)
+    if not match:
+        return None
+    name = match.group(1).split("/")[-1]
+    result = _E2E_FILES.get(name)
+    if not result:
+        return None
+    verdict = result.get("verdict", "")
+    # review.py 的测试状态词表只有 pass / fail / skip / blocked / not_evaluated。
+    # 部分通过（partial）不能算通过；记为 not_evaluated，并在证据里写明跳过数。
+    status = {"pass": "pass", "partial": "not_evaluated", "fail": "fail"}.get(verdict)
+    if not status:
+        return None
+    meta = json.loads(E2E_RESULTS.read_text(encoding="utf-8"))
+    ran_at = meta.get("ran_at", "")
+    evidence = (f"{match.group(1)}.mjs 跑过：通过 {result.get('pass', 0)}、"
+                f"跳过 {result.get('skip', 0)}、失败 {result.get('fail', 0)}")
+    if status == "not_evaluated":
+        evidence += "（有跳过，跳过不算通过）"
+    return {"status": status, "evidence": f"{evidence}；运行 {ran_at}",
+            "run": {"command": meta.get("command", ""),
+                    "baseline": meta.get("baseline", ""),
+                    "environment": f"HarmonyOS 设备 {meta.get('device', '')}，hdc",
+                    "executed_at": ran_at}}
 
 
 def load_requirements():
@@ -280,6 +345,9 @@ def load_lld():
         ("VpnCommandStateMachine", "L-VM-2", ["H-C-01", "H-C-10"]),
         ("VpnReconnectSupervisor", "L-VM-3", ["H-C-11", "H-C-10"]),
         ("VpnStatusReader", "L-VM-4", ["H-C-03", "H-C-04"]),
+        # 本批新增：会话意图与恢复、省电档位。
+        ("VM-5", "L-VM-5", ["H-C-11", "H-C-19", "H-C-03"]),
+        ("VM-6", "L-VM-6", ["H-C-03", "H-C-11"]),
     ]
     design = []
     for needle, did, parents in plan:

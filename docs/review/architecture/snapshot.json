@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "51e680d",
+  "baseline": "ec64476",
   "stage": "architecture",
   "design": [
     {
@@ -209,16 +209,16 @@
     {
       "id": "R-CONN-05",
       "layer": "requirements",
-      "title": "非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数",
+      "title": "非用户主动的掉线自动恢复：指数退避，退避上限 300 s",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数",
-        "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "规则：非用户主动的掉线自动恢复：指数退避，退避上限 300 s；稳定 60 s 后清零计数。恢复不设次数上限",
+        "优先级：高",
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`services/VpnReconnectSupervisor.ets`（`BACKGROUND_SETTLE_MS`/`MAX_ATTEMPTS`/`STABLE_MS`）"
+        "`services/VpnReconnectSupervisor.ets`（`RETRY_BASE_MS`/`RETRY_MAX_MS`/`STABLE_MS`）"
       ]
     },
     {
@@ -271,31 +271,34 @@
     {
       "id": "R-CONN-09",
       "layer": "requirements",
-      "title": "长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放",
+      "title": "长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放",
-        "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "规则：长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放",
+        "优先级：高",
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`VpnBackgroundTaskManager.ets` `VPN_STATUS_GRACE_MS`"
+        "`VpnBackgroundTaskManager.ets` 的意图守卫",
+        "`services/VpnSessionIntent.ets`",
+        "2026-10-20 修订，原值为「有界宽限后释放」"
       ]
     },
     {
       "id": "R-CONN-10",
       "layer": "requirements",
-      "title": "用户主动取消保活通知后，不得在同一会话内自行恢复",
+      "title": "用户取消保活通知不等于停止连接。后台不抢",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：用户主动取消保活通知后，不得在同一会话内自行恢复",
+        "规则：用户取消保活通知不等于停止连接。后台不抢；回到前台且连接意图仍在时重新申请保护",
         "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`VpnBackgroundTaskManager.ets` `suppressedUntilDisconnect`"
+        "`VpnBackgroundTaskManager.ets` `suppressedUntilForeground`（本批由 `suppressedUntilDisconnect` 重命名）",
+        "2026-10-20 修订"
       ]
     },
     {
@@ -1037,9 +1040,116 @@
       ]
     },
     {
+      "id": "R-CONN-11",
+      "layer": "requirements",
+      "title": "用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户报告「长时间使用会断连」",
+        "`VpnBackgroundTaskManager.suppressedUntilDisconnect` 只在读到 `DISCONNECTED` 时清零"
+      ]
+    },
+    {
+      "id": "R-CONN-12",
+      "layer": "requirements",
+      "title": "非用户原因的断连都要落盘留证。每条记录带原因分类：扩展崩溃、进程回收、交接超时、系统策略、网络失效",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：非用户原因的断连都要落盘留证。每条记录带原因分类：扩展崩溃、进程回收、交接超时、系统策略、网络失效",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户要求「非用户原因的断连都要记录」"
+      ]
+    },
+    {
+      "id": "R-CONN-13",
+      "layer": "requirements",
+      "title": "断连后自动恢复不设次数上限。用户在场且连接可用时重连",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：断连后自动恢复不设次数上限。用户在场且连接可用时重连；用户主动停止后不恢复",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批修订 R-CONN-05 的「最多 3 次」。来源：用户要求「用户没有点击停止时不要停止连接」"
+      ]
+    },
+    {
+      "id": "R-NET-05",
+      "layer": "requirements",
+      "title": "网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。扩展进程已有 `VpnNetworkMonitor`",
+        "本批把它接到恢复决策"
+      ]
+    },
+    {
+      "id": "R-POWER-01",
+      "layer": "requirements",
+      "title": "应用退到后台后停止界面类探测并降低刷新频率。隧道的保护与恢复不受影响",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：应用退到后台后停止界面类探测并降低刷新频率。隧道的保护与恢复不受影响",
+        "优先级：中",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户报告「系统提示耗电较多」"
+      ]
+    },
+    {
+      "id": "R-POWER-02",
+      "layer": "requirements",
+      "title": "屏幕熄灭后再降一档：只保留心跳、命令应答与恢复所需的最小检查",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：屏幕熄灭后再降一档：只保留心跳、命令应答与恢复所需的最小检查",
+        "优先级：中",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。官方 `power.isActive()` 有屏设备亮屏为活动、熄屏为非活动"
+      ]
+    },
+    {
       "id": "QG-01",
       "layer": "requirements",
       "title": "锁屏静置后台存活",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：≥ 12 h，全程心跳龄 ≤ 15 s，扩展只拉起一次",
+        "观测环境与测量方法：真机：`scripts/e2e/endurance-survival.mjs` 连接后锁屏静置 12 h，扩展每秒把 `heartbeatMs=` 镜像进设备日志，脚本按相邻两条算间隔，并取每天的前台/后台/熄屏事件",
+        "现状：**待实测（2026-10-20）**。上一批次 720 s 已通过，见本表下方历史行"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-02",
+      "layer": "requirements",
+      "title": "锁屏静置后台存活（历史）",
       "status": "ready",
       "depends_on": [],
       "content": [
@@ -1052,7 +1162,52 @@
       ]
     },
     {
-      "id": "QG-02",
+      "id": "QG-03",
+      "layer": "requirements",
+      "title": "非用户断连可归因",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：每次非用户断连都有一条 `vpn_session_end` 事件，原因分类在受控词表内",
+        "观测环境与测量方法：真机诊断文件 `diagnostic-vpn-events.ndjson`；字段 `reason` 取值来自登记表",
+        "现状：**待实现（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-04",
+      "layer": "requirements",
+      "title": "省电：后台探测停止",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：退到后台后 5 s 内不再发起对端、媒体、Sunshine、LocalSend 探测",
+        "观测环境与测量方法：真机诊断文件：后台期间无 `peer_path_result` / `media_probe_*` / `sunshine_probe_*` 新事件",
+        "现状：**待实测（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-05",
+      "layer": "requirements",
+      "title": "省电：熄屏降频",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：熄屏后扩展命令轮询从 100 ms 降到 ≥ 1000 ms，状态快照从 1 s 降到 ≥ 5 s",
+        "观测环境与测量方法：真机：按 1 h 对比熄屏前后诊断事件条数与进程 CPU 时间（`/proc/<pid>/stat` 的 utime+stime）",
+        "现状：**待实测（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-06",
       "layer": "requirements",
       "title": "连接期保活覆盖",
       "status": "ready",
@@ -1067,7 +1222,7 @@
       ]
     },
     {
-      "id": "QG-03",
+      "id": "QG-07",
       "layer": "requirements",
       "title": "网络切换恢复",
       "status": "ready",
@@ -1082,7 +1237,7 @@
       ]
     },
     {
-      "id": "QG-04",
+      "id": "QG-08",
       "layer": "requirements",
       "title": "掉线自动恢复",
       "status": "ready",
@@ -1097,7 +1252,7 @@
       ]
     },
     {
-      "id": "QG-05",
+      "id": "QG-09",
       "layer": "requirements",
       "title": "传输完整性",
       "status": "ready",
@@ -1112,7 +1267,7 @@
       ]
     },
     {
-      "id": "QG-06",
+      "id": "QG-10",
       "layer": "requirements",
       "title": "诊断脱敏",
       "status": "ready",
@@ -1127,7 +1282,7 @@
       ]
     },
     {
-      "id": "QG-07",
+      "id": "QG-11",
       "layer": "requirements",
       "title": "双语完整",
       "status": "ready",
@@ -1142,7 +1297,7 @@
       ]
     },
     {
-      "id": "QG-08",
+      "id": "QG-12",
       "layer": "requirements",
       "title": "启动到可用",
       "status": "ready",
@@ -1328,6 +1483,40 @@
         "R-CONN-06",
         "R-DEV-05",
         "R-DEV-06"
+      ]
+    },
+    {
+      "id": "A-2.6",
+      "layer": "architecture",
+      "title": "§2.6 长时会话的生命周期与能量策略（本批新增，2026-10-20）",
+      "status": "ready",
+      "depends_on": [
+        "R-CONN-03",
+        "R-CONN-04",
+        "R-CONN-05",
+        "R-CONN-06",
+        "R-CONN-07",
+        "R-CONN-08",
+        "R-CONN-09",
+        "R-CONN-10",
+        "R-DIAG-02",
+        "R-DIAG-05",
+        "R-NET-03",
+        "R-NET-04",
+        "R-PRIV-01",
+        "R-SETUP-05",
+        "R-UI-03",
+        "R-UI-04",
+        "R-UI-05",
+        "R-XFER-05",
+        "R-XFER-06",
+        "R-XFER-07"
+      ],
+      "content": [
+        "本批把「用户没有点击停止」作为会话存续的唯一意图来源。意图写在本地文件，两个进程都可读。 下图只画意图、状态与责任方。 ```text 用户点击连接 ──> 意图=connected（落盘） 用户点击停止 ──> 意图=stopped（落盘） │ ├─ 意图=connected │ ├─ 状态 live（connected / connecting）────> 持有长时任务 │ ├─ 状态 down（disconnected / 陈旧心跳）──> 记录原因 + 保持保护 + 恢复 │ └─ 网络离线 ────────────────────────────> 等系统网络回调，回到下行 │ └─ 意图=stopped └─ 释放任务，停止扩展，不再恢复 ``` 三条横切约束： 1. **意图优先于观测。** 一次读不到心跳不等于用户停止。只有意图文件、用户入口或系统确认的停止才能改变 意图。"
+      ],
+      "sources": [
+        "docs/architecture/architecture.md §2.6"
       ]
     },
     {
@@ -1835,34 +2024,97 @@
       "id": "O-CONN-04",
       "level": "journey",
       "introduced_at": "requirements",
-      "title": "后台掉线自动恢复（非用户主动）",
+      "title": "掉线自动恢复（意图为连接时）",
       "status": "ready",
       "parent_ids": [],
       "design_ids": [
         "R-CONN-05",
-        "R-CONN-06"
+        "R-CONN-06",
+        "R-CONN-13"
       ],
-      "trigger": "隧道曾在 connected 后掉到 disconnected，且应用已切到后台满 10 s，且不是经本应用受控入口请求的断开",
-      "observe": "诊断事件 vpn_reconnect_attempt、vpn_reconnect_started、vpn_reconnect_not_started、vpn_reconnect_failed、vpn_reconnect_succeeded、vpn_reconnect_exhausted、vpn_drop_ignored_foreground、vpn_drop_after_requested_stop；vpn-probe-status.txt 是否回到 state=Running | tun=true",
+      "trigger": "意图文件 `vpn-intent.json` 为 `connected`，隧道从 connected 掉到 disconnected，或从 connected 变为 unknown 且心跳龄超过 30 s",
+      "observe": "诊断事件 `vpn_session_end_observed`、`vpn_session_recovery_attempt`、`vpn_session_recovered`、`vpn_reconnect_attempt`、`vpn_reconnect_started`、`vpn_reconnect_not_started`、`vpn_reconnect_failed`、`vpn_reconnect_succeeded`、`vpn_drop_after_requested_stop`；`vpn-probe-status.txt` 是否回到 `state=Running | tun=true`",
       "expected": [
-        "正常：VpnReconnectSupervisor 只在 connected 掉到 disconnected 时触发（不从未知态触发），后台满 10 s（BACKGROUND_SETTLE_MS）才认定为非主动掉线，调 VpnSessionController.connect 重连",
-        "最多 3 次（MAX_ATTEMPTS），退避 30 s→60 s→120 s（RETRY_BASE_MS 指数退避、上限 300 s），连接稳定满 60 s（STABLE_MS）才清零尝试计数。边界：回到前台即清空尝试计数与重试梯（onForeground）",
-        "连接只维持片刻又掉的 flapping 情形因 60 s 稳定门限不会每轮清零而无限重试。失败与恢复：用户主动断开（卡片 call 触发 noteRequestedStop）后的掉线记 vpn_drop_after_requested_stop 且不重连",
-        "前台附近的掉线记 vpn_drop_ignored_foreground 且不重连",
-        "达到 3 次后记 vpn_reconnect_exhausted 停止自动恢复。安全与质量：用户的主动断开绝不能被自动恢复撤销。"
+        "正常：意图为 connected 时，`VpnReconnectSupervisor` 在 connected 掉到 disconnected、或 connected 变为 unknown 且心跳龄超过 30 s 时触发 `VpnSessionController.connect`。退避 30/60/120/300 s 封顶，不设次数上限。连接稳定满 60 s 后清零计数并记 `vpn_session_recovered`。边界：前台可见时同样恢复，不再等待后台静置 10 s",
+        "网络离线时不消耗尝试次数，等 `netAvailable` 回调后立即恢复",
+        "回到前台清零退避。失败与恢复：用户主动断开（意图为 stopped）后的掉线记 `vpn_drop_after_requested_stop` 且不重连",
+        "恢复返回 `NEEDS_UI` 时记 `vpn_session_recovery_needs_ui` 并停在 NEEDS_UI，不反复重试。安全与质量：用户的主动断开绝不能被自动恢复撤销。"
       ],
-      "failure_message": "期望「非主动掉线在后台自动恢复、主动断开不被撤销」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」",
+      "failure_message": "期望「意图为连接时掉线一直恢复直到成功或用户停止」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」",
       "sources": [
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:107 handleDrop",
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:91",
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:62 noteRequestedStop",
-        "entry/src/main/ets/entryability/EntryAbility.ets:202 performCardToggle",
-        "entry/src/main/ets/entryability/EntryAbility.ets:251",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
         "docs/oracles/90-journeys/02-connection.md"
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-CONN-08",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "非用户断连的留证与恢复",
+      "status": "draft",
+      "parent_ids": [],
+      "design_ids": [
+        "R-CONN-11",
+        "R-CONN-12"
+      ],
+      "trigger": "已连接会话发生非用户原因的结束——扩展 `onDestroy`、后端交接超时、进程被回收、系统策略停止。意图文件仍为 `connected`",
+      "observe": "`vpn-session-ledger.ndjson` 中的 `vpn_session_end` 与 `vpn_session_end_observed`（含 `reason`、`sessionId`）；诊断事件 `background_user_cancelled_kept_vpn`、`background_protection_restored`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态",
+      "expected": [
+        "正常：先退出的进程写一条带受控原因词的结束记录",
+        "后感知的进程按 `sessionId` 补写观测记录。原因不是 `user_stop` 且意图为 connected 时进入恢复，不设次数上限。边界：扩展被硬杀时没有结束记录，存活的 P1 以「心跳停止超过 15 s 且账本无结束记录」判 `extension_crash` 并补写。长时任务被用户取消后，后台不重抢",
+        "回到前台且意图仍为 connected 时重新申请。失败与恢复：账本写入失败不阻止退出",
+        "恢复失败按 R-CONN-05 的退避继续。安全与质量：账本不含地址、账号、令牌",
+        "原因无法判定时写 `unknown` 并写明缺哪条证据，不猜。"
+      ],
+      "failure_message": "期望「每次非用户断连都有原因记录且随后恢复」，实际「断连原因不明、没有记录，或断连后一直等到用户打开应用」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "docs/oracles/90-journeys/02-connection.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "UNCERTAIN-PLATFORM P1 被冻结期间发生的结束，记录时间等于解冻后的补写时间，不等于发生时刻",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-CONN-09",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "网络恢复后自动恢复连接",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "R-CONN-13",
+        "R-NET-05"
+      ],
+      "trigger": "意图为 `connected`，隧道不可用，默认网络 `netId=0`（离线）。之后系统报告默认网络可用",
+      "observe": "`connection.getDefaultNet()` 的 `netId`；诊断事件 `vpn_session_recovery_deferred`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态",
+      "expected": [
+        "正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按采样写重复记录，也不消耗恢复次数。收到 `netAvailable` 后立即发起一次恢复，不等退避到期。恢复成功后连接稳定 60 s 记 `vpn_session_recovered`。边界：网络在恢复在途时再次变化，恢复被新的网络事件重新驱动",
+        "旧网络的恢复结果不得覆盖新网络。失败与恢复：恢复失败按退避继续",
+        "网络再次离线时回到等待。安全与质量：只读默认网络的 `netId`，不读取或记录地址、DNS、接口名。"
+      ],
+      "failure_message": "期望「离线等待、网络恢复后立即恢复」，实际「离线期间反复重试耗尽退避，或网络恢复后仍不重连」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "docs/oracles/90-journeys/02-connection.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -2063,6 +2315,34 @@
       "oracle_state": "closed",
       "uncertainty": "none",
       "owner": "—",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-NET-04",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "网络不通时等待回调，网络恢复后自动恢复连接",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "R-CONN-13",
+        "R-NET-05"
+      ],
+      "trigger": "意图为 `connected`，隧道不可用，`connection.getDefaultNet()` 返回 `netId=0`。之后 Wi-Fi 或蜂窝恢复。",
+      "observe": "`vpn_session_recovery_deferred` 与 `vpn_session_recovery_attempt` 的写入顺序与时间；`connect` 的调用时刻；`vpn_session_recovered`；界面的连接状态文案",
+      "expected": [
+        "正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按固定间隔盲目调用 `connect`。收到 `netAvailable` 后立即尝试一次，不等退避到期。恢复成功后写 `vpn_session_recovered`，界面回到已连接。边界：离线期间多次采样不写重复记录，也不消耗退避。网络在恢复在途时再次变化，恢复由新的网络事件重新驱动。失败与恢复：恢复失败按退避继续。网络再次离线时回到等待。安全与质量：只读 `netId` 与承载类别，不记录地址、接口名或 DNS。判定在真机走查下成立"
+      ],
+      "failure_message": "期望「离线等待、网络恢复后自动重连」，实际「离线期间重试耗尽，网络恢复后仍保持断开」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets 的网络回调",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "docs/oracles/90-journeys/03-network.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -2623,6 +2903,35 @@
       "oracle_state": "pending-test",
       "uncertainty": "none",
       "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-DIAG-02",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "非用户原因的断连留下可导出的原因记录",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "R-CONN-12",
+        "R-DIAG-02",
+        "R-DIAG-05"
+      ],
+      "trigger": "一次已连接会话以非用户原因结束——扩展 onDestroy、扩展崩溃、后端交接超时、系统策略停止或网络失效。用户未点击停止。",
+      "observe": "`vpn-session-ledger.ndjson` 的 `reason`、`writer`、`kind`、`timestampMs`；诊断报告中的同一记录；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered` 事件",
+      "expected": [
+        "正常：每次非用户结束写一条 `end` 记录，原因在受控词表内。P1 随后补写 `observed` 并进入恢复。恢复稳定 60 s 写 `vpn_session_recovered`。边界：同一 `sessionId` 的同一类记录只出现一次。用户主动停止写 `user_stop`，不进入恢复。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。安全与质量：记录只含时间戳、写方、类型、原因、阶段与数值码，不含地址、账号、令牌或设备标识。判定在宿主侧桩边界与真机走查下成立"
+      ],
+      "failure_message": "期望「每次非用户断连都能在设备上查到原因」，实际「断开后没有记录，无法区分用户停止、扩展崩溃与系统停止」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy",
+        "entry/src/main/ets/services/DiagnosticReportService.ets",
+        "docs/oracles/90-journeys/09-diagnostics.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -3278,6 +3587,40 @@
       "seam_not_applicable": ""
     },
     {
+      "id": "O-SEAM-19",
+      "level": "seam",
+      "introduced_at": "architecture",
+      "title": "会话结束事件与原因分类：两个进程都可能先退出",
+      "status": "ready",
+      "parent_ids": [
+        "O-CONN-08"
+      ],
+      "design_ids": [
+        "A-SEAMS",
+        "R-CONN-12"
+      ],
+      "trigger": "一次 VPN 会话结束。结束由任一进程先感知——用户停止（P1）、扩展 onDestroy（P2）、后端交接超时（P2）、系统停止或网络失效。两个进程都可能先退出。",
+      "observe": "`vpn-session-ledger.ndjson` 的行；`vpn-intent.json`；`vpn-session-end.json`；`vpn-probe-status.txt` 的 `sessionId`；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered`、`vpn_session_recovery_deferred` 事件",
+      "expected": [
+        "正常：先退出的进程写 `kind=end`，`reason` 在受控词表内。后感知的进程按同一 `sessionId` 补写 `kind=observed`，不重复写 `end`。边界：用户停止时 P1 先写 `user_stop`，意图随后为 stopped，P2 的 onDestroy 不再写第二条 `end`。交接超时由 P2 写 `handoff_timeout`。P1 读到心跳停止且账本没有 `end` 记录时写 `extension_crash` 或 `unknown`，并在 `phase` 说明缺哪条证据。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。安全与质量：同一 `sessionId + kind` 只写一次",
+        "记录只含受控字段，不含地址、账号、令牌或设备标识",
+        "意图文件是唯一意图来源，账本不得反向改写意图。判定在宿主侧桩边界（两个沙箱共享一个内存文件系统）下成立"
+      ],
+      "failure_message": "期望「谁先退出谁写原因，后感知的一方补写观测且不重复」，实际「两个进程各写一条或多条，原因拼写不一致，无法统计」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "scripts/integration/session-ledger-seam.mjs",
+        "docs/oracles/91-seams/S3-orchestration-system.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
       "id": "O-SEAM-13",
       "level": "seam",
       "introduced_at": "architecture",
@@ -3540,85 +3883,111 @@
   ],
   "tests": [
     {
-      "id": "T-O-SETUP-01",
+      "id": "T-O-SETUP-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-01"
       ],
-      "evidence": "未建：scripts/e2e/first-run.mjs::首次启动展示欢迎与更新日志且确认后不再打扰"
+      "evidence": "scripts/e2e/first-run.mjs 跑过：通过 1、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-02",
+      "id": "T-O-SETUP-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-02"
       ],
-      "evidence": "未建：scripts/e2e/control-server.mjs::配置控制服务器含明文 HTTP 风险确认与非法地址拒绝"
+      "evidence": "scripts/e2e/control-server.mjs 跑过：通过 0、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-03",
+      "id": "T-O-SETUP-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-03"
       ],
-      "evidence": "未建：scripts/e2e/browser-login.mjs::经系统浏览器登录并回落到未登录态"
+      "evidence": "scripts/e2e/browser-login.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-04",
+      "id": "T-O-SETUP-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-04"
       ],
-      "evidence": "未建：scripts/e2e/logout.mjs::连接中先提示断开且退出后清理账户状态"
+      "evidence": "scripts/e2e/logout.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-01",
+      "id": "T-O-CONN-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-CONN-01"
       ],
-      "evidence": "未建：scripts/e2e/connect-journey.mjs::从首页连接后进入可用隧道"
+      "evidence": "scripts/e2e/connect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-02",
+      "id": "T-O-CONN-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-CONN-02"
       ],
-      "evidence": "未建：scripts/e2e/disconnect-journey.mjs::从首页断开后回到未连接并释放长时任务"
+      "evidence": "scripts/e2e/disconnect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-03",
+      "id": "T-O-CONN-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-03"
       ],
-      "evidence": "未建：scripts/e2e/connect-window-background.mjs::连接窗口期切到其它应用仍建成隧道"
+      "evidence": "scripts/e2e/connect-window-background.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-04",
+      "id": "T-O-CONN-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-04"
       ],
-      "evidence": "未建：scripts/e2e/background-reconnect.mjs::后台非主动掉线自动恢复且不撤销主动断开"
+      "evidence": "scripts/e2e/background-reconnect.mjs 跑过：通过 2、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-05",
+      "id": "T-O-CONN-08",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-08"
+      ],
+      "evidence": "未建：scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录"
+    },
+    {
+      "id": "T-O-CONN-09",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-09"
+      ],
+      "evidence": "未建：scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连"
+    },
+    {
+      "id": "T-O-CONN-05-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-05"
       ],
-      "evidence": "未建：scripts/e2e/vpn-conflict.mjs::存在另一个系统 VPN 时给出冲突提示"
+      "evidence": "scripts/e2e/vpn-conflict.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-CONN-06",
@@ -3630,31 +3999,48 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-01（源文档实测，本批未复跑）；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-02（源文档实测，本批未复跑）"
     },
     {
+      "id": "T-O-CONN-07-e2e",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-07"
+      ],
+      "evidence": "scripts/e2e/headless-connect.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
       "id": "T-O-CONN-07",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-07"
       ],
-      "evidence": "未建：scripts/e2e/headless-connect.mjs::无界面入口独立完成连接并应答后端交接；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-13（源文档实测，本批未复跑）"
+      "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-13（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-NET-01",
+      "id": "T-O-NET-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-NET-01"
       ],
-      "evidence": "未建：scripts/e2e/network-settings.mjs::连接前选择出口节点并在已连接时被拒改"
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-NET-02",
+      "id": "T-O-NET-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-NET-02"
       ],
-      "evidence": "未建：scripts/e2e/network-settings.mjs::切换子网路由与出口节点局域网开关"
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-NET-03",
@@ -3666,67 +4052,101 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-03（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-DEV-01",
+      "id": "T-O-NET-04",
       "level": "e2e",
       "status": "not_evaluated",
+      "oracle_ids": [
+        "O-NET-04"
+      ],
+      "evidence": "未建：scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连"
+    },
+    {
+      "id": "T-O-DEV-01-e2e",
+      "level": "e2e",
+      "status": "pass",
       "oracle_ids": [
         "O-DEV-01"
       ],
-      "evidence": "未建：scripts/e2e/devices-journey.mjs::设备列表在未登录与加载态下不显示空列表"
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-DEV-02",
+      "id": "T-O-DEV-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-DEV-02"
       ],
-      "evidence": "未建：scripts/e2e/devices-journey.mjs::打开设备详情读取服务与路径并在离线时降级"
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-01",
+      "id": "T-O-XFER-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-01"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-send.mjs::从传输页向在线目标发送文件"
+      "evidence": "scripts/e2e/taildrop-send.mjs 跑过：通过 1、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-02",
+      "id": "T-O-XFER-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-XFER-02"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-text.mjs::发送文字并在接收端预览"
+      "evidence": "scripts/e2e/taildrop-text.mjs 跑过：通过 0、跳过 4、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-03",
+      "id": "T-O-XFER-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-03"
       ],
-      "evidence": "未建：scripts/e2e/meshsend-dual-channel.mjs::双通道目标让用户显式选择传输方式"
+      "evidence": "scripts/e2e/meshsend-dual-channel.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-04",
+      "id": "T-O-XFER-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-04"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-receive.mjs::接收文件按类型落地并只在成功后删除等待文件"
+      "evidence": "scripts/e2e/taildrop-receive.mjs 跑过：通过 1、跳过 7、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-05",
+      "id": "T-O-XFER-05-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-05"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-history.mjs::取消重试与历史上限"
+      "evidence": "scripts/e2e/taildrop-history.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
+      "id": "T-O-DRIVE-01-e2e",
+      "level": "e2e",
+      "status": "fail",
+      "oracle_ids": [
+        "O-DRIVE-01"
+      ],
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-DRIVE-01",
@@ -3735,7 +4155,20 @@
       "oracle_ids": [
         "O-DRIVE-01"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::浏览共享目录并完成上传与下载；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+    },
+    {
+      "id": "T-O-DRIVE-02-e2e",
+      "level": "e2e",
+      "status": "fail",
+      "oracle_ids": [
+        "O-DRIVE-02"
+      ],
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-DRIVE-02",
@@ -3744,7 +4177,7 @@
       "oracle_ids": [
         "O-DRIVE-02"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::从设备详情跳转到该设备共享目录；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
     },
     {
       "id": "T-O-MEDIA-01",
@@ -3756,58 +4189,88 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-09（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-MEDIA-02",
+      "id": "T-O-MEDIA-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-MEDIA-02"
       ],
-      "evidence": "未建：scripts/e2e/media-launch.mjs::经 Sunshine/Moonlight 串流"
+      "evidence": "scripts/e2e/media-launch.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-PRIV-01",
+      "id": "T-O-PRIV-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-PRIV-01"
       ],
-      "evidence": "未建：scripts/e2e/security-locks.mjs::应用锁开启与回前台锁定"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 1、跳过 3、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-PRIV-02",
+      "id": "T-O-PRIV-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-PRIV-02"
       ],
-      "evidence": "未建：scripts/e2e/security-locks.mjs::Taildrive 文件夹锁"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 1、跳过 3、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-DIAG-01",
+      "id": "T-O-DIAG-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-DIAG-01"
       ],
-      "evidence": "未建：scripts/e2e/diagnostics-report.mjs::解锁诊断并导出脱敏报告"
+      "evidence": "scripts/e2e/diagnostics-report.mjs 跑过：通过 5、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-UI-01",
+      "id": "T-O-DIAG-02",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-DIAG-02"
+      ],
+      "evidence": "未建：scripts/test-session-ledger.mjs::the ledger never stores addresses or identity fields、scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录"
+    },
+    {
+      "id": "T-O-UI-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-UI-01"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::页签导航与显隐排序"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-UI-02",
+      "id": "T-O-UI-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-UI-02"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::中英双语与深浅主题"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
+      "id": "T-O-CARD-01-e2e",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CARD-01"
+      ],
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-CARD-01",
@@ -3816,16 +4279,16 @@
       "oracle_ids": [
         "O-CARD-01"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN；未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
     },
     {
-      "id": "T-O-BUILD-00",
+      "id": "T-O-BUILD-00-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-00"
       ],
-      "evidence": "未建：scripts/e2e/build-journey.mjs::开发者从仓库根运行构建脚本得到可装配的 AArch64 产物"
+      "evidence": "scripts/e2e/build-journey.mjs 跑过：通过 2、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-SEAM-01",
@@ -3857,15 +4320,11 @@
     {
       "id": "T-O-SEAM-03-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line"
     },
     {
       "id": "T-O-SEAM-04",
@@ -3949,6 +4408,15 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-03（源文档实测，本批未复跑）；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-04（源文档实测，本批未复跑）"
     },
     {
+      "id": "T-O-SEAM-19",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SEAM-19"
+      ],
+      "evidence": "未建：scripts/integration/session-ledger-seam.mjs::two writers append to one ledger with the same reason vocabulary"
+    },
+    {
       "id": "T-O-SEAM-13",
       "level": "e2e",
       "status": "not_evaluated",
@@ -3960,15 +4428,11 @@
     {
       "id": "T-O-SEAM-14-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-14"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认"
     },
     {
       "id": "T-O-SEAM-17",
@@ -3982,15 +4446,11 @@
     {
       "id": "T-O-SEAM-15-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-15"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧"
     },
     {
       "id": "T-O-SEAM-16",
@@ -4004,15 +4464,11 @@
     {
       "id": "T-O-SEAM-16-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-16"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch"
     },
     {
       "id": "T-O-SEAM-18",

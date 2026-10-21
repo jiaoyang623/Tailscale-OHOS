@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "runnerModel": "node",
+  "oracleDir": "docs/oracles",
+  "requirementsDir": "docs/requirements",
+  "tests": ["scripts", "scripts/integration"],
+  "testExts": [".mjs"],
+  "anchorExts": [".mjs"],
+  "entryModel": "test-files",
+  "caseName": { "fileSeparator": "::" },
+  "sourceExts": [".mjs", ".ets", ".md"],
+  "pathOverrides": {
+    "docs/changes/vpn-endurance/requirements.md": "docs/requirements/requirements.md",
+    "docs/changes/vpn-endurance/architecture.md": "docs/architecture/architecture.md",
+    "docs/changes/vpn-endurance/hld.md": "docs/hld/hld.md",
+    "docs/changes/vpn-endurance/lld.md": "docs/lld/lld.md",
+    "docs/oracles/journey.md": "docs/oracles/90-journeys",
+    "docs/oracles/seam.md": "docs/oracles/91-seams",
+    "docs/oracles/point.md": "docs/oracles/points",
+    "docs/changes/vpn-endurance/review-snapshot.json": "docs/review/requirements/snapshot.json",
+    "docs/changes/vpn-endurance/review-decisions.json": "docs/review/requirements/review-decisions.json",
+    "docs/changes/vpn-endurance/review/": "docs/review/"
+  }
+}

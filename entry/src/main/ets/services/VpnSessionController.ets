@@ -3,6 +3,8 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { ControlServerConfig, ControlServerSettings } from './ControlServerConfig';
 import { DeviceNameService } from './DeviceNameService';
 import { DiagnosticEventStore } from './DiagnosticEventStore';
+import { SessionEndReason, SessionLedger } from './SessionLedger';
+import { VpnIntent, VpnIntentDesired, VpnSessionIntent } from './VpnSessionIntent';
 import { VpnCommandGateway } from './VpnCommandGateway';
 import { VpnLinkSnapshot, VpnLinkState, VpnStatusReader } from './VpnStatusReader';
 
@@ -28,6 +30,10 @@ const CONFIG_PENDING_MARKER: string = 'PENDING';
 // so this side has to keep watching for at least that long.
 const BACKEND_HANDOFF_POLL_INTERVAL_MS: number = 250;
 const BACKEND_HANDOFF_MAX_ATTEMPTS: number = 60;
+// A user connect can spend up to 20 s in backend readiness plus config work
+// before the extension writes a connecting marker. An intent written inside
+// this window belongs to that attempt.
+const CONNECT_REQUEST_FRESH_MS: number = 30000;
 
 interface VpnBackendHandoffRequest {
   requestId: number;
@@ -82,16 +88,50 @@ export class VpnSessionController {
   /**
    * Starts the tunnel.
    *
-   * `cancelled` lets the caller withdraw its authority while this runs. The
+   * `authorised` lets the caller withdraw its authority while this runs. The
    * reconnect supervisor passes one, because a user disconnect that arrives
    * during a reconnect must not end with a tunnel the user just killed. The
-   * check sits after the backend wait, which is the long step, and again before
-   * the extension starts.
+   * token reports true while the attempt still holds its authority.
+   *
+   * The polarity matters. Each side has its own test, so a mismatch here shows
+   * up only on a device. The check sits before the intent write, after the
+   * backend wait, which is the long step, and again before the extension
+   * starts.
    */
-  async connect(filesDir: string, cancelled?: () => boolean): Promise<VpnActionResult> {
+  async connect(filesDir: string, authorised?: () => boolean,
+    by: string = 'recovery'): Promise<VpnActionResult> {
+    const recovery: boolean = by === 'recovery';
+    const prior: VpnIntent = VpnSessionIntent.read(filesDir);
+    // A user entry point writes the intent before any command file. A recovery
+    // does not: the supervisor only calls it while the intent already says
+    // connected, and rewriting it here could erase a stop that landed between
+    // the supervisor's read and this call. The recovery checks its token first
+    // for the same reason.
+    if (recovery) {
+      if (authorised !== undefined && !authorised()) {
+        return VpnActionResult.CANCELLED;
+      }
+    } else {
+      VpnSessionIntent.write(filesDir, VpnIntentDesired.CONNECTED, by);
+    }
     const current: VpnLinkSnapshot = VpnStatusReader.read(filesDir);
     if (current.state === VpnLinkState.CONNECTED) {
       return VpnActionResult.UNCHANGED;
+    }
+    if (current.state === VpnLinkState.CONNECTING) {
+      // The extension is already starting. A second start would race the first
+      // and can leave two start requests for one session.
+      return VpnActionResult.UNCHANGED;
+    }
+    if (!recovery && current.state === VpnLinkState.UNKNOWN) {
+      // No heartbeat yet, but the intent was written moments ago by this or
+      // another user entry point. The attempt is still in backend or config
+      // work, so a second start would race it.
+      const nowMs: number = Date.now();
+      if (prior.desired === VpnIntentDesired.CONNECTED && prior.changedAtMs > 0 &&
+        nowMs >= prior.changedAtMs && nowMs - prior.changedAtMs <= CONNECT_REQUEST_FRESH_MS) {
+        return VpnActionResult.UNCHANGED;
+      }
     }
     if (current.state === VpnLinkState.NEEDS_LOGIN) {
       return VpnActionResult.NEEDS_UI;
@@ -104,7 +144,7 @@ export class VpnSessionController {
       if (!await this.ensureBackendReady(filesDir, controlServer.controlURL)) {
         return VpnActionResult.NEEDS_UI;
       }
-      if (cancelled !== undefined && cancelled()) {
+      if (!VpnSessionController.tunnelStillWanted(filesDir, recovery, authorised)) {
         return VpnActionResult.CANCELLED;
       }
       const config: string = await this.requestConnectConfig();
@@ -114,7 +154,7 @@ export class VpnSessionController {
       if (!this.gateway.stageConnectConfig(filesDir, VPN_CONNECT_CONFIG_FILE_NAME, config)) {
         return VpnActionResult.FAILED;
       }
-      if (cancelled !== undefined && cancelled()) {
+      if (!VpnSessionController.tunnelStillWanted(filesDir, recovery, authorised)) {
         return VpnActionResult.CANCELLED;
       }
       this.clearHandoffFiles(filesDir);
@@ -132,8 +172,16 @@ export class VpnSessionController {
     }
   }
 
-  async disconnect(filesDir: string): Promise<VpnActionResult> {
+  async disconnect(filesDir: string, by: string = 'ui'): Promise<VpnActionResult> {
     const current: VpnLinkSnapshot = VpnStatusReader.read(filesDir);
+    // A recovery undo stops the extension this attempt started. The user
+    // already owns the intent at that point. Writing stopped or a user_stop
+    // entry here would erase a new connect the user just asked for.
+    if (by !== 'recovery') {
+      SessionLedger.recordEnd(filesDir, 'ui', current.sessionId,
+        SessionEndReason.USER_STOP, 'user_stop', 0, Date.now());
+      VpnSessionIntent.write(filesDir, VpnIntentDesired.STOPPED, by);
+    }
     if (current.state === VpnLinkState.DISCONNECTED) {
       return VpnActionResult.UNCHANGED;
     }
@@ -203,6 +251,23 @@ export class VpnSessionController {
 
   private record(filesDir: string, event: string, phase: string): void {
     DiagnosticEventStore.record(filesDir, 'ui', event, phase);
+  }
+
+  /**
+   * The long steps are the backend wait and the config wait. A user stop can
+   * land inside either one. A user connect therefore re-reads the intent; a
+   * failed or missing read cancels rather than start a tunnel the user killed.
+   */
+  private static tunnelStillWanted(filesDir: string, recovery: boolean,
+    authorised?: () => boolean): boolean {
+    if (recovery) {
+      return authorised === undefined ? true : authorised();
+    }
+    try {
+      return VpnSessionIntent.read(filesDir).desired === VpnIntentDesired.CONNECTED;
+    } catch (_error) {
+      return false;
+    }
   }
 
   private async ensureBackendReady(filesDir: string, controlURL: string): Promise<boolean> {

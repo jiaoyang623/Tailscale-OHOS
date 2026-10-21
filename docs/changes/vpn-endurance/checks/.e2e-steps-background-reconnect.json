@@ -1,0 +1,157 @@
+{
+ "skill_version": "a01",
+ "title": "后台重连与用户主动断开",
+ "change_id": "vpn-endurance",
+ "baseline": "ec64476（工作树有本批次未提交改动）",
+ "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+ "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/background-reconnect.mjs",
+ "executed_at": "2026-10-20T13:05:38.297Z",
+ "target": "mobile",
+ "notice": "用户主动断开在前台验证。后台非主动掉线缺制造通道，用例按原因跳过。",
+ "cases": [
+  {
+   "id": "BG-CONNECT",
+   "title": "重连监督：先连上隧道",
+   "oracle_ids": [
+    "O-CONN-04"
+   ],
+   "status": "pass",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "冷启动应用",
+     "operation": "aa force-stop 后 aa start",
+     "expected": [
+      "设备日志出现 ui_opened",
+      "界面显示连接状态"
+     ],
+     "actual": "应用冷启动完成，界面显示连接状态",
+     "status": "pass",
+     "evidence": {
+      "kind": "ui",
+      "screenshots": [
+       {
+        "path": "e2e-run/shots/01-background-reconnect-launch.png",
+        "label": "操作后"
+       }
+      ]
+     }
+    },
+    {
+     "id": "S2",
+     "name": "建立隧道",
+     "operation": "界面处于未连接时点击连接按钮",
+     "expected": [
+      "设备日志出现 vpn_connected",
+      "监督器记录一轮 connected 采样"
+     ],
+     "actual": "点击连接后出现 vpn_connected，监督器已采样",
+     "status": "pass",
+     "evidence": {
+      "kind": "ui",
+      "screenshots": [
+       {
+        "path": "e2e-run/shots/02-background-reconnect-connected.png",
+        "label": "结果"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "BG-USER-STOP",
+   "title": "重连监督：前台主动断开记为用户停止且不重连",
+   "oracle_ids": [
+    "O-RECONN-10",
+    "O-SEAM-11"
+   ],
+   "status": "pass",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "前台点击断开",
+     "operation": "点击界面的断开按钮",
+     "expected": [
+      "设备日志出现 vpn_drop_after_requested_stop",
+      "界面回到未连接"
+     ],
+     "actual": "出现 vpn_drop_after_requested_stop，界面回到未连接",
+     "status": "pass",
+     "evidence": {
+      "kind": "ui",
+      "screenshots": [
+       {
+        "path": "e2e-run/shots/03-background-reconnect-foreground-drop.png",
+        "label": "结果"
+       }
+      ]
+     }
+    },
+    {
+     "id": "S2",
+     "name": "确认没有自动重连",
+     "operation": "检索本次日志中的恢复事件",
+     "expected": [
+      "不出现 vpn_session_recovery_attempt",
+      "不出现 vpn_session_recovery_started"
+     ],
+     "actual": "日志中没有恢复事件",
+     "status": "pass",
+     "evidence": {
+      "kind": "log",
+      "output": "vpn_session_recovery_attempt 0 次，vpn_session_recovery_started 0 次"
+     }
+    }
+   ]
+  },
+  {
+   "id": "BG-BACKGROUND-DROP",
+   "title": "重连监督：后台非主动掉线自动重连",
+   "oracle_ids": [
+    "O-CONN-04"
+   ],
+   "status": "skip",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "用例适用性",
+     "operation": "检查前置条件",
+     "expected": [
+      "前置条件满足"
+     ],
+     "actual": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。"
+     }
+    }
+   ]
+  },
+  {
+   "id": "BG-CARD-STOP",
+   "title": "重连监督：受控入口的主动断开",
+   "oracle_ids": [
+    "O-RECONN-10"
+   ],
+   "status": "skip",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "用例适用性",
+     "operation": "检查前置条件",
+     "expected": [
+      "前置条件满足"
+     ],
+     "actual": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。"
+     }
+    }
+   ]
+  }
+ ]
+}

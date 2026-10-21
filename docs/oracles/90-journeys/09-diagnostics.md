@@ -18,3 +18,21 @@
 - 不确定特征：none
 - 归属：owner=项目维护者 接收批次=a01-E2E
 - 复核：待复核
+
+### O-DIAG-02 非用户原因的断连留下可导出的原因记录
+- 层级：旅程
+- 父判据：无（旅程层没有父判据）
+- 强度：强
+- 设计依据：需求 R-CONN-12「非用户原因的断连都要落盘留证」、R-DIAG-05「关键链路（连接、握手、掉线、网络变化、扩展生命周期）留下可复核的事件」、R-DIAG-02「落盘诊断必须脱敏」；架构 §2.6、§五 O-CONN-08；HLD 契约 C-19
+- 触发与前置条件：一次已连接会话以非用户原因结束——扩展 onDestroy、扩展崩溃、后端交接超时、系统策略停止或网络失效。用户未点击停止。
+- 可观测点：会话账本（按写者分文件）的 `reason`、`writer`、`kind`、`timestampMs`；诊断报告中的同一记录；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered` 事件
+- 期望：正常：每次非用户结束写一条 `end` 记录，原因在受控词表内。P1 随后补写 `observed` 并进入恢复。恢复稳定 60 s 写 `vpn_session_recovered`。边界：同一 `sessionId` 的同一类记录只出现一次。用户主动停止写 `user_stop`，不进入恢复。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。安全与质量：记录只含时间戳、写方、类型、原因、阶段与数值码，不含地址、账号、令牌或设备标识。判定在宿主侧桩边界与真机走查下成立
+- 失败信息：期望「每次非用户断连都能在设备上查到原因」，实际「断开后没有记录，无法区分用户停止、扩展崩溃与系统停止」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy；entry/src/main/ets/services/DiagnosticReportService.ets
+- 上游：R-CONN-12、R-DIAG-05
+- 测试：scripts/test-session-ledger.mjs::the ledger never stores addresses or identity fields
+- 待接线测试：[E2E] scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录（设备未连接，待执行）
+- 状态：pending-test
+- 不确定特征：none
+- 归属：owner=项目维护者 接收批次=vpn-endurance（设备未连接，E2E 待执行）
+- 复核：待复核

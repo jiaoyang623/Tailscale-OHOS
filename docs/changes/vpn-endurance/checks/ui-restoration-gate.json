@@ -1,0 +1,23 @@
+{
+  "schema": "a01.ui-restoration-gate/1",
+  "verdict": "not-applicable",
+  "mode": "not-applicable",
+  "reason": "本批次只改运行行为：恢复状态机、意图文件、会话账本、长时任务守护与省电档位的定时器节拍。没有改布局、颜色、字体、图标、控件结构或页面跳转。界面可见的变化只有刷新时机变慢，截图像素比对不能检出节拍变化。项目声明也没有配置 UI 还原适配器与设计稿来源。",
+  "blocking_findings": 0,
+  "coverage": 0.0,
+  "coverage_floor": 0.0,
+  "identity_unmapped": 0,
+  "identity_ambiguous": 0,
+  "calibrated": false,
+  "calibration_samples": 0,
+  "findings_total": 0,
+  "elements_total": 0,
+  "reported_verdict": "not-applicable",
+  "change_id": "vpn-endurance",
+  "baseline": "ec64476",
+  "accepted_findings": 0,
+  "weak_findings": 0,
+  "element_types": [],
+  "gate_state": "clear",
+  "ok": true
+}

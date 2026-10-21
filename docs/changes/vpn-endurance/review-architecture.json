@@ -1,0 +1,344 @@
+{
+  "schema_version": "a01-review-brief/1",
+  "baseline": "ec64476",
+  "abbreviations": {
+    "VPN": "虚拟专用网络",
+    "UI": "用户界面",
+    "P1": "应用界面进程",
+    "P2": "VPN 扩展进程",
+    "P3": "桌面卡片进程",
+    "NDJSON": "按行分隔的 JSON",
+    "KB": "千字节"
+  },
+  "diff_from_last_review": {
+    "first_review": true
+  },
+  "layer": "architecture",
+  "title": "连接常驻与省电 · 架构审核",
+  "conclusion": "本层确认四件事：意图优先的横切约束、会话结束接缝、恢复责任分层、能量档位的作用范围。请逐项选择。",
+  "decisions": [
+    {
+      "id": "D-01",
+      "priority": "P0",
+      "question": "停止连接的依据是什么？",
+      "reason": "现有架构以状态判读驱动长时任务与恢复。状态缺失时会误判为用户停止。",
+      "options": [
+        {
+          "id": "A",
+          "label": "意图优先于观测",
+          "description": "意图文件是唯一意图来源。状态判读只决定是否恢复，不决定是否停止。",
+          "consequences": "连接保持与用户动作一致。需要新增意图文件与读写方。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "状态优先",
+          "description": "继续以状态判读决定停止。",
+          "consequences": "不改架构。一次读不到心跳就可能停止连接。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "A-2.6",
+        "A-D4",
+        "A-3.2"
+      ]
+    },
+    {
+      "id": "D-02",
+      "priority": "P1",
+      "question": "会话结束的原因由谁记录？",
+      "reason": "两个进程都可能先退出。合并进诊断接缝会隐藏责任问题。",
+      "options": [
+        {
+          "id": "A",
+          "label": "单立一条双向接缝",
+          "description": "先退出的进程写原因。后感知的进程补写观测。账本按会话编号去重。",
+          "consequences": "责任明确。新增一个接缝与文件。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "并入现有诊断接缝",
+          "description": "原因写进诊断事件。",
+          "consequences": "少一条接缝。谁写最后一条原因没有定义。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "A-SEAMS",
+        "A-2.6",
+        "A-3.2"
+      ]
+    },
+    {
+      "id": "D-03",
+      "priority": "P1",
+      "question": "恢复责任放在哪一层？",
+      "reason": "扩展进程守着已建立的隧道。应用进程守着扩展进程本身。",
+      "options": [
+        {
+          "id": "A",
+          "label": "分两层",
+          "description": "扩展进程负责网络重绑。应用进程负责重启扩展与长时任务。",
+          "consequences": "职责清晰。应用进程被冻结时恢复延迟。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "全部放在应用进程",
+          "description": "应用进程负责隧道与扩展。",
+          "consequences": "实现集中。扩展死亡时无人重建隧道。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "A-3.2",
+        "A-D5",
+        "A-D4"
+      ]
+    },
+    {
+      "id": "D-04",
+      "priority": "P2",
+      "question": "能量档位影响哪些部件？",
+      "reason": "省电只能改变观测频率。隧道与恢复必须保持。",
+      "options": [
+        {
+          "id": "A",
+          "label": "只影响观测频率",
+          "description": "档位改变轮询与探测频率。隧道、重绑、恢复看门狗不降频。",
+          "consequences": "耗电下降。连接保持不受影响。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "也影响恢复",
+          "description": "低档位时延长恢复间隔。",
+          "consequences": "更省电。掉线恢复变慢。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "A-2.6",
+        "A-3.3",
+        "A-D5"
+      ]
+    }
+  ],
+  "figures": [
+    {
+      "id": "F-01",
+      "kind": "flow",
+      "decision_id": "D-01",
+      "title": "连接保持的正常路径",
+      "caption": "意图为连接时，长时任务与恢复看门狗持续运行。",
+      "source": "flowchart LR\n  A[用户点击连接] --> B[意图写为连接]\n  B --> C[长时任务持有]\n  C --> D[隧道运行]\n  D --> E[应用进入后台]\n  E --> C",
+      "focus": "D-01",
+      "omitted": "省略连接建立细节。省略网络重绑。",
+      "markers": [
+        {
+          "id": "B",
+          "type": "new",
+          "label": "新增意图文件"
+        }
+      ],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-02",
+      "kind": "flow",
+      "decision_id": "D-03",
+      "title": "掉线后的两个恢复层",
+      "caption": "应用进程重启扩展。扩展进程重绑网络。",
+      "source": "flowchart TB\n  A[隧道掉线] --> B[写结束原因]\n  B --> C{扩展进程存活}\n  C -->|是| D[扩展重绑网络]\n  C -->|否| E[应用进程重启扩展]\n  E --> F[重新建立隧道]",
+      "focus": "D-03",
+      "omitted": "省略退避数值与取消令牌。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-03",
+      "kind": "module",
+      "decision_id": "D-02",
+      "title": "两个进程与共享文件",
+      "caption": "进程之间只用文件交接。",
+      "source": "flowchart TB\n  subgraph P1[应用进程]\n    A[EntryAbility]\n    B[BridgeStatus]\n    C[VpnBackgroundTaskManager]\n    D[VpnReconnectSupervisor]\n    E[VpnSessionController]\n  end\n  subgraph P2[扩展进程]\n    F[TailscaleVpnExtensionAbility]\n  end\n  subgraph P3[卡片进程]\n    G[EntryFormAbility]\n  end\n  C --> F\n  D --> E\n  E --> F\n  B --> E\n  G --> H[状态文件]",
+      "focus": "D-02",
+      "omitted": "省略进程内部的类与方法。省略诊断与传输通道。",
+      "markers": [
+        {
+          "id": "D",
+          "type": "change",
+          "label": "改为意图驱动"
+        }
+      ],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-04",
+      "kind": "sequence",
+      "decision_id": "D-03",
+      "title": "一次非用户掉线的时序",
+      "caption": "先退出的一方写原因。后感知的一方补写并恢复。",
+      "source": "sequenceDiagram\n  participant P1 as 应用进程\n  participant P2 as 扩展进程\n  participant N as 系统网络\n  participant L as 会话账本\n  P2->>L: 写结束原因\n  P1->>L: 补写观测\n  P1->>N: 读默认网络\n  N-->>P1: 网络可用\n  P1->>P2: 重启扩展\n  P2-->>P1: 状态恢复",
+      "focus": "D-03",
+      "omitted": "省略交接超时与用户停止两条分支。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-05",
+      "kind": "data",
+      "decision_id": "D-02",
+      "title": "五个本地文件",
+      "caption": "意图、账本、结束记录、状态与档位各有一个文件。",
+      "source": "flowchart LR\n  A[vpn-intent.json] --> B[VpnBackgroundTaskManager]\n  A --> C[VpnReconnectSupervisor]\n  D[vpn-session-ledger.ndjson] --> E[DiagnosticReportService]\n  F[vpn-session-end.json] --> C\n  G[vpn-probe-status.txt] --> C\n  H[vpn-power-stage.json] --> I[VPN 扩展]",
+      "focus": "D-02",
+      "omitted": "省略字段与大小上限。详见技术细节。",
+      "markers": [
+        {
+          "id": "A",
+          "type": "new",
+          "label": "新增"
+        },
+        {
+          "id": "D",
+          "type": "new",
+          "label": "新增"
+        },
+        {
+          "id": "H",
+          "type": "new",
+          "label": "新增"
+        }
+      ],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-06",
+      "kind": "state",
+      "decision_id": "D-01",
+      "title": "会话状态",
+      "caption": "意图为连接时，未知与断开都进入恢复。",
+      "source": "stateDiagram-v2\n  Connected --> Recovering: 明确断开\n  Connected --> Unknown: 心跳停止\n  Unknown --> Recovering: 超过 30 秒\n  Recovering --> Deferred: 网络离线\n  Deferred --> Recovering: 网络恢复\n  Recovering --> Connected: 恢复成功\n  Connected --> Stopped: 用户停止\n  Recovering --> Stopped: 用户停止",
+      "focus": "D-01",
+      "omitted": "省略退避状态与界面需求分支。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-07",
+      "kind": "change-map",
+      "decision_id": "D-04",
+      "title": "本批改动位置",
+      "caption": "新增一节架构策略。修改接缝表与运行视图。",
+      "source": "flowchart LR\n  A[架构策略] --> B[接缝表]\n  B --> C[运行视图]",
+      "focus": "D-04",
+      "omitted": "省略未改动的小节。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    }
+  ],
+  "change_map": [
+    {
+      "location": "架构 §2.6 长时会话与能量策略",
+      "now": "无",
+      "after": "新增意图、恢复责任与档位三条横切约束",
+      "type": "new",
+      "design_ids": [
+        "A-2.6"
+      ]
+    },
+    {
+      "location": "架构 §五 接缝表",
+      "now": "十八条接缝",
+      "after": "新增会话结束接缝，修订连接保持行的责任",
+      "type": "modified",
+      "design_ids": [
+        "A-SEAMS"
+      ]
+    },
+    {
+      "location": "架构 §3.2 运行视图",
+      "now": "连接与断开",
+      "after": "增加掉线、离线等待与恢复路径",
+      "type": "modified",
+      "design_ids": [
+        "A-3.2"
+      ]
+    },
+    {
+      "location": "其余架构条目",
+      "now": "保持不变",
+      "after": "保持不变",
+      "type": "unchanged",
+      "design_ids": [
+        "A-2.1",
+        "A-2.2",
+        "A-2.3",
+        "A-2.4",
+        "A-2.5",
+        "A-3.1",
+        "A-3.3",
+        "A-D1",
+        "A-D2",
+        "A-D3",
+        "A-D4",
+        "A-D5",
+        "A-D6"
+      ]
+    }
+  ],
+  "technical_notes": [
+    {
+      "item": "状态新鲜度",
+      "value": "15 秒",
+      "reason": "现有常量，读取侧共用"
+    },
+    {
+      "item": "未知转掉线窗口",
+      "value": "30 秒",
+      "reason": "避免单次未知触发恢复"
+    },
+    {
+      "item": "恢复退避",
+      "value": "30、60、120、300 秒",
+      "reason": "封顶后低频重试"
+    },
+    {
+      "item": "网络判定",
+      "value": "默认网络编号为 0 即离线",
+      "reason": "不读取地址与接口名"
+    }
+  ],
+  "trace": {
+    "snapshot": "docs/review/architecture/snapshot.json",
+    "oracles": "docs/review/architecture/oracles.html"
+  }
+}

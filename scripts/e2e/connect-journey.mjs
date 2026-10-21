@@ -67,7 +67,8 @@ test('连接旅程：未连接时首页给出连接入口', (t) => {
   assert.ok(state !== null, '首页没有连接按钮（vpn-connect）');
 });
 
-test('连接旅程：点连接后隧道可用，且界面承认已连接', async (t) => {
+// 判据 O-CONN-01 声明的用例名，保留原样以便 check-e2e-plan.py 对得上。
+test('连接旅程：从首页连接后进入可用隧道', async (t) => {
   if (!configured) {
     t.skip('未登录，跳过');
     return;

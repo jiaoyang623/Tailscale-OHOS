@@ -1,10 +1,10 @@
 # MeshArc 单点判据 · 网络重绑与掉线恢复（P2）
 
-覆盖 test-vpn-network-monitor.mjs（8 条）与 test-vpn-reconnect-supervisor.mjs（9 条）。
-前者守在扩展进程内的系统网络回调与重绑，后者守「后台掉线后替用户恢复」的意图判读——
-它的每一条守卫都是为了不跟刚刚点了断开的用户抢。
+覆盖 test-vpn-network-monitor.mjs 与 test-vpn-reconnect-supervisor.mjs。
+前者守在扩展进程内的系统网络回调与重绑。后者守「意图为连接时替用户恢复」的判读。
+2026-10-20 起，恢复不再限制次数，也不再忽略前台掉线。唯一的停止条件是用户意图。
 
-O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
+O-RECONN-01…13 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 旧值混用 O-SEAM-10、O-SEAM-11、O-SEAM-03。
 新值统一为 O-SEAM-11（恢复责任）与 O-SEAM-03（状态判读）。
 理由：这些判据断言的是该不该重连，不是两条编排是否交出同一套契约。
@@ -185,12 +185,12 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 层级：单点
 - 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）；HLD 契约 C-11
-- 触发与前置条件：上一次采样为 connected；onBackground 之后已过 BACKGROUND_SETTLE_MS=10000（测试取 60000）；本次采样为 disconnected
-- 可观测点：VpnSessionController.connect 的调用次数；vpn_reconnect_attempt 诊断事件
-- 期望：正常：调用 connect 一次并记 vpn_reconnect_attempt；边界：只有 connected→disconnected 的边沿才算掉线（同日两次采样都是 disconnected 不重复触发）；失败与恢复：—；安全与质量：恢复责任落在 P1，而 P1 在后台无长时任务时可能已被冻结——这正是 O-SEAM-11 登记的空洞，本判据只保证「能跑时判定正确」，不承诺冻结期间一定恢复。判定在宿主侧桩边界（VpnStatusReader、VpnSessionController 为桩）下成立
+- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：指数退避，退避上限 300 s；稳定 60 s 后清零计数。恢复不设次数上限」；架构 O-SEAM-11 责任空洞第 3 条（恢复责任在 VpnReconnectSupervisor）；HLD 契约 C-11
+- 触发与前置条件：意图为 `connected`；上一次采样为 connected；本次采样为 disconnected（不论应用在前台还是后台）
+- 可观测点：VpnSessionController.connect 的调用次数；`vpn_session_recovery_attempt` 诊断事件
+- 期望：正常：调用 connect 一次并记 `vpn_session_recovery_attempt`；边界：只有 connected→disconnected 的边沿（或回退到未连接）才算一次掉线，连续两次 disconnected 不重复触发；失败与恢复：用户停止后不恢复（O-RECONN-03）；安全与质量：恢复责任落在 P1，而 P1 在后台无长时任务时可能已被冻结——这正是 O-SEAM-11 登记的空洞，本判据只保证「能跑时判定正确」，不承诺冻结期间一定恢复。判定在宿主侧桩边界（VpnStatusReader、VpnSessionController 为桩）下成立
 - 失败信息：期望「后台静置后的掉线触发一次恢复」，实际「掉线后一直等到用户自己发现，或在前台就抢着重连」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:78 poll；:107 handleDrop；:11 BACKGROUND_SETTLE_MS；scripts/test-vpn-reconnect-supervisor.mjs
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets 的 poll 与恢复状态机；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-reconnect-supervisor.mjs
 - 上游：R-CONN-05
 - 测试：scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back
 - 状态：closed
@@ -198,19 +198,18 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 归属：—
 - 复核：待复核
 
-### O-RECONN-02 前台可见或刚进入后台的掉线视为用户主动
+### O-RECONN-02 意图为连接时前台或刚进后台的掉线立即恢复
 - 层级：单点
 - 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §2.5 重试「重试必须能被用户意图打断」；HLD 契约 C-11
-- 触发与前置条件：掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）
-- 可观测点：connect 调用次数；vpn_drop_ignored_foreground 诊断事件
-- 期望：正常：—；边界：两种情形都不 connect，并记 vpn_drop_ignored_foreground；失败与恢复：—；安全与质量：用户刚看过应用时的掉线更可能是他自己按的，宁可不重试。判定在桩边界下成立
-- 失败信息：期望「前台或刚进后台的掉线按用户主动处理」，实际「用户刚点了断开又被自动连上」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:112 handleDrop 的前台/静置守卫；scripts/test-vpn-reconnect-supervisor.mjs
-- 上游：R-CONN-06
-- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a drop moments after backgrounding is left alone
-- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a drop while the app is on screen is left alone
+- 设计依据：需求 R-CONN-11「用户没有点击停止时，连接不得停止」、R-CONN-13「恢复不设次数上限」；架构 §2.6「意图优先于观测」；HLD 契约 C-11
+- 触发与前置条件：应用在前台，或刚进入后台；意图为 `connected`；隧道从 connected 掉到 disconnected
+- 可观测点：`connect` 的调用次数与时机；`vpn_session_recovery_attempt` 的写入；`vpn_drop_ignored_foreground` 不再出现
+- 期望：正常：意图为 connected 时立即恢复，前台与刚进后台都不延迟；边界：用户点停止会先写意图 stopped，在途恢复的授权令牌随即返回 false；失败与恢复：恢复失败按退避继续，不退化为「当作没发生」；安全与质量：前台恢复不得抢在用户自己的连接命令之前——同一时刻由 `VpnCommandStateMachine.begin` 拒绝后发起者。判定在宿主侧桩边界（`Date.now`、`fileIo` 为桩）下成立
+- 失败信息：期望「前台与刚进后台的掉线都恢复」，实际「前台掉线被当作用户主动，从不恢复」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnCommandGateway.ets；scripts/test-vpn-reconnect-supervisor.mjs
+- 上游：R-CONN-11、R-CONN-13
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a foreground drop is recovered without the ten second settle
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -221,11 +220,11 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
 - 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §3.2 S2 无 UI 控制面的意图记忆；HLD 契约 C-11
-- 触发与前置条件：noteRequestedStop() 之后，后台静置足够久，再读到掉线
+- 触发与前置条件：意图文件为 `stopped`（用户停止后的状态），再读到掉线
 - 可观测点：connect 调用次数；vpn_drop_after_requested_stop 诊断事件
-- 期望：正常：—；边界：stopRequested 优先于「已后台足够久」的判据，不 connect，并记 vpn_drop_after_requested_stop；失败与恢复：—；安全与质量：这条是整套守卫里最重要的一条——与刚点了断开的用户抢夺比漏掉一次重试更糟。判定在桩边界下成立
+- 期望：正常：—；边界：意图 stopped 优先于任何掉线判据，不 connect，并记 `vpn_drop_after_requested_stop`；失败与恢复：—；安全与质量：这条是整套守卫里最重要的一条——与刚点了断开的用户抢夺比漏掉一次重试更糟。判定在桩边界下成立
 - 失败信息：期望「已请求停止的掉线不恢复」，实际「卡片或应用断开后，后台又把隧道拉了回来」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:62 noteRequestedStop；:108 handleDrop 的 stopRequested 分支；scripts/test-vpn-reconnect-supervisor.mjs
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets 的 poll 意图分支；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-reconnect-supervisor.mjs
 - 上游：R-CONN-06
 - 测试：scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone
 - 状态：closed
@@ -250,18 +249,18 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 归属：—
 - 复核：待复核
 
-### O-RECONN-05 恢复尝试有上限，耗尽后放弃
+### O-RECONN-05 意图未停止时恢复不设次数上限，退避封顶
 - 层级：单点
 - 父判据：O-SEAM-11、O-SEAM-03
 - 强度：强
-- 设计依据：需求 R-CONN-05「最多 3 次」；架构 §2.5 重试；HLD 契约 C-11
-- 触发与前置条件：连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed
-- 可观测点：connect 调用次数；vpn_reconnect_exhausted 诊断事件
-- 期望：正常：—；边界：尝试数达到 MAX_ATTEMPTS=3 后不再 connect（connects 恰为 3），并记 vpn_reconnect_exhausted；失败与恢复：—；安全与质量：不无限重试，也不把失败静默吞掉。判定在桩边界下成立
-- 失败信息：期望「最多 3 次后放弃并记账」，实际「无限重试或一次失败就放弃且不留痕」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:119 handleDrop；:14 MAX_ATTEMPTS；scripts/test-vpn-reconnect-supervisor.mjs
-- 上游：R-CONN-05
-- 测试：scripts/test-vpn-reconnect-supervisor.mjs::recovery gives up instead of retrying forever
+- 设计依据：需求 R-CONN-13「断连后自动恢复不设次数上限」、R-CONN-05「指数退避，退避上限 300 s」；架构 §2.6 恢复状态机；HLD 契约 C-11
+- 触发与前置条件：意图为 `connected`，`connect` 连续失败超过 3 次（测试取 5 次），每次间隔超过当前退避
+- 可观测点：`connect` 的调用次数；退避间隔序列；`vpn_session_recovery_exhausted` 是否出现（不应出现）；`vpn_session_recovery_attempt` 的尝试序号
+- 期望：正常：第 4 次及以后仍调用 `connect`；边界：退避序列为 30/60/120/300/300… s，封顶 300 s；失败与恢复：意图变为 stopped 后立即停止，且不存在「放弃」事件；安全与质量：不得无限快速重试。判定在宿主侧桩边界（`Date.now` 为桩）下成立
+- 失败信息：期望「一直重试到成功或用户停止」，实际「3 次后永久放弃」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets 的退避与恢复状态机（本批移除 `MAX_ATTEMPTS`）；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-reconnect-supervisor.mjs
+- 上游：R-CONN-05、R-CONN-13
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::recovery never exhausts while the user keeps the intent
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -324,12 +323,12 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 强度：弱
 - 设计依据：需求 R-CONN-05「稳定 60 s 才清零计数」；架构 §2.5 重试；HLD 契约 C-11
 - 触发与前置条件：一次恢复成功使状态回到 connected，并保持超过 STABLE_MS=60000
-- 可观测点：attempts 与 nextAttemptAtMs 的归零；vpn_reconnect_succeeded 诊断事件
-- 期望：正常：连接持续 ≥60 s 才记 vpn_reconnect_succeeded 并把重试阶梯归零；边界：短于 60 s 的短暂连接不清零，避免「连一下又断」的抖动隧道把计数反复归零而无限重试；失败与恢复：—；安全与质量：—。判定在桩边界（Date.now 为桩）下成立
+- 可观测点：attempts 与 nextAttemptAtMs 的归零；`vpn_session_recovered` 诊断事件
+- 期望：正常：连接持续 ≥60 s 才记 `vpn_session_recovered` 并把重试阶梯归零；边界：短于 60 s 的短暂连接不清零，避免「连一下又断」的抖动隧道把计数反复归零而无限重试；失败与恢复：—；安全与质量：—。判定在桩边界（Date.now 为桩）下成立
 - 失败信息：期望「稳定 60 s 才清零重试计数」，实际「每次短暂连上就清零，抖动隧道无限重连」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:91 poll 的稳定性判据；:20 STABLE_MS；scripts/test-vpn-reconnect-supervisor.mjs
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets 的 poll 稳定性判据与 STABLE_MS；scripts/test-vpn-reconnect-supervisor.mjs
 - 上游：R-CONN-05
-- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window records a recovery
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -341,17 +340,70 @@ O-RECONN-01…09 的父判据由审查人裁决 Q16a（2026-10-12）重定。
 - 强度：强
 - 设计依据：需求 R-CONN-06「用户的主动断开不得被自动恢复撤销」；架构 §五 责任空洞检查第 3 条；HLD 契约 C-11
 - 触发与前置条件：`handleDrop` 已经发起 `VpnSessionController.connect`，该 connect 仍在途时入口点调 `noteRequestedStop()`
-- 可观测点：传给 `connect` 的取消令牌的返回值；`vpn_reconnect_cancelled` 与 `vpn_reconnect_superseded` 事件；`disconnect` 的调用次数；扩展是否被启动
-- 期望：正常：没有停止请求时，重连照常完成并记 `vpn_reconnect_started`，不调用 `disconnect`；边界：停止请求到达后令牌立即返回 false，连接在后端就绪之后与启动扩展之前各查一次，命中即返回 `cancelled` 且**不启动扩展**；失败与恢复：万一窗口落在两次检查之间，完成时按令牌撤销自己刚建起的隧道并记 `vpn_reconnect_superseded`，撤销失败记 `vpn_reconnect_undo_failed`，而返回 `cancelled` 时不需要撤销，记 `vpn_reconnect_cancelled`；安全与质量：`connect` 在扩展启动中途没有中断点，所以保证是「用户停止后不留下隧道」，不是「隧道从不被短暂建起」。判定在桩边界下成立
+- 可观测点：传给 `connect` 的授权令牌的返回值（true 表示仍有授权）；`vpn_session_recovery_cancelled` 与 `vpn_session_recovery_superseded` 事件；`disconnect` 的调用次数；扩展是否被启动
+- 期望：正常：没有停止请求时，重连照常完成并记 `vpn_session_recovery_started`，不调用 `disconnect`；边界：停止请求到达后令牌立即返回 false，连接在写意图之前、后端就绪之后与启动扩展之前各查一次，命中即返回 `cancelled` 且**不启动扩展**；失败与恢复：万一窗口落在最后一次检查之后，完成时先读意图。意图为 `stopped` 才撤销自己刚建起的隧道并记 `vpn_session_recovery_superseded`，撤销失败记 `vpn_session_recovery_undo_failed`，撤销不写意图、不记 `user_stop`。意图仍为 `connected`（卡片重新连接）时不撤销，隧道留给新的连接。返回 `cancelled` 时不需要撤销，记 `vpn_session_recovery_cancelled`；安全与质量：`connect` 在扩展启动中途没有中断点，所以保证是「用户停止后不留下隧道」，不是「隧道从不被短暂建起」。判定在桩边界下成立
 - 失败信息：期望「停止请求作废在途重连并且不留下隧道」，实际「重连照常完成，用户刚点下的断开被静默撤销」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:71-77 noteRequestedStop 自增 attemptId；:129-152 handleDrop 的 stillAuthorised 与撤销分支；entry/src/main/ets/services/VpnSessionController.ets:78-125 connect 的两处取消点与 CANCELLED；scripts/test-vpn-reconnect-supervisor.mjs；scripts/test-vpn-session-controller.mjs
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets 的 noteRequestedStop / authorised / 撤销分支；entry/src/main/ets/services/VpnSessionController.ets 的三处授权检查与 CANCELLED；scripts/test-vpn-reconnect-supervisor.mjs；scripts/test-vpn-session-controller.mjs
 - 上游：R-CONN-06、R-CONN-08
 - 测试：scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect
 - 测试：scripts/test-vpn-reconnect-supervisor.mjs::a connect that cancelled itself is not undone
-- 测试：scripts/test-vpn-reconnect-supervisor.mjs::the supervisor hands the controller a cancellation token
-- 测试：scripts/test-vpn-session-controller.mjs::a cancelled connect never starts the extension
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a card reconnect supersedes an in-flight recovery without stopping the tunnel
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::the supervisor hands the controller a positive authority token
+- 测试：scripts/test-vpn-session-controller.mjs::a connect that lost its authority never starts the extension
+- 测试：scripts/test-vpn-session-controller.mjs::a stop after the backend wait cancels the connect
+- 测试：scripts/test-vpn-session-controller.mjs::a recovery undo leaves the user intent and the stop ledger alone
 - 状态：closed
 - 不确定特征：none
 - 归属：—
 - 复核：待复核
 
+### O-RECONN-11 网络离线时等待网络回调，不消耗恢复次数
+- 层级：单点
+- 父判据：O-SEAM-11、O-SEAM-12
+- 强度：强
+- 设计依据：需求 R-NET-05「网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔」；架构 §2.6；HLD 契约 C-11、C-12
+- 触发与前置条件：意图为 connected，隧道不可用，`connection.getDefaultNet()` 返回 `netId=0`；之后系统回调 `netAvailable`
+- 可观测点：`connect` 的调用次数与时机；`vpn_session_recovery_deferred` 与 `vpn_session_recovery_attempt` 的写入；退避计数；账本 `observed` 记录的 `reason`
+- 期望：正常：离线期间不调用 `connect`，只写一次 `vpn_session_recovery_deferred`；边界：离线期间多次采样不写重复记录，也不增加退避计数；观察到的心跳失效掉线记为 `network_lost`，phase 为 `network_offline`；失败与恢复：收到 `netAvailable` 后立即调用一次 `connect`，不等退避到期；网络再次离线时回到等待。安全与质量：只读 `netId`，不记录地址或接口名。判定在宿主侧桩边界（`connection` 为桩）下成立
+- 失败信息：期望「离线等待、恢复后立即重试」，实际「离线期间按固定间隔重试并耗尽次数，或网络恢复后仍不重试」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/entryability/EntryAbility.ets；scripts/test-vpn-reconnect-supervisor.mjs
+- 上游：R-NET-05
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::network loss defers recovery until the network returns
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-RECONN-12 已连接后的持续未知按掉线处理
+- 层级：单点
+- 父判据：O-SEAM-03、O-SEAM-11
+- 强度：强
+- 设计依据：需求 R-CONN-11「用户没有点击停止时，连接不得停止」、R-CONN-13；架构 §2.6；HLD 契约 C-03、C-11
+- 触发与前置条件：意图为 connected，隧道曾在 connected，之后心跳停止（状态判读为 unknown）持续超过 30 s
+- 可观测点：恢复是否发起；`vpn_session_end_observed` 的 `reason`；单次 unknown 采样时的恢复次数
+- 期望：正常：unknown 持续超过 30 s 时按掉线进入恢复，`reason` 为 `extension_crash`（账本无结束记录时）；边界：短暂 unknown（少于 30 s）不触发，也不写结束记录；失败与恢复：恢复发起后未知解除且回到 connected，写 `vpn_session_recovered`。安全与质量：不得把一次未知当成掉线，也不得永远停在未知。判定在宿主侧桩边界（`Date.now` 为桩）下成立
+- 失败信息：期望「持续未知按掉线恢复」，实际「扩展死亡后永远停在 unknown，界面显示未知但不再恢复」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；scripts/test-vpn-reconnect-supervisor.mjs
+- 上游：R-CONN-11、R-CONN-13
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::sustained unknown after a connection is a drop
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-RECONN-13 VPN 冲突记为系统停止并停止重试
+- 层级：单点
+- 父判据：O-SEAM-11、O-SEAM-19
+- 强度：强
+- 设计依据：需求 R-CONN-12「原因分类含系统策略」、R-CONN-11；HLD 契约 C-11、C-19
+- 触发与前置条件：意图为 connected，状态行含 `code=2203002`（系统 VPN 冲突）
+- 可观测点：`connect` 的调用次数；账本 `observed` 记录的 `reason` 与 `phase`；`vpn_session_recovery_needs_ui` 事件
+- 期望：正常：冲突发生时不调用 `connect`，写一条 `system_stopped` / `vpn_conflict`，并写 `vpn_session_recovery_needs_ui`；边界：同一冲突多次采样不重复写结束记录；失败与恢复：意图时间戳变新（用户重新操作）后恢复一次；安全与质量：冲突期间不得消耗退避次数，也不得反复拉起扩展。判定在宿主侧桩边界下成立
+- 失败信息：期望「冲突记为系统停止并等待用户」，实际「冲突被当成普通掉线，监督器无限重试」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets observeEnd 与 poll；entry/src/main/ets/services/VpnStatusReader.ets readText；scripts/test-vpn-reconnect-supervisor.mjs
+- 上游：R-CONN-11、R-CONN-12
+- 测试：scripts/test-vpn-reconnect-supervisor.mjs::a VPN conflict is recorded as a system stop and does not retry
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核

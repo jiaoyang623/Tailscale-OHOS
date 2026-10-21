@@ -1,6 +1,6 @@
 # MeshArc 单点判据 · 连接保活与状态读取（P1）
 
-覆盖 test-vpn-background-task.mjs（18 条）与 test-vpn-status-reader.mjs（13 条）。两条链同属 P1 进程侧：一条决定「连接期间要不要替无人应答的扩展活着」，另一条决定「状态文件到底读成了什么」。后者被卡片、FormExtensionAbility 与应用共用，措辞漂移会让卡片与应用对同一条隧道各说各话。
+覆盖 test-vpn-background-task.mjs（21 条）与 test-vpn-status-reader.mjs（17 条）。两条链同属 P1 进程侧：一条决定「连接期间要不要替无人应答的扩展活着」，另一条决定「状态文件到底读成了什么」。后者被卡片、FormExtensionAbility 与应用共用，措辞漂移会让卡片与应用对同一条隧道各说各话。
 
 ### O-BGTASK-01 前台连接即持有 dataTransfer 长时任务并用实况窗更新真实流量
 - 层级：单点
@@ -18,21 +18,21 @@
 - 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-18（蜂窝下的长时间存活）
 - 状态：closed
 - 不确定特征：none
-- 归属：—
+- 归属：owner=项目维护者 接收批次=vpn-endurance
 - 复核：待复核
 
-### O-BGTASK-02 状态陈旧或读取失败时把已持有的任务保留到有界宽限期
+### O-BGTASK-02 状态不确定时不释放任务，释放只看意图
 - 层级：单点
 - 父判据：O-SEAM-03、O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-09「长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放」；架构 §2.5 错误处理「失败即降级为可读状态」；HLD 契约 C-03
-- 触发与前置条件：已持有任务，status 心跳龄超过 VPN_STATUS_FRESH_MS=15000，或 fileIo.readTextSync 抛临时 I/O
-- 可观测点：stopBackgroundRunning 调用次数；background_status_timeout 诊断事件；任务重新取得后的 starts 计数
-- 期望：正常：新鲜且 connected 时持续持有不释放；边界：心跳龄 16 s 或读取抛错时仍保留（自 lastLiveAtMs 起算，VPN_STATUS_GRACE_MS=60000 内），超过宽限才 stop 一次并记 background_status_timeout；失败与恢复：读取恢复且重新 live 后再次取得任务（starts 由 1 变 2）；安全与质量：单次 I/O 抖动不得立刻撤销保护。判定在桩边界（fileIo、Date.now 为桩）下成立
-- 失败信息：期望「陈旧心跳与读失败按不确定保留到 60 s 宽限」，实际「一读不到就释放任务，或永久持有不释放」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:171 reconcile 的宽限分支；:344 readStatus；scripts/test-vpn-background-task.mjs
-- 上游：R-CONN-09
-- 测试：scripts/test-vpn-background-task.mjs::stale heartbeat and read errors retain acquired protection for a bounded grace period
+- 设计依据：需求 R-CONN-09「长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放」（2026-10-20 修订）、R-CONN-11；架构 §2.6；HLD 契约 C-11
+- 触发与前置条件：已持有任务；status 心跳龄超过 VPN_STATUS_FRESH_MS=15000，或 fileIo.readTextSync 抛临时 I/O；意图仍为 `connected`
+- 可观测点：stopBackgroundRunning 调用次数；`background_status_timeout` 诊断事件；意图文件的读取；任务重新取得后的 starts 计数
+- 期望：正常：新鲜且 connected 时持续持有不释放；边界：心跳龄 16 s、读取抛错、或持续 unknown 超过 60 s 都不释放，只记 `background_status_timeout`；失败与恢复：意图变为 `stopped` 时立即释放；读取恢复且重新 live 后继续持有，starts 不变；安全与质量：一次 I/O 抖动或不确定判读不得撤销保护。判定在桩边界（fileIo、Date.now 为桩）下成立
+- 失败信息：期望「不确定不释放，释放只看意图」，实际「一读不到状态就释放任务，随后进程被冻结」
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-background-task.mjs
+- 上游：R-CONN-09、R-CONN-11
+- 测试：scripts/test-vpn-background-task.mjs::protection follows intent, not a single uncertain status read
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -43,9 +43,9 @@
 - 父判据：O-SEAM-03、O-SEAM-11
 - 强度：强
 - 设计依据：需求 R-CONN-09「状态缺失/陈旧时按不确定处理」；架构 D5 保留的 M1 门槛；HLD 契约 C-03
-- 触发与前置条件：register 或 reconcile 时，status 缺 heartbeatMs、heartbeatMs=1、heartbeatMs=2000000（未来），或含 tun=false
-- 可观测点：startBackgroundRunning 调用次数（starts 长度）
-- 期望：正常：仅当心跳新鲜且 state=Running|tun=true 才启动；边界：以上四种证据不足的状态一律不启动，也不因「看不懂」而启动；失败与恢复：状态转为 live 后由下一次 reconcile 补上启动；安全与质量：无证据不得占用长时任务。判定在桩边界（fileIo、Date.now 为桩）下成立
+- 触发与前置条件：register 或 reconcile 时，status 缺 heartbeatMs、heartbeatMs=1、heartbeatMs=2000000（未来），或含 tun=false，且意图不是 60 秒内新写的 `connected`
+- 可观测点：startBackgroundRunning 调用次数（starts 长度）；意图文件的 `changedAtMs`
+- 期望：正常：仅当心跳新鲜且 state=Running|tun=true，或意图在 60 秒内刚写为 `connected` 时才启动；边界：以上四种证据不足的状态在意图陈旧时一律不启动，也不因「看不懂」而启动；失败与恢复：状态转为 live 后由下一次 reconcile 补上启动；安全与质量：无证据不得占用长时任务。判定在桩边界（fileIo、Date.now 为桩）下成立
 - 失败信息：期望「证据不足不启动」，实际「按残缺状态或旧心跳抢占了长时任务」
 - 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:344 readStatus；:182 reconcile 启动条件；scripts/test-vpn-background-task.mjs
 - 上游：R-CONN-09
@@ -55,19 +55,19 @@
 - 归属：—
 - 复核：待复核
 
-### O-BGTASK-04 读到显式断开即刻释放长时任务
+### O-BGTASK-04 读到断开标记时按意图决定释放或保留
 - 层级：单点
 - 父判据：O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-02「从首页一键断开：停止扩展、释放长时任务、回到未连接态」；HLD 契约 C-11
-- 触发与前置条件：status 含 extension destroyed / vpn disconnected / state=stopped / 非 status unavailable 的 FAILED
-- 可观测点：stopBackgroundRunning 调用次数；task 是否被置为 undefined
-- 期望：正常：读到断开标记即 stop 一次并把 task 置空；边界：连接窗口期内读到断开同样立即释放；失败与恢复：—；安全与质量：断开即释放，不空转占着任务。判定在桩边界下成立
-- 失败信息：期望「显式断开即刻释放」，实际「断开后仍持有任务，等待下一次超时」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:163 reconcile 的 disconnected 分支；:292 stop；scripts/test-vpn-background-task.mjs
-- 上游：R-CONN-02
-- 测试：scripts/test-vpn-background-task.mjs::explicit disconnect promptly releases the task
-- 测试：scripts/test-vpn-background-task.mjs::an explicit disconnect during the connect window releases promptly
+- 设计依据：需求 R-CONN-02「从首页一键断开：停止扩展、释放长时任务、回到未连接态」、R-CONN-11「用户没有点击停止时，连接不得停止」；架构 §2.6；HLD 契约 C-11、C-19
+- 触发与前置条件：status 含 extension destroyed / vpn disconnected / state=stopped / 非 status unavailable 的 FAILED；意图文件可读
+- 可观测点：stopBackgroundRunning 调用次数；task 是否被置为 undefined；意图文件的 `desired`
+- 期望：正常：意图为 `stopped` 时 stop 一次并把 task 置空；边界：意图为 `connected` 时读到断开不释放任务，交给恢复看门狗，连接窗口期内同样按意图处理；失败与恢复：释放失败记 `background_stop_failed`，下一轮重试；安全与质量：读到断开不等于用户停止，只有意图才能决定释放。判定在桩边界下成立
+- 失败信息：期望「意图为停止时才释放」，实际「读到任何断开标记就释放，恢复窗口内进程被冻结」
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile 的 disconnected 分支；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-background-task.mjs
+- 上游：R-CONN-02、R-CONN-11
+- 测试：scripts/test-vpn-background-task.mjs::a stopped intent releases protection promptly
+- 测试：scripts/test-vpn-background-task.mjs::a disconnect while the intent is connected keeps protection
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -90,18 +90,19 @@
 - 归属：—
 - 复核：待复核
 
-### O-BGTASK-06 用户取消保活后在同一会话内保持抑制，直到确认断开
+### O-BGTASK-06 用户取消保活通知不停止连接，回到前台重新申请保护
 - 层级：单点
 - 父判据：O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-10「用户主动取消保活通知后，不得在同一会话内自行恢复」；架构 §2.5 重试「重试必须能被用户意图打断」；HLD 契约 C-11
-- 触发与前置条件：continuousTaskCancel 的 reason 为 USER_CANCEL(1) 或 USER_CANCEL_REMOVE_NOTIFICATION(3)
-- 可观测点：suppressedUntilDisconnect 的效果（starts 计数）；background_user_cancelled 诊断事件
-- 期望：正常：置抑制位，之后不再自动启动；边界：陈旧 telemetry（90 s 无心跳）与回到前台（onForeground 清 nextStartAtMs）都不解除抑制，starts 仍为 1；失败与恢复：只有读到确认断开、再转 live 后才恢复启动（starts 变 2）；安全与质量：绝不替用户撤销他自己按下的取消。判定在桩边界（backgroundTaskManager 的取消回调为桩）下成立
-- 失败信息：期望「用户取消在同会话内始终被尊重」，实际「回前台或状态一变就自行恢复保活」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:57 cancelCallback；:182 启动条件里的抑制位；:144 onForeground；scripts/test-vpn-background-task.mjs
-- 上游：R-CONN-10
-- 测试：scripts/test-vpn-background-task.mjs::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect
+- 设计依据：需求 R-CONN-10「用户取消保活通知不等于停止连接。后台不抢；回到前台且连接意图仍在时重新申请保护」（2026-10-20 修订）、R-CONN-11；HLD 契约 C-11
+- 触发与前置条件：continuousTaskCancel 的 reason 为 USER_CANCEL(1) 或 USER_CANCEL_REMOVE_NOTIFICATION(3)，意图仍为 `connected`
+- 可观测点：`suppressedUntilForeground` 的效果（starts 计数）；`background_user_cancelled_kept_vpn`、`background_protection_restored` 诊断事件；当前是否在前台
+- 期望：正常：不停止隧道，不改变意图，记 `background_user_cancelled_kept_vpn`；边界：前台取消时立即解除抑制并在一拍内重新申请（starts 变 2），后台取消时置抑制位、不重抢（starts 保持 1），陈旧 telemetry 也不解除抑制；失败与恢复：后台取消后回到前台且意图为 connected 时重新申请一次，记 `background_protection_restored`；安全与质量：用户取消通知的意图是隐藏通知，不是断开连接。判定在桩边界（backgroundTaskManager 的取消回调为桩）下成立
+- 失败信息：期望「取消通知后连接保持，前台取消立即恢复保护」，实际「前台取消后下次进后台没有任务，进程被冻结」
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets cancelCallback、onForeground 与 onBackground；scripts/test-vpn-background-task.mjs
+- 上游：R-CONN-10、R-CONN-11
+- 测试：scripts/test-vpn-background-task.mjs::user dismissed notification keeps the vpn and re-arms on foreground
+- 测试：scripts/test-vpn-background-task.mjs::dismissing the notification in the foreground re-arms protection at once
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -158,20 +159,20 @@
 - 归属：—
 - 复核：待复核
 
-### O-BGTASK-10 启动期间收到的取消、断开或销毁不被迟到的启动结果覆盖
+### O-BGTASK-10 启动期间收到的取消、停止意图或销毁不被迟到的启动结果覆盖
 - 层级：单点
 - 父判据：O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-10「不得在同一会话内自行恢复」；架构 §2.5 异步陈旧「迟到结果不得覆盖新结果」；HLD 契约 C-11
-- 触发与前置条件：startBackgroundRunning 尚未 resolve 时，收到 USER_CANCEL、读到断开、或调用 unregister
+- 设计依据：需求 R-CONN-10「用户取消保活通知不等于停止连接」、R-CONN-11「用户没有点击停止时，连接不得停止」；架构 §2.5 异步陈旧「迟到结果不得覆盖新结果」、§2.6；HLD 契约 C-11
+- 触发与前置条件：startBackgroundRunning 尚未 resolve 时，收到 USER_CANCEL、意图变为 `stopped`、或调用 unregister
 - 可观测点：task 是否被置空；stopBackgroundRunning 次数；publish 次数；监听回调表是否被清空
-- 期望：正常：无中断的启动成功才落 task 并发通知；边界：三种中断下迟到的成功结果都必须被清理——取消后 task 为 undefined 且不 publish，断开后 stop 一次且不 publish，销毁后 stop 一次并清空回调（callbacks.size 为 0）；失败与恢复：—；安全与质量：用 cancellationRevision 与 lifecycleGeneration 双重守卫，迟到的成功不得复活已被取消或销毁的任务。判定在桩边界（startBackgroundRunning 用 deferred 门控）下成立
+- 期望：正常：无中断的启动成功才落 task 并发通知；边界：三种中断下迟到的成功结果都必须被清理——取消后 task 为 undefined 且不 publish，意图 stopped 后 stop 一次且不 publish，销毁后 stop 一次并清空回调（callbacks.size 为 0）；失败与恢复：只读到 disconnected 而意图仍为 connected 不算中断，任务保留给恢复看门狗；安全与质量：用 cancellationRevision 与 lifecycleGeneration 双重守卫，迟到的成功不得复活已被取消或销毁的任务。判定在桩边界（startBackgroundRunning 用 deferred 门控）下成立
 - 失败信息：期望「迟到结果按取消代数/世代被丢弃并清理」，实际「取消或销毁后任务又被迟到结果装上」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:206 start 的 revision 快照；:226 迟到结果守卫；:230 走后校验；scripts/test-vpn-background-task.mjs
-- 上游：R-CONN-10
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets start 的 revision 快照与迟到结果守卫；entry/src/main/ets/services/VpnSessionIntent.ets；scripts/test-vpn-background-task.mjs
+- 上游：R-CONN-10、R-CONN-11
 - 测试：scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result
-- 测试：scripts/test-vpn-background-task.mjs::disconnect during start cleans up the late successful task without publishing
 - 测试：scripts/test-vpn-background-task.mjs::destroy during start cleans up the late successful task
+- 测试：scripts/test-vpn-background-task.mjs::a stopped intent during start cleans up the late task without publishing
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -216,18 +217,20 @@
 - 父判据：O-SEAM-03、O-SEAM-11
 - 强度：强
 - 设计依据：需求 R-CONN-03「连接窗口期内应用进程必须持有长时任务，使切到后台后仍能应答扩展的后端交接请求」；架构 D5（§四）选择方案 (b)；HLD 契约 C-03
-- 触发与前置条件：status 含 vpn interface established 且心跳新鲜（扩展已建 TUN、backend handoff pending）
+- 触发与前置条件：status 含 vpn interface established 且心跳新鲜（扩展已建 TUN、backend handoff pending）；或意图在 60 秒内刚写为 `connected` 而扩展尚未写出 connecting
 - 可观测点：startBackgroundRunning 次数与模式；进入 connected 后是否出现第二个任务；切后台后的 stop 次数
-- 期望：正常：把该状态解析为 connecting，与 connected 同级，立即以 dataTransfer 取得任务；边界：随后转为 state=Running 不产生第二个任务（connecting 平滑滚入 connected），切后台不释放；失败与恢复：—；安全与质量：这是 D5 特意放宽的门槛，用来消除「用到一半自己断了」的成因。判定在桩边界下成立，M3 的真机场景尚未重跑
+- 期望：正常：把该状态解析为 connecting，与 connected 同级，立即以 dataTransfer 取得任务；边界：意图刚写的窗口内、状态仍为 unknown 或空时同样取得任务，随后转为 state=Running 不产生第二个任务（connecting 平滑滚入 connected），切后台不释放；失败与恢复：意图超过 60 秒且无接口证据时不凭旧意图启动；安全与质量：这是 D5 特意放宽的门槛，用来消除「用到一半自己断了」的成因。判定在桩边界下成立，M3 的真机场景尚未重跑
 - 失败信息：期望「连接窗口即持有任务」，实际「只在 state=Running 后才持有，交接窗口内进程被冻结」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:362 readStatus 的 connecting 分支；:171 reconcile 的 live 判定；:200 isLiveState；scripts/test-vpn-background-task.mjs
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets readStatus 的 connecting 分支、reconcile 的 live 与 connectRequested 判定、isLiveState、connectRequestedRecently；scripts/test-vpn-background-task.mjs
 - 上游：R-CONN-03
 - 测试：scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered
+- 测试：scripts/test-vpn-background-task.mjs::a fresh connected intent holds protection before any interface evidence
+- 测试：scripts/test-vpn-background-task.mjs::an old connected intent does not start protection on its own
 - 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-16（special-scenario 长时任务）
 - 待建测试：[真机] 真机走查 a01-baseline/manual-checks.md#M-18（蜂窝下的长时间存活）
 - 状态：closed
 - 不确定特征：none
-- 归属：—
+- 归属：owner=项目维护者 接收批次=vpn-endurance
 - 复核：待复核
 
 ### O-BGTASK-14 连接窗口需要接口建立的证据，不接受任意无法识别的状态
@@ -237,7 +240,7 @@
 - 设计依据：需求 R-CONN-03「连接窗口期内必须持有长时任务」；架构 D5 保留的 M1 门槛「无法识别的状态仍然不持有任务」；HLD 契约 C-03
 - 触发与前置条件：status 为 `VPN extension lifecycle entered`、`VPN probe TUN creation pending`，或 `state=Running | tun=false`
 - 可观测点：startBackgroundRunning 次数
-- 期望：正常：只有含 vpn interface established 的证据才判 connecting；边界：以上三种无法识别或缺 TUN 的状态一律不启动任务（starts 为 0）；失败与恢复：—；安全与质量：不得凭「看不懂」就持有长时任务。判定在桩边界下成立
+- 期望：正常：只有含 vpn interface established 的证据或 60 秒内刚写的 `connected` 意图才判为连接在途；边界：以上三种无法识别或缺 TUN 的状态，在没有新意图时一律不启动任务（starts 为 0）；失败与恢复：—；安全与质量：不得凭「看不懂」就持有长时任务。判定在桩边界下成立
 - 失败信息：期望「只认接口建立的证据」，实际「任何陌生文案都被当成连接中并占住任务」
 - 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:362 readStatus 的 connecting 判据；:350 新鲜度守卫；scripts/test-vpn-background-task.mjs
 - 上游：R-CONN-03
@@ -247,18 +250,18 @@
 - 归属：—
 - 复核：待复核
 
-### O-BGTASK-15 停滞的连接窗口超过宽限期仍释放保护
+### O-BGTASK-15 停滞的连接窗口不释放保护，交给恢复看门狗
 - 层级：单点
 - 父判据：O-SEAM-03、O-SEAM-11
 - 强度：强
-- 设计依据：需求 R-CONN-09「状态缺失/陈旧时按不确定处理，有界宽限后释放」；架构 D5「connecting 与 connected 等重，但要有界」；HLD 契约 C-03
-- 触发与前置条件：进入 connecting 后扩展停止写心跳（status 不再更新）
-- 可观测点：stopBackgroundRunning 次数随时间的变化
-- 期望：正常：—；边界：心跳龄刚过 FRESH（20 s）时仍持有（stop 次数为 0）；失败与恢复：继续停滞到超过 GRACE（再 50 s，累计超过 60 s）释放一次（stop 次数为 1）；安全与质量：停滞的连接窗口不得永久占住长时任务。判定在桩边界下成立
-- 失败信息：期望「停滞窗口按 60 s 宽限释放」，实际「一直持有，或一过 15 s 就释放」
-- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets:171 宽限分支；:175 VPN_STATUS_GRACE_MS 判据；scripts/test-vpn-background-task.mjs
-- 上游：R-CONN-09
-- 测试：scripts/test-vpn-background-task.mjs::a stalled connect window still releases protection
+- 设计依据：需求 R-CONN-03「连接窗口期内必须持有长时任务」、R-CONN-11；架构 §2.6；HLD 契约 C-11
+- 触发与前置条件：进入 connecting 后扩展停止写心跳；意图仍为 `connected`
+- 可观测点：stopBackgroundRunning 次数随时间的变化；恢复看门狗的恢复动作
+- 期望：正常：—；边界：心跳龄刚过 FRESH（20 s）时仍持有（stop 次数为 0）；失败与恢复：继续停滞到超过 GRACE（累计超过 60 s）也不释放（stop 次数仍为 0），由恢复看门狗在 sustained unknown 判定后发起恢复；意图变为 `stopped` 时才释放一次；安全与质量：停滞窗口不得永久占住任务，也不得靠释放任务来「解决」停滞。判定在桩边界下成立
+- 失败信息：期望「停滞不释放，恢复看门狗接手」，实际「一直持有到最后，或一过 15 s 就释放」
+- 来源：entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile；entry/src/main/ets/services/VpnReconnectSupervisor.ets；scripts/test-vpn-background-task.mjs
+- 上游：R-CONN-03、R-CONN-11
+- 测试：scripts/test-vpn-background-task.mjs::a stalled connect window keeps protection while the intent stands
 - 状态：closed
 - 不确定特征：none
 - 归属：—
@@ -418,6 +421,23 @@
 - 来源：entry/src/main/ets/services/VpnStatusReader.ets:96-98 judge 的 connecting 分支；scripts/test-vpn-status-reader.mjs
 - 上游：R-CONN-03
 - 测试：scripts/test-vpn-status-reader.mjs::the connect window reports connecting
+- 状态：closed
+- 不确定特征：none
+- 归属：—
+- 复核：待复核
+
+### O-STATUS-10 VPN 冲突在快照上可见
+- 层级：单点
+- 父判据：O-SEAM-03
+- 强度：强
+- 设计依据：需求 R-CONN-12「非用户原因的断连都要落盘留证，原因分类含系统策略」；HLD 契约 C-03、C-19
+- 触发与前置条件：status 为 FAILED 行且含系统冲突码 `code=2203002`，心跳新鲜
+- 可观测点：快照的 `state` 与 `conflict`
+- 期望：正常：冲突行报 disconnected，`conflict=true`；边界：其他 FAILED 行报 disconnected，`conflict=false`；失败与恢复：—；安全与质量：冲突标记只来自状态行，不从界面文案推断。判定在桩边界（fileIo 为桩）下成立
+- 失败信息：期望「冲突可辨认」，实际「冲突与普通启动失败同形，监督器把它当普通掉线反复重试」
+- 来源：entry/src/main/ets/services/VpnStatusReader.ets readText；scripts/test-vpn-status-reader.mjs
+- 上游：R-CONN-12
+- 测试：scripts/test-vpn-status-reader.mjs::a VPN conflict is flagged on the snapshot
 - 状态：closed
 - 不确定特征：none
 - 归属：—

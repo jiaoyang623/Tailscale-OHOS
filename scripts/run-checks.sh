@@ -80,4 +80,17 @@ else
   rc=1
 fi
 
+# 判据正文里写下了每条 E2E 的文件与用例名，那就是计划测试清单。
+# a01 的完成条件里有一条：计划清单与实际执行清单要一致。
+# 这里只核对「声明了却没写下来」；文件整个还没建的只报告，那是 E2E 层的待办进度。
+echo
+echo "== E2E 计划与实际是否一致 =="
+python3 scripts/check-e2e-plan.py || rc=1
+
+# 公共件没 import 的错，语法检查抓不到：跑到那一行才抛 X is not defined，
+# 而那时真机已经跑了几十秒。立 E2E 层时一次出了两处，所以静态查一遍。
+echo
+echo "== E2E 公共件的来源 =="
+python3 scripts/check-e2e-imports.py || rc=1
+
 exit "$rc"

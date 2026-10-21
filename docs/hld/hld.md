@@ -39,9 +39,9 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 
 ---
 
-## 二、接口与事件契约
+## 二、接口契约与事件契约
 
-**本层主体。每条接缝一张契约卡，字段固定：通道 / 方向 / 载荷格式 / 顺序与时机 / 错误与责任 / 幂等性 / 可观测点。** 18 条接缝 O-SEAM-01…O-SEAM-18 全部出现；不掌握处写 `不确定特征` 并记入未决项，但不缺席。所有文件路径均为 `context.filesDir`（`StoragePaths.ets:6-7` 说明该目录跨能力共享）；文件名与常量逐字取自代码。
+**本层主体。每条接缝一张契约卡，字段固定：通道 / 方向 / 载荷格式 / 顺序与时机 / 错误与责任 / 幂等性 / 可观测点。** 19 条接缝 O-SEAM-01…O-SEAM-19 全部出现；不掌握处写 `不确定特征` 并记入未决项，但不缺席。所有文件路径均为 `context.filesDir`（`StoragePaths.ets:6-7` 说明该目录跨能力共享）；文件名与常量逐字取自代码。
 
 ### C-01 · O-SEAM-01 应用进程 ↔ VPN 扩展：生命周期命令通道
 
@@ -71,18 +71,18 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **通道**：`vpn-probe-status.txt`（主状态）；随环发布 `vpn-config-summary.txt`、`vpn-peer-probe-status.txt`（`TailscaleVpnExtensionAbility.ets:955`、`:702-726`）。路径适配见 `StoragePaths.vpnStatusPath`（`StoragePaths.ets:17-19`）。
 - **方向**：P2 只写（`writeStatus:1904-1907`、`writeCurrentStatusHeartbeat:1909-1912`）；P1 全部读方与 P3 只读（`VpnStatusReader.read:37-44` 与它调用的 `judge:80-100`、`VpnBackgroundTaskManager.readStatus:344-354`、`FormCardService.buildBindingData:28-41`）。
 - **载荷格式**：`<可见状态文本> | heartbeatMs=<毫秒时间戳>`（`:1910-1911`）。可见状态文本来自 `backendSnapshot().status`，含 `state=Running`、`tun=true`、`txBytes=<n>`、`rxBytes=<n>` 等字段；`vpn-config-summary.txt` 是 `addressCount=… | routeCount=… | hasIPv4Address=…` 等（`:719-725`）；`vpn-peer-probe-status.txt` 为原始探测串。
-- **顺序与时机**：1 s `statusTimer`（`:905-951`）**先写心跳再拍快照**，使 liveness 独立于可能耗时数秒的 `backendSnapshot`（`:906-908`）；快照完成后覆写状态与两份快照文件。写用原子写 `.tmp` + `renameSync`（`writeAtomicTextFile:1935-1953`）。新鲜度：>15 s 视为**不确定**而非健康。窗口只在 `VpnStatusReader.ets:12` 定义一次（`VPN_STATUS_FRESH_MS`），`BridgeStatus` 借用同一个常量，不再自带 5000 ms 门限。
-- **错误与责任**：写状态 best-effort，**永不阻断 VPN 启动**（`writeTextFile:1921-1923` 注释）；快照失败保留上一次已知 backend 状态并记 `vpn_snapshot_unavailable`（`:939-946`）。读侧把不确定转成「不新建长时任务、已持有的有界宽限后才释放」（C-11）。`onDestroy` 写 `VPN extension destroyed`（`:1995`）。
-- **幂等性**：每秒整文件覆写（last-writer-wins）；词表不再靠约定维持——`VpnStatusReader.judge`（`VpnStatusReader.ets:80-100`）是唯一判读，`VpnBackgroundTaskManager.readStatus` 调它（`VpnBackgroundTaskManager.ets:344-354`）。判读顺序：陈旧/未来/缺失心跳→unknown；终态标记→disconnected（压过运行中的隧道）；`state=Running` 且 `tun=true`→connected；`needsLogin`→needs_login；`vpn interface established`→connecting。
-- **可观测点**：扩展 `vpn_snapshot_unavailable`、`vpn_connected`（`:546`）；P1 侧由读方派生状态；长时任务事件见 C-11（`background_started`、`background_status_timeout` 等）。
+- **顺序与时机**：1 s `statusTimer`（`:905-951`）**先写心跳再拍快照**，使 liveness 独立于可能耗时数秒的 `backendSnapshot`（`:906-908`）；快照完成后覆写状态与两份快照文件。写用原子写 `.tmp` + `renameSync`（`writeAtomicTextFile:1935-1953`）。新鲜度：>15 s 视为**不确定**而非健康。窗口只在 `VpnStatusReader.ets:12` 定义一次（`VPN_STATUS_FRESH_MS`），`BridgeStatus` 借用同一个常量，不再自带 5000 ms 门限。**2026-10-20 修订**：节奏按能量档位变化。active 档保持 1 s；background 档 2 s；screen-off 档 5 s。心跳龄上限仍是 15 s，所以三档都保留至少 3 倍余量。快照查询单独降档，screen-off 档为 15 s。
+- **错误与责任**：写状态 best-effort，**永不阻断 VPN 启动**（`writeTextFile:1921-1923` 注释）；快照失败保留上一次已知 backend 状态并记 `vpn_snapshot_unavailable`（`:939-946`）。读侧把不确定转成「不新建长时任务、已持有的有界宽限后才释放」（C-11）。`onDestroy` 写 `VPN extension destroyed`（`:1995`），同时写入会话结束记录（C-19）。
+- **幂等性**：每秒整文件覆写（last-writer-wins）；词表不再靠约定维持——`VpnStatusReader.judge`（`VpnStatusReader.ets:80-100`）是唯一判读，`VpnBackgroundTaskManager.readStatus` 调它（`VpnBackgroundTaskManager.ets:344-354`）。判读顺序：陈旧/未来/缺失心跳→unknown；终态标记→disconnected（压过运行中的隧道）；`state=Running` 且 `tun=true`→connected；`needsLogin`→needs_login；`vpn interface established`→connecting。快照另带 `conflict`：状态行含系统冲突码 `code=2203002` 时为 true，监督器据此记 `system_stopped` 并等待用户（O-STATUS-10、O-RECONN-13）。
+- **可观测点**：扩展 `vpn_snapshot_unavailable`、`vpn_connected`（`:546`）、`vpn_power_stage_changed`（本批新增）；P1 侧由读方派生状态；长时任务事件见 C-11（`background_started`、`background_status_timeout` 等）。
 
 ### C-04 · O-SEAM-04 VPN 扩展 → 应用进程：对端快照
 
 - **通道**：`vpn-peers.json`。常量：扩展 `:57`；`BridgeStatus.ets:203`。路径 `peerSnapshotFilePath`（`BridgeStatus.ets:3592-3595`）。
 - **方向**：P2 只写（`writePeerSnapshot:1000-1008`，随 1 s 快照）；P1 只读（`refreshPeerSnapshot:3597-3634`）。
 - **载荷格式**：`PersistedPeerSnapshot = { peers: PeerSummary[], meshArcReceiver: MeshArcReceiverStatus, updatedAtMs: number }`；`PeerSummary = { key, name, os, osVersion?, deviceModel, deviceType, addresses: string[], online: boolean, exitNode: boolean, keyExpired: boolean, keyExpiryUnixMs: number, localSend? }`（扩展 `:67-88`）。
-- **顺序与时机**：随 1 s 快照环原子写（`writeAtomicTextFile`）。P1 接受条件：`updatedAtMs > 0 && 0 ≤ age ≤ 5000 ms`（`BridgeStatus.ets:3606`），且只保留 `key` 匹配 `/^peer-[a-f0-9]{16}$/` 且 `name` 非空的项（`:3610`）。
-- **错误与责任**：写侧失败不影响隧道（快照是可选服务）；读侧超 5 s 或解析失败**保留上一次有效列表、不清空**（`:3631-3634`），避免闪成空列表。`onCreate` 写空快照（`:341`）。
+- **顺序与时机**：随快照环原子写；节奏按档位为 1 s、2 s、15 s。P1 接受条件：`updatedAtMs > 0 && 0 ≤ age ≤ 16000 ms`（`BridgeStatus.ets` 的 `SNAPSHOT_ACCEPT_MAX_AGE_MS`），覆盖熄屏档的 15 s 周期，且只保留 `key` 匹配 `/^peer-[a-f0-9]{16}$/` 且 `name` 非空的项。
+- **错误与责任**：写侧失败不影响隧道（快照是可选服务）；读侧超 16 s 或解析失败**保留上一次有效列表、不清空**，避免闪成空列表。`onCreate` 写空快照。
 - **幂等性**：每环整文件替换；P1 用 `peerSnapshotSignature` 去重（`:3620-3623`）。
 - **可观测点**：P1 `applyPeers`、`logServiceStatusIfChanged`（`:3622`、`:3627`）；无专门诊断事件名（自由字符串）。
 
@@ -156,11 +156,11 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **通道**：系统回调与 API——`backgroundTaskManager.on('continuousTaskCancel', …)`、`on('continuousTaskSuspend', …)`、`startBackgroundRunning(context, ['dataTransfer'], agent)`、`stopBackgroundRunning(context)`；实况窗 `notificationManager.publish`（`SlotType.LIVE_VIEW`，`typeCode 8`）。`module.json5:29-30` 声明 `backgroundModes ["dataTransfer"]`。
 - **方向**：P1（`VpnBackgroundTaskManager`）向系统申请/释放；系统回调进入 P1。P3 明确**不可导入** `backgroundTaskManager`（`EntryFormAbility.ets:13-16`）。
 - **载荷格式**：`startBackgroundRunning` 的 `WantAgentInfo` 指向 `EntryAbility`（`:207-212`）；实况窗 `NotificationRequest.content.systemLiveView = { typeCode: 8, title, text }`，`text = "↑ <tx>  ↓ <rx>"`（`:309-341`）。
-- **顺序与时机**：每 1000 ms（`CONNECTION_CHECK_INTERVAL_MS`，`:16`）读 `vpn-probe-status.txt`；live 判定 = `connected`（`state=Running | tun=true`）或 `connecting`（含 `vpn interface established` 的新鲜心跳，`:171`、`:362-369`）；start/stop 经 `operationInFlight` 串行化（`:152`）。心跳龄 ≤ `VPN_STATUS_FRESH_MS`(15000)（`:14`）；陈旧/缺失时已持有的任务在 `VPN_STATUS_GRACE_MS`(60000) 宽限后才释放并记 `background_status_timeout`（`:15`、`:175-178`）；**从不凭旧证据新建任务**（`:182`）。实况窗按 `NOTIFICATION_UPDATE_INTERVAL_MS`(30000) 刷新（`:17`）。
-- **错误与责任**：只有系统侧取消（非用户）才 `scheduleRetry`（`START_RETRY_BASE_MS` 30000 起、指数、`START_RETRY_MAX_MS` 300000 封顶，`:18-19`、`:392-396`）；用户取消（`USER_CANCEL`/`USER_CANCEL_REMOVE_NOTIFICATION`）→ `suppressedUntilDisconnect = true`，同一会话内不自行恢复（`:66-73`、`:182`）；读到 `disconnected` 立即清零重试态并释放（`:163-169`）。**责任空洞（本层确认的唯一空洞）**：P1 在后台且未持任务时会被冻结，此时若 P2 被杀导致掉线，没有任何子系统承诺恢复——恢复责任在 `VpnReconnectSupervisor`，而它恰恰是可能已被冻结的一方（`docs/background-vpn-reliability.md` Milestone 2；架构 D4 风险）。用户回到应用前保持断开。
+- **顺序与时机**：每 1000 ms（`CONNECTION_CHECK_INTERVAL_MS`，`:16`）读 `vpn-probe-status.txt`；live 判定 = `connected`（`state=Running | tun=true`）或 `connecting`（含 `vpn interface established` 的新鲜心跳），或意图在 `CONNECT_REQUEST_FRESH_MS`(60000) 内刚写为 `connected`；start/stop 经 `operationInFlight` 串行化（`:152`）。心跳龄 ≤ `VPN_STATUS_FRESH_MS`(15000)（`:14`）；陈旧/缺失时已持有的任务在 `VPN_STATUS_GRACE_MS`(60000) 宽限后才记 `background_status_timeout`（`:15`）。**不凭陈旧状态新建任务，但凭 60 秒内的新意图提前取得任务**，使扩展在报出 connecting 之前就有应答方。实况窗按 `NOTIFICATION_UPDATE_INTERVAL_MS`(30000) 刷新（`:17`）。
+- **错误与责任**：只有系统侧取消（非用户）才 `scheduleRetry`（`START_RETRY_BASE_MS` 30000 起、指数、`START_RETRY_MAX_MS` 300000 封顶，`:18-19`、`:392-396`）。**2026-10-20 修订**：用户取消保活通知不再等于停止连接。`USER_CANCEL` / `USER_CANCEL_REMOVE_NOTIFICATION` 只记录 `background_user_cancelled_kept_vpn`。前台取消时立即解除抑制并在下一拍重新申请；后台取消时置抑制位，回到前台且连接意图仍在时重新申请（R-CONN-10 修订）。读到 `disconnected` 立即清零重试态并释放，但仅当连接意图为 stopped。**2026-10-20 修订**：状态陈旧不再触发 60 s 后无条件释放。已建立过会话时，任务保留到确认断开或用户停止；`unknown` 只记 `background_status_timeout` 并交给恢复看门狗（R-CONN-09 修订）。**责任空洞（本层确认的唯一空洞）**：P1 在后台且未持任务时会被冻结，此时若 P2 被杀导致掉线，没有任何子系统承诺恢复。本批把意图为 connected 时的保护延长到确认断开，缩小空洞；P2 仍只重绑已有隧道，没有启动连接的恢复入口。剩余部分见 O-CONN-08 的不确定特征。
 - **幂等性**：`cancellationRevision` / `lifecycleGeneration` 保证销毁期间的迟到 start 结果被丢弃（`:206`、`:214-218`、`:226-234`）；非本任务的取消事件被忽略（`:59-62`）。`SPECIAL_SCENARIO_SUBMODE = 0` 使 special-scenario 路径**默认惰性**（`:31`、`:257-259`）。
-- **可观测点**：`background_started`、`background_stopped`、`background_status_timeout`、`background_entered`、`background_user_cancelled`、`background_system_cancelled`、`background_suspended` / `background_resumed`、`background_listener_failed`、`background_suspend_listener_failed`、`background_operation_failed`、`background_stop_failed`、`background_notification_failed`、`background_started_special_scenario`（`:73,83,97,103,140,176,190,236,285,301,303,340`）。
-- **单点判据**：O-BGTASK-01…15（P1-background-status.md）。
+- **可观测点**：`background_started`、`background_stopped`、`background_status_timeout`、`background_entered`、`background_user_cancelled`、`background_system_cancelled`、`background_suspended` / `background_resumed`、`background_listener_failed`、`background_suspend_listener_failed`、`background_operation_failed`、`background_stop_failed`、`background_notification_failed`、`background_started_special_scenario`（`:73,83,97,103,140,176,190,236,285,301,303,340`），以及本批新增 `background_intent_connected` / `background_intent_stopped`、`background_protection_restored`、`background_user_cancelled_kept_vpn`。
+- **单点判据**：O-BGTASK-01…15（P1-background-status.md，本批修订 02/04/06/10/15）。
 
 ### C-12 · O-SEAM-12 应用进程 ↔ 系统：网络变化回调与重绑
 
@@ -202,7 +202,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **顺序与时机**：写入即读-改-写整文件并套字节上限（`:27-30`）；单文件 `MAX_EVENTS_PER_FILE` = 100 事件（`DiagnosticPrivacy.ets:13`）、`MAX_EVENT_FILE_BYTES` = 24 KB（`:14`），超出淘汰最旧（`DiagnosticEventStore.ets:111-119`）；报告保留 `REPORT_RETENTION_MS` = 24 h 后 `cleanupExpiredReports` 清理（`DiagnosticReportService.ets:10,646-654`）。
 - **错误与责任**：所有可能落盘/离开进程的文本（含 hilog）**必须**先经 `DiagnosticPrivacy.redactForLog:47-55`——URL、bearer/basic、token/secret 键、查询串令牌一律替换；错误只保留稳定类别 + 数字码（`classifyError:18-34`），原生错误文本从不保留。诊断 best-effort，永不影响 VPN 生命周期（`DiagnosticEventStore.ets:98-99`）。报告生成中途失败不分享半成品 zip 并删除残留（`DiagnosticReportService.ets:246-248`）。
 - **幂等性**：追加写；超限淘汰最旧；`load` 去重靠截断（`:40-41`）。
-- **可观测点**：事件名是**自由字符串、无受控词表**（§七 Q-05）；同一语义在两进程可能两种拼写（`VpnSessionController.record:187-189` 把 UI 侧事件写进 UI 文件）。
+- **可观测点**：事件名由登记表 `docs/diagnostics/event-names.md` 统一。2026-10-20 起，检查器核对名字、阶段与首次出现行号。会话结束原因另走 C-19 的专用文件，不受本卡的 100 条上限影响。
 
 ### C-16 · O-SEAM-16 VPN 替换批准通道
 
@@ -234,6 +234,25 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 - **错误与责任**：补丁缺失、补丁冲突、编译失败都让脚本非零退出。`set -euo pipefail` 让脚本在编译前中止（`scripts/build-go.sh:10`、`:56-59`）。非 default 产品在 macOS 入口开头被拒，责任在误用入口的一方（`scripts/build.sh:6-12`）。Windows 入口只接受 `default` 与 `release`。release 还要先过 changelog 校验（`scripts/build.ps1:1-4`、`:126-132`）。构建模式不是独立校验项，它由产品派生（`scripts/build.ps1:134-135`）。macOS 入口固定 debug（`scripts/build.sh:58-59`）。
 - **幂等性**：补丁应用是幂等的。reverse-check 成功即判定「已应用」，不再叠加（`scripts/build-go.sh:60-61`）。判定只看补丁自身，不读工作区整体状态。
 - **可观测点**：两次连续执行的退出码与 stdout（`Applied patch` 或 `Patch already applied`）。传给 `go` 的实参（`-buildmode=c-shared`、`-trimpath`、两个 `-X` 版本戳都等于 1.86.5）。`entry/libs/arm64-v8a/` 下 `.so` 与 `.h` 是否落位。传给 node 的装配参数（`hvigorw.js`、`buildMode=debug`、`debuggable=true`、`assembleHap`）。非 default 产品时的 stderr 文案。
+
+### C-19 · O-SEAM-19 会话结束事件与原因分类（本批新增，2026-10-20）
+
+- **通道**：每个写者一个专用账本文件。P1 写 `filesDir/vpn-session-ledger-ui.ndjson`，P2 写 `filesDir/vpn-session-ledger-vpn.ndjson`。配套两个意图文件：`filesDir/vpn-intent.json`（`{ desired: "connected" | "stopped", changedAtMs, by: "ui" | "card" | "recovery" }`）与写者各自的 `filesDir/vpn-session-end-ui.json` 或 `filesDir/vpn-session-end-vpn.json`（最近一次结束记录，供下一个读者补写观测）。旧版单文件 `vpn-session-ledger.ndjson` 与 `vpn-session-end.json` 只读，用于升级后读取旧记录。
+- **方向**：意图文件由 P1 写（用户动作与恢复），P2 不读也不写。账本双向追加：先退出的进程写结束记录，后感知到的进程补写观测记录。读取方 P1 在报告导出时合并（C-15）。
+- **并发与合并**：写者只追加和压缩自己拥有的文件。压缩不改写另一写者的文件，因此不会擦掉对方刚追加的行。去重读取全部账本文件。读取按 `timestampMs` 升序合并，并按 `sessionId + kind` 保留第一条。没有跨进程锁，也没有共享可写文件。
+- **载荷格式**：每行 `SessionLedgerEntry = { timestampMs, writer: "ui" | "vpn", sessionId, kind: "end" | "observed", reason, phase, code }`。`sessionId` 由 P2 在 `onCreate` 时生成，写进状态文件与每条账本记录。`reason` 取自受控词表：
+  - `user_stop`：用户经 UI 或卡片断开。
+  - `extension_destroyed`：扩展进程 `onDestroy` 正常触发。
+  - `extension_crash`：扩展进程非正常死亡（由 P1 观测到心跳停止且无 `end` 记录）。
+  - `handoff_timeout`：后端交接 15 s 无人应答。
+  - `system_stopped`：系统策略或 VPN 冲突停止 VPN。当前生产者是 `code=2203002` 冲突。
+  - `network_lost`：观察到掉线时设备没有默认网络。当前生产者是监督器的离线判读。
+  - `unknown`：证据不足。必须同时写 `phase` 说明缺哪条证据。
+- **顺序与时机**：P1 在写意图 `stopped` 的同一动作内先写账本 `user_stop`。P2 在 `onDestroy` 开头写 `extension_destroyed`，再停止其他工作。P1 读到 `end` 记录后，若原因不是 `user_stop` 且意图仍为 `connected`，写 `observed` 并进入恢复流程（C-11）。
+- **错误与责任**：账本写入失败不得阻止退出（与 C-15 同一原则）。原因判不清时写 `unknown` 与缺失证据，不猜。P2 崩溃时没有 `end` 记录，责任落在 P1 的观测补写。
+- **幂等性**：同一 `sessionId` 的 `end` 记录只写一次。`sessionId` 由 P2 在 `onCreate` 时生成并写进状态文件。每个写者读取全部账本文件去重。
+- **可观测点**：`vpn_session_end`（P2）、`vpn_session_end_observed`（P1）、`vpn_session_recovered`（P1）、`vpn_session_recovery_deferred`（P1，网络离线）。
+- **单点判据**：O-SESSION-09…13、O-POWER-01…04（P3-session.md、P6-power.md）。
 
 ### SWEBOK 六项逐项核对
 
@@ -291,7 +310,9 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 ### 3.3 失败恢复路径
 
 - **连接窗口期内用户切走 → 交接无人应答 → 扩展 15 s 后销毁 VPN**（本批修复，O-CONN-03）：P2 记 `vpn_backend_handoff_timeout` 并 `destroyProbeTun`；修复点是 D5——把 `connecting` 也算 live 提前持有长时任务，使 P1 有机会应答。→ O-SEAM-02、O-SEAM-10、O-SEAM-11。单点：O-BGTASK-13、O-SESSION-07。**注意**：端到端真机复现尚未重跑（`docs/background-vpn-reliability.md`）。
-- **后台掉线自动恢复**（O-CONN-04）：`VpnReconnectSupervisor` 仅在 `connected→disconnected` 且已后台 ≥10 s 且未 `noteRequestedStop` 时交 `VpnSessionController.connect`；最多 3 次，退避 30/60/120 s，稳定 60 s 才清零。**责任空洞**：P1 若已被冻结（无长时任务），恢复不可靠——没有任何子系统承诺（架构 §五 第 3 条空洞）。→ O-SEAM-11（恢复责任）、O-SEAM-03（状态判读）。审查人裁决 Q16a（2026-10-12）把本条的接缝集收敛为这两条（原记 O-SEAM-01/02）。
+- **后台掉线自动恢复**（O-CONN-04、O-CONN-08、O-CONN-09，本批修订）：`VpnReconnectSupervisor` 读取意图文件。意图为 `connected` 时，以下任一条件触发恢复：`connected→disconnected`；`connected→unknown` 且心跳龄超过 30 s；扩展进程 `onDestroy` 的账本记录不是 `user_stop`。恢复调用 `VpnSessionController.connect`，退避 30/60/120/300 s，不设次数上限。意图为 `stopped` 时不触发。网络离线时不消耗退避：等 `netAvailable` 回调，网络恢复后立即重试。已知剩余空洞：P1 被冻结且无长时任务时，恢复要等 P1 解冻；本批通过「意图为 connected 时保留任务」缩小该窗口。→ O-SEAM-11（恢复责任）、O-SEAM-03（状态判读）、O-SEAM-19（结束原因）。审查人裁决 Q16a（2026-10-12）把接缝集收敛为 O-SEAM-11 与 O-SEAM-03。
+- **扩展进程先退出**（O-CONN-08）：P2 写 `vpn_session_end(extension_destroyed)`。P1 的下一次采样发现心跳停止（>15 s）或是账本记录，写 `vpn_session_end_observed`，然后走上面的恢复流程。P2 崩溃时没有 `end` 记录，P1 以心跳停止加无结束记录判 `extension_crash`。
+- **网络离线后恢复**（O-CONN-09、O-NET-04）：P1 在写恢复计划前检查 `connection.getDefaultNet()`。`netId=0` 时只写 `vpn_session_recovery_deferred`，不计尝试次数。P1 注册 `netAvailable` 回调，网络恢复后立即发起一次恢复。
 - **停止请求无人应答**（O-CONN-02）：P1 超时（50 ms × 150）后仍调 `stopVpnExtension`，视为无害。→ O-SEAM-01。
 - **报告生成中途失败**：不分享半成品 zip 并删除残留（O-DIAG-01）。→ O-SEAM-15。
 - **网络重绑失败**：P2 有界 5 s 重试，不要求用户重连（O-NET-03）。→ O-SEAM-12。
@@ -321,7 +342,7 @@ HLD 模块沿用架构 §2.2 的子系统编号（S1…S9），只补一层「�
 
 ---
 
-## 五、装配与验证边界
+## 五、装配与测试边界
 
 ### 5.1 真实生产装配入口
 

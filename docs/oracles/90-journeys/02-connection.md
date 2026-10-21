@@ -1,4 +1,4 @@
-# MeshArc 旅程判据 · 连接与存活（O-CONN-01 … O-CONN-07）
+# MeshArc 旅程判据 · 连接与存活（O-CONN-01 … O-CONN-09）
 
 ### O-CONN-01 从首页一键连接并进入可用隧道
 - 层级：旅程
@@ -51,21 +51,55 @@
 - 归属：owner=项目维护者 接收批次=a01-E2E
 - 复核：待复核
 
-### O-CONN-04 后台掉线自动恢复（非用户主动）
+### O-CONN-04 掉线自动恢复（意图为连接时）
 - 层级：旅程
 - 父判据：无（旅程层没有父判据）
 - 强度：强
-- 设计依据：需求 R-CONN-05「非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数」、R-CONN-06「用户的主动断开不得被自动恢复撤销」
-- 触发与前置条件：隧道曾在 connected 后掉到 disconnected，且应用已切到后台满 10 s，且不是经本应用受控入口请求的断开
-- 可观测点：诊断事件 vpn_reconnect_attempt、vpn_reconnect_started、vpn_reconnect_not_started、vpn_reconnect_failed、vpn_reconnect_succeeded、vpn_reconnect_exhausted、vpn_drop_ignored_foreground、vpn_drop_after_requested_stop；vpn-probe-status.txt 是否回到 state=Running | tun=true
-- 期望：正常：VpnReconnectSupervisor 只在 connected 掉到 disconnected 时触发（不从未知态触发），后台满 10 s（BACKGROUND_SETTLE_MS）才认定为非主动掉线，调 VpnSessionController.connect 重连；最多 3 次（MAX_ATTEMPTS），退避 30 s→60 s→120 s（RETRY_BASE_MS 指数退避、上限 300 s），连接稳定满 60 s（STABLE_MS）才清零尝试计数。边界：回到前台即清空尝试计数与重试梯（onForeground）；连接只维持片刻又掉的 flapping 情形因 60 s 稳定门限不会每轮清零而无限重试。失败与恢复：用户主动断开（卡片 call 触发 noteRequestedStop）后的掉线记 vpn_drop_after_requested_stop 且不重连；前台附近的掉线记 vpn_drop_ignored_foreground 且不重连；达到 3 次后记 vpn_reconnect_exhausted 停止自动恢复。安全与质量：用户的主动断开绝不能被自动恢复撤销。
-- 失败信息：期望「非主动掉线在后台自动恢复、主动断开不被撤销」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」
-- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets:107 handleDrop；entry/src/main/ets/services/VpnReconnectSupervisor.ets:91；entry/src/main/ets/services/VpnReconnectSupervisor.ets:62 noteRequestedStop；entry/src/main/ets/entryability/EntryAbility.ets:202 performCardToggle；entry/src/main/ets/entryability/EntryAbility.ets:251
-- 上游：R-CONN-05、R-CONN-06
+- 设计依据：需求 R-CONN-05「非用户主动的掉线自动恢复：指数退避，退避上限 300 s；稳定 60 s 后清零计数。恢复不设次数上限」（2026-10-20 修订）、R-CONN-06「用户的主动断开不得被自动恢复撤销」、R-CONN-13「断连后自动恢复不设次数上限」
+- 触发与前置条件：意图文件 `vpn-intent.json` 为 `connected`，隧道从 connected 掉到 disconnected，或从 connected 变为 unknown 且心跳龄超过 30 s
+- 可观测点：诊断事件 `vpn_session_end_observed`、`vpn_session_recovery_attempt`、`vpn_session_recovery_started`、`vpn_session_recovery_failed`、`vpn_session_recovery_deferred`、`vpn_session_recovered`、`vpn_drop_after_requested_stop`、`vpn_intent_missing`；`vpn-probe-status.txt` 是否回到 `state=Running | tun=true` 并带新的 `sessionId`
+- 期望：正常：意图为 connected 时，`VpnReconnectSupervisor` 在 connected 掉到 disconnected、或 connected 变为 unknown 且心跳龄超过 30 s 时触发 `VpnSessionController.connect`。退避 30/60/120/300 s 封顶，不设次数上限。连接稳定满 60 s 后清零计数并记 `vpn_session_recovered`。边界：前台可见时同样恢复，不再等待后台静置 10 s；网络离线时不消耗尝试次数，等 `netAvailable` 回调后立即恢复；回到前台清零退避。失败与恢复：用户主动断开（意图为 stopped）后的掉线记 `vpn_drop_after_requested_stop` 且不重连；恢复返回 `NEEDS_UI` 时记 `vpn_session_recovery_needs_ui` 并停在 NEEDS_UI，不反复重试。安全与质量：用户的主动断开绝不能被自动恢复撤销。
+- 失败信息：期望「意图为连接时掉线一直恢复直到成功或用户停止」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/entryability/EntryAbility.ets
+- 上游：R-CONN-05、R-CONN-06、R-CONN-13
 - 待建测试：[E2E] scripts/e2e/background-reconnect.mjs::后台非主动掉线自动恢复且不撤销主动断开
 - 状态：pending-test
 - 不确定特征：none
-- 归属：owner=项目维护者 接收批次=a01-E2E
+- 归属：owner=项目维护者 接收批次=vpn-endurance
+- 复核：待复核
+
+### O-CONN-08 非用户断连的留证与恢复
+- 层级：旅程
+- 父判据：无（旅程层没有父判据）
+- 强度：强
+- 设计依据：需求 R-CONN-11「用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护」、R-CONN-12「非用户原因的断连都要落盘留证」；架构 §2.6；HLD C-11、C-19
+- 触发与前置条件：已连接会话发生非用户原因的结束——扩展 `onDestroy`、后端交接超时、进程被回收、系统策略停止。意图文件仍为 `connected`
+- 可观测点：会话账本（按写者分文件）中的 `vpn_session_end` 与 `vpn_session_end_observed`（含 `reason`、`sessionId`）；诊断事件 `background_user_cancelled_kept_vpn`、`background_protection_restored`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态
+- 期望：正常：先退出的进程写一条带受控原因词的结束记录；后感知的进程按 `sessionId` 补写观测记录。原因不是 `user_stop` 且意图为 connected 时进入恢复，不设次数上限。边界：扩展被硬杀时没有结束记录，存活的 P1 以「心跳停止超过 15 s 且账本无结束记录」判 `extension_crash` 并补写。长时任务被用户取消后，后台不重抢；回到前台且意图仍为 connected 时重新申请。失败与恢复：账本写入失败不阻止退出；恢复失败按 R-CONN-05 的退避继续。安全与质量：账本不含地址、账号、令牌；原因无法判定时写 `unknown` 并写明缺哪条证据，不猜。
+- 失败信息：期望「每次非用户断连都有原因记录且随后恢复」，实际「断连原因不明、没有记录，或断连后一直等到用户打开应用」
+- 来源：entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets
+- 上游：R-CONN-11、R-CONN-12
+- 待建测试：[E2E] scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录
+- 状态：pending-test
+- 不确定特征：UNCERTAIN-PLATFORM P1 被冻结期间发生的结束，记录时间等于解冻后的补写时间，不等于发生时刻
+- 归属：owner=项目维护者 接收批次=vpn-endurance
+- 复核：待复核
+
+### O-CONN-09 网络恢复后自动恢复连接
+- 层级：旅程
+- 父判据：无（旅程层没有父判据）
+- 强度：强
+- 设计依据：需求 R-NET-05「网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔」、R-CONN-13；架构 §2.6；HLD C-11、C-12
+- 触发与前置条件：意图为 `connected`，隧道不可用，默认网络 `netId=0`（离线）。之后系统报告默认网络可用
+- 可观测点：`connection.getDefaultNet()` 的 `netId`；诊断事件 `vpn_session_recovery_deferred`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态
+- 期望：正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按采样写重复记录，也不消耗恢复次数。收到 `netAvailable` 后立即发起一次恢复，不等退避到期。恢复成功后连接稳定 60 s 记 `vpn_session_recovered`。边界：网络在恢复在途时再次变化，恢复被新的网络事件重新驱动；旧网络的恢复结果不得覆盖新网络。失败与恢复：恢复失败按退避继续；网络再次离线时回到等待。安全与质量：只读默认网络的 `netId`，不读取或记录地址、DNS、接口名。
+- 失败信息：期望「离线等待、网络恢复后立即恢复」，实际「离线期间反复重试耗尽退避，或网络恢复后仍不重连」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets
+- 上游：R-NET-05、R-CONN-13
+- 待接线测试：[E2E] scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连（设备未连接，待执行）
+- 状态：pending-test
+- 不确定特征：none
+- 归属：owner=项目维护者 接收批次=vpn-endurance（设备未连接，E2E 待执行）
 - 复核：待复核
 
 ### O-CONN-05 另一个系统 VPN 占用时的冲突处理

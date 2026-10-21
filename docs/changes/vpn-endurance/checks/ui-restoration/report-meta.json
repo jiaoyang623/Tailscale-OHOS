@@ -1,0 +1,47 @@
+{
+  "skill_version": "a01",
+  "report_version": 1,
+  "title": "UI 高度还原核对报告",
+  "change_id": "vpn-endurance",
+  "baseline": "ec64476",
+  "environment": "Pura X / 56T0225330000021 / 3.25 / ArkUI",
+  "command": "ui-restoration-report.py docs/changes/vpn-endurance/checks/ui-restoration.json --output docs/changes/vpn-endurance/checks/ui-restoration",
+  "executed_at": "2026-10-20T22:10:47+11:00",
+  "target": "mobile",
+  "generated_at": "2026-10-20T22:10:47+11:00",
+  "case_count": 1,
+  "passed": 0,
+  "failed": 0,
+  "skipped": 0,
+  "blocked": 0,
+  "step_count": 0,
+  "steps_passed": 0,
+  "steps_failed": 0,
+  "steps_skipped": 0,
+  "steps_blocked": 0,
+  "screenshots": 0,
+  "outputs": 1,
+  "evidence": [
+    {
+      "case_id": "vpn-endurance",
+      "step_id": "evidence",
+      "type": "json",
+      "label": "证据包",
+      "file": "ui-restoration.json",
+      "size": 1412,
+      "sha256": "2b19ab273f80080bdd6b6d3878bb1af3a2977de4f87db3de4c4bb1eb60814a68"
+    }
+  ],
+  "ui_restoration": {
+    "mode": "not-applicable",
+    "verdict": "not-applicable",
+    "reason": "本批次只改运行行为：恢复状态机、意图文件、会话账本、长时任务守护与省电档位的定时器节拍。没有改布局、颜色、字体、图标、控件结构或页面跳转。界面可见的变化只有刷新时机变慢，截图像素比对不能检出节拍变化。项目声明也没有配置 UI 还原适配器与设计稿来源。",
+    "blocking_findings": 0,
+    "coverage": 0.0,
+    "coverage_floor": 0.0,
+    "identity_unmapped": 0,
+    "identity_ambiguous": 0,
+    "calibrated": false,
+    "calibration_samples": 0
+  }
+}

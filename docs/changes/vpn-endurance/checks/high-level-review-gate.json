@@ -1,0 +1,13 @@
+{
+  "schema": "a01.high-level-review-gate/1",
+  "state": "blocking",
+  "reason": "存在 1 条未处置的强漏项。",
+  "counts": {
+    "items": 49,
+    "strong_open": 1,
+    "weak_open": 30,
+    "accepted": 0,
+    "coverage_dimensions": 8,
+    "coverage_floor": 8
+  }
+}

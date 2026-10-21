@@ -1,0 +1,13 @@
+# Debug 构建记录
+
+- 命令：sudo -n -u w2h bash .build/compile.sh
+- 时间：2026-10-20T22:45:44+1100
+- 基线：ec64476（工作树有本批次未提交改动）
+- 结果：BUILD SUCCESSFUL
+- 产物：entry/build/default/outputs/default/entry-default-signed.hap（35928034 字节）
+
+```text
+> hvigor BUILD SUCCESSFUL in 7 s 48 ms
+-rw-rw-r-- 1 w2h users 35928034 Oct 20 22:45 entry-default-signed.hap
+exit=0
+```

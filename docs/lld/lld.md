@@ -11,7 +11,7 @@
 
 ---
 
-## 一、上层 HLD 与现状盘点
+## 一、上层 HLD 与实现盘点
 
 ### 1.1 盘点口径
 
@@ -41,6 +41,8 @@
 | M-2 | 状态词表增补 `connecting`。**Q10 决策已解决**：`VpnLinkState` 增 `CONNECTING`，`judge` 增 connecting 分支（见 §八 D-2） | 卡片与读取器曾经各用一套词表 | O-BGTASK-13、O-BGTASK-14、O-STATUS-*（卡片一致性） |
 | M-3 | `VpnLinkState` 判定顺序与 `readStatus` 判定顺序对齐。**Q13 决策已解决**：`readStatus` 调 `judge`，两处只有一份顺序（见 §三 表 4 与 §八 D-3） | 同一行在两侧曾可解析出相反结果 | O-STATUS-02、O-STATUS-04、O-STATUS-07 |
 | M-4 | 四台状态机的转换表落成可执行断言的表驱动用例（见 §六） | 现在只有行为用例，没有转换覆盖 | 全部 |
+| M-5 | 新增 VM-5（会话意图与恢复）与 VM-6（省电档位），见 §3.5、§3.6 | 用户要求「未停止不得停止」与「省电」 | O-RECONN-05/02、O-BGTASK-02/06/15、O-SESSION-09…13、O-POWER-01…04 |
+| M-6 | 账本原因词表与 `sessionId` 进入状态文件，见 §3.5 与 HLD C-19 | 用户要求「非用户原因的断连都要记录」 | O-SESSION-10…12、O-DIAG-02 |
 
 **M-1…M-3 已由 Q9、Q10、Q13 决策落地**（代码与判据均已改动）。**M-4 仍未实施**：转换表尚未落成表驱动用例。两条记录都保留在此，作为「曾出过什么错、后来怎么改」的凭证。
 
@@ -125,7 +127,7 @@
 
 **这是全仓唯一的「同一份读取被三处消费」点**：卡片（P3）、应用外壳、恢复监督者。Q10 与 Q13 决策把一致性从「头注里的声明」变成代码事实：`VpnBackgroundTaskManager.readStatus` 调 `readText`，两处不再各判一遍。§八 D-2 与 D-3 记录旧的不一致及解决方式。
 
-### 2.5 责任分配总表（SWEBOK「责任分配」）
+### 2.5 责任映射总表（SWEBOK「责任分配」）
 
 | 问题 | 归谁 | 不归谁 | 证据 |
 | --- | --- | --- | --- |
@@ -140,7 +142,8 @@
 
 ## 三、状态转换与行为
 
-四台状态机。每台给出：状态集、事件集、转换表（含守卫）、输出、**非法组合**。行号已逐个复核。
+五台状态机。每台给出：状态集、事件集、转换表（含守卫）、输出、**非法组合**。行号已逐个复核。
+第五台 VM-5 由本批（2026-10-20，`vpn-endurance`）新增。
 
 ### 3.1 VM-1 · 保活任务生命周期（`services/VpnBackgroundTaskManager.ets`）
 
@@ -161,13 +164,13 @@
 
 | # | 当前 | 事件 | 守卫 | 下一 | 输出 | 代码 |
 | --- | --- | --- | --- | --- | --- | --- |
-| T1 | 任意 | E1，`state==='disconnected'` | — | IDLE | 清 `suppressed`/`nextStartAt`/`retryCount`/`lastLiveAtMs`，`stop` 一次 | :163-169 |
-| T2 | 任意 | E1，`connecting\|connected` 且 `task===undefined` | `!suppressed && now>=nextStartAtMs` | HELD_DATA（或 HELD_SPECIAL 若 :219 命中） | `startBackgroundRunning(['dataTransfer'])`；`background_started` | :171, :182-183, :224-236 |
-| T3 | 已持有 | E1，`live` | `generation` 与 `monitoring` 未变 | 不变 | 30 s 节流后 `publish` LIVE_VIEW | :185-187, :316-319 |
-| T4 | 已持有 | E1，`!live` | `now - lastLiveAtMs > 60000` | IDLE | `stop`；`background_status_timeout` | :172-178 |
-| T5 | 已持有 | E1，`!live` | `now - lastLiveAtMs <= 60000` | 不变 | 无（**保留**） | :172-179 |
+| T1 | 任意 | E1，意图为 `stopped` | — | IDLE | 清 `suppressed`/`nextStartAt`/`retryCount`/`lastLiveAtMs`，`stop` 一次 | :190-197 |
+| T2 | 任意 | E1，`connecting\|connected` 且 `task===undefined` | `!suppressed && now>=nextStartAtMs` | HELD_DATA（或 HELD_SPECIAL 若 :219 命中） | `startBackgroundRunning(['dataTransfer'])`；`background_started` | :200-206, :241-266 |
+| T3 | 已持有 | E1，`live` | `generation` 与 `monitoring` 未变 | 不变 | 30 s 节流后 `publish` LIVE_VIEW | :207-209, :316-319 |
+| T4 | 已持有 | E1，`!live` 且意图仍为 `connected` | — | 不变 | 保留任务；超过 60 s 记一次 `background_status_timeout` | :212-219 |
+| T5 | 已持有 | E1，`!live` | `now - lastLiveAtMs <= 60000` | 不变 | 无（**保留**） | :212-219 |
 | T6 | 任意 | E4 系统取消 | `info.id === task.continuousTaskId`（或 task 无 id） | BACKOFF | `scheduleRetry`；`background_system_cancelled` | :59-62, :70-72 |
-| T7 | 任意 | E5 用户取消 | 同上 | SUPPRESSED | **不**重试；`background_user_cancelled` | :66-69, :73 |
+| T7 | 任意 | E5 用户取消 | 同上 | SUPPRESSED | **不**重试；`background_user_cancelled_kept_vpn` | :66-69, :73 |
 | T8 | HELD_* | E8 销毁 | — | IDLE | `stop`；`background_stopped` | :111-136, :193-195 |
 | T9 | BACKOFF | E2 前台 | — | IDLE | `nextStartAtMs=0`，`retryCount=0`，立刻 reconcile | :146-148 |
 | T10 | BACKOFF | E6 启动失败 | — | BACKOFF（基数×2^min(n,4)，封顶 300 000） | `background_operation_failed` | :188-190, :392-396 |
@@ -188,7 +191,7 @@
 | I1 | 同一时刻存在两个 `dataTransfer` 任务 | `operationInFlight`（:152）与 `stopping`（:49, :296）串行化；`stop` 在途时 `task` 仍非空（:293 有值才停），新的 reconcile 只走 T4/T5 分支，不起第二个 | 已守 |
 | I2 | 迟到启动成功复活「已被取消」的任务 | `revision` 快照（:206）比对（:226）→ 丢弃 | 已守（O-BGTASK-10） |
 | I3 | 迟到启动成功复活「已销毁」的任务 | `generation`（:156/:214/:230）→ `stop` 善后 | 已守（O-BGTASK-10） |
-| I4 | 用户取消后自行恢复 | `suppressedUntilDisconnect` 只在读到 **disconnected** 时清（:164），前台不清 | 已守（O-BGTASK-06） |
+| I4 | 用户取消后在后台自行恢复 | 前台取消时 `foreground` 为 true，不置抑制并在下一拍重抢；后台取消置 `suppressedUntilForeground`，只在回到前台时清 | 已守（O-BGTASK-06） |
 | I5 | 凭陈旧/未来/缺失心跳新建任务 | `VpnStatusReader.judge:83` 三条守卫 → `unknown` → 不 live（:172） | 已守（O-BGTASK-03） |
 | I6 | 停滞的连接窗口永久占住任务 | `lastLiveAtMs` 只在 live 时推进（:181）；停滞 60 s 后 T4 | 已守（O-BGTASK-15） |
 | I7 | 非本任务的取消事件误伤本任务 | `info.id !== task.continuousTaskId` → return（:59-62） | 已守（O-BGTASK-08） |
@@ -242,55 +245,11 @@
 | J5 | `begin(CONNECT)` 在已连接时启动新一轮 | **无守卫**。本机不看状态文件，「已连上」由调用方在 `BridgeStatus.beginVpnConnection` 侧早退；命令状态机本身允许 `starting` | 未守（分层责任：幂等由 O-SESSION-01/早退守） |
 | J6 | `stopping` 与 `starting` 交错（先断后连） | 由 `BridgeStatus` 的 `disconnectInProgress`/`connectInProgress` 与 U4 共同隔离；机器本身不区分 | 部分守 |
 
-### 3.3 VM-3 · `VpnReconnectSupervisor`（`services/VpnReconnectSupervisor.ets`）
+### 3.3 VM-3 · `VpnReconnectSupervisor`（已被 §3.5 VM-5 取代）
 
-**状态集**（同样是「标志 + 边沿」而非 enum）
+本节记录 2026-10-20 之前的状态机。它有两个与需求冲突的守卫：后台静置 10 s 内的掉线不恢复，以及 3 次尝试后放弃。需求 R-CONN-11 与 R-CONN-13 要求用户未停止时一直恢复，因此本批用 §3.5 的 VM-5 整体替换本节的 `BACKGROUND_SETTLE_MS`、`MAX_ATTEMPTS` 与 `vpn_drop_ignored_foreground`。
 
-| 状态 | 定义 |
-| --- | --- |
-| `WATCHING` 观察中 | `lastState !== DISCONNECTED` 或尚未见过掉线边沿 |
-| `OFFLINE_PENDING` 已掉线待恢复 | 刚由 `CONNECTED → DISCONNECTED` 边沿进入，正判是否重连 |
-| `BACKOFF` 退避中 | `attempts >= 1 && now < nextAttemptAtMs` |
-| `EXHAUSTED` 已耗尽 | `attempts >= 3` |
-| `USER_STOPPED` 已被用户请求停止 | `stopRequested === true` |
-| 正交标志 | `inForeground`、`backgroundSinceMs`、`connectedSinceMs`、`polling`（重入互斥） |
-
-**事件集**：`poll` 的一次采样（`connected` / `disconnected` / `needs_login` / `unknown`）；`onForeground`；`onBackground`；`noteRequestedStop`；`noteRequestedStart`；`STABLE_MS` 到期。
-
-**转换表**
-
-| # | 当前 | 事件 | 守卫 | 下一 | 输出 | 代码 |
-| --- | --- | --- | --- | --- | --- | --- |
-| R1 | WATCHING | 采样 connected，上一态非 connected | — | WATCHING（记 `connectedSinceMs`） | 无 | :88-90 |
-| R2 | WATCHING | 采样 connected，`attempts > 0` | `now - connectedSinceMs >= 60000` | WATCHING（`attempts=0`，`nextAttemptAt=0`） | `vpn_reconnect_succeeded` | :91-95 |
-| R3 | WATCHING | 采样 connected，`attempts > 0` | 稳定不足 60 s | WATCHING（**不清零**） | 无 | :91 |
-| R4 | WATCHING | 采样 disconnected，上一态 connected | 无 | OFFLINE_PENDING → 立即进 R5…R9 | — | :98-101 |
-| R5 | OFFLINE_PENDING | 同上 | `stopRequested` | USER_STOPPED | `vpn_drop_after_requested_stop` | :108-111 |
-| R6 | OFFLINE_PENDING | 同上 | `inForeground \|\| backgroundSinceMs===0 \|\| now-backgroundSince < 10000` | WATCHING | `vpn_drop_ignored_foreground` | :112-118 |
-| R7 | OFFLINE_PENDING | 同上 | `attempts >= 3` | EXHAUSTED | `vpn_reconnect_exhausted` | :119-122 |
-| R8 | OFFLINE_PENDING | 同上 | `now < nextAttemptAtMs` | BACKOFF | **无输出**（静默） | :123-125 |
-| R9 | OFFLINE_PENDING | 同上 | 四道守卫全过 | BACKOFF | `attempts++`；`nextAttemptAt = now + min(300000, 30000·2^(attempts-1))`；`vpn_reconnect_attempt`；`controller.connect` 不 await → `vpn_reconnect_started`/`_not_started`/`_failed` | :126-134 |
-| R10 | 任意 | 采样 disconnected，上一态**不是** connected | — | 不变 | **无输出** | :98 |
-| R11 | 任意 | 采样 unknown / needs_login | `state !== DISCONNECTED` | 不变 | **无输出** | :98 |
-| R12 | 任意 | `onForeground()` | — | WATCHING（`attempts=0`，`nextAttemptAt=0`） | 无 | :47-54 |
-| R13 | 任意 | `onBackground(now)` | — | 不变 | 记 `backgroundSinceMs` | :56-59 |
-| R14 | USER_STOPPED | `noteRequestedStart()` | — | WATCHING | 清 `stopRequested`/`attempts`/`nextAttemptAt` | :69-73 |
-| R15 | 任意 | `poll` 重入 | `polling === true` | 不变 | 立即返回 | :79-81 |
-
-**非法组合**
-
-| # | 非法组合 | 行为 | 判定 |
-| --- | --- | --- | --- |
-| K1 | 两次连续 `disconnected` 各触发一次重连 | 边沿触发（:98 `previous !== CONNECTED` 即返回） | 已守（O-RECONN-01 边界） |
-| K2 | `unknown` 被当成掉线 | R11 无输出；**连诊断事件都不记** | 已守（O-RECONN-07） |
-| K3 | 用户已按断开后又把隧道拉回来 | R5 优先于「后台够久」 | 已守（O-RECONN-03） |
-| K4 | 刚进后台/在前台的掉线被恢复 | R6 的 10 s 静置 | 已守（O-RECONN-02） |
-| K5 | 网络抖动变成每秒重连 | R8 的退避窗口 | 已守（O-RECONN-06） |
-| K6 | 抖动隧道无限重连 | R2 要求连续 60 s 才清零 | 已守，**但无用例**（§八 G-3） |
-| K7 | 无限重试 | R7 上限 3 | 已守 |
-| K8 | **重连在途时用户按下断开，连接不被中止** | `controller.connect(filesDir)` 是 **fire-and-forget**（:129），无取消句柄；`noteRequestedStop` 只防**将来**的恢复（R5），不能撤销**已经发出**的那一次 | **未守（登记）**。窗口 = 一次 `connect` 的历时（含 `ensureBackendReady` 250 ms×40 ≈ 10 s + `requestConnectConfig` 500 ms×20 ≈ 10 s，`VpnSessionController.ets:22-25`），最坏 ~20 s |
-| K9 | 前台 `onForeground` 与在途 `poll` 交错 | R15 使 poll 不重入；`handleDrop` 在调用时读 `this.inForeground`（:112）故即时生效 | 已守 |
-| K10 | 恢复成功但状态停在 `needs_login` | R11 无输出；`connect` 返回的 `NEEDS_UI` 由 O-RECONN 未覆盖 | 未守（无判据；见 §八 G-3 邻域） |
+实现后的入口仍是 `poll` / `onForeground` / `onBackground` / `noteRequestedStop` / `noteRequestedStart`，另加 `onNetworkAvailable`。转换表、守卫与非法组合以 §3.5 为准。旧行 `vpn_reconnect_*` 事件名已改名为 `vpn_session_recovery_*`；`vpn_reconnect_exhausted` 不再存在。
 
 ### 3.4 VM-4 · `VpnStatusReader` 判定优先级（`services/VpnStatusReader.ets`）
 
@@ -323,7 +282,87 @@
 | L7 | **`connecting` 被卡片看见** | **可达（Q10 决策）**：`VpnLinkState` 增 `CONNECTING`，`judge` 报 connecting，卡片照此渲染 | 已闭环（O-STATUS-09；§八 D-2） |
 | L8 | 同一行同时含 `state=Running\|tun=true` 与终态标记 | P1 先于 P2，两处都报 `disconnected` | 已守（O-STATUS-04；Q13 决策） |
 
-### 3.5 四台机器的非法组合汇总（跨机器）
+### 3.5 VM-5 · 会话意图与恢复（`services/VpnSessionIntent.ets`、`services/SessionLedger.ets`、`services/VpnReconnectSupervisor.ets`，本批新增）
+
+设计依据：需求 R-CONN-11…13、R-NET-05；架构 §2.6；HLD C-11、C-19。实现增量见
+`docs/changes/vpn-endurance/design.md` §2.1–2.4。
+
+**状态集**
+
+| 状态 | 定义 |
+| --- | --- |
+| `STOPPED` | 意图文件 `desired=stopped`，或文件缺失或损坏 |
+| `CONNECTED` | 意图 `desired=connected` 且最近一次判读为 connected |
+| `RECOVERING` | 意图 `desired=connected` 且最近一次判读不是 connected，恢复已发起 |
+| `DEFERRED` | 意图 `desired=connected`、恢复未发起、默认网络 `netId=0` |
+| `BACKOFF` | 意图 `desired=connected`，上次恢复失败，未到下次尝试时刻 |
+| `NEEDS_UI` | 恢复返回 `NEEDS_UI`。意图保持，等待用户 |
+
+**事件集**：`poll` 采样（connected / disconnected / unknown / needs_login）；意图文件变化；
+`netAvailable` 回调；`netLost` 回调；`onForeground`；用户停止；用户连接；退避到期；稳定 60 s 到期。
+
+**转换表**
+
+| # | 当前 | 事件 | 守卫 | 下一 | 输出 |
+| --- | --- | --- | --- | --- | --- |
+| V1 | 任意 | 用户连接 | — | CONNECTED | 写意图 `connected`（`by=ui\|card`）；清零退避 |
+| V2 | 任意 | 用户停止 | — | STOPPED | 先写账本 `user_stop`，再写意图 `stopped`；作废在途恢复（既有 `attemptId`） |
+| V3 | CONNECTED | 采样 connected | — | CONNECTED | 稳定 60 s 后写 `vpn_session_recovered`（若本轮从恢复而来） |
+| V4 | CONNECTED | 采样 disconnected 或 unknown 且心跳龄 > 30 s | 意图 connected | DEFERRED 或 RECOVERING | 写 `vpn_session_end_observed`；查默认网络；`netId=0` 进 DEFERRED，否则进 RECOVERING |
+| V5 | RECOVERING | `connect` 返回 STARTED | — | CONNECTED（待稳定） | 写 `vpn_session_recovery_attempt`；不重置 60 s 稳定窗口 |
+| V6 | RECOVERING | `connect` 返回 FAILED / CANCELLED | — | BACKOFF 或 STOPPED | CANCELLED 且意图 stopped 进 STOPPED；否则进 BACKOFF，退避 30/60/120/300 s 封顶 |
+| V7 | RECOVERING | `connect` 返回 NEEDS_UI | — | NEEDS_UI | 写 `vpn_session_recovery_needs_ui`；不发通知，界面下一轮读状态自然呈现 |
+| V8 | DEFERRED | `netAvailable` | 意图 connected | RECOVERING | 立即发起恢复，**不消耗次数** |
+| V9 | DEFERRED | 采样 | 默认网络仍为 0 | DEFERRED | 不写诊断。避免离线期间每秒一条 |
+| V10 | BACKOFF | 退避到期 | 意图 connected | RECOVERING 或 DEFERRED | 先查网络再发起 |
+| V11 | BACKOFF | `onForeground` | — | RECOVERING 或 DEFERRED | 清零退避 |
+| V12 | 任意 | P1 被唤醒后读到 P2 的 `end` 记录 | 原因不是 `user_stop` 且意图 connected | RECOVERING 或 DEFERRED | 写 `vpn_session_end_observed(<reason>)` |
+| V13 | 任意 | 意图文件缺失或损坏 | — | STOPPED | 写 `vpn_intent_missing`；不恢复 |
+
+**非法组合**
+
+| # | 非法组合 | 行为 | 判定 |
+| --- | --- | --- | --- |
+| J1 | 用户停止后恢复把隧道拉回 | V2 先落盘意图，V6 的 CANCELLED 与既有授权令牌三处检查 | 已守（复用 O-RECONN-10） |
+| J2 | 一次状态判读改变意图 | 意图只由 V1/V2/V13 写 | 已守（O-SESSION-09） |
+| J3 | 网络离线时每次采样都发起恢复 | V8/V9 只等回调 | 已守（O-RECONN-11） |
+| J4 | 恢复次数耗尽后永久放弃 | 不设上限，退避封顶 300 s | 已守（O-RECONN-05 修订） |
+| J5 | 两个进程重复写同一结束记录 | 账本按 `sessionId + kind` 去重 | 已守（O-SESSION-12） |
+| J6 | 恢复发生在用户正操作界面时 | 意图 connected 即恢复；前台恢复不延迟 | 已守（O-RECONN-02 修订） |
+| J7 | 恢复成功后界面仍显示旧流量 | `trafficSession` 变化触发清零（既有） | 已守（O-SESSION-13） |
+| J8 | 恢复与前台连接同时进行 | 复用 `VpnCommandStateMachine.begin` 的单命令约束；恢复在 `begin` 返回 0 时改为 BACKOFF | 已守（O-SESSION-13） |
+
+### 3.6 VM-6 · 省电档位（`services/VpnPowerPolicy.ets`，本批新增）
+
+**状态集**：`ACTIVE`（前台）、`BACKGROUND`（后台，亮屏或屏幕状态未知）、`SCREEN_OFF`（后台且熄屏）。
+
+**事件集**：`onForeground`、`onBackground`、屏幕状态采样（每 30 s 一次，`power.isActive()`）、
+档位文件缺失、P2 读到新档位。
+
+**转换表**
+
+| # | 当前 | 事件 | 下一 | 输出 |
+| --- | --- | --- | --- | --- |
+| P1 | 任意 | `onForeground` | ACTIVE | 写档位文件；恢复全部 UI 定时器；P2 下一轮读 1 s 节奏 |
+| P2 | ACTIVE | `onBackground` 且 `power.isActive()==true` | BACKGROUND | 写档位文件；停 UI 服务类定时器 |
+| P3 | ACTIVE | `onBackground` 且 `power.isActive()==false` | SCREEN_OFF | 同上，P2 下一轮读 5 s 节奏 |
+| P4 | BACKGROUND | 采样熄屏 | SCREEN_OFF | 写档位文件 |
+| P5 | SCREEN_OFF | 采样亮屏 | BACKGROUND | 写档位文件 |
+| P6 | SCREEN_OFF / BACKGROUND | `onForeground` | ACTIVE | 写档位文件；恢复定时器 |
+| P7 | 任意 | 档位文件缺失（P2 侧） | ACTIVE | 记 `vpn_power_stage_missing`，按 1 s 节奏运行 |
+
+**非法组合**
+
+| # | 非法组合 | 行为 | 判定 |
+| --- | --- | --- | --- |
+| L1 | 熄屏时降频导致心跳龄超过 15 s | 5 s 状态环 × 3 = 15 s 余量；心跳上限仍是 15 s | 已守（O-POWER-02） |
+| L2 | 降频停掉恢复看门狗 | 恢复看门狗不属于 UI 服务类定时器，档位表未包含 | 已守（O-POWER-01） |
+| L3 | 档位文件写失败后一直全速 | P2 保持上一档；P1 下一轮重试 | 已守（O-POWER-04） |
+| L4 | 后台停掉详情页定时器后，回前台不恢复 | 恢复入口与启动入口是同一组函数 | 已守（O-POWER-01） |
+
+
+
+### 3.7 跨机器的非法组合汇总
 
 | 跨机器非法组合 | 现状 |
 | --- | --- |
@@ -331,6 +370,8 @@
 | VM-2 的 `running` 与 VM-3 的 `WATCHING` 不一致 | 无守卫。VM-2 由 UI 命令驱动，VM-3 由状态文件驱动；两者可以同时成立（VM-2=`running` 且 VM-3 已见掉线边沿）。这是设计（两套独立判据），但**没有任何判据断言它们的分歧有界** |
 | VM-3 发起 `connect` 时 VM-2 未参与 | 正常：headless 路径不用 VM-2（§2.2） |
 | VM-1 的 `HELD_*` 与 VM-3 的恢复同时作用 | 可以同时动作：VM-3 只做「请求连接」，VM-1 只做「持有任务」，不冲突 |
+| VM-5 恢复与 VM-6 降档同时作用 | 不冲突：VM-6 只改观测频率，恢复看门狗不降档。VM-5 的「心跳龄 > 30 s」判定使用 `heartbeatMs` 绝对值，与轮询频率无关 |
+| VM-5 说「该恢复」而 VM-6 处于 SCREEN_OFF | 不冲突：恢复只在判定需要时发起。熄屏时 P1 若被冻结，恢复会在解冻后执行；账本记录实际时刻 |
 
 ---
 
@@ -446,6 +487,34 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | 等待文件列表 | `TaildropWaitingFileSummary[]`，身份 `name:size` | §4.4 | 形状过滤 :6985 |
 | Taildrive 请求 | `{requestId, operation, payload}` | 四通道各自串行 | 单请求超时 32 s/35 s/30 min+10 s/5 s |
 
+### 4.7 会话账本追加与去重（`services/SessionLedger.ets`，本批新增）
+
+- **输入**：`{ sessionId, writer, kind, reason, phase, code }`。
+- **输出**：追加一行到写者自己的账本文件，返回是否写入。P1 写 `vpn-session-ledger-ui.ndjson`，P2 写 `vpn-session-ledger-vpn.ndjson`。
+- **不变量**：
+  1. `reason` 必须属于词表 `user_stop`、`extension_destroyed`、`extension_crash`、`handoff_timeout`、`system_stopped`、`network_lost`、`unknown`。词表外的值替换为 `unknown`。
+  2. 同一 `sessionId + kind` 只写一次。去重读取全部账本文件。进程重启后以文件为准。
+  3. 每个写者文件最多 512 行或 64 KB。先到者为准，淘汰最旧。压缩只改自己拥有的文件。
+  4. 读取按 `timestampMs` 升序合并全部写者文件，按 `sessionId + kind` 保留第一条。
+  5. 写入失败不抛异常，不影响调用方。
+- **边界**：
+  - 文件不存在：创建后写入。
+  - 文件最后一行不完整：解析时忽略该行，写入前重新截断到最后一个完整行。
+  - 旧版单文件存在：只读并参与合并，新记录不写入该文件。
+  - 磁盘满：写入失败，记 hilog，不重试。
+- **异常**：全部吞掉并记录。理由与 `DiagnosticEventStore` 相同：诊断不得影响生命周期。
+
+### 4.8 档位判定与定时器重排（`services/VpnPowerPolicy.ets`，本批新增）
+
+- **输入**：前台标志、`power.isActive()`、当前档位。
+- **输出**：`active` / `background` / `screen-off`，以及该档的四个间隔值。
+- **不变量**：档位单调：只有前台事件能进 `active`。屏幕状态只在后台采样。
+- **边界**：
+  - 熄屏后 30 s 内进入 `screen-off`。P2 在下一轮读取时生效，最迟多一个状态环周期。
+  - 亮屏后立即回到 `background`，下一次前台事件回到 `active`。
+  - `power.isActive()` 抛错：保持上一档，记 `vpn_power_probe_failed`。
+- **异常**：档位文件损坏按 `active`。
+
 ---
 
 ## 五、UI 与生命周期
@@ -549,7 +618,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 | O-RECONN-02 | `handleDrop` 前台/静置守卫 :112 | O-SEAM-10 → 同上（C-10） | closed：`…::a drop moments after backgrounding is left alone`；`…::a drop while the app is on screen is left alone` | O-CONN-04 |
 | O-RECONN-03 | `noteRequestedStop` :62 / `handleDrop` 分支 :108 | O-SEAM-10 → 同上（C-10） | closed：`…::a drop after the user asked to disconnect is not undone` | O-CONN-04 / O-CARD-01 |
 | O-RECONN-04 | `noteRequestedStart` :69 | O-SEAM-10 → 同上（C-10） | closed：`…::a deliberate reconnect re-arms recovery` | O-CONN-04 |
-| O-RECONN-05 | `handleDrop` :119 / `MAX_ATTEMPTS` :14 | O-SEAM-10 → 同上（C-10） | closed：`…::recovery gives up instead of retrying forever` | O-CONN-04 |
+| O-RECONN-05 | `poll` :118 / `delayFor` :325 | O-SEAM-10 → 同上（C-10） | closed：`…::recovery never exhausts while the user keeps the intent` | O-CONN-04 |
 | O-RECONN-06 | `handleDrop` 退避判据 :123 / `nextAttemptAtMs` :127 | O-SEAM-10 → 同上（C-10） | closed：`…::retries back off instead of firing on every sample` | O-CONN-04 |
 | O-RECONN-07 | `poll` 边沿判定 :98 | O-SEAM-03、O-SEAM-10（HLD **仅 C-03**） | closed：`…::an unknown state is not treated as a drop` | O-CONN-04；VM-3 R11 |
 | O-RECONN-08 | `onForeground` :47 | O-SEAM-10 → 同上（C-10） | closed：`…::returning to the foreground clears the retry ladder` | O-CONN-04 |
@@ -614,18 +683,54 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 **开口小结**：单点判据层面 3 条开（O-RECONN-09、O-SESSION-07、O-PEER-11）；接缝层面 O-SEAM-10、O-SEAM-13、O-SEAM-16、O-SEAM-17 只有 `pending-test`（O-SEAM-14 与 O-SEAM-15 已由集成用例闭环）；集成层 8 个文件里 3 个已建、5 个仍不存在。
 
+### 6.7 本批新增的判据与计划测试（`vpn-endurance`，2026-10-20）
+
+| 判据 | 计划测试文件 | 计划用例名 | 验证内容 |
+| --- | --- | --- | --- |
+| O-RECONN-02（修订） | `scripts/test-vpn-reconnect-supervisor.mjs` | `a foreground drop is recovered without the ten second settle` | 前台或刚进后台的掉线按意图立即恢复 |
+| O-RECONN-05（修订） | `scripts/test-vpn-reconnect-supervisor.mjs` | `recovery never exhausts while the user keeps the intent` | 5 次失败后第 6 次仍尝试 |
+| O-RECONN-11 | `scripts/test-vpn-reconnect-supervisor.mjs` | `network loss defers recovery until the network returns` | 离线不进 BACKOFF，收到 `netAvailable` 立即恢复一次 |
+| O-RECONN-12 | `scripts/test-vpn-reconnect-supervisor.mjs` | `sustained unknown after a connection is a drop` | connected→unknown 持续 30 s 触发恢复 |
+| O-BGTASK-02（修订） | `scripts/test-vpn-background-task.mjs` | `protection follows intent, not a single uncertain status read` | unknown 不释放 |
+| O-BGTASK-04（修订） | `scripts/test-vpn-background-task.mjs` | `a stopped intent releases protection promptly` | 意图 stopped 立即释放 |
+| O-BGTASK-04（修订） | `scripts/test-vpn-background-task.mjs` | `a disconnect while the intent is connected keeps protection` | 意图 connected 时读到断开不释放 |
+| O-BGTASK-06（修订） | `scripts/test-vpn-background-task.mjs` | `user dismissed notification keeps the vpn and re-arms on foreground` | 用户取消后不释放连接，回前台重抢 |
+| O-BGTASK-10（修订） | `scripts/test-vpn-background-task.mjs` | `a stopped intent during start cleans up the late task without publishing` | 启动在途时意图停止，迟到结果被清理 |
+| O-BGTASK-15（修订） | `scripts/test-vpn-background-task.mjs` | `a stalled connect window keeps protection while the intent stands` | 停滞窗口不释放 |
+| O-SESSION-09 | `scripts/test-vpn-session-intent.mjs` | `intent is the only writer that changes the desired state` | 意图文件读写与默认值 |
+| O-SESSION-10 | `scripts/test-session-ledger.mjs` | `every non-user end is recorded with a controlled reason` | 原因词表与记录 |
+| O-SESSION-11 | `scripts/test-session-ledger.mjs` | `the ledger survives probe noise and bounds itself` | 512 条 / 64 KB 上限 |
+| O-SESSION-12 | `scripts/test-session-ledger.mjs` | `duplicate end records are written once` | `sessionId + kind` 去重 |
+| O-SESSION-13 | `scripts/test-vpn-session-controller.mjs` | `a recovered session refreshes the snapshot and clears stale traffic` | 恢复后刷新 |
+| O-DIAG-02 | `scripts/test-session-ledger.mjs` | `the ledger never stores addresses or identity fields` | 脱敏 |
+| O-DIAG-02 | `scripts/e2e/endurance-recovery.mjs` | `扩展被杀后自动恢复并留下原因记录` | 设备留证 |
+| O-NET-04 | `scripts/e2e/network-recovery.mjs` | `断网后恢复网络自动重连` | 网络恢复 |
+| O-SEAM-19 | `scripts/integration/session-ledger-seam.mjs` | `two writers append to one ledger and neither rewrite drops the other record` | 双向追加、去重与写者文件隔离 |
+| O-POWER-01 | `scripts/test-vpn-power-policy.mjs` | `background stops UI probes but keeps the recovery watchdog` | 档位表 |
+| O-POWER-02 | `scripts/test-vpn-power-policy.mjs` | `screen off slows the extension cadence without breaking freshness` | 间隔与 15 s 新鲜度 |
+| O-POWER-03 | `scripts/test-vpn-power-policy.mjs` | `a missing or corrupt stage file falls back to active` | 缺失与损坏 |
+| O-POWER-04 | `scripts/test-vpn-power-policy.mjs` | `stage changes are observable` | 档位事件 |
+
+**执行状态（2026-10-20）**：上表的宿主侧用例已全部建立并通过。`node --test scripts/test-*.mjs scripts/integration/*.mjs`
+共 172 条，172 条通过。设备侧 E2E 文件已建立并接入 `scripts/e2e/run-batch.sh`。
+安装重启恢复与 720 秒锁屏存活已在设备上通过。另两条 E2E 因主机通道不足跳过（不能只结束扩展进程；
+Wi-Fi 关闭后仍有其它数据通道）。O-DIAG-02、O-CONN-09、O-NET-04 保持 `pending-test`
+与 owner，不记通过。
+
 ---
 
 ## 七、旅程复核
 
-方法：把 §三 的四张转换表与 §六 的 70 条单点按旅程重新组合，检查**接缝与单点组合后是否仍满足完整旅程**。逐条给「结论 + 依据 + 残留风险」。
+方法：把 §三 的状态机转换表与 §六 的单点按旅程重新组合，检查**接缝与单点组合后是否仍满足完整旅程**。逐条给「结论 + 依据 + 残留风险」。
 
 | 旅程判据 | 涉及的接缝 | 涉及的单点 | 复核结论 | 残留风险 |
 | --- | --- | --- | --- | --- |
 | **O-CONN-01** 一键连接 | O-SEAM-01/02/03/05/11 | O-BGTASK-13 | **成立（宿主侧）**。VM-1 T2 在连接窗口内取得任务（`judge:96-98` → `isLiveState:201` → `:182`），使交接能被应答 | 真机 15 s 窗口未重跑（HLD §3.3）；`Q-01`（两进程引擎实例）未验证 |
 | **O-CONN-02** 一键断开 | O-SEAM-01 | 无专属单点 | **成立**。VM-1 T1 读到 disconnected 即释放；停止应答 7.5 s 超时后仍调 `stopVpnExtension` | 无（超时被显式定为无害） |
 | **O-CONN-03** 连接窗口保活 | O-SEAM-03/11 | O-BGTASK-13/14/15 | **成立**。VM-1 把 connecting 与 connected 等重（:171），且有界（T4） | **VM-3 K8**：重连在途用户按断开不可中止（本旅程邻域） |
-| **O-CONN-04** 后台掉线自动恢复 | O-SEAM-10/11/03（**归属分歧** §八 A-1） | O-RECONN-01…09 | **部分成立**。VM-3 的意图判读（R5/R6/R7/R8）完整；**但 K8 与 O-RECONN-09 的缺口**使「稳定 60 s 才清零」这条防线没有证据 | **责任空洞**（HLD Q-09）：P1 被冻结时无人恢复，本层转换表无法覆盖 |
+| **O-CONN-04** 后台掉线自动恢复 | O-SEAM-10/11/03（**归属分歧** §八 A-1） | O-RECONN-01…12 | **成立（本批修订后）**。VM-5 的意图判读与 VM-3 的边沿、退避组合后，覆盖持续 unknown、离线等待、不设上限三种情形；K8 仍由既有取消令牌与 O-RECONN-10 守住 | **责任空洞**（HLD Q-09）：P1 被冻结时恢复延迟到解冻；不再永久放弃 |
+| **O-CONN-08** 非用户断连留证与恢复 | O-SEAM-11/03/19 | O-SESSION-09…13、O-BGTASK-02/04/06/10/15（修订）、O-DIAG-02 | **成立（宿主侧）**。意图文件、账本、恢复状态机三者的转换表互相衔接 | P1 冻结期间的结束记录要靠解冻后补写，时间戳不等于发生时刻 |
+| **O-CONN-09** 网络恢复后自动恢复 | O-SEAM-11/12 | O-RECONN-11、O-NET-04 | **成立（宿主侧）**。离线不消耗退避，`netAvailable` 立即触发 | 真机 Wi-Fi 断开重连未重跑 |
 | **O-CONN-05** 其它 VPN 冲突 | O-SEAM-16（不可达）/ O-SEAM-10 | 无 | **成立（走的是替代路径）**。实际是 `showVpnConflictDialog`；批准通道不可达 | 批准 TTL 10 s 与写方缺失（Q-03/Q-06） |
 | **O-CONN-06** 后台长时存活 | O-SEAM-03/11 | O-BGTASK-01…15、O-STATUS-01…09 | **成立**。VM-1 全表 + VM-4 P0–P5 全序都有用例 | 蜂窝 720 s（M-11）未完成；D-1/D-2 已由 Q9/Q10 决策解决 |
 | **O-CONN-07** 无 UI 连接 | O-SEAM-10/01/02/17 | O-SESSION-01…07 | **部分成立**。VM-2 不参与（§2.2），headless 用 `VpnActionResult`；交接半环有 6 条用例；**O-SESSION-07 未闭环**——R 侧 15 s 与扩展 15 s 无耦合 | `orchestration-fork.mjs` 不存在 |
@@ -725,7 +830,7 @@ new RegExp(`(?:^|\s)${field}=(\\d+)(?:\s|$)`)
 
 **G-3 `O-RECONN-09`——60 s 稳定性窗口已实现但无用例**
 
-- 事实：`VpnReconnectSupervisor.ets:91-95` 已实现（`attempts > 0 && now - connectedSinceMs >= STABLE_MS` → 记 `vpn_reconnect_succeeded` 并清零）；`STABLE_MS = 60000`（:20）。判据强度是**弱**，状态 `pending-test`。
+- 事实：VM-5 的稳定窗口已实现（`attempts > 0 && now - connectedSinceMs >= STABLE_MS` → 记 `vpn_session_recovered` 并清零）；`STABLE_MS = 60000`。判据强度是**弱**，状态 `closed`，用例见 `scripts/test-vpn-reconnect-supervisor.mjs`。
 - LLD 的设计：VM-3 的转换表把 R2/R3 写成两条**互斥**行——「稳定 ≥60 s 才清零」与「不足 60 s 不清零」——这就是该用例必须覆盖的两个分支（含「抖动隧道不得无限重连」这一失败信息）。**代码不变**：逻辑与常量都已存在，缺的只是用例。
 - **本层补充发现（K10，登记不修）**：VM-3 对 `needs_login` 与 `unknown` 一样是**静默**（R11），因此「恢复后停在待登录」这一结局没有任何事件、也没有判据。这与 O-RECONN-09 是同一邻域的另一半，登记为**新识别的空缺**（不新增判据 ID）。
 - 归属：`owner=项目维护者 接收批次=a01-单元`（判据现文）。

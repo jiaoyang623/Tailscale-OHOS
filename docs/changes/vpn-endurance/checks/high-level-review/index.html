@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="a01-change-id" content="vpn-endurance">
+<meta name="a01-baseline" content="ec64476">
+<title>高层次复查 · vpn-endurance</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --panel-2: #eef2f6;
+  --text: #17212b;
+  --fg: #17212b;
+  --muted: #5c6b7a;
+  --line: #d8e0e8;
+  --accent: #2457c5;
+  --accent-2: #e8eefc;
+  --ok: #18794e;
+  --ok-bg: #e7f6ee;
+  --fail: #b42318;
+  --fail-bg: #fdecea;
+  --warn: #9a5b00;
+  --warn-bg: #fff4d6;
+  --info: #5b3fa8;
+  --info-bg: #f0ebff;
+  --na: #52606d;
+  --na-bg: #eef1f4;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e141b;
+    --panel: #151d26;
+    --panel-2: #1b2530;
+    --text: #e7edf4;
+    --fg: #e7edf4;
+    --muted: #9caaba;
+    --line: #2a3644;
+    --accent: #8ab4ff;
+    --accent-2: #1c2b44;
+    --ok: #6ee7a8;
+    --ok-bg: #10291d;
+    --fail: #ff8d84;
+    --fail-bg: #351715;
+    --warn: #f5c46b;
+    --warn-bg: #33270f;
+    --info: #c4b5fd;
+    --info-bg: #251c40;
+    --na: #b3c0cd;
+    --na-bg: #202a34;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e141b;
+  --panel: #151d26;
+  --panel-2: #1b2530;
+  --text: #e7edf4;
+  --fg: #e7edf4;
+  --muted: #9caaba;
+  --line: #2a3644;
+  --accent: #8ab4ff;
+  --accent-2: #1c2b44;
+  --ok: #6ee7a8;
+  --ok-bg: #10291d;
+  --fail: #ff8d84;
+  --fail-bg: #351715;
+  --warn: #f5c46b;
+  --warn-bg: #33270f;
+  --info: #c4b5fd;
+  --info-bg: #251c40;
+  --na: #b3c0cd;
+  --na-bg: #202a34;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(1.35rem, 2.4vw, 2rem); }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
+p { margin: 0.35rem 0 0; }
+.muted { color: var(--muted); }
+select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.page-head {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 14px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.eyebrow { color: var(--accent); font-weight: 700; letter-spacing: 0.04em; font-size: 0.78rem; text-transform: uppercase; }
+.verdict-badge {
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border: 1px solid currentColor;
+  background: var(--panel);
+}
+.verdict-badge.clear { color: var(--ok); background: var(--ok-bg); }
+.verdict-badge.blocking { color: var(--fail); background: var(--fail-bg); }
+.gate-reason { color: var(--muted); font-size: 0.9rem; max-width: 60ch; }
+main { max-width: 1180px; margin: 0 auto; padding: 6px 20px 40px; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-top: 16px;
+}
+.panel > h2 { margin-bottom: 12px; }
+.panel > h2::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; }
+.kv { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.92rem; }
+.kv th, .kv td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.kv th { width: 34%; color: var(--muted); font-weight: 600; }
+.data, .grid { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data th, .data td, .grid th, .grid td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.data th, .grid th { background: var(--panel-2); color: var(--muted); font-weight: 600; white-space: nowrap; }
+.data tr.blocking td, .grid tr.blocking td { background: var(--fail-bg); }
+.data td.empty, .grid td.empty { color: var(--muted); }
+.table-scroll { overflow-x: auto; margin-top: 10px; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); margin-top: 12px; }
+.tile {
+  background: var(--panel-2);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid transparent;
+}
+.tile .tile-num { display: block; font-size: 1.5rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+.tile .tile-label { display: block; color: var(--muted); font-size: 0.8rem; }
+.tile.blocking { background: var(--fail-bg); border-color: color-mix(in srgb, var(--fail) 26%, transparent); }
+.tile.blocking .tile-num { color: var(--fail); }
+.filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+.filter-bar label { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 0.86rem; }
+select, button {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 10px;
+  max-width: 100%;
+}
+button { cursor: pointer; }
+button:hover { border-color: var(--accent); }
+.filter-count { margin-left: auto; color: var(--muted); font-size: 0.84rem; }
+.bars { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.bar { display: grid; grid-template-columns: 116px 1fr 86px; gap: 10px; align-items: center; }
+.bar-label { color: var(--muted); font-size: 0.84rem; }
+.bar-track { display: block; height: 12px; border-radius: 999px; background: var(--panel-2); overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: 999px; background: var(--na); }
+.bar-fill.clean { background: var(--ok); }
+.bar-fill.gaps-found { background: var(--warn); }
+.bar-fill.missing { background: var(--na); }
+.bar-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.82rem; color: var(--muted); }
+.clear-note {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent);
+  background: var(--ok-bg);
+  color: var(--ok);
+  font-weight: 600;
+}
+.footer { max-width: 1180px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 0.82rem; }
+[hidden] { display: none !important; }
+@media (max-width: 720px) {
+  .page-head { padding-top: 18px; }
+  main { padding: 6px 12px 28px; }
+  .footer { padding: 0 12px 24px; }
+  .panel { padding: 14px; border-radius: 12px; }
+  .kv th { width: 42%; }
+  .bar { grid-template-columns: 100px 1fr 78px; }
+  .filter-count { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<header class="page-head">
+  <div>
+    <p class="eyebrow">a01 · 高层次复查</p>
+    <h1>高层次复查 · vpn-endurance</h1>
+    <p class="muted">批次 <code>vpn-endurance</code> · 基线 <code>ec64476</code> · 生成 2026-10-20T23:03:25+11:00</p>
+    <p class="gate-reason">存在 1 条未处置的强漏项。</p>
+  </div>
+  <div class="verdict-badge blocking">门禁判定：阻塞</div>
+</header>
+
+<main>
+<section id="summary" class="panel">
+  <h2>1 · 总览</h2>
+  <p class="muted">数字来自清单与覆盖说明。门禁结论由脚本重算。</p>
+  <div class="tiles" data-src="list.json" role="img" aria-label="总览数字块：漏项总数、强漏项未处置数、弱漏项未处置数、已签字接受数、覆盖维度数与下限"><div class="tile "><span class="tile-num">49</span><span class="tile-label">漏项总数</span></div><div class="tile blocking"><span class="tile-num">1</span><span class="tile-label">强漏项未处置</span></div><div class="tile blocking"><span class="tile-num">30</span><span class="tile-label">弱漏项未处置</span></div><div class="tile "><span class="tile-num">0</span><span class="tile-label">已签字接受</span></div><div class="tile "><span class="tile-num">8 / 8</span><span class="tile-label">覆盖维度</span></div></div>
+</section>
+
+<section id="strong" class="panel">
+  <h2>2 · 强漏项</h2>
+  <p class="muted">这里只列未处置的强漏项。强漏项排在全部漏项之前。</p>
+  <div class="table-scroll" data-src="list.json"><table class="grid" data-src="list.json" aria-label="未处置的强漏项"><thead><tr><th>编号</th><th>维度</th><th>漏项</th><th>锚点</th><th>强度</th><th>处置</th><th>说明</th></tr></thead><tbody><tr data-dimension="journey-branches,non-functional,requirement-coverage" data-severity="strong" data-disposition="open" class="blocking"><td>HLR-04</td><td>旅程分支、非功能质量条件、需求覆盖</td><td>P1 被冻结或死亡时没有子系统负责恢复</td><td><code>docs/hld/hld.md:160</code></td><td>强</td><td>未处置</td><td>恢复轮询与网络回调都在 EntryAbility。P2 只重绑已有隧道。HLD C-11 称本批把恢复入口新增到扩展进程，但扩展没有恢复代码。设计文本与成品不一致。；已修：HLD C-11 改为「P2 仍只重绑已有隧道，没有启动连接的恢复入口」，不再声称扩展进程已有恢复入口。；已修：HLD C-11 删去不存在的 sessionHeld 字段，改为按意图与 lastLiveAtMs 描述。</td></tr></tbody></table></div>
+</section>
+
+<section id="items" class="panel">
+  <h2>3 · 全部漏项</h2>
+  <p class="muted">按锚点合并后的清单。筛选状态写进地址栏的片段，刷新后保留。</p>
+  <div class="filter-bar" role="group" aria-label="漏项筛选">
+    <label>维度
+      <select id="filter-dimension" aria-label="按维度筛选">
+        <option value="all">全部维度</option>
+        <option value="requirement-coverage">需求覆盖</option><option value="hld-contract-coverage">HLD 契约覆盖</option><option value="journey-branches">旅程分支</option><option value="reverse-enumeration">反向枚举</option><option value="state-and-persistence">状态与持久化</option><option value="concurrency-and-timing">并发与时序</option><option value="non-functional">非功能质量条件</option><option value="interface-consumers">接口消费方</option>
+      </select>
+    </label>
+    <label>风险
+      <select id="filter-severity" aria-label="按风险强度筛选">
+        <option value="all">全部强度</option>
+        <option value="strong">强</option><option value="weak">弱</option>
+      </select>
+    </label>
+    <label>处置
+      <select id="filter-disposition" aria-label="按处置筛选">
+        <option value="all">全部处置</option>
+        <option value="open">未处置</option><option value="oracle-added">已补判据</option><option value="not-applicable">声明不适用</option><option value="risk-accepted">接受残余风险</option>
+      </select>
+    </label>
+    <button type="button" id="filter-reset">重置</button>
+    <span class="filter-count" id="filter-count" role="status" aria-live="polite">未筛选</span>
+  </div>
+  <div class="table-scroll">
+    <table class="data" id="item-table" data-src="list.json" aria-label="全部漏项">
+      <thead><tr><th>编号</th><th>维度</th><th>漏项</th><th>锚点</th><th>强度</th><th>处置</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr data-dimension="journey-branches,requirement-coverage" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-01</td><td>旅程分支、需求覆盖</td><td>连接窗口在 P2 报出 connecting 之前没有长时任务</td><td><code>entry/src/main/ets/services/VpnBackgroundTaskManager.ets:200</code></td><td>强</td><td>已补判据</td><td>已修：意图在 60 秒内刚写为 connected 时，长时任务在扩展报出 connecting 之前取得。判据 O-BGTASK-13 已更新。测试「a fresh connected intent holds protection before any interface evidence」与「an old connected intent does not start protection on its own」覆盖。；与 HLR-01 同一修复。R-CONN-03 与 R-CONN-11 的连接窗口保护从意图写入时开始。</td></tr><tr data-dimension="journey-branches" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-03</td><td>旅程分支</td><td>前台时取消实况窗通知，下次进后台不再申请保护</td><td><code>entry/src/main/ets/services/VpnBackgroundTaskManager.ets:170</code></td><td>强</td><td>已补判据</td><td>已修：manager 记录前台状态。前台取消通知时不置抑制并在下一拍重抢。判据 O-BGTASK-06 已更新。测试「dismissing the notification in the foreground re-arms protection at once」覆盖。</td></tr><tr data-dimension="journey-branches,non-functional,requirement-coverage" data-severity="strong" data-disposition="open" class="blocking"><td>HLR-04</td><td>旅程分支、非功能质量条件、需求覆盖</td><td>P1 被冻结或死亡时没有子系统负责恢复</td><td><code>docs/hld/hld.md:160</code></td><td>强</td><td>未处置</td><td>恢复轮询与网络回调都在 EntryAbility。P2 只重绑已有隧道。HLD C-11 称本批把恢复入口新增到扩展进程，但扩展没有恢复代码。设计文本与成品不一致。；已修：HLD C-11 改为「P2 仍只重绑已有隧道，没有启动连接的恢复入口」，不再声称扩展进程已有恢复入口。；已修：HLD C-11 删去不存在的 sessionHeld 字段，改为按意图与 lastLiveAtMs 描述。</td></tr><tr data-dimension="state-and-persistence,hld-contract-coverage,concurrency-and-timing" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-07</td><td>状态与持久化、HLD 契约覆盖、并发与时序</td><td>两个进程重写同一账本且无锁，记录会丢失</td><td><code>entry/src/main/ets/services/SessionLedger.ets:189</code></td><td>强</td><td>已补判据</td><td>每个写者只追加和压缩自己的账本文件。去重读取全部账本文件。读取按 timestampMs 合并，并按 sessionId + kind 保留第一条。压缩不再重写对方文件，并发追加不会被擦掉。O-SESSION-11、O-SESSION-12 与 O-SEAM-19 覆盖该行为。；HLD C-19 新增「并发与合并」契约：写者文件归属、跨文件去重、压缩边界、读取合并顺序。LLD 4.7 同步写入不变量。契约与成品一致。；SessionLedger 压缩只改本写者文件。集成用例 two writers append to one ledger and neither rewrite drops the other record 与单元用例 a writer compacts only its own file 钉住该行为。</td></tr><tr data-dimension="requirement-coverage,interface-consumers" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-10</td><td>需求覆盖、接口消费方</td><td>后台仍有两个界面定时器在跑，违反 R-POWER-01</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:1097</code></td><td>强</td><td>已补判据</td><td>已修：handleAppBackground 停 cacheSizePollTimer 与 connectionDurationTimer，回前台按页面可见性恢复。VpnPowerPolicy.uiTimersToStop 列出七个定时器。判据 O-POWER-01 已更新。测试「background stops UI probes but keeps the recovery watchdog」覆盖清单。；与 HLR-10 同一修复。档位接口的定时器清单现在包含这两个定时器。</td></tr><tr data-dimension="requirement-coverage" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-12</td><td>需求覆盖</td><td>后台一秒健康轮询仍会触发对端、Sunshine 与媒体探测</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:3412</code></td><td>强</td><td>已补判据</td><td>已修：autoProbeConnectedPeerServices 在 lifecycleBackgrounded 时直接返回，后台健康轮询不再触发对端、Sunshine 与媒体探测。判据 O-POWER-01 的后台探测要求覆盖。设备批次在后台场景复跑。</td></tr><tr data-dimension="requirement-coverage,state-and-persistence,hld-contract-coverage,non-functional" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-13</td><td>需求覆盖、状态与持久化、HLD 契约覆盖、非功能质量条件</td><td>原因词表缺系统策略与网络失效的生产者，冲突被当作普通掉线重试</td><td><code>entry/src/main/ets/services/SessionLedger.ets:23</code></td><td>强</td><td>已补判据</td><td>已修：network_lost 由监督器在离线掉线时写。system_stopped 由 VPN 冲突码 2203002 写。快照新增 conflict 标记。判据 O-SESSION-10、O-RECONN-11、O-RECONN-13、O-STATUS-10 已更新或新增。测试「network loss defers recovery until the network returns」「a VPN conflict is recorded as a system stop and does not retry」「a VPN conflict is flagged on the snapshot」覆盖。；与 HLR-13 同一修复。词表的七个原因现在都有写入方或兜底。；与 HLR-13 同一修复。HLD C-19 的七个原因与生产者一致。；与 HLR-13 同一修复。网络原因的结束记为 network_lost，冲突记为 system_stopped。</td></tr><tr data-dimension="requirement-coverage" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-17</td><td>需求覆盖</td><td>熄屏快照 15 s 一次，界面读取侧 5 s 后拒收</td><td><code>entry/src/main/ets/services/VpnPowerPolicy.ets:76</code></td><td>强</td><td>已补判据</td><td>已修：对端快照与 Taildrop 快照的接受窗口由 5 秒改为 16 秒，覆盖熄屏档 15 秒周期。HLD C-04 已更新。设备批次在熄屏后复跑。</td></tr><tr data-dimension="reverse-enumeration" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-18</td><td>反向枚举</td><td>状态为 unknown 时第二次连接仍会启动扩展</td><td><code>entry/src/main/ets/services/VpnSessionController.ets:116</code></td><td>强</td><td>已补判据</td><td>已修：控制器在 unknown 状态且意图在 30 秒内刚写为 connected 时早退，不再第二次启动扩展。判据 O-SESSION-01 已更新。测试「a second connect during an uncertain status does not start again」与「an old connected intent does not block a connect during an uncertain status」覆盖。</td></tr><tr data-dimension="hld-contract-coverage,concurrency-and-timing" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-19</td><td>HLD 契约覆盖、并发与时序</td><td>恢复失去令牌后会停掉它不拥有的隧道，包括用户的新连接</td><td><code>entry/src/main/ets/services/VpnReconnectSupervisor.ets:293</code></td><td>强</td><td>已补判据</td><td>已修：STARTED 且令牌失效时先读意图。意图仍为 connected 则只记录 superseded，不再 disconnect。撤销只在用户已停止时执行。测试「a card reconnect supersedes an in-flight recovery without stopping the tunnel」与「a stop written only to the intent supersedes an in-flight reconnect」覆盖。判据 O-RECONN-10 已更新。；与 HLR-19 同一处，同一修复。</td></tr><tr data-dimension="concurrency-and-timing" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-21</td><td>并发与时序</td><td>无界面连接在第一次检查后不再复查用户停止</td><td><code>entry/src/main/ets/services/VpnSessionController.ets:132</code></td><td>强</td><td>已补判据</td><td>已修：后端就绪后与启动扩展前各复查一次意图。用户路径读意图，恢复路径读正向令牌。测试「a stop after the backend wait cancels the connect」与「a connect that lost its authority leaves the user intent alone」覆盖。判据 O-SESSION-09 已更新。</td></tr><tr data-dimension="non-functional" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-22</td><td>非功能质量条件</td><td>卡片在后台每 5 s 查询一次卡片服务，档位不治理它</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:322</code></td><td>强</td><td>已补判据</td><td>已修：卡片刷新按档位放慢，active 每拍、background 每 3 拍、screen-off 每 12 拍。测试「the desktop card refresh slows with the power stage」覆盖。判据 O-POWER-01 已更新。</td></tr><tr data-dimension="requirement-coverage" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-23</td><td>需求覆盖</td><td>非用户断连指标对扩展崩溃无法成立</td><td><code>docs/requirements/requirements.md:167</code></td><td>强</td><td>已补判据</td><td>已修：指标接受 vpn_session_end 或 vpn_session_end_observed。崩溃由 P1 补写观测记录。判据 O-SESSION-11 与 O-DIAG-02 覆盖补写路径。</td></tr><tr data-dimension="requirement-coverage" data-severity="strong" data-disposition="oracle-added" class=""><td>HLR-24</td><td>需求覆盖</td><td>LLD VM-1 的释放与抑制规则与代码不符</td><td><code>docs/lld/lld.md:170</code></td><td>强</td><td>已补判据</td><td>已修：T1 改为意图为 stopped 时释放，T4 改为意图仍 connected 时保留任务。行为由 O-BGTASK-02/04 与 O-SESSION-09 覆盖。</td></tr><tr data-dimension="journey-branches" data-severity="weak" data-disposition="oracle-added" class=""><td>HLR-25</td><td>旅程分支</td><td>恢复在 P2 仍在连接时继续触发</td><td><code>entry/src/main/ets/services/VpnReconnectSupervisor.ets:190</code></td><td>弱</td><td>已补判据</td><td>已修：控制器对 CONNECTING 早退，重复启动不再发生。测试「a connect during the connect window does not start a second extension」覆盖。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="oracle-added" class=""><td>HLR-26</td><td>HLD 契约覆盖</td><td>意图写失败后连接仍继续</td><td><code>entry/src/main/ets/services/VpnSessionController.ets:110</code></td><td>弱</td><td>已补判据</td><td>已修：启动前复查意图，写失败时读到 stopped 并取消。测试「a user connect cancels when its intent write fails」覆盖。界面自己的写路径仍见 HLR-31。</td></tr><tr data-dimension="state-and-persistence" data-severity="weak" data-disposition="oracle-added" class=""><td>HLR-27</td><td>状态与持久化</td><td>LLD 的长时任务释放表仍写旧行为</td><td><code>docs/lld/lld.md:167</code></td><td>弱</td><td>已补判据</td><td>已修：T1/T4 行与代码一致。行为由 O-BGTASK-02/04 覆盖。</td></tr><tr data-dimension="state-and-persistence" data-severity="weak" data-disposition="oracle-added" class=""><td>HLR-28</td><td>状态与持久化</td><td>LLD 判据表仍断言恢复会放弃</td><td><code>docs/lld/lld.md:619</code></td><td>弱</td><td>已补判据</td><td>已修：O-RECONN-05 行改为「recovery never exhausts while the user keeps the intent」。测试与行文一致。</td></tr><tr data-dimension="requirement-coverage" data-severity="weak" data-disposition="oracle-added" class=""><td>HLR-29</td><td>需求覆盖</td><td>需求表把六个新增条目写成待实现</td><td><code>docs/requirements/requirements.md:119</code></td><td>弱</td><td>已补判据</td><td>已修：R-CONN-11/12/13、R-NET-05、R-POWER-01/02 改为已实现，并写出判据锚点。</td></tr><tr data-dimension="journey-branches,interface-consumers,reverse-enumeration" data-severity="weak" data-disposition="open" class=""><td>HLR-30</td><td>旅程分支、接口消费方、反向枚举</td><td>卡片在连接进行中没有停止分支</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:276</code></td><td>弱</td><td>未处置</td><td>卡片只对 connected 选择断开。CONNECTING 时再点会调用 connect。控制器现在早退，不再重复启动，但用户仍无法用卡片停止连接。；与 HLR-30 同一处。连接窗口内卡片仍显示连接动作。；与 HLR-30 同一处。削弱 R-CONN-06 的用户停止权威。</td></tr><tr data-dimension="journey-branches" data-severity="weak" data-disposition="open" class=""><td>HLR-33</td><td>旅程分支</td><td>扩展启动失败后意图仍为 connected</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:2536</code></td><td>弱</td><td>未处置</td><td>失败路径记录 vpn_start_failed 并结束命令，但不改写意图。监督器会一直重试，包括用户拒绝系统 VPN 授权之后。</td></tr><tr data-dimension="journey-branches" data-severity="weak" data-disposition="open" class=""><td>HLR-34</td><td>旅程分支</td><td>恢复与界面连接没有共用串行化</td><td><code>entry/src/main/ets/services/VpnReconnectSupervisor.ets:287</code></td><td>弱</td><td>未处置</td><td>监督器直接调 controller.connect。界面用自己的 VpnCommandStateMachine。LLD J8 声称一个命令守卫覆盖两条路径，实际没有共享守卫。</td></tr><tr data-dimension="journey-branches" data-severity="weak" data-disposition="open" class=""><td>HLR-35</td><td>旅程分支</td><td>与另一 VPN 冲突时无界面连接不抬升界面</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:289</code></td><td>弱</td><td>未处置</td><td>扩展启动后 connect 返回 STARTED。卡片只在 NEEDS_UI 时抬升窗口。冲突只出现在状态文件里，卡片没有提示。</td></tr><tr data-dimension="state-and-persistence" data-severity="weak" data-disposition="open" class=""><td>HLR-36</td><td>状态与持久化</td><td>界面路径忽略意图写失败并继续连接</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:2408</code></td><td>弱</td><td>未处置</td><td>beginVpnConnection 丢弃 VpnSessionIntent.write 的布尔结果。写失败后重启会读到旧意图或被当成已停止，恢复不再启动。</td></tr><tr data-dimension="state-and-persistence,interface-consumers,concurrency-and-timing" data-severity="weak" data-disposition="open" class=""><td>HLR-37</td><td>状态与持久化、接口消费方、并发与时序</td><td>P2 在档位文件缺失时写 P1 的诊断文件</td><td><code>entry/src/main/ets/services/VpnPowerPolicy.ets:181</code></td><td>弱</td><td>未处置</td><td>readStage 回落 active 并调 recordMissing。记录来源写 ui，P2 由此写 diagnostic-ui-events.ndjson。该文件按 C-15 属于 P1。；与 HLR-37 同一处。DiagnosticEventStore 做读改写，两进程会丢事件。；与 HLR-37 同一处。两进程的读改写会互相覆盖。</td></tr><tr data-dimension="state-and-persistence" data-severity="weak" data-disposition="open" class=""><td>HLR-40</td><td>状态与持久化</td><td>两个写者共用 vpn-connect-config.json 的同一个临时文件</td><td><code>entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:1101</code></td><td>弱</td><td>未处置</td><td>P2 在此暂存重连配置，P1 经 VpnCommandGateway 暂存同一路径加 .tmp。改名可能发布对方的内容，或因临时文件已被移走而失败。</td></tr><tr data-dimension="state-and-persistence,hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-41</td><td>状态与持久化、HLD 契约覆盖</td><td>用户停止可能为过期会话写 user_stop</td><td><code>entry/src/main/ets/services/VpnSessionController.ets:166</code></td><td>弱</td><td>未处置</td><td>记录使用最后一次状态读取的 sessionId。该读取可能是 UNKNOWN，也可能属于已崩溃的会话。崩溃因此可能被记成用户停止。；sessionId 为空时 recordEnd 丢弃记录。扩展随后在 onDestroy 写 extension_destroyed，用户原因丢失。</td></tr><tr data-dimension="state-and-persistence" data-severity="weak" data-disposition="open" class=""><td>HLR-43</td><td>状态与持久化</td><td>结束记录只有一个槽位，未读时会被覆盖</td><td><code>entry/src/main/ets/services/SessionLedger.ets:197</code></td><td>弱</td><td>未处置</td><td>writeEndFile 每次 END 替换 vpn-session-end.json。监督器只读这个文件。P1 被冻结跨过两次结束时会丢掉前一个原因。</td></tr><tr data-dimension="state-and-persistence,requirement-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-44</td><td>状态与持久化、需求覆盖</td><td>P1 被杀后档位没有写入方</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:240</code></td><td>弱</td><td>未处置</td><td>档位采样只在 ability 里跑。P1 在 background 档死亡后，后续熄屏不会把 P2 降到 5 s 状态环。；与 HLR-44 同一处。用户离开时正是界面进程最可能被冻结的时候。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-46</td><td>HLD 契约覆盖</td><td>C-04 仍把对端快照写成 1 s 发布与 5 s 接受</td><td><code>docs/hld/hld.md:84</code></td><td>弱</td><td>未处置</td><td>档位把快照环放到 2 s 或 15 s。熄屏时对端文件在每个 15 s 周期的大部分时间里超过 5 s。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-47</td><td>HLD 契约覆盖</td><td>C-09 的探测时序在熄屏档不再成立</td><td><code>docs/hld/hld.md:139</code></td><td>弱</td><td>未处置</td><td>Sunshine 与媒体探测只在快照块内运行。熄屏时该块 15 s 一次，客户端超时仍为 3.5 s 与 4 s。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-48</td><td>HLD 契约覆盖</td><td>power.isActive() 失败时不保留上一档，也不记事件</td><td><code>entry/src/main/ets/services/VpnPowerPolicy.ets:87</code></td><td>弱</td><td>未处置</td><td>catch 置 screenOn=true 并返回 background。LLD 4.8 要求保留上一档并记 vpn_power_probe_failed。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-49</td><td>HLD 契约覆盖</td><td>意图写入方不校验 by 词表</td><td><code>entry/src/main/ets/services/VpnSessionIntent.ets:100</code></td><td>弱</td><td>未处置</td><td>C-19 把 by 固定为 ui、card、recovery。write 接受任意字符串，read 只检查非空。</td></tr><tr data-dimension="hld-contract-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-50</td><td>HLD 契约覆盖</td><td>交接应答方清除请求后可能不再应答</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:3494</code></td><td>弱</td><td>未处置</td><td>连接命令不再活跃时，then 与 catch 都在写应答前返回。扩展随后等满 15 s 并销毁 TUN。C-02 要求应答。</td></tr><tr data-dimension="interface-consumers" data-severity="weak" data-disposition="open" class=""><td>HLR-51</td><td>接口消费方</td><td>SessionLedger.read 没有产品消费方</td><td><code>entry/src/main/ets/services/SessionLedger.ets:80</code></td><td>弱</td><td>未处置</td><td>C-19 说 P1 在报告导出时合并账本。没有产品文件读它，监督器只用 readEndFile。账本正文从不导出。</td></tr><tr data-dimension="interface-consumers" data-severity="weak" data-disposition="open" class=""><td>HLR-52</td><td>接口消费方</td><td>P1 诊断路径用旧格式写 P2 拥有的状态文件</td><td><code>entry/src/main/ets/services/AccountDiagnosticsGateway.ets:108</code></td><td>弱</td><td>未处置</td><td>stageCrashProbeStatus 截断 vpn-probe-status.txt，写入只有 heartbeatMs 没有 sessionId 的行。C-03 规定 P2 是唯一写入方，C-19 用 sessionId 作账本键。</td></tr><tr data-dimension="interface-consumers" data-severity="weak" data-disposition="open" class=""><td>HLR-53</td><td>接口消费方</td><td>connect 的默认 by 为 recovery，新调用方会跳过意图写入</td><td><code>entry/src/main/ets/services/VpnSessionController.ets:97</code></td><td>弱</td><td>未处置</td><td>省略 by 的用户入口会启动扩展但不写意图。长时任务与监督器随后把会话当成已停止。用户动作的默认值应失败关闭。</td></tr><tr data-dimension="concurrency-and-timing" data-severity="weak" data-disposition="open" class=""><td>HLR-54</td><td>并发与时序</td><td>永不结算的连接会永久阻塞后续恢复</td><td><code>entry/src/main/ets/services/VpnReconnectSupervisor.ets:286</code></td><td>弱</td><td>未处置</td><td>attemptInFlight 只在 promise 回调里清零。startVpnExtension 没有超时，平台调用挂起时标志一直置位。</td></tr><tr data-dimension="concurrency-and-timing" data-severity="weak" data-disposition="open" class=""><td>HLR-55</td><td>并发与时序</td><td>心跳新鲜度比较两个墙上时钟，调时会让运行中的隧道不可读</td><td><code>entry/src/main/ets/services/VpnStatusReader.ets:142</code></td><td>弱</td><td>未处置</td><td>时钟回拨使 ageMs 为负，judge 返回 unknown。界面宽限 8 s 后把运行中的隧道显示为已停止。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-56</td><td>非功能质量条件</td><td>界面定时器的单一清单没有调用者</td><td><code>entry/src/main/ets/services/VpnPowerPolicy.ets:41</code></td><td>弱</td><td>未处置</td><td>uiTimersToStop 没有被任何 .ets 引用。BridgeStatus 自己硬编码五个定时器停止。新定时器不受档位治理，两份清单会漂移。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-57</td><td>非功能质量条件</td><td>界面健康轮询在后台保持 1 s 节拍</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:3968</code></td><td>弱</td><td>未处置</td><td>handleAppBackground 不停 healthPollTimer。该轮询每秒读状态文件，并在隧道不活跃时调 refreshOrRecoverBackend。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-58</td><td>非功能质量条件</td><td>熄屏档仍每秒跑一次原生 Taildrop 快照</td><td><code>entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:864</code></td><td>弱</td><td>未处置</td><td>incoming 定时器取 max(commandMs, 250)。熄屏命令环 1000 ms 因此让原生查询保持每秒一次。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-59</td><td>非功能质量条件</td><td>选中的动画预设用硬编码亮色背景，暗色主题不可读</td><td><code>entry/src/main/ets/components/NativeSettingsNavigation.ets:1058</code></td><td>弱</td><td>未处置</td><td>填充色为 #E7E1FF，文字用 app.color.emphasize。该令牌在暗色主题是 #73a7f9，形成浅底浅字。其他表面都用系统色或暗色资源。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-60</td><td>非功能质量条件</td><td>长时任务丢失且没有取消回调时不再申请保护</td><td><code>entry/src/main/ets/services/VpnBackgroundTaskManager.ets:203</code></td><td>弱</td><td>未处置</td><td>reconcile 只在 task 为 undefined 时 start。只有 cancelCallback 清零字段。监听未注册或回调不来时，管理器保留死任务，会话期间不再申请保护。</td></tr><tr data-dimension="non-functional" data-severity="weak" data-disposition="open" class=""><td>HLR-61</td><td>非功能质量条件</td><td>后台会话变化仍会安排对端、Sunshine 与媒体探测</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:944</code></td><td>弱</td><td>未处置</td><td>applyPeers 在隧道连接时安排自动探测。refreshVpnProbeStatus 在每次状态或会话变化时调对端快照，后台 1 s 健康轮询让该路径持续存活。</td></tr><tr data-dimension="requirement-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-62</td><td>需求覆盖</td><td>LLD 的档位探测失败回退与代码不符</td><td><code>docs/lld/lld.md:513</code></td><td>弱</td><td>未处置</td><td>设计写保留上一档并记事件。代码把失败样本当成亮屏，熄屏档会退到 background，且没有事件。</td></tr><tr data-dimension="reverse-enumeration" data-severity="weak" data-disposition="open" class=""><td>HLR-63</td><td>反向枚举</td><td>onCreate 在未知前后台状态时先写 ACTIVE 档</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:111</code></td><td>弱</td><td>未处置</td><td>卡片调用可在后台唤醒 ability。若 onBackground 不随后发生，扩展保持 active 的 100 ms 与 1 s 节拍。</td></tr><tr data-dimension="requirement-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-64</td><td>需求覆盖</td><td>netAvailable 注册失败后不再重试</td><td><code>entry/src/main/ets/entryability/EntryAbility.ets:115</code></td><td>弱</td><td>未处置</td><td>失败分支只写 hilog。VpnNetworkMonitor 每 5 s 重试自己的注册，恢复监听不重试。恢复因此退回 5 s 轮询，R-NET-05 要求的网络回调失效。</td></tr><tr data-dimension="requirement-coverage" data-severity="weak" data-disposition="open" class=""><td>HLR-65</td><td>需求覆盖</td><td>界面路径的意图写失败会让恢复撤销用户停止</td><td><code>entry/src/main/ets/components/BridgeStatus.ets:2568</code></td><td>弱</td><td>未处置</td><td>stopVpnProbe 忽略写结果。只有卡片路径调 noteRequestedStop。写失败时监督器仍读到 connected，扩展停止后恢复，违反 R-CONN-06。</td></tr>
+        <tr id="filter-empty" hidden><td colspan="7" class="empty">没有匹配的漏项。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="coverage" class="panel">
+  <h2>4 · 覆盖说明</h2>
+  <p class="muted">八项维度逐项列出。条形表示该维度的覆盖状态。</p>
+  <div class="table-scroll" data-src="list.json"><div class="bars"><div class="bar"><span class="bar-label">需求覆盖</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">HLD 契约覆盖</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">旅程分支</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">反向枚举</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">状态与持久化</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">并发与时序</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">非功能质量条件</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div><div class="bar"><span class="bar-label">接口消费方</span><span class="bar-track"><span class="bar-fill gaps-found" style="width:100%"></span></span><span class="bar-value">gaps-found</span></div></div><p class="muted">覆盖 8 / 8 项维度，共 100%。</p></div>
+  <div class="table-scroll">
+    <table class="data" data-src="list.json" aria-label="覆盖说明明细">
+      <thead><tr><th>维度</th><th>结论</th><th>扫过什么</th><th>备注</th></tr></thead>
+      <tbody><tr><td>需求覆盖</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td><td>需求逐条对设计与成品。未守住的行为集中在 R-CONN-03、R-CONN-06、R-CONN-09、R-CONN-11、R-CONN-12、R-NET-05、R-POWER-01 与 R-POWER-02。</td></tr><tr><td>HLD 契约覆盖</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/AccountDiagnosticsGateway.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/module.json5</td><td>C-02、C-03、C-04、C-09、C-11、C-15、C-19 逐件对成品。契约与成品不一致处见 HLR-04、HLR-08、HLR-17、HLR-42、HLR-46、HLR-47、HLR-49、HLR-50。</td></tr><tr><td>旅程分支</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/DiagnosticEventStore.ets</td><td>每条旅程逐分支对断言。正常、边界、失败、取消、恢复与权限分支见 HLR-01、HLR-03、HLR-04、HLR-25、HLR-30、HLR-33、HLR-34、HLR-35。</td></tr><tr><td>反向枚举</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td><td>从 UI ability、VPN 扩展、卡片 ability、卡片、服务、定时器与网络回调逐个反查。多出的行为与矛盾的行为见 HLR-18、HLR-30、HLR-63。</td></tr><tr><td>状态与持久化</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/DiagnosticEventStore.ets</td><td>合法与非法状态迁移、持久化往返、数据迁移。见 HLR-07、HLR-14、HLR-27、HLR-28、HLR-36、HLR-37、HLR-40、HLR-41、HLR-43、HLR-44。</td></tr><tr><td>并发与时序</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/DiagnosticPrivacy.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/RecoverableCachePaths.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/ets/components/BridgeStatus.ets</td><td>共享可变状态、竞态、超时、重试与降级。见 HLR-09、HLR-20、HLR-21、HLR-39、HLR-54、HLR-55。</td></tr><tr><td>非功能质量条件</td><td>gaps-found</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/DiagnosticPrivacy.ets；entry/src/main/ets/services/DiagnosticReportService.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/TaildriveGateway.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/components/NativeSettingsNavigation.ets；entry/src/main/module.json5；entry/src/main/resources/base/element/color.json；entry/src/main/resources/dark/element/color.json</td><td>判据期望里的质量条件逐项对手段与证据。耗电、刷新节拍、暗色可读性与任务丢失见 HLR-05、HLR-16、HLR-22、HLR-56、HLR-57、HLR-58、HLR-59、HLR-60、HLR-61。</td></tr><tr><td>接口消费方</td><td>gaps-found</td><td>entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/AccountDiagnosticsGateway.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td><td>逐个消费方核对变更接口。见 HLR-11、HLR-31、HLR-38、HLR-51、HLR-52、HLR-53。</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="independence" class="panel">
+  <h2>5 · 独立性</h2>
+  <p class="muted">每个子 agent 只看声明过的输入。判据、测试与审核页不进输入清单。</p>
+  <div class="table-scroll">
+    <table class="data" data-src="list.json" aria-label="派发记录">
+      <thead><tr><th>子 agent</th><th>负责维度</th><th>输入清单</th></tr></thead>
+      <tbody><tr><td>HLR: requirement coverage</td><td>需求覆盖、反向枚举</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td></tr><tr><td>HLR: HLD contracts</td><td>HLD 契约覆盖、接口消费方</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/services/AccountDiagnosticsGateway.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td></tr><tr><td>HLR: journeys and state</td><td>旅程分支、状态与持久化</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td></tr><tr><td>HLR: concurrency and quality</td><td>并发与时序、非功能质量条件</td><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/components/NativeSettingsNavigation.ets；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/DiagnosticPrivacy.ets；entry/src/main/ets/services/DiagnosticReportService.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/RecoverableCachePaths.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/TaildriveGateway.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="meta" class="panel">
+  <h2>6 · 元信息</h2>
+  <table class="kv" data-src="list.json" aria-label="批次元信息"><tr><th>批次</th><td>vpn-endurance</td></tr><tr><th>代码基线</th><td>ec64476</td></tr><tr><th>生成时间</th><td>2026-10-20T22:05:00+11:00</td></tr><tr><th>输入清单</th><td>docs/requirements/requirements.md；docs/architecture/architecture.md；docs/hld/hld.md；docs/lld/lld.md；entry/src/main/module.json5；entry/src/main/ets/entryability/EntryAbility.ets；entry/src/main/ets/entryformability/EntryFormAbility.ets；entry/src/main/ets/widget/pages/VpnToggleCard.ets；entry/src/main/ets/components/BridgeStatus.ets；entry/src/main/ets/components/NativeSettingsNavigation.ets；entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets；entry/src/main/ets/services/AccountDiagnosticsGateway.ets；entry/src/main/ets/services/AppLifecycleEvents.ets；entry/src/main/ets/services/DiagnosticEventStore.ets；entry/src/main/ets/services/DiagnosticPrivacy.ets；entry/src/main/ets/services/DiagnosticReportService.ets；entry/src/main/ets/services/FormCardService.ets；entry/src/main/ets/services/RecoverableCachePaths.ets；entry/src/main/ets/services/SessionLedger.ets；entry/src/main/ets/services/StoragePaths.ets；entry/src/main/ets/services/TaildriveGateway.ets；entry/src/main/ets/services/VpnBackgroundTaskManager.ets；entry/src/main/ets/services/VpnCommandGateway.ets；entry/src/main/ets/services/VpnNetworkMonitor.ets；entry/src/main/ets/services/VpnPowerPolicy.ets；entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/services/VpnSessionController.ets；entry/src/main/ets/services/VpnSessionIntent.ets；entry/src/main/ets/services/VpnStatusReader.ets</td></tr><tr><th>禁止输入核验</th><td>docs/oracles/ 判据文件；docs/diagnostics/ 诊断登记表不作判据依据；scripts/test-*.mjs 与 scripts/integration/*.mjs 测试文件；scripts/e2e/** 端到端脚本；docs/review/** 审核页与审核快照；docs/changes/vpn-endurance/checks/** 本批次执行记录</td></tr><tr><th>门禁结论</th><td>blocking：存在 1 条未处置的强漏项。</td></tr></table>
+</section>
+</main>
+
+<footer class="footer">
+  <p>本报告由 <code>a01</code> 生成。报告只投影清单与覆盖说明，不替代人工审核。</p>
+  <p>报告目录自包含，不引用外部资源。筛选只影响显示，不改动清单数据。</p>
+</footer>
+
+<script>
+(function () {
+  var table = document.getElementById('item-table');
+  if (!table || !table.tBodies.length) return;
+  var dim = document.getElementById('filter-dimension');
+  var sev = document.getElementById('filter-severity');
+  var dis = document.getElementById('filter-disposition');
+  var reset = document.getElementById('filter-reset');
+  var count = document.getElementById('filter-count');
+  if (!dim || !sev || !dis) return;
+
+  var body = table.tBodies[0];
+  var rows = [];
+  var emptyRow = null;
+  var items = 0;
+  for (var i = 0; i < body.rows.length; i += 1) {
+    var row = body.rows[i];
+    if (row.id === 'filter-empty') {
+      emptyRow = row;
+    } else {
+      rows.push(row);
+      if (row.getAttribute('data-severity')) items += 1;
+    }
+  }
+
+  var FIELDS = [['dimension', dim], ['severity', sev], ['disposition', dis]];
+
+  function pick(row, name, value) {
+    if (value === 'all') return true;
+    return (row.getAttribute('data-' + name) || '').split(',').indexOf(value) >= 0;
+  }
+
+  function rank(row) {
+    if (!row.getAttribute('data-severity')) return 2;
+    if (row.getAttribute('data-severity') === 'strong' &&
+        row.getAttribute('data-disposition') === 'open') return 0;
+    return 1;
+  }
+
+  function filtering() {
+    for (var k = 0; k < FIELDS.length; k += 1) {
+      if (FIELDS[k][1].value !== 'all') return true;
+    }
+    return false;
+  }
+
+  function order() {
+    var list = rows.slice();
+    if (!filtering()) list.sort(function (a, b) { return rank(a) - rank(b); });
+    for (var k = 0; k < list.length; k += 1) body.appendChild(list[k]);
+    if (emptyRow) body.appendChild(emptyRow);
+  }
+
+  function apply() {
+    var shown = 0;
+    for (var k = 0; k < rows.length; k += 1) {
+      var keep = true;
+      for (var j = 0; j < FIELDS.length; j += 1) {
+        if (!pick(rows[k], FIELDS[j][0], FIELDS[j][1].value)) { keep = false; break; }
+      }
+      rows[k].hidden = !keep;
+      if (keep && rows[k].getAttribute('data-severity')) shown += 1;
+    }
+    order();
+    if (emptyRow) emptyRow.hidden = !(items > 0 && shown === 0);
+    if (count) count.textContent = items ? '显示 ' + shown + ' / ' + items + ' 条漏项' : '没有漏项';
+  }
+
+  function selectValue(node, value) {
+    for (var k = 0; k < node.options.length; k += 1) {
+      if (node.options[k].value === value && !node.options[k].disabled) {
+        node.value = value;
+        return;
+      }
+    }
+    node.value = 'all';
+  }
+
+  function readHash() {
+    var parts = location.hash.replace(/^#/, '').split('&');
+    var seen = {};
+    for (var k = 0; k < parts.length; k += 1) {
+      var pair = parts[k].split('=');
+      if (pair.length === 2 && pair[1]) seen[pair[0]] = decodeURIComponent(pair[1]);
+    }
+    selectValue(dim, seen.dim || 'all');
+    selectValue(sev, seen.sev || 'all');
+    selectValue(dis, seen.dis || 'all');
+  }
+
+  function writeHash() {
+    var pairs = [];
+    if (dim.value !== 'all') pairs.push('dim=' + encodeURIComponent(dim.value));
+    if (sev.value !== 'all') pairs.push('sev=' + encodeURIComponent(sev.value));
+    if (dis.value !== 'all') pairs.push('dis=' + encodeURIComponent(dis.value));
+    var hash = pairs.length ? '#' + pairs.join('&') : '#';
+    if (location.hash === hash) return;
+    try {
+      history.replaceState(null, '', hash);
+    } catch (error) {
+      location.hash = hash;
+    }
+  }
+
+  function sync() {
+    apply();
+    writeHash();
+  }
+
+  dim.addEventListener('change', sync);
+  sev.addEventListener('change', sync);
+  dis.addEventListener('change', sync);
+  if (reset) {
+    reset.addEventListener('click', function () {
+      dim.value = 'all';
+      sev.value = 'all';
+      dis.value = 'all';
+      sync();
+    });
+  }
+  window.addEventListener('hashchange', function () {
+    readHash();
+    apply();
+  });
+
+  readHash();
+  apply();
+})();
+</script>
+</body>
+</html>

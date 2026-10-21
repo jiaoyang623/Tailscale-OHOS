@@ -1,0 +1,113 @@
+{
+ "skill_version": "a01",
+ "title": "安装重启后的意图恢复",
+ "change_id": "vpn-endurance",
+ "baseline": "ec64476（工作树有本批次未提交改动）",
+ "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+ "command": "DEVICE=2LQGK24828000076 HAP=/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap node --test scripts/e2e/install-restart-recovery.mjs",
+ "executed_at": "2026-10-20T13:02:57.916Z",
+ "target": "mobile",
+ "notice": "安装由本用例执行。安装会结束应用进程，应用数据保留。",
+ "cases": [
+  {
+   "id": "INSTALL-RESTART",
+   "title": "安装重启后按意图恢复隧道",
+   "oracle_ids": [
+    "O-CONN-08",
+    "O-DIAG-02",
+    "O-RECONN-02"
+   ],
+   "status": "pass",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "确认安装前状态",
+     "operation": "读取状态文件与意图文件",
+     "expected": [
+      "状态为 Running",
+      "意图为 connected",
+      "状态文件带 sessionId"
+     ],
+     "actual": "会话 1792501348074，state=Running，意图 connected",
+     "status": "pass",
+     "evidence": {
+      "kind": "log",
+      "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=9 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792501348253 | txBytes=632 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792501380370 | sessionId=1792501348074\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792501344314,\"by\":\"ui\"}"
+     }
+    },
+    {
+     "id": "S2",
+     "name": "安装新 HAP",
+     "operation": "hdc install -r /opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap",
+     "expected": [
+      "安装成功",
+      "应用与扩展进程被结束"
+     ],
+     "actual": "安装成功，应用数据保留",
+     "status": "pass",
+     "evidence": {
+      "kind": "log",
+      "output": "[Info]App install path:/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap msg:install bundle successfully. \nAppMod finish"
+     }
+    },
+    {
+     "id": "S3",
+     "name": "启动应用",
+     "operation": "aa start -a EntryAbility",
+     "expected": [
+      "启动成功",
+      "设备日志出现 ui_opened"
+     ],
+     "actual": "应用启动并显示界面",
+     "status": "pass",
+     "evidence": {
+      "kind": "ui",
+      "screenshots": [
+       {
+        "path": "e2e-run/shots/01-install-restart-launched.png",
+        "label": "操作后"
+       }
+      ]
+     }
+    },
+    {
+     "id": "S4",
+     "name": "等待记录与恢复",
+     "operation": "等待结束观测、恢复事件与新扩展",
+     "expected": [
+      "出现 vpn_session_end_observed",
+      "出现 vpn_session_recovery_attempt",
+      "出现 vpn_session_recovery_started",
+      "状态回到 Running 且 sessionId 改变"
+     ],
+     "actual": "新会话 1792501414003，state=Running",
+     "status": "pass",
+     "evidence": {
+      "kind": "ui",
+      "screenshots": [
+       {
+        "path": "e2e-run/shots/02-install-restart-recovered.png",
+        "label": "结果"
+       }
+      ]
+     }
+    },
+    {
+     "id": "S5",
+     "name": "校验原因账本",
+     "operation": "读取会话账本（按写者分文件）",
+     "expected": [
+      "旧会话有 observed 或 end 记录",
+      "本次运行没有 user_stop"
+     ],
+     "actual": "旧会话 1792501348074 已记录结束原因，本次没有 user_stop",
+     "status": "pass",
+     "evidence": {
+      "kind": "log",
+      "output": "[\n  {\n    \"timestampMs\": 1792501413780,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792501348074\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired\",\n    \"code\": 0\n  }\n]"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -5,6 +5,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { fileIo } from '@kit.CoreFileKit';
 import nativeBridge from 'libtailscale_ohos.so';
 import { DiagnosticEventStore } from '../services/DiagnosticEventStore';
+import { SessionEndReason, SessionLedger } from '../services/SessionLedger';
+import { VpnPowerIntervals, VpnPowerPolicy, VpnPowerStage } from '../services/VpnPowerPolicy';
 import { RecoverableCachePaths } from '../services/RecoverableCachePaths';
 import {
   clearTaildropProgress,
@@ -309,6 +311,13 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
   private statusUpdateInFlight: boolean = false;
   private taildropIncomingSnapshotInFlight: boolean = false;
   private currentVisibleStatus: string = 'VPN extension lifecycle entered';
+  /**
+   * One id per extension process. The app uses it to tell a recovered session
+   * from the one it was showing, and to deduplicate ledger records.
+   */
+  private sessionId: string = '';
+  private lastSnapshotAtMs: number = 0;
+  private statusIntervals: VpnPowerIntervals = VpnPowerPolicy.extensionIntervals(VpnPowerStage.ACTIVE);
   private backendStopWatcher?: fileIo.Watcher;
   private peerConnectivityInFlight: boolean = false;
   private sunshineProbeInFlight: boolean = false;
@@ -335,6 +344,7 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
   };
 
   onCreate(want: Want): void {
+    this.sessionId = Date.now().toString();
     this.recordDiagnosticEvent('vpn_extension_created', 'lifecycle');
     this.writePeerSnapshot([], emptyMeshArcReceiverStatus());
     this.cleanupStaleTaildropOutbox();
@@ -643,6 +653,8 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
       await this.waitForVpnTransition(VPN_BACKEND_HANDOFF_POLL_INTERVAL_MS);
     }
     this.recordDiagnosticEvent('vpn_backend_handoff_timeout', 'vpn_handoff');
+    SessionLedger.recordEnd(this.context.filesDir, 'vpn', this.sessionId,
+      SessionEndReason.HANDOFF_TIMEOUT, 'handoff', 0, Date.now());
     return 'FAILED | backend handoff | stop timeout';
   }
 
@@ -826,6 +838,10 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
     if (this.taildropIncomingTimer >= 0) {
       clearInterval(this.taildropIncomingTimer);
     }
+    // The app chooses the observation rate from the power stage. A missing or
+    // damaged stage file yields the active rate, never the slowest one.
+    const intervals: VpnPowerIntervals = VpnPowerPolicy.extensionIntervalsForFile(this.context.filesDir);
+    this.statusIntervals = intervals;
     // Request handling must not wait behind the status snapshot. That snapshot
     // can spend several seconds querying targets and inbox files.
     this.taildropRequestTimer = setInterval(() => {
@@ -841,15 +857,24 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
       this.processTaildriveControlRequest();
       this.processLocalSendRefreshRequest();
       this.processPeerConnectivityRequest();
-    }, 100);
+    }, intervals.commandMs);
     // The regular backend snapshot can wait on file-target and inbox queries.
     // Keep receive notifications tied to the IPN-bus state so a fast transfer
     // is visible before the full snapshot finishes.
     this.taildropIncomingTimer = setInterval(() => {
       this.refreshTaildropIncomingNotification();
-    }, 250);
+    }, Math.max(intervals.commandMs, 250));
     this.refreshTaildropIncomingNotification();
+    this.lastSnapshotAtMs = 0;
     this.statusTimer = setInterval(() => {
+      const current: VpnPowerIntervals = VpnPowerPolicy.extensionIntervalsForFile(this.context.filesDir);
+      if (current.statusMs !== this.statusIntervals.statusMs ||
+        current.snapshotMs !== this.statusIntervals.snapshotMs ||
+        current.commandMs !== this.statusIntervals.commandMs) {
+        // The app changed the stage. Rebuild every loop at the new rate.
+        this.startStatusUpdates();
+        return;
+      }
       // Keep liveness independent from the full backend snapshot. File-target
       // and inbox queries can occasionally take several seconds, but that does
       // not mean the HarmonyOS VPN connection or its TUN has stopped.
@@ -860,6 +885,10 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
       if (this.processBackendStopRequest()) {
         return;
       }
+      if (Date.now() - this.lastSnapshotAtMs < this.statusIntervals.snapshotMs) {
+        return;
+      }
+      this.lastSnapshotAtMs = Date.now();
       this.statusUpdateInFlight = true;
       nativeBridge.backendSnapshot()
         .then((snapshotText: string): void => {
@@ -895,7 +924,7 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
         .finally(() => {
           this.statusUpdateInFlight = false;
         });
-    }, 1000);
+    }, intervals.statusMs);
   }
 
   private writePeerStatus(status: string): void {
@@ -1856,7 +1885,7 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
   private writeCurrentStatusHeartbeat(): void {
     const heartbeatMs: number = Date.now();
     this.writeAtomicTextFile(`${this.context.filesDir}/vpn-probe-status.txt`,
-      `${this.currentVisibleStatus} | heartbeatMs=${heartbeatMs}`);
+      `${this.currentVisibleStatus} | heartbeatMs=${heartbeatMs} | sessionId=${this.sessionId}`);
     // Mirror the timestamp to the device log. The host cannot read this file,
     // and no file-pull command exists, so this line is the only way a device
     // run can measure the heartbeat. A gap between two lines is how long the
@@ -1907,6 +1936,10 @@ export default class TailscaleVpnExtensionAbility extends VpnExtensionAbility {
   }
 
   onDestroy(): void {
+    // Record why the session ended before any teardown work can fail. A user
+    // stop is already in the ledger, so this record is refused in that case.
+    SessionLedger.recordEnd(this.context.filesDir, 'vpn', this.sessionId,
+      SessionEndReason.EXTENSION_DESTROYED, 'on_destroy', 0, Date.now());
     this.destroying = true;
     this.networkMonitor.stop();
     this.recordDiagnosticEvent('vpn_extension_destroyed', 'lifecycle');

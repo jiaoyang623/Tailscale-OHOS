@@ -1,0 +1,974 @@
+{
+  "schema": "high-level-review/1",
+  "change_id": "vpn-endurance",
+  "baseline": "ec64476",
+  "meta": {
+    "change_id": "vpn-endurance",
+    "baseline": "ec64476",
+    "created_at": "2026-10-20T22:05:00+11:00",
+    "reviewer_contexts": [
+      {
+        "agent": "HLR: requirement coverage",
+        "dimensions": [
+          "requirement-coverage",
+          "reverse-enumeration"
+        ],
+        "inputs": [
+          "docs/requirements/requirements.md",
+          "docs/architecture/architecture.md",
+          "docs/hld/hld.md",
+          "docs/lld/lld.md",
+          "entry/src/main/module.json5",
+          "entry/src/main/ets/components/BridgeStatus.ets",
+          "entry/src/main/ets/entryability/EntryAbility.ets",
+          "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+          "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+          "entry/src/main/ets/services/AppLifecycleEvents.ets",
+          "entry/src/main/ets/services/FormCardService.ets",
+          "entry/src/main/ets/services/SessionLedger.ets",
+          "entry/src/main/ets/services/StoragePaths.ets",
+          "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+          "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+          "entry/src/main/ets/services/VpnPowerPolicy.ets",
+          "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+          "entry/src/main/ets/services/VpnSessionController.ets",
+          "entry/src/main/ets/services/VpnSessionIntent.ets",
+          "entry/src/main/ets/services/VpnStatusReader.ets",
+          "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+        ]
+      },
+      {
+        "agent": "HLR: HLD contracts",
+        "dimensions": [
+          "hld-contract-coverage",
+          "interface-consumers"
+        ],
+        "inputs": [
+          "docs/requirements/requirements.md",
+          "docs/architecture/architecture.md",
+          "docs/hld/hld.md",
+          "docs/lld/lld.md",
+          "entry/src/main/module.json5",
+          "entry/src/main/ets/components/BridgeStatus.ets",
+          "entry/src/main/ets/entryability/EntryAbility.ets",
+          "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+          "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+          "entry/src/main/ets/services/AccountDiagnosticsGateway.ets",
+          "entry/src/main/ets/services/DiagnosticEventStore.ets",
+          "entry/src/main/ets/services/FormCardService.ets",
+          "entry/src/main/ets/services/SessionLedger.ets",
+          "entry/src/main/ets/services/StoragePaths.ets",
+          "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+          "entry/src/main/ets/services/VpnCommandGateway.ets",
+          "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+          "entry/src/main/ets/services/VpnPowerPolicy.ets",
+          "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+          "entry/src/main/ets/services/VpnSessionController.ets",
+          "entry/src/main/ets/services/VpnSessionIntent.ets",
+          "entry/src/main/ets/services/VpnStatusReader.ets",
+          "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+        ]
+      },
+      {
+        "agent": "HLR: journeys and state",
+        "dimensions": [
+          "journey-branches",
+          "state-and-persistence"
+        ],
+        "inputs": [
+          "docs/requirements/requirements.md",
+          "docs/architecture/architecture.md",
+          "docs/hld/hld.md",
+          "docs/lld/lld.md",
+          "entry/src/main/module.json5",
+          "entry/src/main/ets/components/BridgeStatus.ets",
+          "entry/src/main/ets/entryability/EntryAbility.ets",
+          "entry/src/main/ets/services/DiagnosticEventStore.ets",
+          "entry/src/main/ets/services/SessionLedger.ets",
+          "entry/src/main/ets/services/StoragePaths.ets",
+          "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+          "entry/src/main/ets/services/VpnCommandGateway.ets",
+          "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+          "entry/src/main/ets/services/VpnPowerPolicy.ets",
+          "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+          "entry/src/main/ets/services/VpnSessionController.ets",
+          "entry/src/main/ets/services/VpnSessionIntent.ets",
+          "entry/src/main/ets/services/VpnStatusReader.ets",
+          "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+        ]
+      },
+      {
+        "agent": "HLR: concurrency and quality",
+        "dimensions": [
+          "concurrency-and-timing",
+          "non-functional"
+        ],
+        "inputs": [
+          "docs/requirements/requirements.md",
+          "docs/architecture/architecture.md",
+          "docs/hld/hld.md",
+          "docs/lld/lld.md",
+          "entry/src/main/module.json5",
+          "entry/src/main/ets/components/BridgeStatus.ets",
+          "entry/src/main/ets/components/NativeSettingsNavigation.ets",
+          "entry/src/main/ets/entryability/EntryAbility.ets",
+          "entry/src/main/ets/services/AppLifecycleEvents.ets",
+          "entry/src/main/ets/services/DiagnosticEventStore.ets",
+          "entry/src/main/ets/services/DiagnosticPrivacy.ets",
+          "entry/src/main/ets/services/DiagnosticReportService.ets",
+          "entry/src/main/ets/services/FormCardService.ets",
+          "entry/src/main/ets/services/RecoverableCachePaths.ets",
+          "entry/src/main/ets/services/SessionLedger.ets",
+          "entry/src/main/ets/services/StoragePaths.ets",
+          "entry/src/main/ets/services/TaildriveGateway.ets",
+          "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+          "entry/src/main/ets/services/VpnCommandGateway.ets",
+          "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+          "entry/src/main/ets/services/VpnPowerPolicy.ets",
+          "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+          "entry/src/main/ets/services/VpnSessionController.ets",
+          "entry/src/main/ets/services/VpnSessionIntent.ets",
+          "entry/src/main/ets/services/VpnStatusReader.ets",
+          "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+        ]
+      }
+    ],
+    "inputs_declared": [
+      "docs/requirements/requirements.md",
+      "docs/architecture/architecture.md",
+      "docs/hld/hld.md",
+      "docs/lld/lld.md",
+      "entry/src/main/module.json5",
+      "entry/src/main/ets/entryability/EntryAbility.ets",
+      "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+      "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+      "entry/src/main/ets/components/BridgeStatus.ets",
+      "entry/src/main/ets/components/NativeSettingsNavigation.ets",
+      "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+      "entry/src/main/ets/services/AccountDiagnosticsGateway.ets",
+      "entry/src/main/ets/services/AppLifecycleEvents.ets",
+      "entry/src/main/ets/services/DiagnosticEventStore.ets",
+      "entry/src/main/ets/services/DiagnosticPrivacy.ets",
+      "entry/src/main/ets/services/DiagnosticReportService.ets",
+      "entry/src/main/ets/services/FormCardService.ets",
+      "entry/src/main/ets/services/RecoverableCachePaths.ets",
+      "entry/src/main/ets/services/SessionLedger.ets",
+      "entry/src/main/ets/services/StoragePaths.ets",
+      "entry/src/main/ets/services/TaildriveGateway.ets",
+      "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+      "entry/src/main/ets/services/VpnCommandGateway.ets",
+      "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+      "entry/src/main/ets/services/VpnPowerPolicy.ets",
+      "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+      "entry/src/main/ets/services/VpnSessionController.ets",
+      "entry/src/main/ets/services/VpnSessionIntent.ets",
+      "entry/src/main/ets/services/VpnStatusReader.ets"
+    ],
+    "inputs_forbidden_checked": [
+      "docs/oracles/ 判据文件",
+      "docs/diagnostics/ 诊断登记表不作判据依据",
+      "scripts/test-*.mjs 与 scripts/integration/*.mjs 测试文件",
+      "scripts/e2e/** 端到端脚本",
+      "docs/review/** 审核页与审核快照",
+      "docs/changes/vpn-endurance/checks/** 本批次执行记录"
+    ]
+  },
+  "items": [
+    {
+      "id": "HLR-01",
+      "dimension": "journey-branches",
+      "title": "连接窗口在 P2 报出 connecting 之前没有长时任务",
+      "anchor": "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:200",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：意图在 60 秒内刚写为 connected 时，长时任务在扩展报出 connecting 之前取得。判据 O-BGTASK-13 已更新。测试「a fresh connected intent holds protection before any interface evidence」与「an old connected intent does not start protection on its own」覆盖。"
+    },
+    {
+      "id": "HLR-02",
+      "dimension": "requirement-coverage",
+      "title": "意图为 connected 时仍可能没有长时任务，违反 R-CONN-03 与 R-CONN-11",
+      "anchor": "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:200",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-01 同一修复。R-CONN-03 与 R-CONN-11 的连接窗口保护从意图写入时开始。"
+    },
+    {
+      "id": "HLR-03",
+      "dimension": "journey-branches",
+      "title": "前台时取消实况窗通知，下次进后台不再申请保护",
+      "anchor": "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:170",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：manager 记录前台状态。前台取消通知时不置抑制并在下一拍重抢。判据 O-BGTASK-06 已更新。测试「dismissing the notification in the foreground re-arms protection at once」覆盖。"
+    },
+    {
+      "id": "HLR-04",
+      "dimension": "journey-branches",
+      "title": "P1 被冻结或死亡时没有子系统负责恢复",
+      "anchor": "docs/hld/hld.md:160",
+      "severity": "strong",
+      "disposition": "open",
+      "reason": "恢复轮询与网络回调都在 EntryAbility。P2 只重绑已有隧道。HLD C-11 称本批把恢复入口新增到扩展进程，但扩展没有恢复代码。设计文本与成品不一致。"
+    },
+    {
+      "id": "HLR-05",
+      "dimension": "non-functional",
+      "title": "HLD C-11 声称扩展进程有恢复入口，成品没有",
+      "anchor": "docs/hld/hld.md:160",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：HLD C-11 改为「P2 仍只重绑已有隧道，没有启动连接的恢复入口」，不再声称扩展进程已有恢复入口。"
+    },
+    {
+      "id": "HLR-06",
+      "dimension": "requirement-coverage",
+      "title": "HLD C-11 写了不存在的 sessionHeld 字段",
+      "anchor": "docs/hld/hld.md:160",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：HLD C-11 删去不存在的 sessionHeld 字段，改为按意图与 lastLiveAtMs 描述。"
+    },
+    {
+      "id": "HLR-07",
+      "dimension": "state-and-persistence",
+      "title": "两个进程重写同一账本且无锁，记录会丢失",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:189",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "每个写者只追加和压缩自己的账本文件。去重读取全部账本文件。读取按 timestampMs 合并，并按 sessionId + kind 保留第一条。压缩不再重写对方文件，并发追加不会被擦掉。O-SESSION-11、O-SESSION-12 与 O-SEAM-19 覆盖该行为。"
+    },
+    {
+      "id": "HLR-08",
+      "dimension": "hld-contract-coverage",
+      "title": "C-19 未定义并发追加与压缩的合并规则",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:189",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "HLD C-19 新增「并发与合并」契约：写者文件归属、跨文件去重、压缩边界、读取合并顺序。LLD 4.7 同步写入不变量。契约与成品一致。"
+    },
+    {
+      "id": "HLR-09",
+      "dimension": "concurrency-and-timing",
+      "title": "账本压缩会擦掉另一进程刚追加的行",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:189",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "SessionLedger 压缩只改本写者文件。集成用例 two writers append to one ledger and neither rewrite drops the other record 与单元用例 a writer compacts only its own file 钉住该行为。"
+    },
+    {
+      "id": "HLR-10",
+      "dimension": "requirement-coverage",
+      "title": "后台仍有两个界面定时器在跑，违反 R-POWER-01",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:1097",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：handleAppBackground 停 cacheSizePollTimer 与 connectionDurationTimer，回前台按页面可见性恢复。VpnPowerPolicy.uiTimersToStop 列出七个定时器。判据 O-POWER-01 已更新。测试「background stops UI probes but keeps the recovery watchdog」覆盖清单。"
+    },
+    {
+      "id": "HLR-11",
+      "dimension": "interface-consumers",
+      "title": "档位接口声明的界面定时器清单没有消费方",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:1097",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-10 同一修复。档位接口的定时器清单现在包含这两个定时器。"
+    },
+    {
+      "id": "HLR-12",
+      "dimension": "requirement-coverage",
+      "title": "后台一秒健康轮询仍会触发对端、Sunshine 与媒体探测",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:3412",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：autoProbeConnectedPeerServices 在 lifecycleBackgrounded 时直接返回，后台健康轮询不再触发对端、Sunshine 与媒体探测。判据 O-POWER-01 的后台探测要求覆盖。设备批次在后台场景复跑。"
+    },
+    {
+      "id": "HLR-13",
+      "dimension": "requirement-coverage",
+      "title": "原因词表缺系统策略与网络失效的生产者，冲突被当作普通掉线重试",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:23",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：network_lost 由监督器在离线掉线时写。system_stopped 由 VPN 冲突码 2203002 写。快照新增 conflict 标记。判据 O-SESSION-10、O-RECONN-11、O-RECONN-13、O-STATUS-10 已更新或新增。测试「network loss defers recovery until the network returns」「a VPN conflict is recorded as a system stop and does not retry」「a VPN conflict is flagged on the snapshot」覆盖。"
+    },
+    {
+      "id": "HLR-14",
+      "dimension": "state-and-persistence",
+      "title": "两个受控结束原因没有生产者",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:23",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-13 同一修复。词表的七个原因现在都有写入方或兜底。"
+    },
+    {
+      "id": "HLR-15",
+      "dimension": "hld-contract-coverage",
+      "title": "C-19 列出的七个原因只有五个有写入方",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:23",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-13 同一修复。HLD C-19 的七个原因与生产者一致。"
+    },
+    {
+      "id": "HLR-16",
+      "dimension": "non-functional",
+      "title": "受控结束原因的两个词没有生产者",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:23",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-13 同一修复。网络原因的结束记为 network_lost，冲突记为 system_stopped。"
+    },
+    {
+      "id": "HLR-17",
+      "dimension": "requirement-coverage",
+      "title": "熄屏快照 15 s 一次，界面读取侧 5 s 后拒收",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:76",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：对端快照与 Taildrop 快照的接受窗口由 5 秒改为 16 秒，覆盖熄屏档 15 秒周期。HLD C-04 已更新。设备批次在熄屏后复跑。"
+    },
+    {
+      "id": "HLR-18",
+      "dimension": "reverse-enumeration",
+      "title": "状态为 unknown 时第二次连接仍会启动扩展",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:116",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：控制器在 unknown 状态且意图在 30 秒内刚写为 connected 时早退，不再第二次启动扩展。判据 O-SESSION-01 已更新。测试「a second connect during an uncertain status does not start again」与「an old connected intent does not block a connect during an uncertain status」覆盖。"
+    },
+    {
+      "id": "HLR-19",
+      "dimension": "hld-contract-coverage",
+      "title": "恢复失去令牌后会停掉它不拥有的隧道，包括用户的新连接",
+      "anchor": "entry/src/main/ets/services/VpnReconnectSupervisor.ets:293",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：STARTED 且令牌失效时先读意图。意图仍为 connected 则只记录 superseded，不再 disconnect。撤销只在用户已停止时执行。测试「a card reconnect supersedes an in-flight recovery without stopping the tunnel」与「a stop written only to the intent supersedes an in-flight reconnect」覆盖。判据 O-RECONN-10 已更新。"
+    },
+    {
+      "id": "HLR-20",
+      "dimension": "concurrency-and-timing",
+      "title": "卡片连接使在途恢复失效，恢复随后断开隧道并写入停止意图",
+      "anchor": "entry/src/main/ets/services/VpnReconnectSupervisor.ets:293",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "与 HLR-19 同一处，同一修复。"
+    },
+    {
+      "id": "HLR-21",
+      "dimension": "concurrency-and-timing",
+      "title": "无界面连接在第一次检查后不再复查用户停止",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:132",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：后端就绪后与启动扩展前各复查一次意图。用户路径读意图，恢复路径读正向令牌。测试「a stop after the backend wait cancels the connect」与「a connect that lost its authority leaves the user intent alone」覆盖。判据 O-SESSION-09 已更新。"
+    },
+    {
+      "id": "HLR-22",
+      "dimension": "non-functional",
+      "title": "卡片在后台每 5 s 查询一次卡片服务，档位不治理它",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:322",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：卡片刷新按档位放慢，active 每拍、background 每 3 拍、screen-off 每 12 拍。测试「the desktop card refresh slows with the power stage」覆盖。判据 O-POWER-01 已更新。"
+    },
+    {
+      "id": "HLR-23",
+      "dimension": "requirement-coverage",
+      "title": "非用户断连指标对扩展崩溃无法成立",
+      "anchor": "docs/requirements/requirements.md:167",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：指标接受 vpn_session_end 或 vpn_session_end_observed。崩溃由 P1 补写观测记录。判据 O-SESSION-11 与 O-DIAG-02 覆盖补写路径。"
+    },
+    {
+      "id": "HLR-24",
+      "dimension": "requirement-coverage",
+      "title": "LLD VM-1 的释放与抑制规则与代码不符",
+      "anchor": "docs/lld/lld.md:170",
+      "severity": "strong",
+      "disposition": "oracle-added",
+      "reason": "已修：T1 改为意图为 stopped 时释放，T4 改为意图仍 connected 时保留任务。行为由 O-BGTASK-02/04 与 O-SESSION-09 覆盖。"
+    },
+    {
+      "id": "HLR-25",
+      "dimension": "journey-branches",
+      "title": "恢复在 P2 仍在连接时继续触发",
+      "anchor": "entry/src/main/ets/services/VpnReconnectSupervisor.ets:190",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：控制器对 CONNECTING 早退，重复启动不再发生。测试「a connect during the connect window does not start a second extension」覆盖。"
+    },
+    {
+      "id": "HLR-26",
+      "dimension": "hld-contract-coverage",
+      "title": "意图写失败后连接仍继续",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:110",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：启动前复查意图，写失败时读到 stopped 并取消。测试「a user connect cancels when its intent write fails」覆盖。界面自己的写路径仍见 HLR-31。"
+    },
+    {
+      "id": "HLR-27",
+      "dimension": "state-and-persistence",
+      "title": "LLD 的长时任务释放表仍写旧行为",
+      "anchor": "docs/lld/lld.md:167",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：T1/T4 行与代码一致。行为由 O-BGTASK-02/04 覆盖。"
+    },
+    {
+      "id": "HLR-28",
+      "dimension": "state-and-persistence",
+      "title": "LLD 判据表仍断言恢复会放弃",
+      "anchor": "docs/lld/lld.md:619",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：O-RECONN-05 行改为「recovery never exhausts while the user keeps the intent」。测试与行文一致。"
+    },
+    {
+      "id": "HLR-29",
+      "dimension": "requirement-coverage",
+      "title": "需求表把六个新增条目写成待实现",
+      "anchor": "docs/requirements/requirements.md:119",
+      "severity": "weak",
+      "disposition": "oracle-added",
+      "reason": "已修：R-CONN-11/12/13、R-NET-05、R-POWER-01/02 改为已实现，并写出判据锚点。"
+    },
+    {
+      "id": "HLR-30",
+      "dimension": "journey-branches",
+      "title": "卡片在连接进行中没有停止分支",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:276",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "卡片只对 connected 选择断开。CONNECTING 时再点会调用 connect。控制器现在早退，不再重复启动，但用户仍无法用卡片停止连接。"
+    },
+    {
+      "id": "HLR-31",
+      "dimension": "interface-consumers",
+      "title": "卡片动作未适配新的 CONNECTING 状态",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:276",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "与 HLR-30 同一处。连接窗口内卡片仍显示连接动作。"
+    },
+    {
+      "id": "HLR-32",
+      "dimension": "reverse-enumeration",
+      "title": "连接窗口内卡片不能停止隧道",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:276",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "与 HLR-30 同一处。削弱 R-CONN-06 的用户停止权威。"
+    },
+    {
+      "id": "HLR-33",
+      "dimension": "journey-branches",
+      "title": "扩展启动失败后意图仍为 connected",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:2536",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "失败路径记录 vpn_start_failed 并结束命令，但不改写意图。监督器会一直重试，包括用户拒绝系统 VPN 授权之后。"
+    },
+    {
+      "id": "HLR-34",
+      "dimension": "journey-branches",
+      "title": "恢复与界面连接没有共用串行化",
+      "anchor": "entry/src/main/ets/services/VpnReconnectSupervisor.ets:287",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "监督器直接调 controller.connect。界面用自己的 VpnCommandStateMachine。LLD J8 声称一个命令守卫覆盖两条路径，实际没有共享守卫。"
+    },
+    {
+      "id": "HLR-35",
+      "dimension": "journey-branches",
+      "title": "与另一 VPN 冲突时无界面连接不抬升界面",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:289",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "扩展启动后 connect 返回 STARTED。卡片只在 NEEDS_UI 时抬升窗口。冲突只出现在状态文件里，卡片没有提示。"
+    },
+    {
+      "id": "HLR-36",
+      "dimension": "state-and-persistence",
+      "title": "界面路径忽略意图写失败并继续连接",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:2408",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "beginVpnConnection 丢弃 VpnSessionIntent.write 的布尔结果。写失败后重启会读到旧意图或被当成已停止，恢复不再启动。"
+    },
+    {
+      "id": "HLR-37",
+      "dimension": "state-and-persistence",
+      "title": "P2 在档位文件缺失时写 P1 的诊断文件",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:181",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "readStage 回落 active 并调 recordMissing。记录来源写 ui，P2 由此写 diagnostic-ui-events.ndjson。该文件按 C-15 属于 P1。"
+    },
+    {
+      "id": "HLR-38",
+      "dimension": "interface-consumers",
+      "title": "P2 写 P1 诊断文件，与 P1 的整文件重写互相覆盖",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:181",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "与 HLR-37 同一处。DiagnosticEventStore 做读改写，两进程会丢事件。"
+    },
+    {
+      "id": "HLR-39",
+      "dimension": "concurrency-and-timing",
+      "title": "扩展把档位事件写进界面诊断文件，界面也在重写它",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:181",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "与 HLR-37 同一处。两进程的读改写会互相覆盖。"
+    },
+    {
+      "id": "HLR-40",
+      "dimension": "state-and-persistence",
+      "title": "两个写者共用 vpn-connect-config.json 的同一个临时文件",
+      "anchor": "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:1101",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "P2 在此暂存重连配置，P1 经 VpnCommandGateway 暂存同一路径加 .tmp。改名可能发布对方的内容，或因临时文件已被移走而失败。"
+    },
+    {
+      "id": "HLR-41",
+      "dimension": "state-and-persistence",
+      "title": "用户停止可能为过期会话写 user_stop",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:166",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "记录使用最后一次状态读取的 sessionId。该读取可能是 UNKNOWN，也可能属于已崩溃的会话。崩溃因此可能被记成用户停止。"
+    },
+    {
+      "id": "HLR-42",
+      "dimension": "hld-contract-coverage",
+      "title": "连接窗口内的用户停止可能被记为 extension_destroyed",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:166",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "sessionId 为空时 recordEnd 丢弃记录。扩展随后在 onDestroy 写 extension_destroyed，用户原因丢失。"
+    },
+    {
+      "id": "HLR-43",
+      "dimension": "state-and-persistence",
+      "title": "结束记录只有一个槽位，未读时会被覆盖",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:197",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "writeEndFile 每次 END 替换 vpn-session-end.json。监督器只读这个文件。P1 被冻结跨过两次结束时会丢掉前一个原因。"
+    },
+    {
+      "id": "HLR-44",
+      "dimension": "state-and-persistence",
+      "title": "P1 被杀后档位没有写入方",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:240",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "档位采样只在 ability 里跑。P1 在 background 档死亡后，后续熄屏不会把 P2 降到 5 s 状态环。"
+    },
+    {
+      "id": "HLR-45",
+      "dimension": "requirement-coverage",
+      "title": "熄屏档依赖存活的界面进程，R-POWER-02 在该状态下失效",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:240",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "与 HLR-44 同一处。用户离开时正是界面进程最可能被冻结的时候。"
+    },
+    {
+      "id": "HLR-46",
+      "dimension": "hld-contract-coverage",
+      "title": "C-04 仍把对端快照写成 1 s 发布与 5 s 接受",
+      "anchor": "docs/hld/hld.md:84",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "档位把快照环放到 2 s 或 15 s。熄屏时对端文件在每个 15 s 周期的大部分时间里超过 5 s。"
+    },
+    {
+      "id": "HLR-47",
+      "dimension": "hld-contract-coverage",
+      "title": "C-09 的探测时序在熄屏档不再成立",
+      "anchor": "docs/hld/hld.md:139",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "Sunshine 与媒体探测只在快照块内运行。熄屏时该块 15 s 一次，客户端超时仍为 3.5 s 与 4 s。"
+    },
+    {
+      "id": "HLR-48",
+      "dimension": "hld-contract-coverage",
+      "title": "power.isActive() 失败时不保留上一档，也不记事件",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:87",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "catch 置 screenOn=true 并返回 background。LLD 4.8 要求保留上一档并记 vpn_power_probe_failed。"
+    },
+    {
+      "id": "HLR-49",
+      "dimension": "hld-contract-coverage",
+      "title": "意图写入方不校验 by 词表",
+      "anchor": "entry/src/main/ets/services/VpnSessionIntent.ets:100",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "C-19 把 by 固定为 ui、card、recovery。write 接受任意字符串，read 只检查非空。"
+    },
+    {
+      "id": "HLR-50",
+      "dimension": "hld-contract-coverage",
+      "title": "交接应答方清除请求后可能不再应答",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:3494",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "连接命令不再活跃时，then 与 catch 都在写应答前返回。扩展随后等满 15 s 并销毁 TUN。C-02 要求应答。"
+    },
+    {
+      "id": "HLR-51",
+      "dimension": "interface-consumers",
+      "title": "SessionLedger.read 没有产品消费方",
+      "anchor": "entry/src/main/ets/services/SessionLedger.ets:80",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "C-19 说 P1 在报告导出时合并账本。没有产品文件读它，监督器只用 readEndFile。账本正文从不导出。"
+    },
+    {
+      "id": "HLR-52",
+      "dimension": "interface-consumers",
+      "title": "P1 诊断路径用旧格式写 P2 拥有的状态文件",
+      "anchor": "entry/src/main/ets/services/AccountDiagnosticsGateway.ets:108",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "stageCrashProbeStatus 截断 vpn-probe-status.txt，写入只有 heartbeatMs 没有 sessionId 的行。C-03 规定 P2 是唯一写入方，C-19 用 sessionId 作账本键。"
+    },
+    {
+      "id": "HLR-53",
+      "dimension": "interface-consumers",
+      "title": "connect 的默认 by 为 recovery，新调用方会跳过意图写入",
+      "anchor": "entry/src/main/ets/services/VpnSessionController.ets:97",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "省略 by 的用户入口会启动扩展但不写意图。长时任务与监督器随后把会话当成已停止。用户动作的默认值应失败关闭。"
+    },
+    {
+      "id": "HLR-54",
+      "dimension": "concurrency-and-timing",
+      "title": "永不结算的连接会永久阻塞后续恢复",
+      "anchor": "entry/src/main/ets/services/VpnReconnectSupervisor.ets:286",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "attemptInFlight 只在 promise 回调里清零。startVpnExtension 没有超时，平台调用挂起时标志一直置位。"
+    },
+    {
+      "id": "HLR-55",
+      "dimension": "concurrency-and-timing",
+      "title": "心跳新鲜度比较两个墙上时钟，调时会让运行中的隧道不可读",
+      "anchor": "entry/src/main/ets/services/VpnStatusReader.ets:142",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "时钟回拨使 ageMs 为负，judge 返回 unknown。界面宽限 8 s 后把运行中的隧道显示为已停止。"
+    },
+    {
+      "id": "HLR-56",
+      "dimension": "non-functional",
+      "title": "界面定时器的单一清单没有调用者",
+      "anchor": "entry/src/main/ets/services/VpnPowerPolicy.ets:41",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "uiTimersToStop 没有被任何 .ets 引用。BridgeStatus 自己硬编码五个定时器停止。新定时器不受档位治理，两份清单会漂移。"
+    },
+    {
+      "id": "HLR-57",
+      "dimension": "non-functional",
+      "title": "界面健康轮询在后台保持 1 s 节拍",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:3968",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "handleAppBackground 不停 healthPollTimer。该轮询每秒读状态文件，并在隧道不活跃时调 refreshOrRecoverBackend。"
+    },
+    {
+      "id": "HLR-58",
+      "dimension": "non-functional",
+      "title": "熄屏档仍每秒跑一次原生 Taildrop 快照",
+      "anchor": "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:864",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "incoming 定时器取 max(commandMs, 250)。熄屏命令环 1000 ms 因此让原生查询保持每秒一次。"
+    },
+    {
+      "id": "HLR-59",
+      "dimension": "non-functional",
+      "title": "选中的动画预设用硬编码亮色背景，暗色主题不可读",
+      "anchor": "entry/src/main/ets/components/NativeSettingsNavigation.ets:1058",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "填充色为 #E7E1FF，文字用 app.color.emphasize。该令牌在暗色主题是 #73a7f9，形成浅底浅字。其他表面都用系统色或暗色资源。"
+    },
+    {
+      "id": "HLR-60",
+      "dimension": "non-functional",
+      "title": "长时任务丢失且没有取消回调时不再申请保护",
+      "anchor": "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:203",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "reconcile 只在 task 为 undefined 时 start。只有 cancelCallback 清零字段。监听未注册或回调不来时，管理器保留死任务，会话期间不再申请保护。"
+    },
+    {
+      "id": "HLR-61",
+      "dimension": "non-functional",
+      "title": "后台会话变化仍会安排对端、Sunshine 与媒体探测",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:944",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "applyPeers 在隧道连接时安排自动探测。refreshVpnProbeStatus 在每次状态或会话变化时调对端快照，后台 1 s 健康轮询让该路径持续存活。"
+    },
+    {
+      "id": "HLR-62",
+      "dimension": "requirement-coverage",
+      "title": "LLD 的档位探测失败回退与代码不符",
+      "anchor": "docs/lld/lld.md:513",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "设计写保留上一档并记事件。代码把失败样本当成亮屏，熄屏档会退到 background，且没有事件。"
+    },
+    {
+      "id": "HLR-63",
+      "dimension": "reverse-enumeration",
+      "title": "onCreate 在未知前后台状态时先写 ACTIVE 档",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:111",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "卡片调用可在后台唤醒 ability。若 onBackground 不随后发生，扩展保持 active 的 100 ms 与 1 s 节拍。"
+    },
+    {
+      "id": "HLR-64",
+      "dimension": "requirement-coverage",
+      "title": "netAvailable 注册失败后不再重试",
+      "anchor": "entry/src/main/ets/entryability/EntryAbility.ets:115",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "失败分支只写 hilog。VpnNetworkMonitor 每 5 s 重试自己的注册，恢复监听不重试。恢复因此退回 5 s 轮询，R-NET-05 要求的网络回调失效。"
+    },
+    {
+      "id": "HLR-65",
+      "dimension": "requirement-coverage",
+      "title": "界面路径的意图写失败会让恢复撤销用户停止",
+      "anchor": "entry/src/main/ets/components/BridgeStatus.ets:2568",
+      "severity": "weak",
+      "disposition": "open",
+      "reason": "stopVpnProbe 忽略写结果。只有卡片路径调 noteRequestedStop。写失败时监督器仍读到 connected，扩展停止后恢复，违反 R-CONN-06。"
+    }
+  ],
+  "coverage": [
+    {
+      "dimension": "requirement-coverage",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/module.json5",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+        "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+        "entry/src/main/ets/services/AppLifecycleEvents.ets",
+        "entry/src/main/ets/services/FormCardService.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+      ],
+      "note": "需求逐条对设计与成品。未守住的行为集中在 R-CONN-03、R-CONN-06、R-CONN-09、R-CONN-11、R-CONN-12、R-NET-05、R-POWER-01 与 R-POWER-02。"
+    },
+    {
+      "dimension": "reverse-enumeration",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/module.json5",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+        "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+        "entry/src/main/ets/services/AppLifecycleEvents.ets",
+        "entry/src/main/ets/services/FormCardService.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+      ],
+      "note": "从 UI ability、VPN 扩展、卡片 ability、卡片、服务、定时器与网络回调逐个反查。多出的行为与矛盾的行为见 HLR-18、HLR-30、HLR-63。"
+    },
+    {
+      "dimension": "hld-contract-coverage",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnCommandGateway.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/FormCardService.ets",
+        "entry/src/main/ets/services/DiagnosticEventStore.ets",
+        "entry/src/main/ets/services/AccountDiagnosticsGateway.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/entryformability/EntryFormAbility.ets",
+        "entry/src/main/ets/widget/pages/VpnToggleCard.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "entry/src/main/module.json5"
+      ],
+      "note": "C-02、C-03、C-04、C-09、C-11、C-15、C-19 逐件对成品。契约与成品不一致处见 HLR-04、HLR-08、HLR-17、HLR-42、HLR-46、HLR-47、HLR-49、HLR-50。"
+    },
+    {
+      "dimension": "interface-consumers",
+      "result": "gaps-found",
+      "scanned": [
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/services/AccountDiagnosticsGateway.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets"
+      ],
+      "note": "逐个消费方核对变更接口。见 HLR-11、HLR-31、HLR-38、HLR-51、HLR-52、HLR-53。"
+    },
+    {
+      "dimension": "journey-branches",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/module.json5",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/VpnCommandGateway.ets",
+        "entry/src/main/ets/services/DiagnosticEventStore.ets"
+      ],
+      "note": "每条旅程逐分支对断言。正常、边界、失败、取消、恢复与权限分支见 HLR-01、HLR-03、HLR-04、HLR-25、HLR-30、HLR-33、HLR-34、HLR-35。"
+    },
+    {
+      "dimension": "state-and-persistence",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/module.json5",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/VpnCommandGateway.ets",
+        "entry/src/main/ets/services/DiagnosticEventStore.ets"
+      ],
+      "note": "合法与非法状态迁移、持久化往返、数据迁移。见 HLR-07、HLR-14、HLR-27、HLR-28、HLR-36、HLR-37、HLR-40、HLR-41、HLR-43、HLR-44。"
+    },
+    {
+      "dimension": "concurrency-and-timing",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "entry/src/main/ets/services/VpnCommandGateway.ets",
+        "entry/src/main/ets/services/DiagnosticEventStore.ets",
+        "entry/src/main/ets/services/DiagnosticPrivacy.ets",
+        "entry/src/main/ets/services/FormCardService.ets",
+        "entry/src/main/ets/services/StoragePaths.ets",
+        "entry/src/main/ets/services/RecoverableCachePaths.ets",
+        "entry/src/main/ets/services/AppLifecycleEvents.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets"
+      ],
+      "note": "共享可变状态、竞态、超时、重试与降级。见 HLR-09、HLR-20、HLR-21、HLR-39、HLR-54、HLR-55。"
+    },
+    {
+      "dimension": "non-functional",
+      "result": "gaps-found",
+      "scanned": [
+        "docs/requirements/requirements.md",
+        "docs/architecture/architecture.md",
+        "docs/hld/hld.md",
+        "docs/lld/lld.md",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets",
+        "entry/src/main/ets/services/DiagnosticEventStore.ets",
+        "entry/src/main/ets/services/DiagnosticPrivacy.ets",
+        "entry/src/main/ets/services/DiagnosticReportService.ets",
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/FormCardService.ets",
+        "entry/src/main/ets/services/TaildriveGateway.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "entry/src/main/ets/components/NativeSettingsNavigation.ets",
+        "entry/src/main/module.json5",
+        "entry/src/main/resources/base/element/color.json",
+        "entry/src/main/resources/dark/element/color.json"
+      ],
+      "note": "判据期望里的质量条件逐项对手段与证据。耗电、刷新节拍、暗色可读性与任务丢失见 HLR-05、HLR-16、HLR-22、HLR-56、HLR-57、HLR-58、HLR-59、HLR-60、HLR-61。"
+    }
+  ]
+}

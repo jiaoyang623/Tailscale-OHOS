@@ -1,0 +1,398 @@
+{
+  "schema_version": "a01-review-brief/1",
+  "baseline": "ec64476",
+  "abbreviations": {
+    "VPN": "虚拟专用网络",
+    "UI": "用户界面",
+    "P1": "应用界面进程",
+    "P2": "VPN 扩展进程",
+    "P3": "桌面卡片进程",
+    "NDJSON": "按行分隔的 JSON",
+    "KB": "千字节"
+  },
+  "diff_from_last_review": {
+    "first_review": true
+  },
+  "layer": "requirements",
+  "title": "连接常驻与省电 · 需求审核",
+  "conclusion": "本层确认五件事：连接的停止条件、断连留证方式、恢复尝试策略、网络离线等待、省电档位。请逐项选择。",
+  "decisions": [
+    {
+      "id": "D-01",
+      "priority": "P0",
+      "question": "连接什么时候可以停止？",
+      "reason": "用户报告长时间使用后连接中断。现有逻辑以状态判读决定停止。一次读不到心跳就可能释放保护。",
+      "options": [
+        {
+          "id": "A",
+          "label": "只认用户停止",
+          "description": "停止只由用户动作决定。状态缺失、陈旧、心跳停止都不停止连接。后台任务保留，恢复看门狗继续运行。",
+          "consequences": "连接更稳。代价是进程常驻时间变长。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "沿用状态判读",
+          "description": "读到断开就释放长时任务。",
+          "consequences": "省一点电。连接可能在用户不知情时停止。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "R-CONN-11",
+        "R-CONN-09",
+        "R-CONN-06",
+        "R-CONN-13",
+        "R-CONN-04",
+        "R-CONN-05"
+      ]
+    },
+    {
+      "id": "D-02",
+      "priority": "P0",
+      "question": "非用户断连怎么留证？",
+      "reason": "现有日志只有生命周期事件。无法区分用户停止、扩展崩溃、交接超时与系统停止。",
+      "options": [
+        {
+          "id": "A",
+          "label": "专用会话账本加受控原因词",
+          "description": "每次会话结束写一行。字段固定。原因取自受控词表。账本有上限。",
+          "consequences": "原因可统计。需要新增一个文件与写入点。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "只扩展现有诊断事件",
+          "description": "把原因写进现有诊断事件文件。",
+          "consequences": "改动小。诊断事件会被探测噪声挤掉，断连记录可能丢失。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "R-CONN-12",
+        "R-DIAG-05",
+        "R-DIAG-02",
+        "R-DIAG-03",
+        "R-DIAG-01",
+        "R-DIAG-04"
+      ]
+    },
+    {
+      "id": "D-03",
+      "priority": "P1",
+      "question": "恢复尝试要设上限吗？",
+      "reason": "用户要求连接保持到用户停止。固定上限会让后台断连永久不恢复。",
+      "options": [
+        {
+          "id": "A",
+          "label": "不设上限，退避封顶",
+          "description": "意图为连接时持续重试。间隔为 30、60、120、300 秒。封顶 300 秒。",
+          "consequences": "网络长期不可用时仍会低频重试。用户停止后立即停止。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "最多 3 次",
+          "description": "3 次失败后放弃。",
+          "consequences": "后台断连后可能永久不恢复。与用户要求冲突。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "R-CONN-13",
+        "R-CONN-05",
+        "R-CONN-06"
+      ]
+    },
+    {
+      "id": "D-04",
+      "priority": "P1",
+      "question": "网络离线时怎么等？",
+      "reason": "离线期间的重试没有用。用户要求网络恢复后自动恢复连接。",
+      "options": [
+        {
+          "id": "A",
+          "label": "等系统网络回调",
+          "description": "离线时不重试。收到网络可用回调后立即尝试一次。",
+          "consequences": "网络恢复后快速重连。需要新增网络回调监听。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "固定间隔重试",
+          "description": "每 30 秒重试一次。",
+          "consequences": "实现简单。离线期间做无效唤醒，耗电增加。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "R-NET-05",
+        "R-NET-03",
+        "R-CONN-04"
+      ]
+    },
+    {
+      "id": "D-05",
+      "priority": "P1",
+      "question": "省电在什么条件下降频？",
+      "reason": "用户报告系统提示耗电较多。用户不在用时，应用不应全速计算。",
+      "options": [
+        {
+          "id": "A",
+          "label": "后台降频，熄屏再降",
+          "description": "前台全速。后台停止界面探测。熄屏再降低扩展轮询频率。",
+          "consequences": "锁屏耗电下降。恢复看门狗保持运行。",
+          "recommended": true
+        },
+        {
+          "id": "B",
+          "label": "只在后台降频",
+          "description": "后台停止界面探测。熄屏不额外降频。",
+          "consequences": "实现简单。锁屏仍按后台频率运行。",
+          "recommended": false
+        },
+        {
+          "id": "C",
+          "label": "不降频",
+          "description": "保持现有频率。",
+          "consequences": "不改动。耗电问题保留。",
+          "recommended": false
+        }
+      ],
+      "recommendation": "A",
+      "affected_design_ids": [
+        "R-POWER-01",
+        "R-POWER-02",
+        "R-CONN-11"
+      ]
+    }
+  ],
+  "figures": [
+    {
+      "id": "F-01",
+      "kind": "problem",
+      "decision_id": "D-01",
+      "title": "三个用户可见问题",
+      "caption": "三个问题指向同一条连接生命周期。",
+      "source": "flowchart TB\n  A[长时间使用后连接中断] --> B[用户不知道原因]\n  C[非用户断连没有记录] --> B\n  D[后台与熄屏继续计算] --> E[系统提示耗电较多]",
+      "focus": "D-01",
+      "omitted": "只画三个问题与汇合点。省略每个问题的日志证据。",
+      "markers": [
+        {
+          "id": "B",
+          "type": "change",
+          "label": "本批正面处理"
+        }
+      ],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-02",
+      "kind": "scope",
+      "decision_id": "D-04",
+      "title": "本批范围与非目标",
+      "caption": "四项进入本批。三项明确不做。",
+      "source": "flowchart LR\n  subgraph IN[本批范围]\n    A[连接保持]\n    B[断连留证]\n    C[网络恢复]\n    D[省电档位]\n  end\n  subgraph OUT[本批不做]\n    E[引擎升级]\n    F[冲突交互]\n    G[受限权限]\n  end",
+      "focus": "D-04",
+      "omitted": "省略每项的内部拆解。省略上一批次未提交的产物。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-03",
+      "kind": "journey",
+      "decision_id": "D-01",
+      "title": "一次会话从连接到停止",
+      "caption": "意图文件是唯一停止依据。账本记录每次结束。",
+      "source": "flowchart LR\n  A[用户点击连接] --> B[意图写为连接]\n  B --> C[应用进入后台]\n  C --> D[隧道掉线]\n  D --> E[账本写原因]\n  E --> F[恢复看门狗重连]\n  F --> G[用户看到仍已连接]\n  G --> H[用户点击停止]\n  H --> I[意图写为停止]",
+      "focus": "D-01",
+      "omitted": "省略网络离线与交接超时分支。省略定时器细节。",
+      "markers": [
+        {
+          "id": "E",
+          "type": "new",
+          "label": "新增账本"
+        }
+      ],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    },
+    {
+      "id": "F-04",
+      "kind": "acceptance",
+      "decision_id": "D-02",
+      "title": "验收口径",
+      "caption": "三条可观测结果。每条对应一个用户要求。",
+      "source": "flowchart LR\n  A[12 小时锁屏不断开] --> D[验收]\n  B[每次非用户断连有原因] --> D\n  C[后台与熄屏降频] --> D",
+      "focus": "D-02",
+      "omitted": "省略数值阈值与测试方法。详见技术细节。",
+      "markers": [],
+      "interactions": [
+        "filter",
+        "detail"
+      ]
+    }
+  ],
+  "change_map": [
+    {
+      "location": "本批新增需求",
+      "now": "无",
+      "after": "六条：连接保持、断连留证、不设恢复上限、网络恢复、后台降频、熄屏再降",
+      "type": "new",
+      "design_ids": [
+        "R-CONN-11",
+        "R-CONN-12",
+        "R-CONN-13",
+        "R-NET-05",
+        "R-POWER-01",
+        "R-POWER-02"
+      ]
+    },
+    {
+      "location": "本批修订需求",
+      "now": "按状态判读停止，恢复最多 3 次，取消通知后同会话不恢复",
+      "after": "按意图停止，恢复不设上限，取消通知不等于停止",
+      "type": "modified",
+      "design_ids": [
+        "R-CONN-05",
+        "R-CONN-09",
+        "R-CONN-10"
+      ]
+    },
+    {
+      "location": "既有需求",
+      "now": "保持不变",
+      "after": "保持不变",
+      "type": "unchanged",
+      "design_ids": [
+        "R-SETUP-01",
+        "R-SETUP-02",
+        "R-SETUP-03",
+        "R-SETUP-04",
+        "R-SETUP-05",
+        "R-SETUP-06",
+        "R-SETUP-07",
+        "R-SETUP-08",
+        "R-SETUP-09",
+        "R-CONN-01",
+        "R-CONN-02",
+        "R-CONN-03",
+        "R-CONN-04",
+        "R-CONN-06",
+        "R-CONN-07",
+        "R-CONN-08",
+        "R-NET-01",
+        "R-NET-02",
+        "R-NET-03",
+        "R-NET-04",
+        "R-DEV-01",
+        "R-DEV-02",
+        "R-DEV-03",
+        "R-DEV-04",
+        "R-DEV-05",
+        "R-DEV-06",
+        "R-XFER-01",
+        "R-XFER-02",
+        "R-XFER-03",
+        "R-XFER-04",
+        "R-XFER-05",
+        "R-XFER-06",
+        "R-XFER-07",
+        "R-XFER-08",
+        "R-XFER-09",
+        "R-XFER-10",
+        "R-DRIVE-01",
+        "R-DRIVE-02",
+        "R-DRIVE-03",
+        "R-DRIVE-04",
+        "R-DRIVE-05",
+        "R-DRIVE-06",
+        "R-MEDIA-01",
+        "R-MEDIA-02",
+        "R-MEDIA-03",
+        "R-MEDIA-04",
+        "R-MEDIA-05",
+        "R-PRIV-01",
+        "R-PRIV-02",
+        "R-PRIV-03",
+        "R-PRIV-04",
+        "R-DIAG-01",
+        "R-DIAG-02",
+        "R-DIAG-03",
+        "R-DIAG-04",
+        "R-DIAG-05",
+        "R-UI-01",
+        "R-UI-02",
+        "R-UI-03",
+        "R-UI-04",
+        "R-UI-05",
+        "R-UI-06",
+        "R-BUILD-01",
+        "R-BUILD-02"
+      ]
+    },
+    {
+      "location": "质量目标",
+      "now": "保持不变",
+      "after": "保持不变",
+      "type": "unchanged",
+      "design_ids": [
+        "QG-01",
+        "QG-02",
+        "QG-03",
+        "QG-04",
+        "QG-05",
+        "QG-06",
+        "QG-07",
+        "QG-08",
+        "QG-09",
+        "QG-10",
+        "QG-11",
+        "QG-12"
+      ]
+    }
+  ],
+  "technical_notes": [
+    {
+      "item": "代码基线",
+      "value": "ec64476",
+      "reason": "本次审核对应的提交"
+    },
+    {
+      "item": "真机",
+      "value": "Pura X 56T0225330000021",
+      "reason": "后续设备验证使用同一台设备"
+    },
+    {
+      "item": "连接保活窗口",
+      "value": "状态新鲜度 15 秒",
+      "reason": "现有代码常量，本批不改"
+    },
+    {
+      "item": "恢复退避",
+      "value": "30、60、120、300 秒",
+      "reason": "本批确定为封顶退避"
+    },
+    {
+      "item": "账本上限",
+      "value": "512 条或 64 KB",
+      "reason": "断连是低频事件，上限比诊断事件高"
+    }
+  ],
+  "trace": {
+    "snapshot": "docs/review/requirements/snapshot.json",
+    "oracles": "docs/review/requirements/oracles.html"
+  }
+}

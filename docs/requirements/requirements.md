@@ -62,12 +62,12 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | R-CONN-02 | 从首页一键断开：停止扩展、释放长时任务、回到未连接态 | `BridgeStatus.ets:2512` `stopVpnProbe`、`:2579-2596` | 无 | 高 | O-CONN-02 | 已实现 | 判据待建 |
 | R-CONN-03 | 连接窗口期内应用进程必须持有长时任务，使切到后台后仍能应答扩展的后端交接请求 | `services/VpnBackgroundTaskManager.ets`（`connecting` 态持有任务）；`vpnextensionability/TailscaleVpnExtensionAbility.ets:644` `requestUiBackendHandoff` 等待 15 s | 依赖 R-CONN-01 | 高 | O-CONN-01、O-CONN-03 | 已实现 | 有判据闭环（单元） |
 | R-CONN-04 | 已连接时切到其它应用、锁屏静置，隧道不中断 | `docs/background-vpn-reliability.md` Milestone 1；走查 M-01/M-02 | 依赖 R-CONN-03 | 高 | O-CONN-06 | 已实现 | 有判据闭环（走查） |
-| R-CONN-05 | 非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数 | `services/VpnReconnectSupervisor.ets`（`BACKGROUND_SETTLE_MS`/`MAX_ATTEMPTS`/`STABLE_MS`） | 依赖 R-CONN-04 | 中 | O-CONN-04 | 已实现 | 有判据闭环（单元） |
+| R-CONN-05 | 非用户主动的掉线自动恢复：指数退避，退避上限 300 s；稳定 60 s 后清零计数。恢复不设次数上限 | `services/VpnReconnectSupervisor.ets`（`RETRY_BASE_MS`/`RETRY_MAX_MS`/`STABLE_MS`） | 依赖 R-CONN-04；2026-10-20 修订，原值「最多 3 次」与 R-CONN-11 冲突 | 高 | O-CONN-04 | 部分实现 | 判据待建 |
 | R-CONN-06 | 用户的主动断开不得被自动恢复撤销 | `VpnReconnectSupervisor.ets` `noteRequestedStop`；`VpnSessionController` | 依赖 R-CONN-05 | 高 | O-CONN-04 | 已实现 | 有判据闭环（单元） |
 | R-CONN-07 | 另一个系统 VPN 占用通道时给出可理解的冲突提示，经用户批准才替换 | `TailscaleVpnExtensionAbility.ets:605` `replaceExistingVpn`；`README.md:30` | 平台单 VPN 限制 | 中 | O-CONN-05 | 已实现 | 判据待建 |
 | R-CONN-08 | 无 UI 的入口（桌面卡片、后台恢复）也能独立完成连接，且应答扩展的后端交接 | `services/VpnSessionController.ets` `connect`/`answerBackendHandoff` | 依赖 R-CONN-03 | 中 | O-CONN-07、O-CARD-01 | 已实现 | 有判据闭环（单元） |
-| R-CONN-09 | 长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放 | `VpnBackgroundTaskManager.ets` `VPN_STATUS_GRACE_MS` | 依赖 R-CONN-04 | 中 | O-CONN-06 | 已实现 | 有判据闭环（单元） |
-| R-CONN-10 | 用户主动取消保活通知后，不得在同一会话内自行恢复 | `VpnBackgroundTaskManager.ets` `suppressedUntilDisconnect` | 依赖 R-CONN-04 | 中 | O-CONN-06 | 已实现 | 有判据闭环（单元） |
+| R-CONN-09 | 长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放 | `VpnBackgroundTaskManager.ets` 的意图守卫；`services/VpnSessionIntent.ets`；2026-10-20 修订，原值为「有界宽限后释放」 | 依赖 R-CONN-04、R-CONN-11 | 高 | O-CONN-06、O-CONN-08 | 部分实现 | 判据待建 |
+| R-CONN-10 | 用户取消保活通知不等于停止连接。后台不抢；回到前台且连接意图仍在时重新申请保护 | `VpnBackgroundTaskManager.ets` `suppressedUntilForeground`（本批由 `suppressedUntilDisconnect` 重命名）；2026-10-20 修订 | 依赖 R-CONN-04、R-CONN-11 | 中 | O-CONN-06、O-CONN-08 | 部分实现 | 判据待建 |
 | R-NET-01 | 连接前可选择出口节点；已连接时不可改，并提示先断开 | `BridgeStatus.ets:10285` `exitNodeSelectOptions`、`:10316`、`:1938` `queueExitNodeUpdate` | 依赖 R-CONN-01 | 中 | O-NET-01 | 已实现 | 判据待建 |
 | R-NET-02 | 连接前可开关「使用子网路由」与「出口节点允许访问局域网」 | `BridgeStatus.ets:10199` `NetworkSettingsPanel`、`:1982` `toggleNetworkSetting` | 依赖 R-SETUP-03 | 中 | O-NET-02 | 已实现 | 判据待建 |
 | R-NET-03 | 网络在蜂窝/Wi-Fi 之间变化时，同一次 VPN 会话内自动重绑并恢复直连，不要求用户重连 | `services/VpnNetworkMonitor.ets`；`docs/vpn-network-recovery.md` | 依赖 R-CONN-04 | 高 | O-NET-03 | 已实现 | 有判据闭环（走查） |
@@ -116,6 +116,12 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | R-UI-06 | 版本名与版本号在清单、更新日志与发布校验三处保持一致 | `AppScope/app.json5`、`services/ReleaseChangelog.ets`、`scripts/verify-release-changelog.ps1` | 无 | 中 | —（发布校验守，非用户旅程） | 部分实现 | 判据待建 |
 | R-BUILD-01 | 产物必须是 AArch64 动态库且被正确打进 HAP | `scripts/verify-artifacts.ps1`；`scripts/build-go.sh` | 需要 Windows 校验 | 高 | —（构建约束，判据挂单点层） | 已实现 | 判据待接线 |
 | R-BUILD-02 | 构建脚本对参数与路径的处理可被测试守住 | `scripts/test-macos-build.mjs`（5 条） | 需要 `bash` 与 `git` | 中 | —（构建约束，判据挂单点层） | 已实现 | 有判据闭环（单元） |
+| R-CONN-11 | 用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护 | 本批新增（2026-10-20）。来源：用户报告「长时间使用会断连」；`VpnBackgroundTaskManager.suppressedUntilDisconnect` 只在读到 `DISCONNECTED` 时清零 | 依赖 R-CONN-04；平台单 VPN 限制 | 高 | O-CONN-08 | 已实现 | 有判据闭环（O-SESSION-09、O-BGTASK-02/04） |
+| R-CONN-12 | 非用户原因的断连都要落盘留证。每条记录带原因分类：扩展崩溃、进程回收、交接超时、系统策略、网络失效 | 本批新增（2026-10-20）。来源：用户要求「非用户原因的断连都要记录」 | 依赖 R-DIAG-02、R-DIAG-05 | 高 | O-CONN-08、O-DIAG-02 | 已实现 | 有判据闭环（O-SESSION-10/11/12、O-DIAG-02） |
+| R-CONN-13 | 断连后自动恢复不设次数上限。用户在场且连接可用时重连；用户主动停止后不恢复 | 本批修订 R-CONN-05 的「最多 3 次」。来源：用户要求「用户没有点击停止时不要停止连接」 | 依赖 R-CONN-05、R-CONN-06 | 高 | O-CONN-04、O-CONN-09 | 已实现 | 有判据闭环（O-RECONN-05） |
+| R-NET-05 | 网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔 | 本批新增（2026-10-20）。扩展进程已有 `VpnNetworkMonitor`；本批把它接到恢复决策 | 依赖 R-NET-03、R-CONN-13 | 高 | O-CONN-09、O-NET-04 | 已实现 | 有判据闭环（O-RECONN-11）；真机通道待补（O-NET-04） |
+| R-POWER-01 | 应用退到后台后停止界面类探测并降低刷新频率。隧道的保护与恢复不受影响 | 本批新增（2026-10-20）。来源：用户报告「系统提示耗电较多」 | 依赖 R-CONN-11 | 中 | O-POWER-01 | 已实现 | 有判据闭环（O-POWER-01） |
+| R-POWER-02 | 屏幕熄灭后再降一档：只保留心跳、命令应答与恢复所需的最小检查 | 本批新增（2026-10-20）。官方 `power.isActive()` 有屏设备亮屏为活动、熄屏为非活动 | 依赖 R-POWER-01 | 中 | O-POWER-02 | 已实现 | 有判据闭环（O-POWER-02/03/04） |
 
 ## 四、场景
 
@@ -140,6 +146,9 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 - 网络从 Wi-Fi 切到蜂窝再切回 → 同会话内重绑，不要求重连。
 - 有另一个系统 VPN → 冲突提示 + 用户批准后替换。
 - 进程重启后重新拉起 → 后端重新初始化，不沿用旧快照（`vpn-peers.json` 超过 5 s 即忽略）。
+- 长时任务被系统取消或丢失 → 会话仍在时恢复保护，用户看不到中断（R-CONN-11）。
+- 断连后用户不在场 → 记录原因分类后自动恢复。网络不通时等网络回调，不按固定间隔盲目重试（R-CONN-12、R-CONN-13、R-NET-05）。
+- 用户主动断开 → 不恢复，记录为用户原因（R-CONN-06）。
 
 ### 安全与隐私场景
 
@@ -153,7 +162,11 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 
 | 目标 | 目标值 | 观测环境与测量方法 | 现状 |
 | --- | --- | --- | --- |
-| 锁屏静置后台存活 | ≥ 720 s（12 min），全程心跳龄 ≤ 15 s，扩展只拉起一次 | 真机：`scripts/e2e/screen-off-survival.mjs` 连接后用 `power-shell suspend` 锁屏静置，扩展每秒把 `heartbeatMs=` 镜像进设备日志，脚本按相邻两条算间隔 | **已实测（2026-10-13，Pura X）**：1500 个心跳、跨度 750 s、最大间隔 2.8 s、扩展只拉起一次。Wi-Fi 且 USB 供电。蜂窝版**未完成**（M-11） |
+| 锁屏静置后台存活 | ≥ 12 h，全程心跳龄 ≤ 15 s，扩展只拉起一次 | 真机：`scripts/e2e/endurance-survival.mjs` 连接后锁屏静置 12 h，扩展每秒把 `heartbeatMs=` 镜像进设备日志，脚本按相邻两条算间隔，并取每天的前台/后台/熄屏事件 | **待实测（2026-10-20）**。上一批次 720 s 已通过，见本表下方历史行 |
+| 锁屏静置后台存活（历史） | ≥ 720 s（12 min），全程心跳龄 ≤ 15 s，扩展只拉起一次 | 真机：`scripts/e2e/screen-off-survival.mjs` 连接后用 `power-shell suspend` 锁屏静置，扩展每秒把 `heartbeatMs=` 镜像进设备日志，脚本按相邻两条算间隔 | **已实测（2026-10-13，Pura X）**：1500 个心跳、跨度 750 s、最大间隔 2.8 s、扩展只拉起一次。Wi-Fi 且 USB 供电。蜂窝版**未完成**（M-11） |
+| 非用户断连可归因 | 每次非用户断连都有一条 `vpn_session_end` 或 `vpn_session_end_observed` 记录，原因分类在受控词表内 | 真机诊断文件 `diagnostic-vpn-events.ndjson`；字段 `reason` 取值来自登记表 | **待实现（2026-10-20）** |
+| 省电：后台探测停止 | 退到后台后 5 s 内不再发起对端、媒体、Sunshine、LocalSend 探测 | 真机诊断文件：后台期间无 `peer_path_result` / `media_probe_*` / `sunshine_probe_*` 新事件 | **待实测（2026-10-20）** |
+| 省电：熄屏降频 | 熄屏后扩展命令轮询从 100 ms 降到 ≥ 1000 ms，状态快照从 1 s 降到 ≥ 5 s | 真机：按 1 h 对比熄屏前后诊断事件条数与进程 CPU 时间（`/proc/<pid>/stat` 的 utime+stime） | **待实测（2026-10-20）** |
 | 连接期保活覆盖 | 从扩展建 TUN 到隧道可用，全程持有长时任务 | 真机诊断文件中的 `background_started` 与 `vpn_connected` 先后顺序 | 已真机实测（2026-10-13，Pura X）：`background_started` 14:45:40 早于 `vpn_connected` 14:45:59，连接窗口全程持有长时任务。证据 `~/mesharc-e2e/connect-journey-*.log`，命令 `DEVICE=<序列号> node --test scripts/e2e/connect-journey.mjs` |
 | 网络切换恢复 | 同会话内自动恢复直连，无需重连 | 真机切换承载，测 discovery 响应时间与 TUN 双向包数 | 已实测 11 ms / +142 包（M-03） |
 | 掉线自动恢复 | 不重建 VPN 会话即回到可用路径 | 真机短 down/up，记录恢复路径与耗时 | 已实测 436 ms（M-04） |
@@ -161,6 +174,19 @@ NAS、电脑和自建服务，也无法把手机上的文件送到那些设备�
 | 诊断脱敏 | 报告 zip 中不含 token、认证 URL、账号、tailnet 地址 | 人工审查导出报告 + 单元测试 | 实现存在，**无端到端验证** |
 | 双语完整 | `base` 与 `zh_CN` 的 key 集合一致 | 程序比对两份 `string.json` 的 key | **未验证**（未决 Q5） |
 | 启动到可用 | ≤ 200 ms | 真机：`hdc shell aa force-stop` 后 `aa start`，取设备日志里 `EntryAbility onCreate` 与 `ui_opened` 的时间差。`scripts/device-run.sh` 自动跑 5 次，`scripts/device-analyze.py` 自动计算 | 已实测 5 次（M-19）：中位 140 ms，最大 155 ms。**边界：不含启动器点击与进程创建** |
+
+## 四之二、状态与生命周期
+
+本批次新增用户可见状态「连接意图」。下表写它的进入、退出、生产者与落点。
+
+| 状态 | 进入事件 | 退出事件 | 生产者 | 落点 |
+| --- | --- | --- | --- | --- |
+| 意图为连接 | 用户点击连接，或卡片切换为连接，或恢复成功 | 用户点击停止，或恢复撤销自身刚建的隧道 | 应用界面进程、卡片进程、恢复看门狗 | `vpn-intent.json` 的 `desired` |
+| 意图为停止 | 用户点击停止，或卡片切换为停止，或意图文件缺失 | 用户点击连接 | 应用界面进程、卡片进程 | `vpn-intent.json` 的 `desired` |
+| 会话结束（非用户） | 扩展销毁、交接超时、进程回收、系统策略停止 | 下一次会话建立 | 先退出的进程写结束记录，后感知的进程补写观测 | `vpn-session-ledger.ndjson` |
+| 省电档位为前台 | 应用回到前台 | 应用进入后台 | 应用界面进程 | `vpn-power-stage.json` 的 `stage` |
+| 省电档位为后台 | 应用进入后台且屏幕亮 | 回到前台，或屏幕熄灭 | 应用界面进程 | `vpn-power-stage.json` 的 `stage` |
+| 省电档位为熄屏 | 应用在后台且屏幕熄灭 | 屏幕点亮，或回到前台 | 应用界面进程 | `vpn-power-stage.json` 的 `stage` |
 
 ## 五、未决项
 

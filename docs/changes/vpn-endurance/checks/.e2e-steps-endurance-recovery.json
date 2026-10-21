@@ -1,0 +1,68 @@
+{
+ "skill_version": "a01",
+ "title": "扩展被杀后的记录与恢复",
+ "change_id": "vpn-endurance",
+ "baseline": "ec64476（工作树有本批次未提交改动）",
+ "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+ "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/endurance-recovery.mjs",
+ "executed_at": "2026-10-20T13:03:44.402Z",
+ "target": "mobile",
+ "notice": "结束进程需要设备 shell 向应用进程发信号的权限。没有该权限时用例按原因跳过。",
+ "cases": [
+  {
+   "id": "ENDURANCE-RECOVERY",
+   "title": "扩展被杀后自动恢复并留下原因记录",
+   "oracle_ids": [
+    "O-DIAG-02",
+    "O-CONN-08"
+   ],
+   "status": "skip",
+   "steps": [
+    {
+     "id": "S1",
+     "name": "定位扩展进程",
+     "operation": "hdc shell ps -ef 并筛选带 vpn 的应用进程",
+     "expected": [
+      "只有一个带 vpn 的应用进程",
+      "状态文件带 sessionId"
+     ],
+     "actual": "扩展进程 29317，会话 1792501447047",
+     "status": "pass",
+     "evidence": {
+      "kind": "log",
+      "output": "20020205      29317    583 0 03:11:52 ?     00:00:06 ren.w2h.mesharc:vpn"
+     }
+    },
+    {
+     "id": "S2",
+     "name": "结束扩展进程",
+     "operation": "以应用身份 kill -9 29317",
+     "expected": [
+      "kill 返回 rc=0",
+      "该 PID 从进程表消失"
+     ],
+     "actual": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。"
+     }
+    },
+    {
+     "id": "S3",
+     "name": "跳过原因",
+     "operation": "检查前置条件",
+     "expected": [
+      "前置条件满足"
+     ],
+     "actual": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。",
+     "status": "skip",
+     "evidence": {
+      "kind": "log",
+      "output": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。"
+     }
+    }
+   ]
+  }
+ ]
+}

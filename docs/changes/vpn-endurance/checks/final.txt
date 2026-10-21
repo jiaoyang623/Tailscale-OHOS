@@ -1,0 +1,73 @@
+# 最终验证记录（I-07）
+
+- 命令：`node --test scripts/test-*.mjs scripts/integration/*.mjs`，`bash scripts/run-checks.sh`，`scripts/e2e/run-batch.sh`
+- 时间：2026-10-21T00:15:00+1100
+- 基线：ec64476（工作树有本批次未提交改动，最终 HAP 35928034 字节）
+- 用例数：172 条宿主用例，10 条设备用例，1 次 12 小时尝试
+- 通过：172 条宿主用例；设备通过 6 条，跳过 4 条；12 小时尝试失败（用户停止）
+- 失败：0
+
+## I-07-a 在最终基线上重跑全部适用测试
+
+| 层 | 命令 | 结果 | 记录 |
+| --- | --- | --- | --- |
+| 集成 + 单元 | `node --test scripts/test-*.mjs scripts/integration/*.mjs` | 172 条全部通过，0 失败 | `checks/tests.txt` |
+| 全量检查 | `bash scripts/run-checks.sh` | 退出码 1，唯一失败是审核快照过期（O-4）。判据 P0 为 0 | `checks/run-checks.txt` |
+| 设备 E2E | `scripts/e2e/run-batch.sh` 五个文件 | 通过 6，失败 0，跳过 4 | `checks/e2e-steps.json`、`checks/device-run.txt` |
+| 构建 | `sudo -n -u w2h bash .build/compile.sh` | BUILD SUCCESSFUL，35928034 字节 | `checks/build.txt` |
+
+设备批次在最终 HAP 上运行。设备为 HUAWEI ALN-AL00（API 26），用户完成 Tailscale 登录。
+锁屏存活 720 秒通过：心跳 221 个，跨度 740 秒，最大间隔 6.9 秒，
+扩展创建 1 次、销毁 0 次。安装重启恢复通过：旧会话 1792501348074 记录结束原因，
+新会话 1792501414003 为 `state=Running`。
+账本记录由按写者分文件的读取器合并读出。
+4 条跳过用例缺主机通道，原因逐条写在 `checks/e2e-steps.json` 的 `actual` 字段。
+跳过不算通过。12 小时锁屏尝试在 9 小时 42 分时被用户主动停止打断，
+不记通过，见 `checks/device-run.txt`。
+
+## I-07-b 报告链接与最终基线
+
+| 报告 | 链接 | HTTP | 基线 | 记录 |
+| --- | --- | --- | --- | --- |
+| E2E | http://100.111.99.60/proj/mesharc/e2e/vpn-endurance/index.html | 200 | ec64476（含工作树改动，HAP 35928034） | `checks/e2e-published.txt` |
+| UI 还原 | http://100.111.99.60/proj/mesharc-ui/e2e/vpn-endurance/index.html | 200 | ec64476 | `checks/ui-restoration-published.txt` |
+| 高层次复查 | http://100.111.99.60/proj/mesharc-hlr/e2e/vpn-endurance/index.html | 200 | ec64476 | `checks/high-level-review-published.txt` |
+
+三份报告的批次标记都是 `vpn-endurance`。E2E 报告的 `report-meta.json` 与
+`checks/e2e-steps.json` 的基线一致。最终 HAP 的 E2E 报告已替换旧 HAP 的报告。
+
+## I-07-c UI 还原判定
+
+- 模式：`not-applicable`。
+- 理由：本批次只改运行行为与定时器节拍。没有改布局、颜色、字体、图标、
+  控件结构或页面跳转。项目声明未配置 UI 还原适配器与设计稿来源。
+- 核对退出码：0。证据包 `checks/ui-restoration.json`，报告 `checks/ui-restoration/index.html`。
+- 该理由待人工复审。复审前不把它当作人工接受。
+
+## I-07-d 高层次复查
+
+- 清单：`checks/high-level-review.json`。49 条合并漏项，8 项维度各有覆盖说明。
+- 输入：需求、架构、HLD、LLD 与成品入口清单。未读判据、测试、审核页与审核快照。
+- 派发：4 个独立子 agent，每个负责 2 项维度。
+- 门禁：`blocking`。1 条强漏项未处置，30 条弱漏项未处置，0 条签字接受。
+- 本轮修复并补判据的强项：恢复撤销停掉用户新连接、连接全路径复查意图、
+  连接窗口内重复启动、卡片后台刷新不受档位治理、新鲜意图提前取得保护、
+  前台取消通知后重新武装、UNKNOWN 状态重复启动、原因生产者、熄屏快照窗口、
+  后台剩余界面定时器、后台健康轮询探测、账本并发压缩（3 条同锚点）。
+- 未处置的强项：P1 被冻结或死亡时没有子系统负责恢复。P2 没有启动连接的恢复入口，
+  平台也不提供应用进程死亡后让扩展自行恢复的回调。这是已知责任空洞，
+  见 HLD C-11 与 O-CONN-08 的不确定特征。
+- 门禁退出码：1。记录 `checks/high-level-review-gate.json`。
+
+## 结论
+
+最终代码状态修复了两个用户报告的缺陷，最终 HAP 有设备证据。
+按 a01 完成条件，本批次未达到开发完成：
+
+1. 高层次复查门禁为 blocking（1 条强漏项）。
+2. 四层人工审核结论缺失。
+3. 4 条设备用例因主机通道不足跳过。跳过不算通过。
+4. 12 小时锁屏存活未取得。9 小时 42 分的尝试被用户主动停止打断。
+5. 审核快照过期。
+
+交接见 `completion.md`。

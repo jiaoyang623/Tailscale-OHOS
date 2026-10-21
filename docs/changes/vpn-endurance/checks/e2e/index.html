@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a01-change-id" content="vpn-endurance">
+<meta name="a01-baseline" content="ec64476（工作树有本批次未提交改动）">
+<meta name="a01-report-version" content="1">
+<title>设备侧 E2E：断连恢复与省电 · E2E 报告</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f7fb; --fg:#172337; --muted:#59687c; --line:#dce4ed; --paper:#ffffff; --head:#edf2f8;
+  --accent:#205dc5; --accent-ink:#ffffff; --accent-soft:#edf3fc; --accent-line:#c8d7ee;
+  --ok-bg:#e0f3e9; --ok-ink:#18553a; --ok-line:#8cc8a8;
+  --warn-bg:#fbe4e1; --warn-ink:#842e24; --warn-line:#e0a39c;
+  --hold-bg:#fff1d6; --hold-ink:#785213; --hold-line:#e0c37a;
+  --blocked-bg:#f0e8f7; --blocked-ink:#5b2a6b; --blocked-line:#c8add9;
+  --focus:#b27b00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#10151c; --fg:#e8eef6; --muted:#a3b3c7; --line:#2f3d51; --paper:#161d27; --head:#1b2634;
+    --accent:#78aef5; --accent-ink:#10151c; --accent-soft:#1b2634; --accent-line:#2f3d51;
+    --ok-bg:#14301f; --ok-ink:#74c79b; --ok-line:#2f6b49;
+    --warn-bg:#3a1f1a; --warn-ink:#f08a68; --warn-line:#7a4237;
+    --hold-bg:#33280f; --hold-ink:#e0c37a; --hold-line:#6d5726;
+    --blocked-bg:#2b1b36; --blocked-ink:#c9a2e0; --blocked-line:#624578;
+    --focus:#e0a468;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#10151c; --fg:#e8eef6; --muted:#a3b3c7; --line:#2f3d51; --paper:#161d27; --head:#1b2634;
+  --accent:#78aef5; --accent-ink:#10151c; --accent-soft:#1b2634; --accent-line:#2f3d51;
+  --ok-bg:#14301f; --ok-ink:#74c79b; --ok-line:#2f6b49;
+  --warn-bg:#3a1f1a; --warn-ink:#f08a68; --warn-line:#7a4237;
+  --hold-bg:#33280f; --hold-ink:#e0c37a; --hold-line:#6d5726;
+  --blocked-bg:#2b1b36; --blocked-ink:#c9a2e0; --blocked-line:#624578;
+  --focus:#e0a468;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+main{max-width:1280px;margin:auto;padding:36px 24px 80px}
+h1,h2,h3,h4,p{margin-top:0}h1{font-size:32px;line-height:1.25}h2{font-size:21px;margin:38px 0 14px}h3{font-size:17px;margin:8px 0 4px}h4{font-size:14px;margin:14px 0 4px}
+.eyebrow{font-size:12px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:8px}
+.lead{max-width:900px;color:var(--muted)}
+.muted{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.notice{padding:14px 18px;border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:10px;margin:18px 0}
+.notice.warn{border-color:var(--warn-line);background:var(--warn-bg);color:var(--warn-ink)}
+.viewer{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin:18px 0}
+.viewer-title{font-weight:700;font-size:13px;margin:0 0 10px}
+.viewer-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.viewer-field{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.seg button{font:12px/1.4 inherit;padding:6px 10px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--fg);cursor:pointer}
+.seg button span{color:var(--muted);margin-left:3px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg button[aria-pressed="true"] span{color:var(--accent-ink);opacity:.85}
+select,input[type=search]{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--paper);color:var(--fg)}
+input[type=search]{flex:1;min-width:180px}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--paper)}
+caption{caption-side:top;text-align:left;font-size:13px;color:var(--muted);padding:0 0 8px}
+th,td{text-align:left;padding:11px 12px;border:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+th{background:var(--head);font-size:13px}
+code{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0}
+.tile{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:9px;padding:14px 16px}
+.tile .value{font-size:30px;font-weight:750;line-height:1.1}
+.tile .label{font-size:12px;color:var(--muted);margin-top:4px}
+.tile.ok{border-top-color:var(--ok-line)}.tile.ok .value{color:var(--ok-ink)}
+.tile.fail{border-top-color:var(--warn-line)}.tile.fail .value{color:var(--warn-ink)}
+.tile.hold{border-top-color:var(--hold-line)}.tile.hold .value{color:var(--hold-ink)}
+.tile.blocked{border-top-color:var(--blocked-line)}.tile.blocked .value{color:var(--blocked-ink)}
+.bar{display:flex;width:100%;height:22px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--head);margin:12px 0 6px}
+.bar span{display:block;min-width:0}
+.bar .pass{background:var(--ok-line)}.bar .fail{background:var(--warn-line)}.bar .skip{background:var(--hold-line)}.bar .blocked{background:var(--blocked-line)}
+.bar-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:16px}
+.bar-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.bar-legend .pass{background:var(--ok-line)}.bar-legend .fail{background:var(--warn-line)}.bar-legend .skip{background:var(--hold-line)}.bar-legend .blocked{background:var(--blocked-line)}
+.badge{display:inline-block;padding:3px 9px;border-radius:5px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--head);color:var(--muted)}
+.badge.pass{background:var(--ok-bg);color:var(--ok-ink)}
+.badge.fail{background:var(--warn-bg);color:var(--warn-ink)}
+.badge.skip{background:var(--hold-bg);color:var(--hold-ink)}
+.badge.blocked{background:var(--blocked-bg);color:var(--blocked-ink)}
+.cases{display:flex;flex-direction:column;gap:18px}
+.case{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:11px;padding:20px 22px}
+.case.pass{border-left-color:var(--ok-line)}.case.fail{border-left-color:var(--warn-line)}.case.skip{border-left-color:var(--hold-line)}.case.blocked{border-left-color:var(--blocked-line)}
+.case-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.case-head .case-id{font-size:12px;color:var(--muted)}
+.case-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.chip{display:inline-block;font:12px/1.4 ui-monospace,monospace;padding:3px 7px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:5px;color:var(--accent);text-decoration:none;overflow-wrap:anywhere}
+.steps{list-style:none;margin:14px 0 0;padding:0}
+.step{border-top:1px dashed var(--line);padding:16px 0 6px}
+.step:first-child{border-top:0;padding-top:4px}
+.step-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.step-id{font:12px ui-monospace,monospace;color:var(--muted)}
+.step-name{font-weight:650;margin:4px 0 8px}
+dl{margin:0 0 10px}dt{font-weight:650;font-size:12px;color:var(--muted)}dd{margin:2px 0 10px}
+ul.expected{margin:0;padding-left:20px}ul.expected li{margin-bottom:3px}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0}
+.shots.single{grid-template-columns:1fr}
+figure{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+figure img{display:block;width:100%;max-height:420px;height:auto;object-fit:contain;border-radius:4px;background:var(--paper)}
+figcaption{font-size:12px;color:var(--muted);padding:6px 2px 0;overflow-wrap:anywhere}
+.output{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:360px;overflow:auto}
+.failure-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.failure{background:var(--paper);border:1px solid var(--warn-line);border-radius:10px;padding:16px 18px}
+.failure.blocked{border-color:var(--blocked-line)}.failure.skip{border-color:var(--hold-line)}
+.failure .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.failure .cols>div{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:10px 12px}
+.failure .cols h4{margin:0 0 4px}
+.empty-ok{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line);border-radius:10px;padding:18px 20px;font-weight:600}
+footer{margin-top:34px;color:var(--muted);font-size:12px;line-height:1.8}
+@media(max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.failure-grid{grid-template-columns:1fr}.shots{grid-template-columns:1fr}}
+@media(max-width:560px){main{padding:24px 16px 60px}h1{font-size:25px}.tiles{grid-template-columns:1fr}.failure .cols{grid-template-columns:1fr}.case{padding:16px}}
+@media print{.case,.failure,figure{break-inside:avoid}main{padding:0}.shots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<p class="eyebrow">A01 · E2E 证据报告</p>
+<h1>设备侧 E2E：断连恢复与省电</h1>
+<p class="lead">每个操作有记录。UI 操作有截图。报告来自一次真实运行。</p>
+<div class="notice warn">本次运行没有全部通过。不要把本报告当作完成证据。先修复失败、跳过或阻塞项，再重新运行。</div><div class="notice">本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。跳过项写明缺少的主机通道。</div>
+<div class="table-wrap">
+<table>
+<caption>运行元信息</caption>
+<tbody>
+<tr><th>批次</th><td><code>vpn-endurance</code></td><th>代码基线</th><td><code>ec64476（工作树有本批次未提交改动）</code></td></tr>
+<tr><th>目标类型</th><td>移动端（mobile）</td><th>执行时间</th><td>2026-10-20T13:02:57.916Z</td></tr>
+<tr><th>运行环境</th><td colspan="3">2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中</td></tr>
+<tr><th>运行命令</th><td colspan="3"><code>scripts/e2e/run-batch.sh endurance-recovery network-recovery background-reconnect install-restart-recovery screen-off-survival</code></td></tr>
+</tbody>
+</table>
+</div>
+</header>
+
+<section class="viewer" aria-label="视角筛选">
+<p class="viewer-title">换一个视角看这次运行</p>
+<div class="viewer-bar">
+<div class="seg" role="group" aria-label="按结果筛选">
+<button type="button" data-filter-status="all" aria-pressed="true">全部 <span>10</span></button>
+<button type="button" data-filter-status="fail" aria-pressed="false">失败 <span>0</span></button>
+<button type="button" data-filter-status="skip" aria-pressed="false">跳过 <span>4</span></button>
+<button type="button" data-filter-status="blocked" aria-pressed="false">阻塞 <span>0</span></button>
+<button type="button" data-filter-status="pass" aria-pressed="false">通过 <span>6</span></button>
+</div>
+<label class="viewer-field">旅程判据
+<select id="filter-oracle">
+<option value="all">全部旅程判据</option>
+<option value="O-CONN-04">O-CONN-04</option><option value="O-CONN-06">O-CONN-06</option><option value="O-CONN-08">O-CONN-08</option><option value="O-CONN-09">O-CONN-09</option><option value="O-DIAG-02">O-DIAG-02</option><option value="O-NET-04">O-NET-04</option><option value="O-RECONN-02">O-RECONN-02</option><option value="O-RECONN-10">O-RECONN-10</option><option value="O-RECONN-11">O-RECONN-11</option><option value="O-SEAM-11">O-SEAM-11</option>
+</select>
+</label>
+<input id="filter-search" type="search" placeholder="搜索用例、步骤、期望或实际" aria-label="搜索用例、步骤、期望或实际">
+<span id="filter-count" class="muted" role="status" aria-live="polite">显示 10 个用例</span>
+</div>
+<p class="muted">先看失败。再按旅程判据或关键词缩小范围。每一步都带操作、期望、实际与证据。</p>
+</section>
+
+<section>
+<h2>结果总览</h2>
+<div class="tiles"><div class="tile "><div class="value">10</div><div class="label">用例数</div></div><div class="tile ok"><div class="value">6</div><div class="label">通过</div></div><div class="tile fail"><div class="value">0</div><div class="label">失败</div></div><div class="tile hold"><div class="value">4</div><div class="label">跳过</div></div><div class="tile blocked"><div class="value">0</div><div class="label">阻塞</div></div></div>
+<div class="bar" role="img" aria-label="用例结果比例条"><span class="pass" style="width:60.0000%"></span><span class="skip" style="width:40.0000%"></span></div>
+<div class="bar-legend"><span><i class="pass"></i>通过</span><span><i class="fail"></i>失败</span><span><i class="skip"></i>跳过</span><span><i class="blocked"></i>阻塞</span></div>
+<div class="table-wrap">
+<table>
+<caption>用例与步骤的结果计数</caption>
+<thead><tr><th>对象</th><th>总数</th><th>通过</th><th>失败</th><th>跳过</th><th>阻塞</th></tr></thead>
+<tbody><tr><td>用例</td><td>10</td><td>6</td><td>0</td><td>4</td><td>0</td></tr><tr><td>步骤</td><td>21</td><td>15</td><td>0</td><td>6</td><td>0</td></tr></tbody>
+</table>
+</div>
+</section>
+
+<section id="failures">
+<h2>失败与未完成</h2>
+<p class="muted">失败、跳过与阻塞优先显示。每一项带期望、实际与本次运行的证据。</p>
+<div class="failure-grid"><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>BG-BACKGROUND-DROP</code> · 步骤 <code>S1</code></span><h3>用例适用性</h3></div><span class="badge skip">跳过</span></div><p class="muted">检查前置条件</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>前置条件满足</li></ul></div><div><h4>实际</h4><p>缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。</p></div></div></div><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>BG-CARD-STOP</code> · 步骤 <code>S1</code></span><h3>用例适用性</h3></div><span class="badge skip">跳过</span></div><p class="muted">检查前置条件</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>前置条件满足</li></ul></div><div><h4>实际</h4><p>缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。</p></div></div></div><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>ENDURANCE-RECOVERY</code> · 步骤 <code>S2</code></span><h3>结束扩展进程</h3></div><span class="badge skip">跳过</span></div><p class="muted">以应用身份 kill -9 29317</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>kill 返回 rc=0</li><li>该 PID 从进程表消失</li></ul></div><div><h4>实际</h4><p>结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</p></div></div></div><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>ENDURANCE-RECOVERY</code> · 步骤 <code>S3</code></span><h3>跳过原因</h3></div><span class="badge skip">跳过</span></div><p class="muted">检查前置条件</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>前置条件满足</li></ul></div><div><h4>实际</h4><p>结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</p></div></div></div><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>NET-RECOVERY</code> · 步骤 <code>S1</code></span><h3>断开网络</h3></div><span class="badge skip">跳过</span></div><p class="muted">hdc shell svc wifi disable 并等待 ping 失败</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>命令成功</li><li>设备不再能访问 1.1.1.1</li></ul></div><div><h4>实际</h4><p>`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</p></div></div></div><div class="failure skip"><div class="case-head"><div><span class="case-id">用例 <code>NET-RECOVERY</code> · 步骤 <code>S2</code></span><h3>跳过原因</h3></div><span class="badge skip">跳过</span></div><p class="muted">检查前置条件</p><div class="cols"><div><h4>期望</h4><ul class="expected"><li>前置条件满足</li></ul></div><div><h4>实际</h4><p>`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</p></div></div></div></div>
+</section>
+
+<section>
+<h2>旅程判据覆盖</h2>
+<p class="muted">本表把每个用例挂到旅程判据。空白表示本次运行没有覆盖该判据。</p>
+<div class="table-wrap">
+<table>
+<caption>旅程判据到用例的对应关系</caption>
+<thead><tr><th>旅程判据</th><th>用例</th><th>结果</th><th>步骤数</th></tr></thead>
+<tbody><tr><td><code>O-CONN-04</code></td><td><a class="chip" href="#case-BG-CONNECT">BG-CONNECT</a> <a class="chip" href="#case-BG-BACKGROUND-DROP">BG-BACKGROUND-DROP</a></td><td><span class="badge skip">跳过</span></td><td>3</td></tr><tr><td><code>O-CONN-06</code></td><td><a class="chip" href="#case-SURV-CONNECT">SURV-CONNECT</a> <a class="chip" href="#case-SURV-SCREEN-OFF">SURV-SCREEN-OFF</a> <a class="chip" href="#case-SURV-ONE-PROCESS">SURV-ONE-PROCESS</a></td><td><span class="badge pass">通过</span></td><td>5</td></tr><tr><td><code>O-CONN-08</code></td><td><a class="chip" href="#case-ENDURANCE-RECOVERY">ENDURANCE-RECOVERY</a> <a class="chip" href="#case-INSTALL-RESTART">INSTALL-RESTART</a></td><td><span class="badge skip">跳过</span></td><td>8</td></tr><tr><td><code>O-CONN-09</code></td><td><a class="chip" href="#case-NET-RECOVERY">NET-RECOVERY</a></td><td><span class="badge skip">跳过</span></td><td>2</td></tr><tr><td><code>O-DIAG-02</code></td><td><a class="chip" href="#case-ENDURANCE-RECOVERY">ENDURANCE-RECOVERY</a> <a class="chip" href="#case-INSTALL-RESTART">INSTALL-RESTART</a></td><td><span class="badge skip">跳过</span></td><td>8</td></tr><tr><td><code>O-NET-04</code></td><td><a class="chip" href="#case-NET-RECOVERY">NET-RECOVERY</a></td><td><span class="badge skip">跳过</span></td><td>2</td></tr><tr><td><code>O-RECONN-02</code></td><td><a class="chip" href="#case-INSTALL-RESTART">INSTALL-RESTART</a></td><td><span class="badge pass">通过</span></td><td>5</td></tr><tr><td><code>O-RECONN-10</code></td><td><a class="chip" href="#case-BG-USER-STOP">BG-USER-STOP</a> <a class="chip" href="#case-BG-CARD-STOP">BG-CARD-STOP</a></td><td><span class="badge skip">跳过</span></td><td>3</td></tr><tr><td><code>O-RECONN-11</code></td><td><a class="chip" href="#case-NET-RECOVERY">NET-RECOVERY</a></td><td><span class="badge skip">跳过</span></td><td>2</td></tr><tr><td><code>O-SEAM-11</code></td><td><a class="chip" href="#case-BG-USER-STOP">BG-USER-STOP</a></td><td><span class="badge pass">通过</span></td><td>2</td></tr></tbody>
+</table>
+</div>
+</section>
+
+<section id="timeline">
+<h2>步骤时间线</h2>
+<p class="muted">按用例与步骤排列。截图和输出来自本次运行。点击截图可看原图。</p>
+<div class="cases"><article class="case pass" id="case-BG-CONNECT" data-case-card data-status="pass" data-oracles="O-CONN-04"><div class="case-head"><div><span class="case-id">用例 <code>BG-CONNECT</code></span><h3>重连监督：先连上隧道</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-CONN-04</span><span class="muted">步骤 2</span></div><ol class="steps"><li class="step" id="step-BG-CONNECT-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">冷启动应用</p><dl><dt>操作</dt><dd>aa force-stop 后 aa start</dd><dt>期望</dt><dd><ul class="expected"><li>设备日志出现 ui_opened</li><li>界面显示连接状态</li></ul></dd><dt>实际</dt><dd>应用冷启动完成，界面显示连接状态</dd></dl><div class="shots single"><figure><a href="shots/BG-CONNECT__S1__1.png"><img src="shots/BG-CONNECT__S1__1.png" alt="操作后" loading="lazy"></a><figcaption>操作后 · e2e-run/shots/01-background-reconnect-launch.png</figcaption></figure></div></li><li class="step" id="step-BG-CONNECT-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge pass">通过</span></div><p class="step-name">建立隧道</p><dl><dt>操作</dt><dd>界面处于未连接时点击连接按钮</dd><dt>期望</dt><dd><ul class="expected"><li>设备日志出现 vpn_connected</li><li>监督器记录一轮 connected 采样</li></ul></dd><dt>实际</dt><dd>点击连接后出现 vpn_connected，监督器已采样</dd></dl><div class="shots single"><figure><a href="shots/BG-CONNECT__S2__1.png"><img src="shots/BG-CONNECT__S2__1.png" alt="结果" loading="lazy"></a><figcaption>结果 · e2e-run/shots/02-background-reconnect-connected.png</figcaption></figure></div></li></ol></article><article class="case pass" id="case-BG-USER-STOP" data-case-card data-status="pass" data-oracles="O-RECONN-10 O-SEAM-11"><div class="case-head"><div><span class="case-id">用例 <code>BG-USER-STOP</code></span><h3>重连监督：前台主动断开记为用户停止且不重连</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-RECONN-10</span><span class="chip">O-SEAM-11</span><span class="muted">步骤 2</span></div><ol class="steps"><li class="step" id="step-BG-USER-STOP-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">前台点击断开</p><dl><dt>操作</dt><dd>点击界面的断开按钮</dd><dt>期望</dt><dd><ul class="expected"><li>设备日志出现 vpn_drop_after_requested_stop</li><li>界面回到未连接</li></ul></dd><dt>实际</dt><dd>出现 vpn_drop_after_requested_stop，界面回到未连接</dd></dl><div class="shots single"><figure><a href="shots/BG-USER-STOP__S1__1.png"><img src="shots/BG-USER-STOP__S1__1.png" alt="结果" loading="lazy"></a><figcaption>结果 · e2e-run/shots/03-background-reconnect-foreground-drop.png</figcaption></figure></div></li><li class="step" id="step-BG-USER-STOP-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge pass">通过</span></div><p class="step-name">确认没有自动重连</p><dl><dt>操作</dt><dd>检索本次日志中的恢复事件</dd><dt>期望</dt><dd><ul class="expected"><li>不出现 vpn_session_recovery_attempt</li><li>不出现 vpn_session_recovery_started</li></ul></dd><dt>实际</dt><dd>日志中没有恢复事件</dd></dl><h4>运行输出</h4><pre class="output">vpn_session_recovery_attempt 0 次，vpn_session_recovery_started 0 次</pre></li></ol></article><article class="case skip" id="case-BG-BACKGROUND-DROP" data-case-card data-status="skip" data-oracles="O-CONN-04"><div class="case-head"><div><span class="case-id">用例 <code>BG-BACKGROUND-DROP</code></span><h3>重连监督：后台非主动掉线自动重连</h3></div><span class="badge skip">跳过</span></div><div class="case-meta"><span class="chip">O-CONN-04</span><span class="muted">步骤 1</span></div><ol class="steps"><li class="step" id="step-BG-BACKGROUND-DROP-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge skip">跳过</span></div><p class="step-name">用例适用性</p><dl><dt>操作</dt><dd>检查前置条件</dd><dt>期望</dt><dd><ul class="expected"><li>前置条件满足</li></ul></dd><dt>实际</dt><dd>缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。</dd></dl><h4>运行输出</h4><pre class="output">缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。</pre></li></ol></article><article class="case skip" id="case-BG-CARD-STOP" data-case-card data-status="skip" data-oracles="O-RECONN-10"><div class="case-head"><div><span class="case-id">用例 <code>BG-CARD-STOP</code></span><h3>重连监督：受控入口的主动断开</h3></div><span class="badge skip">跳过</span></div><div class="case-meta"><span class="chip">O-RECONN-10</span><span class="muted">步骤 1</span></div><ol class="steps"><li class="step" id="step-BG-CARD-STOP-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge skip">跳过</span></div><p class="step-name">用例适用性</p><dl><dt>操作</dt><dd>检查前置条件</dd><dt>期望</dt><dd><ul class="expected"><li>前置条件满足</li></ul></dd><dt>实际</dt><dd>缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。</dd></dl><h4>运行输出</h4><pre class="output">缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。</pre></li></ol></article><article class="case skip" id="case-ENDURANCE-RECOVERY" data-case-card data-status="skip" data-oracles="O-DIAG-02 O-CONN-08"><div class="case-head"><div><span class="case-id">用例 <code>ENDURANCE-RECOVERY</code></span><h3>扩展被杀后自动恢复并留下原因记录</h3></div><span class="badge skip">跳过</span></div><div class="case-meta"><span class="chip">O-DIAG-02</span><span class="chip">O-CONN-08</span><span class="muted">步骤 3</span></div><ol class="steps"><li class="step" id="step-ENDURANCE-RECOVERY-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">定位扩展进程</p><dl><dt>操作</dt><dd>hdc shell ps -ef 并筛选带 vpn 的应用进程</dd><dt>期望</dt><dd><ul class="expected"><li>只有一个带 vpn 的应用进程</li><li>状态文件带 sessionId</li></ul></dd><dt>实际</dt><dd>扩展进程 29317，会话 1792501447047</dd></dl><h4>运行输出</h4><pre class="output">20020205      29317    583 0 03:11:52 ?     00:00:06 ren.w2h.mesharc:vpn</pre></li><li class="step" id="step-ENDURANCE-RECOVERY-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge skip">跳过</span></div><p class="step-name">结束扩展进程</p><dl><dt>操作</dt><dd>以应用身份 kill -9 29317</dd><dt>期望</dt><dd><ul class="expected"><li>kill 返回 rc=0</li><li>该 PID 从进程表消失</li></ul></dd><dt>实际</dt><dd>结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</dd></dl><h4>运行输出</h4><pre class="output">结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</pre></li><li class="step" id="step-ENDURANCE-RECOVERY-S3"><div class="step-head"><span class="step-id"><code>S3</code></span><span class="badge skip">跳过</span></div><p class="step-name">跳过原因</p><dl><dt>操作</dt><dd>检查前置条件</dd><dt>期望</dt><dd><ul class="expected"><li>前置条件满足</li></ul></dd><dt>实际</dt><dd>结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</dd></dl><h4>运行输出</h4><pre class="output">结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。</pre></li></ol></article><article class="case pass" id="case-INSTALL-RESTART" data-case-card data-status="pass" data-oracles="O-CONN-08 O-DIAG-02 O-RECONN-02"><div class="case-head"><div><span class="case-id">用例 <code>INSTALL-RESTART</code></span><h3>安装重启后按意图恢复隧道</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-CONN-08</span><span class="chip">O-DIAG-02</span><span class="chip">O-RECONN-02</span><span class="muted">步骤 5</span></div><ol class="steps"><li class="step" id="step-INSTALL-RESTART-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">确认安装前状态</p><dl><dt>操作</dt><dd>读取状态文件与意图文件</dd><dt>期望</dt><dd><ul class="expected"><li>状态为 Running</li><li>意图为 connected</li><li>状态文件带 sessionId</li></ul></dd><dt>实际</dt><dd>会话 1792501348074，state=Running，意图 connected</dd></dl><h4>运行输出</h4><pre class="output">状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=9 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792501348253 | txBytes=632 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792501380370 | sessionId=1792501348074
+意图：{&quot;desired&quot;:&quot;connected&quot;,&quot;changedAtMs&quot;:1792501344314,&quot;by&quot;:&quot;ui&quot;}</pre></li><li class="step" id="step-INSTALL-RESTART-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge pass">通过</span></div><p class="step-name">安装新 HAP</p><dl><dt>操作</dt><dd>hdc install -r /opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap</dd><dt>期望</dt><dd><ul class="expected"><li>安装成功</li><li>应用与扩展进程被结束</li></ul></dd><dt>实际</dt><dd>安装成功，应用数据保留</dd></dl><h4>运行输出</h4><pre class="output">[Info]App install path:/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap msg:install bundle successfully. 
+AppMod finish</pre></li><li class="step" id="step-INSTALL-RESTART-S3"><div class="step-head"><span class="step-id"><code>S3</code></span><span class="badge pass">通过</span></div><p class="step-name">启动应用</p><dl><dt>操作</dt><dd>aa start -a EntryAbility</dd><dt>期望</dt><dd><ul class="expected"><li>启动成功</li><li>设备日志出现 ui_opened</li></ul></dd><dt>实际</dt><dd>应用启动并显示界面</dd></dl><div class="shots single"><figure><a href="shots/INSTALL-RESTART__S3__1.png"><img src="shots/INSTALL-RESTART__S3__1.png" alt="操作后" loading="lazy"></a><figcaption>操作后 · e2e-run/shots/01-install-restart-launched.png</figcaption></figure></div></li><li class="step" id="step-INSTALL-RESTART-S4"><div class="step-head"><span class="step-id"><code>S4</code></span><span class="badge pass">通过</span></div><p class="step-name">等待记录与恢复</p><dl><dt>操作</dt><dd>等待结束观测、恢复事件与新扩展</dd><dt>期望</dt><dd><ul class="expected"><li>出现 vpn_session_end_observed</li><li>出现 vpn_session_recovery_attempt</li><li>出现 vpn_session_recovery_started</li><li>状态回到 Running 且 sessionId 改变</li></ul></dd><dt>实际</dt><dd>新会话 1792501414003，state=Running</dd></dl><div class="shots single"><figure><a href="shots/INSTALL-RESTART__S4__1.png"><img src="shots/INSTALL-RESTART__S4__1.png" alt="结果" loading="lazy"></a><figcaption>结果 · e2e-run/shots/02-install-restart-recovered.png</figcaption></figure></div></li><li class="step" id="step-INSTALL-RESTART-S5"><div class="step-head"><span class="step-id"><code>S5</code></span><span class="badge pass">通过</span></div><p class="step-name">校验原因账本</p><dl><dt>操作</dt><dd>读取会话账本（按写者分文件）</dd><dt>期望</dt><dd><ul class="expected"><li>旧会话有 observed 或 end 记录</li><li>本次运行没有 user_stop</li></ul></dd><dt>实际</dt><dd>旧会话 1792501348074 已记录结束原因，本次没有 user_stop</dd></dl><h4>运行输出</h4><pre class="output">[
+  {
+    &quot;timestampMs&quot;: 1792501413780,
+    &quot;writer&quot;: &quot;ui&quot;,
+    &quot;sessionId&quot;: &quot;1792501348074&quot;,
+    &quot;kind&quot;: &quot;observed&quot;,
+    &quot;reason&quot;: &quot;extension_crash&quot;,
+    &quot;phase&quot;: &quot;heartbeat_expired&quot;,
+    &quot;code&quot;: 0
+  }
+]</pre></li></ol></article><article class="case skip" id="case-NET-RECOVERY" data-case-card data-status="skip" data-oracles="O-NET-04 O-CONN-09 O-RECONN-11"><div class="case-head"><div><span class="case-id">用例 <code>NET-RECOVERY</code></span><h3>断网后恢复网络自动重连</h3></div><span class="badge skip">跳过</span></div><div class="case-meta"><span class="chip">O-NET-04</span><span class="chip">O-CONN-09</span><span class="chip">O-RECONN-11</span><span class="muted">步骤 2</span></div><ol class="steps"><li class="step" id="step-NET-RECOVERY-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge skip">跳过</span></div><p class="step-name">断开网络</p><dl><dt>操作</dt><dd>hdc shell svc wifi disable 并等待 ping 失败</dd><dt>期望</dt><dd><ul class="expected"><li>命令成功</li><li>设备不再能访问 1.1.1.1</li></ul></dd><dt>实际</dt><dd>`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</dd></dl><h4>运行输出</h4><pre class="output">`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</pre></li><li class="step" id="step-NET-RECOVERY-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge skip">跳过</span></div><p class="step-name">跳过原因</p><dl><dt>操作</dt><dd>检查前置条件</dd><dt>期望</dt><dd><ul class="expected"><li>前置条件满足</li></ul></dd><dt>实际</dt><dd>`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</dd></dl><h4>运行输出</h4><pre class="output">`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。</pre></li></ol></article><article class="case pass" id="case-SURV-CONNECT" data-case-card data-status="pass" data-oracles="O-CONN-06"><div class="case-head"><div><span class="case-id">用例 <code>SURV-CONNECT</code></span><h3>锁屏存活：先连上隧道</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-CONN-06</span><span class="muted">步骤 2</span></div><ol class="steps"><li class="step" id="step-SURV-CONNECT-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">冷启动应用</p><dl><dt>操作</dt><dd>aa force-stop 后 aa start</dd><dt>期望</dt><dd><ul class="expected"><li>设备日志出现 ui_opened</li><li>界面显示未连接或已连接</li></ul></dd><dt>实际</dt><dd>应用冷启动完成，界面显示连接状态</dd></dl><div class="shots single"><figure><a href="shots/SURV-CONNECT__S1__1.png"><img src="shots/SURV-CONNECT__S1__1.png" alt="操作后" loading="lazy"></a><figcaption>操作后 · e2e-run/shots/01-survival-launch.png</figcaption></figure></div></li><li class="step" id="step-SURV-CONNECT-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge pass">通过</span></div><p class="step-name">建立隧道</p><dl><dt>操作</dt><dd>界面处于未连接时点击连接按钮</dd><dt>期望</dt><dd><ul class="expected"><li>设备日志出现 vpn_connected</li></ul></dd><dt>实际</dt><dd>点击连接后出现 vpn_connected</dd></dl><div class="shots single"><figure><a href="shots/SURV-CONNECT__S2__1.png"><img src="shots/SURV-CONNECT__S2__1.png" alt="结果" loading="lazy"></a><figcaption>结果 · e2e-run/shots/02-survival-connected.png</figcaption></figure></div></li></ol></article><article class="case pass" id="case-SURV-SCREEN-OFF" data-case-card data-status="pass" data-oracles="O-CONN-06"><div class="case-head"><div><span class="case-id">用例 <code>SURV-SCREEN-OFF</code></span><h3>锁屏 720 秒静置期间心跳不断</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-CONN-06</span><span class="muted">步骤 2</span></div><ol class="steps"><li class="step" id="step-SURV-SCREEN-OFF-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">锁屏静置</p><dl><dt>操作</dt><dd>power-shell suspend 后等待 720 秒并唤醒</dd><dt>期望</dt><dd><ul class="expected"><li>设备进入锁屏</li><li>到点后唤醒成功</li></ul></dd><dt>实际</dt><dd>锁屏 720 秒后唤醒</dd></dl><div class="shots"><figure><a href="shots/SURV-SCREEN-OFF__S1__1.png"><img src="shots/SURV-SCREEN-OFF__S1__1.png" alt="操作前" loading="lazy"></a><figcaption>操作前 · e2e-run/shots/03-survival-before-suspend.png</figcaption></figure><figure><a href="shots/SURV-SCREEN-OFF__S1__2.png"><img src="shots/SURV-SCREEN-OFF__S1__2.png" alt="操作后" loading="lazy"></a><figcaption>操作后 · e2e-run/shots/04-survival-after-wakeup.png</figcaption></figure></div></li><li class="step" id="step-SURV-SCREEN-OFF-S2"><div class="step-head"><span class="step-id"><code>S2</code></span><span class="badge pass">通过</span></div><p class="step-name">校验心跳</p><dl><dt>操作</dt><dd>统计锁屏期间扩展写入的心跳</dd><dt>期望</dt><dd><ul class="expected"><li>心跳数量达到下限</li><li>心跳跨度达到 720 秒</li><li>最大间隔不超过 15 秒</li></ul></dd><dt>实际</dt><dd>心跳 221 个，跨度 740 s，最大间隔 6.9 s</dd></dl><h4>运行输出</h4><pre class="output">心跳 221 个，跨度 740 s，最大间隔 6.9 s</pre></li></ol></article><article class="case pass" id="case-SURV-ONE-PROCESS" data-case-card data-status="pass" data-oracles="O-CONN-06"><div class="case-head"><div><span class="case-id">用例 <code>SURV-ONE-PROCESS</code></span><h3>锁屏存活：全程只有一个扩展进程</h3></div><span class="badge pass">通过</span></div><div class="case-meta"><span class="chip">O-CONN-06</span><span class="muted">步骤 1</span></div><ol class="steps"><li class="step" id="step-SURV-ONE-PROCESS-S1"><div class="step-head"><span class="step-id"><code>S1</code></span><span class="badge pass">通过</span></div><p class="step-name">统计扩展进程</p><dl><dt>操作</dt><dd>检索设备日志中的扩展创建与销毁事件</dd><dt>期望</dt><dd><ul class="expected"><li>vpn_extension_created 出现 1 次</li><li>vpn_extension_destroyed 出现 0 次</li></ul></dd><dt>实际</dt><dd>vpn_extension_created 1 次，vpn_extension_destroyed 0 次</dd></dl><h4>运行输出</h4><pre class="output">vpn_extension_created 1 次，vpn_extension_destroyed 0 次</pre></li></ol></article></div>
+</section>
+
+<section>
+<h2>证据清单</h2>
+<p class="muted">截图带 SHA-256 前缀。文本输出带长度与哈希。哈希由生成器按本次文件计算。</p>
+<label class="viewer-field">证据类型
+<select id="filter-evidence">
+<option value="all">全部证据</option>
+<option value="screenshot">截图</option>
+<option value="output">文本输出</option>
+</select>
+</label>
+<div class="table-wrap">
+<table>
+<caption>本次报告引用的全部证据</caption>
+<thead><tr><th>用例 / 步骤</th><th>类型</th><th>标签</th><th>报告内路径</th><th>大小</th><th>SHA-256 前缀</th></tr></thead>
+<tbody><tr data-evidence-type="screenshot"><td><code>BG-CONNECT</code> / <code>S1</code></td><td>截图</td><td>操作后</td><td><code>shots/BG-CONNECT__S1__1.png</code></td><td>304.7 KB</td><td><code>fadefba2dca0</code></td></tr><tr data-evidence-type="screenshot"><td><code>BG-CONNECT</code> / <code>S2</code></td><td>截图</td><td>结果</td><td><code>shots/BG-CONNECT__S2__1.png</code></td><td>289.6 KB</td><td><code>725ab40d0337</code></td></tr><tr data-evidence-type="screenshot"><td><code>BG-USER-STOP</code> / <code>S1</code></td><td>截图</td><td>结果</td><td><code>shots/BG-USER-STOP__S1__1.png</code></td><td>304.8 KB</td><td><code>59c3847ccd8a</code></td></tr><tr data-evidence-type="output"><td><code>BG-USER-STOP</code> / <code>S2</code></td><td>文本输出</td><td>log</td><td>—</td><td>65 字符</td><td><code>1cf32a3f7ba4</code></td></tr><tr data-evidence-type="output"><td><code>ENDURANCE-RECOVERY</code> / <code>S1</code></td><td>文本输出</td><td>log</td><td>—</td><td>72 字符</td><td><code>739458bfd7ee</code></td></tr><tr data-evidence-type="output"><td><code>INSTALL-RESTART</code> / <code>S1</code></td><td>文本输出</td><td>log</td><td>—</td><td>534 字符</td><td><code>a6c037f07dfa</code></td></tr><tr data-evidence-type="output"><td><code>INSTALL-RESTART</code> / <code>S2</code></td><td>文本输出</td><td>log</td><td>—</td><td>155 字符</td><td><code>26c715b6c7e7</code></td></tr><tr data-evidence-type="screenshot"><td><code>INSTALL-RESTART</code> / <code>S3</code></td><td>截图</td><td>操作后</td><td><code>shots/INSTALL-RESTART__S3__1.png</code></td><td>846.2 KB</td><td><code>8db1e3bbf61d</code></td></tr><tr data-evidence-type="screenshot"><td><code>INSTALL-RESTART</code> / <code>S4</code></td><td>截图</td><td>结果</td><td><code>shots/INSTALL-RESTART__S4__1.png</code></td><td>208.0 KB</td><td><code>331a81a1b96c</code></td></tr><tr data-evidence-type="output"><td><code>INSTALL-RESTART</code> / <code>S5</code></td><td>文本输出</td><td>log</td><td>—</td><td>204 字符</td><td><code>11f1c2d5e110</code></td></tr><tr data-evidence-type="screenshot"><td><code>SURV-CONNECT</code> / <code>S1</code></td><td>截图</td><td>操作后</td><td><code>shots/SURV-CONNECT__S1__1.png</code></td><td>304.8 KB</td><td><code>9b435f8ca2f3</code></td></tr><tr data-evidence-type="screenshot"><td><code>SURV-CONNECT</code> / <code>S2</code></td><td>截图</td><td>结果</td><td><code>shots/SURV-CONNECT__S2__1.png</code></td><td>289.0 KB</td><td><code>ba96b23ddb4e</code></td></tr><tr data-evidence-type="screenshot"><td><code>SURV-SCREEN-OFF</code> / <code>S1</code></td><td>截图</td><td>操作前</td><td><code>shots/SURV-SCREEN-OFF__S1__1.png</code></td><td>288.9 KB</td><td><code>06f51da07181</code></td></tr><tr data-evidence-type="screenshot"><td><code>SURV-SCREEN-OFF</code> / <code>S1</code></td><td>截图</td><td>操作后</td><td><code>shots/SURV-SCREEN-OFF__S1__2.png</code></td><td>2548.1 KB</td><td><code>db62ff161bcf</code></td></tr><tr data-evidence-type="output"><td><code>SURV-SCREEN-OFF</code> / <code>S2</code></td><td>文本输出</td><td>log</td><td>—</td><td>28 字符</td><td><code>6aecc47dfce3</code></td></tr><tr data-evidence-type="output"><td><code>SURV-ONE-PROCESS</code> / <code>S1</code></td><td>文本输出</td><td>log</td><td>—</td><td>53 字符</td><td><code>73ffe8dfe648</code></td></tr></tbody>
+</table>
+</div>
+</section>
+
+<footer>
+生成时间 2026-10-21T00:21:47+11:00 · 报告结构版本 1 · 由 <code>a01</code> 的 <code>scripts/e2e-report.py</code> 生成。<br>
+此页只投影运行日志。此页不执行测试，不自动判定开发完成。发布链接见 <code>e2e-published.txt</code>。
+</footer>
+</main>
+<script>
+(() => {
+  const cards = Array.from(document.querySelectorAll('[data-case-card]'));
+  const buttons = Array.from(document.querySelectorAll('[data-filter-status]'));
+  const oracle = document.getElementById('filter-oracle');
+  const search = document.getElementById('filter-search');
+  const count = document.getElementById('filter-count');
+  const evidenceFilter = document.getElementById('filter-evidence');
+  const evidenceRows = Array.from(document.querySelectorAll('[data-evidence-type]'));
+  let status = 'all';
+  function apply() {
+    const query = search.value.trim().toLocaleLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const statusOk = status === 'all' || card.dataset.status === status;
+      const oracleOk = oracle.value === 'all' || (card.dataset.oracles || '').split(' ').includes(oracle.value);
+      const textOk = !query || card.textContent.toLocaleLowerCase().includes(query);
+      card.hidden = !(statusOk && oracleOk && textOk);
+      if (!card.hidden) visible += 1;
+    }
+    count.textContent = '显示 ' + visible + ' / ' + cards.length + ' 个用例';
+    for (const button of buttons) {
+      button.setAttribute('aria-pressed', String(button.dataset.filterStatus === status));
+    }
+  }
+  for (const button of buttons) {
+    button.addEventListener('click', () => { status = button.dataset.filterStatus; apply(); });
+  }
+  oracle.addEventListener('change', apply);
+  search.addEventListener('input', apply);
+  if (evidenceFilter) {
+    evidenceFilter.addEventListener('change', () => {
+      for (const row of evidenceRows) {
+        row.hidden = evidenceFilter.value !== 'all' && row.dataset.evidenceType !== evidenceFilter.value;
+      }
+    });
+  }
+  apply();
+})();
+</script>
+</body>
+</html>

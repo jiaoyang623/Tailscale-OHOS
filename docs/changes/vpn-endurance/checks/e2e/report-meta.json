@@ -1,0 +1,170 @@
+{
+  "skill_version": "a01",
+  "report_version": 1,
+  "title": "设备侧 E2E：断连恢复与省电",
+  "change_id": "vpn-endurance",
+  "baseline": "ec64476（工作树有本批次未提交改动）",
+  "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+  "command": "scripts/e2e/run-batch.sh endurance-recovery network-recovery background-reconnect install-restart-recovery screen-off-survival",
+  "executed_at": "2026-10-20T13:02:57.916Z",
+  "target": "mobile",
+  "generated_at": "2026-10-21T00:21:47+11:00",
+  "case_count": 10,
+  "passed": 6,
+  "failed": 0,
+  "skipped": 4,
+  "blocked": 0,
+  "step_count": 21,
+  "steps_passed": 15,
+  "steps_failed": 0,
+  "steps_skipped": 6,
+  "steps_blocked": 0,
+  "screenshots": 9,
+  "outputs": 7,
+  "evidence": [
+    {
+      "case_id": "BG-CONNECT",
+      "step_id": "S1",
+      "type": "screenshot",
+      "label": "操作后",
+      "file": "shots/BG-CONNECT__S1__1.png",
+      "size": 311994,
+      "sha256": "fadefba2dca044f0f6190abe70f866c241593222a74f715ffcd2da766f6f646b"
+    },
+    {
+      "case_id": "BG-CONNECT",
+      "step_id": "S2",
+      "type": "screenshot",
+      "label": "结果",
+      "file": "shots/BG-CONNECT__S2__1.png",
+      "size": 296515,
+      "sha256": "725ab40d0337c9ce95a0d02d125bccb4c245a0d80a58da454a1ce73c3571e8c6"
+    },
+    {
+      "case_id": "BG-USER-STOP",
+      "step_id": "S1",
+      "type": "screenshot",
+      "label": "结果",
+      "file": "shots/BG-USER-STOP__S1__1.png",
+      "size": 312135,
+      "sha256": "59c3847ccd8ad075bb3bbfaccdebebe25fb41bcd6224758b95674ea989a016e9"
+    },
+    {
+      "case_id": "BG-USER-STOP",
+      "step_id": "S2",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 65,
+      "sha256": "1cf32a3f7ba400414da93c06fb030977be89588330d81246f6ea06feb50adebf"
+    },
+    {
+      "case_id": "ENDURANCE-RECOVERY",
+      "step_id": "S1",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 72,
+      "sha256": "739458bfd7ee8ca8cc10b7692f0d573acb8d8e26165deae9e9e7a1a7cb39edf3"
+    },
+    {
+      "case_id": "INSTALL-RESTART",
+      "step_id": "S1",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 534,
+      "sha256": "a6c037f07dfa345dad5f59ad44c773ec2edc42476bb1497b743da8660b5ebb31"
+    },
+    {
+      "case_id": "INSTALL-RESTART",
+      "step_id": "S2",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 155,
+      "sha256": "26c715b6c7e7a1d68fff38159b89f74d9896fd4d033afcf5708cc1ea6ffb815d"
+    },
+    {
+      "case_id": "INSTALL-RESTART",
+      "step_id": "S3",
+      "type": "screenshot",
+      "label": "操作后",
+      "file": "shots/INSTALL-RESTART__S3__1.png",
+      "size": 866549,
+      "sha256": "8db1e3bbf61ddc94c9d9147d319e38ba46fc125d1982f3faa1ee630ea2766ef8"
+    },
+    {
+      "case_id": "INSTALL-RESTART",
+      "step_id": "S4",
+      "type": "screenshot",
+      "label": "结果",
+      "file": "shots/INSTALL-RESTART__S4__1.png",
+      "size": 213028,
+      "sha256": "331a81a1b96cb43ad4095d9e96aff0ed2aaf258e7fe7bc972020ddf586a733dd"
+    },
+    {
+      "case_id": "INSTALL-RESTART",
+      "step_id": "S5",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 204,
+      "sha256": "11f1c2d5e11048b4b8c13c58292a50f1f1f4ceb25dbc3a2a9390f3087e194ff9"
+    },
+    {
+      "case_id": "SURV-CONNECT",
+      "step_id": "S1",
+      "type": "screenshot",
+      "label": "操作后",
+      "file": "shots/SURV-CONNECT__S1__1.png",
+      "size": 312136,
+      "sha256": "9b435f8ca2f33663b009079e9ec13dc720bc35a47a2572862e321b81f1aee95a"
+    },
+    {
+      "case_id": "SURV-CONNECT",
+      "step_id": "S2",
+      "type": "screenshot",
+      "label": "结果",
+      "file": "shots/SURV-CONNECT__S2__1.png",
+      "size": 295936,
+      "sha256": "ba96b23ddb4ebb8fa6595771250822595d0ac5d8184abaed73d07bae02766443"
+    },
+    {
+      "case_id": "SURV-SCREEN-OFF",
+      "step_id": "S1",
+      "type": "screenshot",
+      "label": "操作前",
+      "file": "shots/SURV-SCREEN-OFF__S1__1.png",
+      "size": 295791,
+      "sha256": "06f51da0718101e882d37fa5d0e0d9f460746284441d4a518c1ed937fed72f73"
+    },
+    {
+      "case_id": "SURV-SCREEN-OFF",
+      "step_id": "S1",
+      "type": "screenshot",
+      "label": "操作后",
+      "file": "shots/SURV-SCREEN-OFF__S1__2.png",
+      "size": 2609244,
+      "sha256": "db62ff161bcf575b2f0d7dd55bd606373750254991c8f7e20857d6a57bacb281"
+    },
+    {
+      "case_id": "SURV-SCREEN-OFF",
+      "step_id": "S2",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 28,
+      "sha256": "6aecc47dfce35abbbeab2e6908ce17a964defec9a5e8682fd36a6de2b2870163"
+    },
+    {
+      "case_id": "SURV-ONE-PROCESS",
+      "step_id": "S1",
+      "type": "output",
+      "label": "log",
+      "file": "",
+      "size": 53,
+      "sha256": "73ffe8dfe648ce4741355ac4ae28fda9f6708e2195c3cc39d5e36b97117217c0"
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="a01-change-id" content="vpn-endurance">
+<title>UI 高度还原核对报告</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --panel-2: #eef2f6;
+  --text: #17212b;
+  --muted: #5c6b7a;
+  --line: #d8e0e8;
+  --accent: #2457c5;
+  --accent-2: #e8eefc;
+  --ok: #18794e;
+  --ok-bg: #e7f6ee;
+  --fail: #b42318;
+  --fail-bg: #fdecea;
+  --warn: #9a5b00;
+  --warn-bg: #fff4d6;
+  --info: #5b3fa8;
+  --info-bg: #f0ebff;
+  --na: #52606d;
+  --na-bg: #eef1f4;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e141b;
+    --panel: #151d26;
+    --panel-2: #1b2530;
+    --text: #e7edf4;
+    --muted: #9caaba;
+    --line: #2a3644;
+    --accent: #8ab4ff;
+    --accent-2: #1c2b44;
+    --ok: #6ee7a8;
+    --ok-bg: #10291d;
+    --fail: #ff8d84;
+    --fail-bg: #351715;
+    --warn: #f5c46b;
+    --warn-bg: #33270f;
+    --info: #c4b5fd;
+    --info-bg: #251c40;
+    --na: #b3c0cd;
+    --na-bg: #202a34;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e141b;
+  --panel: #151d26;
+  --panel-2: #1b2530;
+  --text: #e7edf4;
+  --muted: #9caaba;
+  --line: #2a3644;
+  --accent: #8ab4ff;
+  --accent-2: #1c2b44;
+  --ok: #6ee7a8;
+  --ok-bg: #10291d;
+  --fail: #ff8d84;
+  --fail-bg: #351715;
+  --warn: #f5c46b;
+  --warn-bg: #33270f;
+  --info: #c4b5fd;
+  --info-bg: #251c40;
+  --na: #b3c0cd;
+  --na-bg: #202a34;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(1.35rem, 2.4vw, 2rem); }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
+p { margin: 0.35rem 0 0; }
+.muted { color: var(--muted); }
+.page-head {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 14px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.eyebrow { color: var(--accent); font-weight: 700; letter-spacing: 0.04em; font-size: 0.78rem; text-transform: uppercase; }
+.verdict-badge {
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border: 1px solid currentColor;
+  background: var(--panel);
+}
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.toolbar label { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 0.88rem; }
+select, button {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+button { cursor: pointer; }
+button:hover { border-color: var(--accent); }
+main { max-width: 1180px; margin: 0 auto; padding: 6px 20px 40px; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-top: 16px;
+}
+.panel > h2 { margin-bottom: 12px; }
+.panel > h2::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; }
+.kv { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.92rem; }
+.kv th, .kv td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+.kv th { width: 34%; color: var(--muted); font-weight: 600; }
+.data { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data th, .data td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+.data th { background: var(--panel-2); color: var(--muted); font-weight: 600; white-space: nowrap; }
+.data tr.fail td { background: var(--fail-bg); }
+.data tr.uncovered td { background: var(--na-bg); }
+.data tr.pass td { background: transparent; }
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+.meta-grid, .gate-grid, .coverage-grid, .tiles {
+  display: grid;
+  gap: 12px;
+}
+.meta-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.gate-grid { grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.4fr); align-items: stretch; }
+.coverage-grid { grid-template-columns: minmax(260px, 1.2fr) minmax(260px, 1fr); align-items: start; }
+.tiles { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.meta-tile, .tile {
+  background: var(--panel-2);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid transparent;
+}
+.meta-tile .value, .tile .value { font-size: 1.5rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+.meta-tile .label, .tile .label { color: var(--muted); font-size: 0.8rem; }
+.tile.ok { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 26%, transparent); }
+.tile.fail { background: var(--fail-bg); border-color: color-mix(in srgb, var(--fail) 26%, transparent); }
+.tile.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 26%, transparent); }
+.tile.info { background: var(--info-bg); border-color: color-mix(in srgb, var(--info) 26%, transparent); }
+.gate-state {
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--panel-2);
+  border-left: 6px solid var(--muted);
+}
+.gate-state .big { font-size: 1.9rem; font-weight: 800; }
+.gate-state.pass { background: var(--ok-bg); border-left-color: var(--ok); }
+.gate-state.fail { background: var(--fail-bg); border-left-color: var(--fail); }
+.gate-state.incomplete { background: var(--warn-bg); border-left-color: var(--warn); }
+.gate-state.uncalibrated { background: var(--info-bg); border-left-color: var(--info); }
+.gate-state.na { background: var(--na-bg); border-left-color: var(--na); }
+.verdict-badge.pass, .badge.pass { color: var(--ok); background: var(--ok-bg); }
+.verdict-badge.fail, .badge.fail, .badge.blocking { color: var(--fail); background: var(--fail-bg); }
+.verdict-badge.incomplete, .badge.incomplete, .badge.warn, .badge.weak { color: var(--warn); background: var(--warn-bg); }
+.verdict-badge.uncalibrated, .badge.uncalibrated { color: var(--info); background: var(--info-bg); }
+.verdict-badge.na, .badge.na { color: var(--na); background: var(--na-bg); }
+.badge.accepted, .badge.pass { color: var(--ok); background: var(--ok-bg); }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.bar-row { display: grid; grid-template-columns: 92px 1fr 52px; gap: 10px; align-items: center; margin: 8px 0; }
+.bar-label { color: var(--muted); font-size: 0.84rem; }
+.bar-track { height: 12px; border-radius: 999px; background: var(--panel-2); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; background: var(--ok); }
+.bar-fill.warn { background: var(--warn); }
+.bar-fill.fail { background: var(--fail); }
+.bar-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.86rem; }
+.finding-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.finding {
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--muted);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--panel-2);
+}
+.finding.blocking { border-left-color: var(--fail); background: var(--fail-bg); }
+.finding.accepted { border-left-color: var(--ok); background: var(--ok-bg); }
+.finding.weak { border-left-color: var(--warn); background: var(--warn-bg); }
+.finding h3 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.finding .coords { color: var(--muted); font-size: 0.82rem; }
+.finding dl { display: grid; grid-template-columns: 80px 1fr; gap: 4px 10px; margin: 10px 0 0; font-size: 0.88rem; }
+.finding dt { color: var(--muted); }
+.finding dd { margin: 0; overflow-wrap: anywhere; }
+.suspects { margin: 8px 0 0; padding-left: 18px; font-size: 0.88rem; }
+.shot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.shot-grid figure { margin: 0; }
+.shot-grid img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.shot-grid figcaption { color: var(--muted); font-size: 0.82rem; margin-top: 6px; }
+.empty { color: var(--muted); padding: 14px; border: 1px dashed var(--line); border-radius: 10px; }
+.footer { max-width: 1180px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 0.82rem; }
+[hidden] { display: none !important; }
+@media (max-width: 720px) {
+  .page-head { padding-top: 18px; }
+  .toolbar { padding: 8px 12px; }
+  main { padding: 6px 12px 28px; }
+  .footer { padding: 0 12px 24px; }
+  .panel { padding: 14px; border-radius: 12px; }
+  .gate-grid, .coverage-grid { grid-template-columns: 1fr; }
+  .kv th { width: 42%; }
+  .bar-row { grid-template-columns: 74px 1fr 46px; }
+}
+</style>
+</head>
+<body>
+<header class="page-head">
+  <div>
+    <p class="eyebrow">a01 · UI 高度还原核对</p>
+    <h1>UI 高度还原核对报告</h1>
+    <p class="muted">批次 <code>vpn-endurance</code> · 基线 <code>ec64476</code> · 生成 2026-10-20T22:10:47+11:00</p>
+  </div>
+  <div class="verdict-badge na">不适用</div>
+</header>
+
+<nav class="toolbar" aria-label="报告视角">
+  <label>结果
+    <select data-filter-status aria-label="按结果筛选">
+      <option value="all">全部</option>
+      <option value="blocking">阻断</option>
+      <option value="uncovered">未覆盖</option>
+      <option value="accepted">已接受</option>
+    </select>
+  </label>
+  <label>元素类型
+    <select data-filter-type aria-label="按元素类型筛选">
+      <option value="all">全部类型</option>
+      
+    </select>
+  </label>
+  <button type="button" data-reset>重置</button>
+  <span class="muted">先看阻断项，再看未覆盖，最后看已接受。</span>
+</nav>
+
+<main>
+<section id="meta" class="panel">
+  <h2>1 · 元信息</h2>
+  <div class="meta-grid"><div class="tile "><div class="value">not-applicable</div><div class="label">通道</div></div><div class="tile info"><div class="value">baseline</div><div class="label">设计源</div></div><div class="tile "><div class="value">0</div><div class="label">设计元素</div></div><div class="tile "><div class="value">0</div><div class="label">可比元素</div></div><div class="tile ok"><div class="value">0</div><div class="label">检出</div></div><div class="tile "><div class="value">0</div><div class="label">差值样本</div></div></div>
+  <table class="kv"><tr><th>模式</th><td>not-applicable</td></tr><tr><th>设计源</th><td>baseline · </td></tr><tr><th>基线引用</th><td>ec64476</td></tr><tr><th>基线版本</th><td>未登记</td></tr><tr><th>设备</th><td>Pura X / 56T0225330000021</td></tr><tr><th>密度</th><td>3.25</td></tr><tr><th>渲染环境</th><td>ArkUI</td></tr><tr><th>状态栏高度</th><td>0 px</td></tr><tr><th>文本阈值</th><td>2 dp</td></tr><tr><th>非文本阈值</th><td>4 dp</td></tr><tr><th>标定</th><td>未标定 · 只报告</td></tr><tr><th>证据包</th><td>vpn-endurance · ec64476</td></tr></table>
+</section>
+
+<section id="gate" class="panel">
+  <h2>2 · 门禁结论</h2>
+  <div class="gate-grid">
+    <div class="gate-state na">
+      <div class="big">不适用</div>
+      <p>本批次只改运行行为：恢复状态机、意图文件、会话账本、长时任务守护与省电档位的定时器节拍。没有改布局、颜色、字体、图标、控件结构或页面跳转。界面可见的变化只有刷新时机变慢，截图像素比对不能检出节拍变化。项目声明也没有配置 UI 还原适配器与设计稿来源。</p>
+    </div>
+    <div class="tiles"><div class="tile ok"><div class="value">0.0%</div><div class="label">覆盖率</div></div><div class="tile ok"><div class="value">0</div><div class="label">阻断项</div></div><div class="tile ok"><div class="value">0</div><div class="label">未映射</div></div><div class="tile ok"><div class="value">0</div><div class="label">歧义</div></div><div class="tile info"><div class="value">0</div><div class="label">标定样本</div></div><div class="tile ok"><div class="value">0</div><div class="label">已接受</div></div></div>
+  </div>
+  <table class="kv"><tr><th>自报判定</th><td>not-applicable</td></tr><tr><th>重算判定</th><td>not-applicable</td></tr><tr><th>阻断数</th><td>0</td></tr><tr><th>门禁状态</th><td>clear</td></tr><tr><th>失败块</th><td>无</td></tr><tr><th>判定原因</th><td>本批次只改运行行为：恢复状态机、意图文件、会话账本、长时任务守护与省电档位的定时器节拍。没有改布局、颜色、字体、图标、控件结构或页面跳转。界面可见的变化只有刷新时机变慢，截图像素比对不能检出节拍变化。项目声明也没有配置 UI 还原适配器与设计稿来源。</td></tr></table>
+</section>
+
+<section id="coverage" class="panel">
+  <h2>3 · 覆盖率与身份映射</h2>
+  <div class="coverage-grid">
+    <div class="bars"><div class="bar-row"><div class="bar-label">总覆盖率</div><div class="bar-track"><div class="bar-fill ok" style="width:0.00%"></div></div><div class="bar-value">0.0%</div></div><div class="bar-row"><div class="bar-label">none</div><div class="bar-track"><div class="bar-fill ok" style="width:0.00%"></div></div><div class="bar-value">0.0%</div></div></div>
+    <div>
+      <table class="kv"><tr><th>已映射</th><td>0</td></tr><tr><th>未映射</th><td>0</td></tr><tr><th>歧义命中</th><td>0</td></tr><tr><th>未覆盖计数</th><td>0</td></tr></table>
+    </div>
+  </div>
+  <table class="data" style="margin-top:12px">
+    <thead><tr><th>元素类型</th><th>覆盖率</th><th>图形</th></tr></thead>
+    <tbody><tr><td>none</td><td>0.0%</td><td><div class="bar-row"><div class="bar-label"></div><div class="bar-track"><div class="bar-fill ok" style="width:0.00%"></div></div><div class="bar-value">0.0%</div></div></td></tr></tbody>
+  </table>
+</section>
+
+<section id="findings" class="panel">
+  <h2>4 · 超阈值项</h2>
+  <p class="muted">阻断项在前。已接受项保留签字记录。这里只放证据，判定由人做。</p>
+  <div class="finding-grid"><div class="empty">本次证据包没有检出。</div></div>
+</section>
+
+<section id="elements" class="panel">
+  <h2>5 · 元素级差值表</h2>
+  <p class="muted">差值单位与证据包一致。超阈值行标红，未覆盖行标灰。</p>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>元素</th><th>类型</th><th>设计</th><th>实现</th><th>差值</th><th>状态</th><th>定位符</th></tr></thead>
+      <tbody><tr><td colspan="7">没有元素差值行。</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="evidence" class="panel">
+  <h2>6 · 证据与截图</h2>
+  <div class="shot-grid"><div class="empty">本次证据包没有截图。报告只显示元素表与块结果。</div></div>
+  <div class="table-wrap">
+    <table class="data" style="margin-top:12px">
+      <thead><tr><th>证据</th><th>类型</th><th>文件</th><th>大小</th><th>SHA-256</th></tr></thead>
+      <tbody><tr><td>证据包</td><td>JSON</td><td><code>ui-restoration.json</code></td><td>1412 字节</td><td><code>2b19ab273f80</code></td></tr></tbody>
+    </table>
+  </div>
+  <table class="kv"><tr><th>来源哈希</th><td>未登记。</td></tr></table>
+</section>
+</main>
+
+<footer class="footer">
+  <p>本报告由 a01 生成。报告只投影证据包，不替代人工审核。超阈值接受必须有签字记录。</p>
+  <p>报告目录自包含，不引用外部资源。</p>
+</footer>
+
+<script>
+(function () {
+  var status = document.querySelector('[data-filter-status]');
+  var type = document.querySelector('[data-filter-type]');
+  var reset = document.querySelector('[data-reset]');
+  function apply() {
+    var wanted = status.value;
+    var kind = type.value;
+    document.querySelectorAll('[data-finding], [data-element-row]').forEach(function (el) {
+      var state = el.getAttribute('data-status') || '';
+      var elementType = el.getAttribute('data-type') || 'all';
+      var show = true;
+      if (wanted === 'blocking') show = state === 'blocking' || state === 'fail';
+      else if (wanted === 'uncovered') show = state === 'uncovered';
+      else if (wanted === 'accepted') show = state === 'accepted';
+      if (show && kind !== 'all' && elementType !== 'all' && elementType !== kind) show = false;
+      el.hidden = !show;
+    });
+  }
+  status.addEventListener('change', apply);
+  type.addEventListener('change', apply);
+  reset.addEventListener('click', function () {
+    status.value = 'all';
+    type.value = 'all';
+    apply();
+  });
+})();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "51e680d",
+  "baseline": "ec64476",
   "stage": "lld",
   "design": [
     {
@@ -209,16 +209,16 @@
     {
       "id": "R-CONN-05",
       "layer": "requirements",
-      "title": "非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数",
+      "title": "非用户主动的掉线自动恢复：指数退避，退避上限 300 s",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：非用户主动的掉线在后台自动恢复：最多 3 次、指数退避、稳定 60 s 才清零计数",
-        "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "规则：非用户主动的掉线自动恢复：指数退避，退避上限 300 s；稳定 60 s 后清零计数。恢复不设次数上限",
+        "优先级：高",
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`services/VpnReconnectSupervisor.ets`（`BACKGROUND_SETTLE_MS`/`MAX_ATTEMPTS`/`STABLE_MS`）"
+        "`services/VpnReconnectSupervisor.ets`（`RETRY_BASE_MS`/`RETRY_MAX_MS`/`STABLE_MS`）"
       ]
     },
     {
@@ -271,31 +271,34 @@
     {
       "id": "R-CONN-09",
       "layer": "requirements",
-      "title": "长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放",
+      "title": "长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：长时任务在状态缺失/陈旧时按不确定处理，有界宽限后释放",
-        "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "规则：长时任务在状态缺失或陈旧时保留保护，不因一次不确定判读释放。只有确认断开或用户停止才释放",
+        "优先级：高",
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`VpnBackgroundTaskManager.ets` `VPN_STATUS_GRACE_MS`"
+        "`VpnBackgroundTaskManager.ets` 的意图守卫",
+        "`services/VpnSessionIntent.ets`",
+        "2026-10-20 修订，原值为「有界宽限后释放」"
       ]
     },
     {
       "id": "R-CONN-10",
       "layer": "requirements",
-      "title": "用户主动取消保活通知后，不得在同一会话内自行恢复",
+      "title": "用户取消保活通知不等于停止连接。后台不抢",
       "status": "ready",
       "depends_on": [],
       "content": [
-        "规则：用户主动取消保活通知后，不得在同一会话内自行恢复",
+        "规则：用户取消保活通知不等于停止连接。后台不抢；回到前台且连接意图仍在时重新申请保护",
         "优先级：中",
-        "实现状态：已实现（产品现状，非本流程的完成定义）"
+        "实现状态：部分实现（产品现状，非本流程的完成定义）"
       ],
       "sources": [
-        "`VpnBackgroundTaskManager.ets` `suppressedUntilDisconnect`"
+        "`VpnBackgroundTaskManager.ets` `suppressedUntilForeground`（本批由 `suppressedUntilDisconnect` 重命名）",
+        "2026-10-20 修订"
       ]
     },
     {
@@ -1037,9 +1040,116 @@
       ]
     },
     {
+      "id": "R-CONN-11",
+      "layer": "requirements",
+      "title": "用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：用户没有点击停止时，连接不得停止。长时任务被系统取消或丢失后，只要会话仍在就恢复保护",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户报告「长时间使用会断连」",
+        "`VpnBackgroundTaskManager.suppressedUntilDisconnect` 只在读到 `DISCONNECTED` 时清零"
+      ]
+    },
+    {
+      "id": "R-CONN-12",
+      "layer": "requirements",
+      "title": "非用户原因的断连都要落盘留证。每条记录带原因分类：扩展崩溃、进程回收、交接超时、系统策略、网络失效",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：非用户原因的断连都要落盘留证。每条记录带原因分类：扩展崩溃、进程回收、交接超时、系统策略、网络失效",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户要求「非用户原因的断连都要记录」"
+      ]
+    },
+    {
+      "id": "R-CONN-13",
+      "layer": "requirements",
+      "title": "断连后自动恢复不设次数上限。用户在场且连接可用时重连",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：断连后自动恢复不设次数上限。用户在场且连接可用时重连；用户主动停止后不恢复",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批修订 R-CONN-05 的「最多 3 次」。来源：用户要求「用户没有点击停止时不要停止连接」"
+      ]
+    },
+    {
+      "id": "R-NET-05",
+      "layer": "requirements",
+      "title": "网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔",
+        "优先级：高",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。扩展进程已有 `VpnNetworkMonitor`",
+        "本批把它接到恢复决策"
+      ]
+    },
+    {
+      "id": "R-POWER-01",
+      "layer": "requirements",
+      "title": "应用退到后台后停止界面类探测并降低刷新频率。隧道的保护与恢复不受影响",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：应用退到后台后停止界面类探测并降低刷新频率。隧道的保护与恢复不受影响",
+        "优先级：中",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。来源：用户报告「系统提示耗电较多」"
+      ]
+    },
+    {
+      "id": "R-POWER-02",
+      "layer": "requirements",
+      "title": "屏幕熄灭后再降一档：只保留心跳、命令应答与恢复所需的最小检查",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "规则：屏幕熄灭后再降一档：只保留心跳、命令应答与恢复所需的最小检查",
+        "优先级：中",
+        "实现状态：待实现（产品现状，非本流程的完成定义）"
+      ],
+      "sources": [
+        "本批新增（2026-10-20）。官方 `power.isActive()` 有屏设备亮屏为活动、熄屏为非活动"
+      ]
+    },
+    {
       "id": "QG-01",
       "layer": "requirements",
       "title": "锁屏静置后台存活",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：≥ 12 h，全程心跳龄 ≤ 15 s，扩展只拉起一次",
+        "观测环境与测量方法：真机：`scripts/e2e/endurance-survival.mjs` 连接后锁屏静置 12 h，扩展每秒把 `heartbeatMs=` 镜像进设备日志，脚本按相邻两条算间隔，并取每天的前台/后台/熄屏事件",
+        "现状：**待实测（2026-10-20）**。上一批次 720 s 已通过，见本表下方历史行"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-02",
+      "layer": "requirements",
+      "title": "锁屏静置后台存活（历史）",
       "status": "ready",
       "depends_on": [],
       "content": [
@@ -1052,7 +1162,52 @@
       ]
     },
     {
-      "id": "QG-02",
+      "id": "QG-03",
+      "layer": "requirements",
+      "title": "非用户断连可归因",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：每次非用户断连都有一条 `vpn_session_end` 事件，原因分类在受控词表内",
+        "观测环境与测量方法：真机诊断文件 `diagnostic-vpn-events.ndjson`；字段 `reason` 取值来自登记表",
+        "现状：**待实现（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-04",
+      "layer": "requirements",
+      "title": "省电：后台探测停止",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：退到后台后 5 s 内不再发起对端、媒体、Sunshine、LocalSend 探测",
+        "观测环境与测量方法：真机诊断文件：后台期间无 `peer_path_result` / `media_probe_*` / `sunshine_probe_*` 新事件",
+        "现状：**待实测（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-05",
+      "layer": "requirements",
+      "title": "省电：熄屏降频",
+      "status": "ready",
+      "depends_on": [],
+      "content": [
+        "目标值：熄屏后扩展命令轮询从 100 ms 降到 ≥ 1000 ms，状态快照从 1 s 降到 ≥ 5 s",
+        "观测环境与测量方法：真机：按 1 h 对比熄屏前后诊断事件条数与进程 CPU 时间（`/proc/<pid>/stat` 的 utime+stime）",
+        "现状：**待实测（2026-10-20）**"
+      ],
+      "sources": [
+        "docs/requirements/requirements.md#质量目标"
+      ]
+    },
+    {
+      "id": "QG-06",
       "layer": "requirements",
       "title": "连接期保活覆盖",
       "status": "ready",
@@ -1067,7 +1222,7 @@
       ]
     },
     {
-      "id": "QG-03",
+      "id": "QG-07",
       "layer": "requirements",
       "title": "网络切换恢复",
       "status": "ready",
@@ -1082,7 +1237,7 @@
       ]
     },
     {
-      "id": "QG-04",
+      "id": "QG-08",
       "layer": "requirements",
       "title": "掉线自动恢复",
       "status": "ready",
@@ -1097,7 +1252,7 @@
       ]
     },
     {
-      "id": "QG-05",
+      "id": "QG-09",
       "layer": "requirements",
       "title": "传输完整性",
       "status": "ready",
@@ -1112,7 +1267,7 @@
       ]
     },
     {
-      "id": "QG-06",
+      "id": "QG-10",
       "layer": "requirements",
       "title": "诊断脱敏",
       "status": "ready",
@@ -1127,7 +1282,7 @@
       ]
     },
     {
-      "id": "QG-07",
+      "id": "QG-11",
       "layer": "requirements",
       "title": "双语完整",
       "status": "ready",
@@ -1142,7 +1297,7 @@
       ]
     },
     {
-      "id": "QG-08",
+      "id": "QG-12",
       "layer": "requirements",
       "title": "启动到可用",
       "status": "ready",
@@ -1328,6 +1483,40 @@
         "R-CONN-06",
         "R-DEV-05",
         "R-DEV-06"
+      ]
+    },
+    {
+      "id": "A-2.6",
+      "layer": "architecture",
+      "title": "§2.6 长时会话的生命周期与能量策略（本批新增，2026-10-20）",
+      "status": "ready",
+      "depends_on": [
+        "R-CONN-03",
+        "R-CONN-04",
+        "R-CONN-05",
+        "R-CONN-06",
+        "R-CONN-07",
+        "R-CONN-08",
+        "R-CONN-09",
+        "R-CONN-10",
+        "R-DIAG-02",
+        "R-DIAG-05",
+        "R-NET-03",
+        "R-NET-04",
+        "R-PRIV-01",
+        "R-SETUP-05",
+        "R-UI-03",
+        "R-UI-04",
+        "R-UI-05",
+        "R-XFER-05",
+        "R-XFER-06",
+        "R-XFER-07"
+      ],
+      "content": [
+        "本批把「用户没有点击停止」作为会话存续的唯一意图来源。意图写在本地文件，两个进程都可读。 下图只画意图、状态与责任方。 ```text 用户点击连接 ──> 意图=connected（落盘） 用户点击停止 ──> 意图=stopped（落盘） │ ├─ 意图=connected │ ├─ 状态 live（connected / connecting）────> 持有长时任务 │ ├─ 状态 down（disconnected / 陈旧心跳）──> 记录原因 + 保持保护 + 恢复 │ └─ 网络离线 ────────────────────────────> 等系统网络回调，回到下行 │ └─ 意图=stopped └─ 释放任务，停止扩展，不再恢复 ``` 三条横切约束： 1. **意图优先于观测。** 一次读不到心跳不等于用户停止。只有意图文件、用户入口或系统确认的停止才能改变 意图。"
+      ],
+      "sources": [
+        "docs/architecture/architecture.md §2.6"
       ]
     },
     {
@@ -1873,6 +2062,21 @@
       ]
     },
     {
+      "id": "H-C-19",
+      "layer": "hld",
+      "title": "O-SEAM-19 会话结束事件与原因分类（本批新增，2026-10-20）",
+      "status": "ready",
+      "depends_on": [
+        "A-SEAMS"
+      ],
+      "content": [
+        "- **通道**：`filesDir/vpn-session-ledger.ndjson`（追加写，专用文件）。配套两个意图文件：`filesDir/vpn-intent.json`（`{ desired: \"connected\" | \"stopped\", changedAtMs, by: \"ui\" | \"card\" | \"recovery\" }`）与 `filesDir/vpn-session-end.json`（最近一次结束记录，供下一个读者补写观测）。 - **方向**：双向。P1 与 P2 都可写意图文件（P1 写用户动作，P2 写系统确认）。先退出的进程写结束记录。后感知到的进程补写观测记录。读取方 P1 在报告导出时合并（C-15）。 - **载荷格式**：每行 `SessionLedgerEntry = { timestampMs, writer: \"ui\" | \"vpn\", kind: \"end\" | \"observed\", reason, phase, code }`。`reason` 取自受控词表： - `user_stop`：用户经 UI 或卡片断开。 - `ex"
+      ],
+      "sources": [
+        "docs/hld/hld.md 契约 C-19"
+      ]
+    },
+    {
       "id": "L-VM-1",
       "layer": "lld",
       "title": "3.1 VM-1 · 保活任务生命周期（`services/VpnBackgroundTaskManager.ets`）",
@@ -1934,6 +2138,39 @@
       ],
       "sources": [
         "docs/lld/lld.md 2.4 `VpnStatusReader`（S7/S1/S2 共用，P1）"
+      ]
+    },
+    {
+      "id": "L-VM-5",
+      "layer": "lld",
+      "title": "3.5 VM-5 · 会话意图与恢复（`services/VpnSessionIntent.ets`、`services/SessionLedger.ets`、`services/VpnReconnectSupervisor.ets`，本批新增）",
+      "status": "ready",
+      "depends_on": [
+        "H-C-11",
+        "H-C-19",
+        "H-C-03"
+      ],
+      "content": [
+        "设计依据：需求 R-CONN-11…13、R-NET-05；架构 §2.6；HLD C-11、C-19。实现增量见 `docs/changes/vpn-endurance/design.md` §2.1–2.4。 **状态集** | 状态 | 定义 | | --- | --- | | `STOPPED` | 意图文件 `desired=stopped`，或文件缺失或损坏 | | `CONNECTED` | 意图 `desired=connected` 且最近一次判读为 connected | | `RECOVERING` | 意图 `desired=connected` 且最近一次判读不是 connected，恢复已发起 | | `DEFERRED` | 意图 `desired=connected`、恢复未发起、默认网络 `netId=0` | | `BACKOFF` | 意图 `desired=connected`，上次恢复失败，未到下次尝试时刻 | | `NEEDS_UI` | 恢复返回 `NEEDS_UI`。意图保持，等待用户 | **事件集**：`poll` 采样（connected / disconnected / unknown / needs_login）；意图文件变化； `netAvailable` 回调；`netLost` 回调；`onForeground`；用户"
+      ],
+      "sources": [
+        "docs/lld/lld.md 3.5 VM-5 · 会话意图与恢复（`services/VpnSessionI"
+      ]
+    },
+    {
+      "id": "L-VM-6",
+      "layer": "lld",
+      "title": "3.6 VM-6 · 省电档位（`services/VpnPowerPolicy.ets`，本批新增）",
+      "status": "ready",
+      "depends_on": [
+        "H-C-03",
+        "H-C-11"
+      ],
+      "content": [
+        "**状态集**：`ACTIVE`（前台）、`BACKGROUND`（后台，亮屏或屏幕状态未知）、`SCREEN_OFF`（后台且熄屏）。 **事件集**：`onForeground`、`onBackground`、屏幕状态采样（每 30 s 一次，`power.isActive()`）、 档位文件缺失、P2 读到新档位。 **转换表** | # | 当前 | 事件 | 下一 | 输出 | | --- | --- | --- | --- | --- | | P1 | 任意 | `onForeground` | ACTIVE | 写档位文件；恢复全部 UI 定时器；P2 下一轮读 1 s 节奏 | | P2 | ACTIVE | `onBackground` 且 `power.isActive()==true` | BACKGROUND | 写档位文件；停 UI 服务类定时器 | | P3 | ACTIVE | `onBackground` 且 `power.isActive()==false` | SCREEN_OFF | 同上，P2 下一轮读 5 s 节奏 | | P4 | BACKGROUND | 采样熄屏 | SCREEN_OFF | 写档位文件 | | P5 | SCREEN_OFF | 采样亮屏 | BACKGROUND | 写档位文件 | | P6 | SCREEN_OF"
+      ],
+      "sources": [
+        "docs/lld/lld.md 3.6 VM-6 · 省电档位（`services/VpnPowerPolicy"
       ]
     },
     {
@@ -2218,34 +2455,101 @@
       "id": "O-CONN-04",
       "level": "journey",
       "introduced_at": "requirements",
-      "title": "后台掉线自动恢复（非用户主动）",
+      "title": "掉线自动恢复（意图为连接时）",
       "status": "ready",
       "parent_ids": [],
       "design_ids": [
         "R-CONN-05",
-        "R-CONN-06"
+        "R-CONN-06",
+        "R-CONN-13"
       ],
-      "trigger": "隧道曾在 connected 后掉到 disconnected，且应用已切到后台满 10 s，且不是经本应用受控入口请求的断开",
-      "observe": "诊断事件 vpn_reconnect_attempt、vpn_reconnect_started、vpn_reconnect_not_started、vpn_reconnect_failed、vpn_reconnect_succeeded、vpn_reconnect_exhausted、vpn_drop_ignored_foreground、vpn_drop_after_requested_stop；vpn-probe-status.txt 是否回到 state=Running | tun=true",
+      "trigger": "意图文件 `vpn-intent.json` 为 `connected`，隧道从 connected 掉到 disconnected，或从 connected 变为 unknown 且心跳龄超过 30 s",
+      "observe": "诊断事件 `vpn_session_end_observed`、`vpn_session_recovery_attempt`、`vpn_session_recovered`、`vpn_reconnect_attempt`、`vpn_reconnect_started`、`vpn_reconnect_not_started`、`vpn_reconnect_failed`、`vpn_reconnect_succeeded`、`vpn_drop_after_requested_stop`；`vpn-probe-status.txt` 是否回到 `state=Running | tun=true`",
       "expected": [
-        "正常：VpnReconnectSupervisor 只在 connected 掉到 disconnected 时触发（不从未知态触发），后台满 10 s（BACKGROUND_SETTLE_MS）才认定为非主动掉线，调 VpnSessionController.connect 重连",
-        "最多 3 次（MAX_ATTEMPTS），退避 30 s→60 s→120 s（RETRY_BASE_MS 指数退避、上限 300 s），连接稳定满 60 s（STABLE_MS）才清零尝试计数。边界：回到前台即清空尝试计数与重试梯（onForeground）",
-        "连接只维持片刻又掉的 flapping 情形因 60 s 稳定门限不会每轮清零而无限重试。失败与恢复：用户主动断开（卡片 call 触发 noteRequestedStop）后的掉线记 vpn_drop_after_requested_stop 且不重连",
-        "前台附近的掉线记 vpn_drop_ignored_foreground 且不重连",
-        "达到 3 次后记 vpn_reconnect_exhausted 停止自动恢复。安全与质量：用户的主动断开绝不能被自动恢复撤销。"
+        "正常：意图为 connected 时，`VpnReconnectSupervisor` 在 connected 掉到 disconnected、或 connected 变为 unknown 且心跳龄超过 30 s 时触发 `VpnSessionController.connect`。退避 30/60/120/300 s 封顶，不设次数上限。连接稳定满 60 s 后清零计数并记 `vpn_session_recovered`。边界：前台可见时同样恢复，不再等待后台静置 10 s",
+        "网络离线时不消耗尝试次数，等 `netAvailable` 回调后立即恢复",
+        "回到前台清零退避。失败与恢复：用户主动断开（意图为 stopped）后的掉线记 `vpn_drop_after_requested_stop` 且不重连",
+        "恢复返回 `NEEDS_UI` 时记 `vpn_session_recovery_needs_ui` 并停在 NEEDS_UI，不反复重试。安全与质量：用户的主动断开绝不能被自动恢复撤销。"
       ],
-      "failure_message": "期望「非主动掉线在后台自动恢复、主动断开不被撤销」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」",
+      "failure_message": "期望「意图为连接时掉线一直恢复直到成功或用户停止」，实际「掉线后一直不恢复直到用户发现，或用户刚断开又被自动连回」",
       "sources": [
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:107 handleDrop",
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:91",
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:62 noteRequestedStop",
-        "entry/src/main/ets/entryability/EntryAbility.ets:202 performCardToggle",
-        "entry/src/main/ets/entryability/EntryAbility.ets:251",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
         "docs/oracles/90-journeys/02-connection.md"
       ],
       "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-CONN-08",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "非用户断连的留证与恢复",
+      "status": "draft",
+      "parent_ids": [],
+      "design_ids": [
+        "H-C-11",
+        "H-C-19",
+        "R-CONN-11",
+        "R-CONN-12"
+      ],
+      "trigger": "已连接会话发生非用户原因的结束——扩展 `onDestroy`、后端交接超时、进程被回收、系统策略停止。意图文件仍为 `connected`",
+      "observe": "`vpn-session-ledger.ndjson` 中的 `vpn_session_end` 与 `vpn_session_end_observed`（含 `reason`、`sessionId`）；诊断事件 `background_user_cancelled_kept_vpn`、`background_protection_restored`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态",
+      "expected": [
+        "正常：先退出的进程写一条带受控原因词的结束记录",
+        "后感知的进程按 `sessionId` 补写观测记录。原因不是 `user_stop` 且意图为 connected 时进入恢复，不设次数上限。边界：扩展被硬杀时没有结束记录，存活的 P1 以「心跳停止超过 15 s 且账本无结束记录」判 `extension_crash` 并补写。长时任务被用户取消后，后台不重抢",
+        "回到前台且意图仍为 connected 时重新申请。失败与恢复：账本写入失败不阻止退出",
+        "恢复失败按 R-CONN-05 的退避继续。安全与质量：账本不含地址、账号、令牌",
+        "原因无法判定时写 `unknown` 并写明缺哪条证据，不猜。"
+      ],
+      "failure_message": "期望「每次非用户断连都有原因记录且随后恢复」，实际「断连原因不明、没有记录，或断连后一直等到用户打开应用」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets",
+        "docs/oracles/90-journeys/02-connection.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "UNCERTAIN-PLATFORM P1 被冻结期间发生的结束，记录时间等于解冻后的补写时间，不等于发生时刻",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-CONN-09",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "网络恢复后自动恢复连接",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "H-C-11",
+        "H-C-12",
+        "R-CONN-13",
+        "R-NET-05"
+      ],
+      "trigger": "意图为 `connected`，隧道不可用，默认网络 `netId=0`（离线）。之后系统报告默认网络可用",
+      "observe": "`connection.getDefaultNet()` 的 `netId`；诊断事件 `vpn_session_recovery_deferred`、`vpn_session_recovery_attempt`、`vpn_session_recovered`；`vpn-probe-status.txt` 的最终状态",
+      "expected": [
+        "正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按采样写重复记录，也不消耗恢复次数。收到 `netAvailable` 后立即发起一次恢复，不等退避到期。恢复成功后连接稳定 60 s 记 `vpn_session_recovered`。边界：网络在恢复在途时再次变化，恢复被新的网络事件重新驱动",
+        "旧网络的恢复结果不得覆盖新网络。失败与恢复：恢复失败按退避继续",
+        "网络再次离线时回到等待。安全与质量：只读默认网络的 `netId`，不读取或记录地址、DNS、接口名。"
+      ],
+      "failure_message": "期望「离线等待、网络恢复后立即恢复」，实际「离线期间反复重试耗尽退避，或网络恢复后仍不重连」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "entry/src/main/ets/services/VpnNetworkMonitor.ets",
+        "docs/oracles/90-journeys/02-connection.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -2446,6 +2750,36 @@
       "oracle_state": "closed",
       "uncertainty": "none",
       "owner": "—",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-NET-04",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "网络不通时等待回调，网络恢复后自动恢复连接",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "H-C-11",
+        "H-C-12",
+        "R-CONN-13",
+        "R-NET-05"
+      ],
+      "trigger": "意图为 `connected`，隧道不可用，`connection.getDefaultNet()` 返回 `netId=0`。之后 Wi-Fi 或蜂窝恢复。",
+      "observe": "`vpn_session_recovery_deferred` 与 `vpn_session_recovery_attempt` 的写入顺序与时间；`connect` 的调用时刻；`vpn_session_recovered`；界面的连接状态文案",
+      "expected": [
+        "正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按固定间隔盲目调用 `connect`。收到 `netAvailable` 后立即尝试一次，不等退避到期。恢复成功后写 `vpn_session_recovered`，界面回到已连接。边界：离线期间多次采样不写重复记录，也不消耗退避。网络在恢复在途时再次变化，恢复由新的网络事件重新驱动。失败与恢复：恢复失败按退避继续。网络再次离线时回到等待。安全与质量：只读 `netId` 与承载类别，不记录地址、接口名或 DNS。判定在真机走查下成立"
+      ],
+      "failure_message": "期望「离线等待、网络恢复后自动重连」，实际「离线期间重试耗尽，网络恢复后仍保持断开」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets 的网络回调",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "docs/oracles/90-journeys/03-network.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -3006,6 +3340,36 @@
       "oracle_state": "pending-test",
       "uncertainty": "none",
       "owner": "owner=项目维护者 接收批次=a01-E2E",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-DIAG-02",
+      "level": "journey",
+      "introduced_at": "requirements",
+      "title": "非用户原因的断连留下可导出的原因记录",
+      "status": "ready",
+      "parent_ids": [],
+      "design_ids": [
+        "H-C-19",
+        "R-CONN-12",
+        "R-DIAG-02",
+        "R-DIAG-05"
+      ],
+      "trigger": "一次已连接会话以非用户原因结束——扩展 onDestroy、扩展崩溃、后端交接超时、系统策略停止或网络失效。用户未点击停止。",
+      "observe": "`vpn-session-ledger.ndjson` 的 `reason`、`writer`、`kind`、`timestampMs`；诊断报告中的同一记录；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered` 事件",
+      "expected": [
+        "正常：每次非用户结束写一条 `end` 记录，原因在受控词表内。P1 随后补写 `observed` 并进入恢复。恢复稳定 60 s 写 `vpn_session_recovered`。边界：同一 `sessionId` 的同一类记录只出现一次。用户主动停止写 `user_stop`，不进入恢复。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。安全与质量：记录只含时间戳、写方、类型、原因、阶段与数值码，不含地址、账号、令牌或设备标识。判定在宿主侧桩边界与真机走查下成立"
+      ],
+      "failure_message": "期望「每次非用户断连都能在设备上查到原因」，实际「断开后没有记录，无法区分用户停止、扩展崩溃与系统停止」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy",
+        "entry/src/main/ets/services/DiagnosticReportService.ets",
+        "docs/oracles/90-journeys/09-diagnostics.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -3661,6 +4025,41 @@
       "seam_not_applicable": ""
     },
     {
+      "id": "O-SEAM-19",
+      "level": "seam",
+      "introduced_at": "architecture",
+      "title": "会话结束事件与原因分类：两个进程都可能先退出",
+      "status": "ready",
+      "parent_ids": [
+        "O-CONN-08"
+      ],
+      "design_ids": [
+        "A-SEAMS",
+        "H-C-19",
+        "R-CONN-12"
+      ],
+      "trigger": "一次 VPN 会话结束。结束由任一进程先感知——用户停止（P1）、扩展 onDestroy（P2）、后端交接超时（P2）、系统停止或网络失效。两个进程都可能先退出。",
+      "observe": "`vpn-session-ledger.ndjson` 的行；`vpn-intent.json`；`vpn-session-end.json`；`vpn-probe-status.txt` 的 `sessionId`；`vpn_session_end`、`vpn_session_end_observed`、`vpn_session_recovered`、`vpn_session_recovery_deferred` 事件",
+      "expected": [
+        "正常：先退出的进程写 `kind=end`，`reason` 在受控词表内。后感知的进程按同一 `sessionId` 补写 `kind=observed`，不重复写 `end`。边界：用户停止时 P1 先写 `user_stop`，意图随后为 stopped，P2 的 onDestroy 不再写第二条 `end`。交接超时由 P2 写 `handoff_timeout`。P1 读到心跳停止且账本没有 `end` 记录时写 `extension_crash` 或 `unknown`，并在 `phase` 说明缺哪条证据。失败与恢复：账本写失败不阻止进程退出，记 hilog。文件最后一行不完整时下一次写入前截断。安全与质量：同一 `sessionId + kind` 只写一次",
+        "记录只含受控字段，不含地址、账号、令牌或设备标识",
+        "意图文件是唯一意图来源，账本不得反向改写意图。判定在宿主侧桩边界（两个沙箱共享一个内存文件系统）下成立"
+      ],
+      "failure_message": "期望「谁先退出谁写原因，后感知的一方补写观测且不重复」，实际「两个进程各写一条或多条，原因拼写不一致，无法统计」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的 onDestroy",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "scripts/integration/session-ledger-seam.mjs",
+        "docs/oracles/91-seams/S3-orchestration-system.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
       "id": "O-SEAM-13",
       "level": "seam",
       "introduced_at": "architecture",
@@ -3961,36 +4360,38 @@
       "id": "O-BGTASK-02",
       "level": "point",
       "introduced_at": "hld",
-      "title": "状态陈旧或读取失败时把已持有的任务保留到有界宽限期",
+      "title": "状态不确定时不释放任务，释放只看意图",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-03",
         "O-SEAM-11"
       ],
       "design_ids": [
-        "H-C-03",
+        "H-C-11",
         "L-VM-1",
         "L-VM-4",
-        "R-CONN-09"
+        "R-CONN-09",
+        "R-CONN-11"
       ],
-      "trigger": "已持有任务，status 心跳龄超过 VPN_STATUS_FRESH_MS=15000，或 fileIo.readTextSync 抛临时 I/O",
-      "observe": "stopBackgroundRunning 调用次数；background_status_timeout 诊断事件；任务重新取得后的 starts 计数",
+      "trigger": "已持有任务；status 心跳龄超过 VPN_STATUS_FRESH_MS=15000，或 fileIo.readTextSync 抛临时 I/O；意图仍为 `connected`",
+      "observe": "stopBackgroundRunning 调用次数；`background_status_timeout` 诊断事件；意图文件的读取；任务重新取得后的 starts 计数",
       "expected": [
         "正常：新鲜且 connected 时持续持有不释放",
-        "边界：心跳龄 16 s 或读取抛错时仍保留（自 lastLiveAtMs 起算，VPN_STATUS_GRACE_MS=60000 内），超过宽限才 stop 一次并记 background_status_timeout",
-        "失败与恢复：读取恢复且重新 live 后再次取得任务（starts 由 1 变 2）",
-        "安全与质量：单次 I/O 抖动不得立刻撤销保护。判定在桩边界（fileIo、Date.now 为桩）下成立"
+        "边界：心跳龄 16 s、读取抛错、或持续 unknown 超过 60 s 都不释放，只记 `background_status_timeout`",
+        "失败与恢复：意图变为 `stopped` 时立即释放",
+        "读取恢复且重新 live 后继续持有，starts 不变",
+        "安全与质量：一次 I/O 抖动或不确定判读不得撤销保护。判定在桩边界（fileIo、Date.now 为桩）下成立"
       ],
-      "failure_message": "期望「陈旧心跳与读失败按不确定保留到 60 s 宽限」，实际「一读不到就释放任务，或永久持有不释放」",
+      "failure_message": "期望「不确定不释放，释放只看意图」，实际「一读不到状态就释放任务，随后进程被冻结」",
       "sources": [
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:171 reconcile 的宽限分支",
-        ":344 readStatus",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
         "scripts/test-vpn-background-task.mjs",
         "docs/oracles/points/P1-background-status.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -4033,35 +4434,37 @@
       "id": "O-BGTASK-04",
       "level": "point",
       "introduced_at": "hld",
-      "title": "读到显式断开即刻释放长时任务",
+      "title": "读到断开标记时按意图决定释放或保留",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-11"
       ],
       "design_ids": [
         "H-C-11",
+        "H-C-19",
         "L-VM-1",
         "L-VM-3",
-        "R-CONN-02"
+        "R-CONN-02",
+        "R-CONN-11"
       ],
-      "trigger": "status 含 extension destroyed / vpn disconnected / state=stopped / 非 status unavailable 的 FAILED",
-      "observe": "stopBackgroundRunning 调用次数；task 是否被置为 undefined",
+      "trigger": "status 含 extension destroyed / vpn disconnected / state=stopped / 非 status unavailable 的 FAILED；意图文件可读",
+      "observe": "stopBackgroundRunning 调用次数；task 是否被置为 undefined；意图文件的 `desired`",
       "expected": [
-        "正常：读到断开标记即 stop 一次并把 task 置空",
-        "边界：连接窗口期内读到断开同样立即释放",
-        "失败与恢复：—",
-        "安全与质量：断开即释放，不空转占着任务。判定在桩边界下成立"
+        "正常：意图为 `stopped` 时 stop 一次并把 task 置空",
+        "边界：意图为 `connected` 时读到断开不释放任务，交给恢复看门狗，连接窗口期内同样按意图处理",
+        "失败与恢复：释放失败记 `background_stop_failed`，下一轮重试",
+        "安全与质量：读到断开不等于用户停止，只有意图才能决定释放。判定在桩边界下成立"
       ],
-      "failure_message": "期望「显式断开即刻释放」，实际「断开后仍持有任务，等待下一次超时」",
+      "failure_message": "期望「意图为停止时才释放」，实际「读到任何断开标记就释放，恢复窗口内进程被冻结」",
       "sources": [
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:163 reconcile 的 disconnected 分支",
-        ":292 stop",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile 的 disconnected 分支",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
         "scripts/test-vpn-background-task.mjs",
         "docs/oracles/points/P1-background-status.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -4103,7 +4506,7 @@
       "id": "O-BGTASK-06",
       "level": "point",
       "introduced_at": "hld",
-      "title": "用户取消保活后在同一会话内保持抑制，直到确认断开",
+      "title": "用户取消保活通知不停止连接，回到前台重新申请保护",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-11"
@@ -4112,27 +4515,26 @@
         "H-C-11",
         "L-VM-1",
         "L-VM-3",
-        "R-CONN-10"
+        "R-CONN-10",
+        "R-CONN-11"
       ],
-      "trigger": "continuousTaskCancel 的 reason 为 USER_CANCEL(1) 或 USER_CANCEL_REMOVE_NOTIFICATION(3)",
-      "observe": "suppressedUntilDisconnect 的效果（starts 计数）；background_user_cancelled 诊断事件",
+      "trigger": "continuousTaskCancel 的 reason 为 USER_CANCEL(1) 或 USER_CANCEL_REMOVE_NOTIFICATION(3)，意图仍为 `connected`",
+      "observe": "`suppressedUntilForeground` 的效果（starts 计数）；`background_user_cancelled`、`background_user_cancelled_kept_vpn`、`background_protection_restored` 诊断事件",
       "expected": [
-        "正常：置抑制位，之后不再自动启动",
-        "边界：陈旧 telemetry（90 s 无心跳）与回到前台（onForeground 清 nextStartAtMs）都不解除抑制，starts 仍为 1",
-        "失败与恢复：只有读到确认断开、再转 live 后才恢复启动（starts 变 2）",
-        "安全与质量：绝不替用户撤销他自己按下的取消。判定在桩边界（backgroundTaskManager 的取消回调为桩）下成立"
+        "正常：置抑制位，不停止隧道，不改变意图，记 `background_user_cancelled_kept_vpn`",
+        "边界：后台不再重抢任务，陈旧 telemetry 不解除抑制（starts 仍为 1）",
+        "失败与恢复：回到前台且意图为 connected 时重新申请一次，记 `background_protection_restored`（starts 变 2）",
+        "安全与质量：用户取消通知的意图是隐藏通知，不是断开连接。判定在桩边界（backgroundTaskManager 的取消回调为桩）下成立"
       ],
-      "failure_message": "期望「用户取消在同会话内始终被尊重」，实际「回前台或状态一变就自行恢复保活」",
+      "failure_message": "期望「取消通知后连接保持并在回前台时恢复保护」，实际「取消后同一会话内不再申请，进程被冻结」",
       "sources": [
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:57 cancelCallback",
-        ":182 启动条件里的抑制位",
-        ":144 onForeground",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets cancelCallback 与 onForeground",
         "scripts/test-vpn-background-task.mjs",
         "docs/oracles/points/P1-background-status.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -4244,7 +4646,7 @@
       "id": "O-BGTASK-10",
       "level": "point",
       "introduced_at": "hld",
-      "title": "启动期间收到的取消、断开或销毁不被迟到的启动结果覆盖",
+      "title": "启动期间收到的取消、停止意图或销毁不被迟到的启动结果覆盖",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-11"
@@ -4253,27 +4655,27 @@
         "H-C-11",
         "L-VM-1",
         "L-VM-3",
-        "R-CONN-10"
+        "R-CONN-10",
+        "R-CONN-11"
       ],
-      "trigger": "startBackgroundRunning 尚未 resolve 时，收到 USER_CANCEL、读到断开、或调用 unregister",
+      "trigger": "startBackgroundRunning 尚未 resolve 时，收到 USER_CANCEL、意图变为 `stopped`、或调用 unregister",
       "observe": "task 是否被置空；stopBackgroundRunning 次数；publish 次数；监听回调表是否被清空",
       "expected": [
         "正常：无中断的启动成功才落 task 并发通知",
-        "边界：三种中断下迟到的成功结果都必须被清理——取消后 task 为 undefined 且不 publish，断开后 stop 一次且不 publish，销毁后 stop 一次并清空回调（callbacks.size 为 0）",
-        "失败与恢复：—",
+        "边界：三种中断下迟到的成功结果都必须被清理——取消后 task 为 undefined 且不 publish，意图 stopped 后 stop 一次且不 publish，销毁后 stop 一次并清空回调（callbacks.size 为 0）",
+        "失败与恢复：只读到 disconnected 而意图仍为 connected 不算中断，任务保留给恢复看门狗",
         "安全与质量：用 cancellationRevision 与 lifecycleGeneration 双重守卫，迟到的成功不得复活已被取消或销毁的任务。判定在桩边界（startBackgroundRunning 用 deferred 门控）下成立"
       ],
       "failure_message": "期望「迟到结果按取消代数/世代被丢弃并清理」，实际「取消或销毁后任务又被迟到结果装上」",
       "sources": [
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:206 start 的 revision 快照",
-        ":226 迟到结果守卫",
-        ":230 走后校验",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets start 的 revision 快照与迟到结果守卫",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
         "scripts/test-vpn-background-task.mjs",
         "docs/oracles/points/P1-background-status.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -4424,36 +4826,38 @@
       "id": "O-BGTASK-15",
       "level": "point",
       "introduced_at": "hld",
-      "title": "停滞的连接窗口超过宽限期仍释放保护",
+      "title": "停滞的连接窗口不释放保护，交给恢复看门狗",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-03",
         "O-SEAM-11"
       ],
       "design_ids": [
-        "H-C-03",
+        "H-C-11",
         "L-VM-1",
         "L-VM-4",
-        "R-CONN-09"
+        "R-CONN-03",
+        "R-CONN-11"
       ],
-      "trigger": "进入 connecting 后扩展停止写心跳（status 不再更新）",
-      "observe": "stopBackgroundRunning 次数随时间的变化",
+      "trigger": "进入 connecting 后扩展停止写心跳；意图仍为 `connected`",
+      "observe": "stopBackgroundRunning 次数随时间的变化；恢复看门狗的恢复动作",
       "expected": [
         "正常：—",
         "边界：心跳龄刚过 FRESH（20 s）时仍持有（stop 次数为 0）",
-        "失败与恢复：继续停滞到超过 GRACE（再 50 s，累计超过 60 s）释放一次（stop 次数为 1）",
-        "安全与质量：停滞的连接窗口不得永久占住长时任务。判定在桩边界下成立"
+        "失败与恢复：继续停滞到超过 GRACE（累计超过 60 s）也不释放（stop 次数仍为 0），由恢复看门狗在 sustained unknown 判定后发起恢复",
+        "意图变为 `stopped` 时才释放一次",
+        "安全与质量：停滞窗口不得永久占住任务，也不得靠释放任务来「解决」停滞。判定在桩边界下成立"
       ],
-      "failure_message": "期望「停滞窗口按 60 s 宽限释放」，实际「一直持有，或一过 15 s 就释放」",
+      "failure_message": "期望「停滞不释放，恢复看门狗接手」，实际「一直持有到最后，或一过 15 s 就释放」",
       "sources": [
-        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets:171 宽限分支",
-        ":175 VPN_STATUS_GRACE_MS 判据",
+        "entry/src/main/ets/services/VpnBackgroundTaskManager.ets reconcile",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
         "scripts/test-vpn-background-task.mjs",
         "docs/oracles/points/P1-background-status.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -5158,7 +5562,7 @@
       "id": "O-RECONN-02",
       "level": "point",
       "introduced_at": "hld",
-      "title": "前台可见或刚进入后台的掉线视为用户主动",
+      "title": "意图为连接时前台或刚进后台的掉线立即恢复",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-11",
@@ -5168,25 +5572,28 @@
         "H-C-11",
         "L-VM-1",
         "L-VM-3",
-        "R-CONN-06"
+        "R-CONN-11",
+        "R-CONN-13"
       ],
-      "trigger": "掉线发生在应用仍在前台；或 onBackground 之后不足 BACKGROUND_SETTLE_MS=10000（测试取 2000）",
-      "observe": "connect 调用次数；vpn_drop_ignored_foreground 诊断事件",
+      "trigger": "应用在前台，或 `onBackground` 之后不足 `BACKGROUND_SETTLE_MS`；意图为 `connected`；隧道从 connected 掉到 disconnected",
+      "observe": "`connect` 的调用次数与时机；`vpn_drop_ignored_foreground` 是否出现；`vpn_session_recovery_attempt` 的写入",
       "expected": [
-        "正常：—",
-        "边界：两种情形都不 connect，并记 vpn_drop_ignored_foreground",
-        "失败与恢复：—",
-        "安全与质量：用户刚看过应用时的掉线更可能是他自己按的，宁可不重试。判定在桩边界下成立"
+        "正常：意图为 connected 时立即恢复，不等待后台静置窗口",
+        "边界：用户点停止会先写意图 stopped，在途恢复的取消令牌随即失效",
+        "失败与恢复：恢复失败按退避继续，不退化为「当作没发生」",
+        "安全与质量：前台恢复不得抢在用户自己的连接命令之前——同一时刻由 `VpnCommandStateMachine.begin` 拒绝后发起者。判定在宿主侧桩边界（`Date.now`、`fileIo` 为桩）下成立"
       ],
-      "failure_message": "期望「前台或刚进后台的掉线按用户主动处理」，实际「用户刚点了断开又被自动连上」",
+      "failure_message": "期望「前台与刚进后台的掉线都恢复」，实际「前台掉线被当作用户主动，从不恢复」",
       "sources": [
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:112 handleDrop 的前台/静置守卫",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "entry/src/main/ets/services/VpnCommandGateway.ets",
         "scripts/test-vpn-reconnect-supervisor.mjs",
         "docs/oracles/points/P2-network-reconnect.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -5264,7 +5671,7 @@
       "id": "O-RECONN-05",
       "level": "point",
       "introduced_at": "hld",
-      "title": "恢复尝试有上限，耗尽后放弃",
+      "title": "意图未停止时恢复不设次数上限，退避封顶",
       "status": "ready",
       "parent_ids": [
         "O-SEAM-11",
@@ -5274,26 +5681,27 @@
         "H-C-11",
         "L-VM-1",
         "L-VM-3",
-        "R-CONN-05"
+        "R-CONN-05",
+        "R-CONN-13"
       ],
-      "trigger": "连续六轮后台掉线、每轮间隔 600000 ms，且 connect 结果始终为 failed",
-      "observe": "connect 调用次数；vpn_reconnect_exhausted 诊断事件",
+      "trigger": "意图为 `connected`，`connect` 连续失败超过 3 次（测试取 5 次），每次间隔超过当前退避",
+      "observe": "`connect` 的调用次数；退避间隔序列；`vpn_reconnect_exhausted` 是否出现；`vpn_session_recovery_attempt` 的尝试序号",
       "expected": [
-        "正常：—",
-        "边界：尝试数达到 MAX_ATTEMPTS=3 后不再 connect（connects 恰为 3），并记 vpn_reconnect_exhausted",
-        "失败与恢复：—",
-        "安全与质量：不无限重试，也不把失败静默吞掉。判定在桩边界下成立"
+        "正常：第 4 次及以后仍调用 `connect`",
+        "边界：退避序列为 30/60/120/300/300… s，封顶 300 s",
+        "失败与恢复：意图变为 stopped 后立即停止，不再写 `vpn_reconnect_exhausted`",
+        "安全与质量：不得无限快速重试。判定在宿主侧桩边界（`Date.now` 为桩）下成立"
       ],
-      "failure_message": "期望「最多 3 次后放弃并记账」，实际「无限重试或一次失败就放弃且不留痕」",
+      "failure_message": "期望「一直重试到成功或用户停止」，实际「3 次后永久放弃」",
       "sources": [
-        "entry/src/main/ets/services/VpnReconnectSupervisor.ets:119 handleDrop",
-        ":14 MAX_ATTEMPTS",
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets 的退避与恢复状态机（本批移除 `MAX_ATTEMPTS`）",
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
         "scripts/test-vpn-reconnect-supervisor.mjs",
         "docs/oracles/points/P2-network-reconnect.md"
       ],
-      "oracle_state": "closed",
+      "oracle_state": "pending-test",
       "uncertainty": "none",
-      "owner": "—",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -5475,6 +5883,79 @@
       "oracle_state": "closed",
       "uncertainty": "none",
       "owner": "—",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-RECONN-11",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "网络离线时等待网络回调，不消耗恢复次数",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-11",
+        "O-SEAM-12"
+      ],
+      "design_ids": [
+        "H-C-11",
+        "H-C-12",
+        "L-VM-1",
+        "L-VM-3",
+        "R-NET-05"
+      ],
+      "trigger": "意图为 connected，隧道不可用，`connection.getDefaultNet()` 返回 `netId=0`；之后系统回调 `netAvailable`",
+      "observe": "`connect` 的调用次数与时机；`vpn_session_recovery_deferred` 与 `vpn_session_recovery_attempt` 的写入；退避计数",
+      "expected": [
+        "正常：离线期间不调用 `connect`，只写一次 `vpn_session_recovery_deferred`",
+        "边界：离线期间多次采样不写重复记录，也不增加退避计数",
+        "失败与恢复：收到 `netAvailable` 后立即调用一次 `connect`，不等退避到期",
+        "网络再次离线时回到等待。安全与质量：只读 `netId`，不记录地址或接口名。判定在宿主侧桩边界（`connection` 为桩）下成立"
+      ],
+      "failure_message": "期望「离线等待、恢复后立即重试」，实际「离线期间按固定间隔重试并耗尽次数，或网络恢复后仍不重试」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "entry/src/main/ets/entryability/EntryAbility.ets",
+        "scripts/test-vpn-reconnect-supervisor.mjs",
+        "docs/oracles/points/P2-network-reconnect.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-RECONN-12",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "已连接后的持续未知按掉线处理",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-03",
+        "O-SEAM-11"
+      ],
+      "design_ids": [
+        "H-C-03",
+        "H-C-11",
+        "L-VM-1",
+        "L-VM-4",
+        "R-CONN-11",
+        "R-CONN-13"
+      ],
+      "trigger": "意图为 connected，隧道曾在 connected，之后心跳停止（状态判读为 unknown）持续超过 30 s",
+      "observe": "恢复是否发起；`vpn_session_end_observed` 的 `reason`；单次 unknown 采样时的恢复次数",
+      "expected": [
+        "正常：unknown 持续超过 30 s 时按掉线进入恢复，`reason` 为 `extension_crash`（账本无结束记录时）",
+        "边界：短暂 unknown（少于 30 s）不触发，也不写结束记录",
+        "失败与恢复：恢复发起后未知解除且回到 connected，写 `vpn_session_recovered`。安全与质量：不得把一次未知当成掉线，也不得永远停在未知。判定在宿主侧桩边界（`Date.now` 为桩）下成立"
+      ],
+      "failure_message": "期望「持续未知按掉线恢复」，实际「扩展死亡后永远停在 unknown，界面显示未知但不再恢复」",
+      "sources": [
+        "entry/src/main/ets/services/VpnReconnectSupervisor.ets",
+        "scripts/test-vpn-reconnect-supervisor.mjs",
+        "docs/oracles/points/P2-network-reconnect.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -5771,6 +6252,165 @@
       "oracle_state": "closed",
       "uncertainty": "none",
       "owner": "—",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-SESSION-09",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "意图文件是唯一的状态意图来源",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-11",
+        "O-SEAM-19"
+      ],
+      "design_ids": [
+        "H-C-11",
+        "H-C-19",
+        "L-VM-1",
+        "L-VM-3",
+        "R-CONN-11"
+      ],
+      "trigger": "`VpnSessionIntent` 读、写 `filesDir/vpn-intent.json`；状态判读、长时任务、恢复三者读取同一份意图",
+      "observe": "意图文件的 `desired`、`changedAtMs` 与 `by` 字段；`VpnSessionIntent.read` 的返回值；诊断事件 `vpn_intent_write_failed`、`vpn_intent_missing`",
+      "expected": [
+        "正常：用户连接写 `desired=connected`，用户停止写 `desired=stopped`，`by` 取 `ui` 或 `card`",
+        "恢复成功写 `connected`，撤销写 `stopped`，`by=recovery`。边界：文件缺失、空文件、非法 JSON、`desired` 不在词表内，一律读成 `stopped` 并记 `vpn_intent_missing`",
+        "一次状态判读不得写意图。失败与恢复：写入失败记 `vpn_intent_write_failed`，调用方的命令流程照常继续",
+        "读方按上一次已知值或 `stopped` 处理。安全与质量：意图文件只含这三个字段，不含地址、账号或令牌。判定在宿主侧桩边界（`fileIo` 为内存文件系统）下成立"
+      ],
+      "failure_message": "期望「意图只由用户动作与恢复写」，实际「状态判读顺带改了意图，用户停止后被打回 connected」",
+      "sources": [
+        "entry/src/main/ets/services/VpnSessionIntent.ets",
+        "scripts/test-vpn-session-intent.mjs",
+        "docs/oracles/points/P3-session.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-SESSION-10",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "非用户结束按受控原因词记录",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-19"
+      ],
+      "design_ids": [
+        "H-C-19",
+        "R-CONN-12"
+      ],
+      "trigger": "`SessionLedger.recordEnd()` 收到一条结束记录；`reason` 来自任一写方",
+      "observe": "`vpn-session-ledger.ndjson` 的行内容；`SessionLedger` 的返回值；诊断事件 `vpn_session_end`、`vpn_session_end_observed`",
+      "expected": [
+        "正常：记录写入 `sessionId`、`writer`、`kind`、`reason`、`phase`、`code` 与时间戳。`reason` 在词表内时原样保留。边界：词表外的 `reason` 替换为 `unknown`，`phase` 写明缺哪条证据。空 `sessionId` 的行不写。失败与恢复：写入失败返回 false，不抛异常。同一 `sessionId + kind` 第二次写入返回 false 且不追加。安全与质量：记录不含地址、账号、令牌与设备标识。判定在宿主侧桩边界（`fileIo` 为内存文件系统）下成立"
+      ],
+      "failure_message": "期望「每次非用户结束都有受控原因」，实际「原因缺失、拼写漂移或出现自由文本」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "scripts/test-session-ledger.mjs",
+        "docs/oracles/points/P3-session.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-SESSION-11",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "账本有上限且不受探测噪声影响",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-19",
+        "O-SEAM-15"
+      ],
+      "design_ids": [
+        "H-C-19",
+        "R-CONN-12",
+        "R-DIAG-03"
+      ],
+      "trigger": "连续写入超过 512 条结束记录，或单条记录使文件超过 64 KB",
+      "observe": "账本文件的行数与字节数；保留下来的最早一条记录",
+      "expected": [
+        "正常：账本最多保留 512 行。边界：写入使字节数超过 64 KB 时从最旧开始淘汰，直到回到上限内，至少保留 1 条。失败与恢复：结束记录与诊断事件分文件，探测噪声写满 `diagnostic-*-events.ndjson` 不影响账本。安全与质量：淘汰只按时间顺序，不按原因分类丢弃。判定在宿主侧桩边界下成立"
+      ],
+      "failure_message": "期望「账本有固定上限且不被探测事件挤掉」，实际「账本无限增长，或结束记录被诊断事件挤出」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "scripts/test-session-ledger.mjs",
+        "docs/oracles/points/P3-session.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-SESSION-12",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "同一会话的同一类记录只写一次",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-19"
+      ],
+      "design_ids": [
+        "H-C-19",
+        "R-CONN-12"
+      ],
+      "trigger": "P1 读到 P2 的结束记录后补写观测；P1 与 P2 都可能写 `end`",
+      "observe": "账本中同一 `sessionId + kind` 的行数；`SessionLedger.recordEnd()` 的返回值",
+      "expected": [
+        "正常：同一 `sessionId` 的 `end` 与 `observed` 各只有一行。边界：进程重启后以文件内容为准，不重复写。失败与恢复：文件最后一行不完整时忽略该行，写入前截断到最后一个完整行。安全与质量：去重不依赖内存集合单独成立。判定在宿主侧桩边界下成立"
+      ],
+      "failure_message": "期望「一次结束只有一条记录」，实际「两个进程各写一遍，统计时重复计数」",
+      "sources": [
+        "entry/src/main/ets/services/SessionLedger.ets",
+        "scripts/test-session-ledger.mjs",
+        "docs/oracles/points/P3-session.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-SESSION-13",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "恢复后界面与快照回到一致状态",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-11",
+        "O-SEAM-03"
+      ],
+      "design_ids": [
+        "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
+        "R-CONN-11",
+        "R-CONN-13"
+      ],
+      "trigger": "`VpnSessionController.connect` 返回 `STARTED`，随后状态文件进入 `state=Running | tun=true`",
+      "observe": "`trafficSession` 的变化；`refreshPeerSnapshot` 的调用；`vpn_session_recovered` 的写入；界面状态文案",
+      "expected": [
+        "正常：恢复成功后立即刷新一次对端快照。`trafficSession` 与上一次不同则清零流量计量与图表样本。连接稳定 60 s 写 `vpn_session_recovered`。边界：恢复返回 `NEEDS_UI` 时不做上述刷新，写 `vpn_session_recovery_needs_ui`。恢复与前台连接同时进行时，后发起者由 `VpnCommandStateMachine.begin` 拒绝，恢复改为退避，不并发建隧道。失败与恢复：恢复失败不刷新快照，界面保持断开态。安全与质量：界面不得在恢复成功前显示已连接。判定在宿主侧桩边界下成立"
+      ],
+      "failure_message": "期望「恢复后快照与流量回到一致状态」，实际「恢复成功但界面仍显示旧流量与旧对端状态」",
+      "sources": [
+        "entry/src/main/ets/services/VpnSessionController.ets",
+        "entry/src/main/ets/components/BridgeStatus.ets",
+        "scripts/test-vpn-session-controller.mjs",
+        "docs/oracles/points/P3-session.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
       "seam_not_applicable": ""
     },
     {
@@ -6476,89 +7116,258 @@
       "uncertainty": "none",
       "owner": "—",
       "seam_not_applicable": ""
+    },
+    {
+      "id": "O-POWER-01",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "后台停止界面类探测但保留恢复看门狗",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-11"
+      ],
+      "design_ids": [
+        "H-C-03",
+        "H-C-11",
+        "L-VM-1",
+        "L-VM-3",
+        "R-POWER-01"
+      ],
+      "trigger": "应用从 active 进入 background；意图为 `connected`",
+      "observe": "`serviceRefreshTimer`、`homeLatencyRefreshTimer`、`deviceDetailRefreshTimer`、`transferProtocolRefreshTimer`、`offlinePeerStatusRefreshTimer` 是否停止；`healthPollTimer`、`cardTimer` 是否继续；`vpn-power-stage.json` 的 `stage`",
+      "expected": [
+        "正常：进入 background 后五个界面类定时器停止，健康轮询（1 s）与卡片轮询（5 s）保留",
+        "边界：`connectionDurationTimer` 只在详情页可见时运行，档位不改变它",
+        "失败与恢复：回到前台后五个定时器恢复，间隔取 active 档",
+        "安全与质量：恢复看门狗不属于界面类定时器，不得被停止。判定在宿主侧桩边界（定时器为桩）下成立"
+      ],
+      "failure_message": "期望「后台停界面探测、留恢复看门狗」，实际「后台仍在每秒探测，或把恢复看门狗一起停掉」",
+      "sources": [
+        "entry/src/main/ets/components/BridgeStatus.ets 的定时器生命周期",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "scripts/test-vpn-power-policy.mjs",
+        "docs/oracles/points/P6-power.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-POWER-02",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "熄屏再降一档且不破坏状态新鲜度",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-03",
+        "O-SEAM-11"
+      ],
+      "design_ids": [
+        "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
+        "R-POWER-02"
+      ],
+      "trigger": "档位从 background 变为 screen-off",
+      "observe": "扩展命令环、状态环、快照环的间隔；心跳龄上限 `VPN_STATUS_FRESH_MS=15000`",
+      "expected": [
+        "正常：命令环由 250 ms 变为 1000 ms，状态环由 2 s 变为 5 s，快照由 2 s 变为 15 s",
+        "边界：状态环 5 s 的三倍（15 s）不超过 `VPN_STATUS_FRESH_MS`，读取侧不因降频判 unknown",
+        "失败与恢复：`power.isActive()` 恢复为 true 时回到 background 档，间隔复原",
+        "安全与质量：隧道、网络重绑与停止请求的文件监听不降频。判定在宿主侧桩边界（定时器、`power.isActive` 为桩）下成立"
+      ],
+      "failure_message": "期望「熄屏降频且状态仍新鲜」，实际「降频后心跳超过 15 s，界面报 unknown」",
+      "sources": [
+        "entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets 的定时器常量",
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "entry/src/main/ets/services/VpnStatusReader.ets 的新鲜度常量",
+        "scripts/test-vpn-power-policy.mjs",
+        "docs/oracles/points/P6-power.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-POWER-03",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "档位文件缺失或损坏时回落到 active",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-03"
+      ],
+      "design_ids": [
+        "H-C-03",
+        "L-VM-1",
+        "L-VM-4",
+        "R-POWER-01",
+        "R-POWER-02"
+      ],
+      "trigger": "P2 读取 `filesDir/vpn-power-stage.json` 时，文件缺失、为空、不是合法 JSON，或 `stage` 不在词表内",
+      "observe": "读取结果与定时器间隔；`vpn_power_stage_missing` 诊断事件",
+      "expected": [
+        "正常：按 active 档处理，状态环 1 s、命令环 100 ms、快照 1 s",
+        "边界：档位文件写失败时 P2 保持上一档，不回落到最慢档",
+        "失败与恢复：下一轮重新读取，读到合法档位后切换",
+        "安全与质量：不得凭损坏文件降到最低档，使恢复与状态读取变慢。判定在宿主侧桩边界（fileIo 为内存文件系统）下成立"
+      ],
+      "failure_message": "期望「缺失或损坏回落到 active」，实际「文件坏了就降档，心跳变慢」",
+      "sources": [
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "scripts/test-vpn-power-policy.mjs",
+        "docs/oracles/points/P6-power.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
+    },
+    {
+      "id": "O-POWER-04",
+      "level": "point",
+      "introduced_at": "hld",
+      "title": "档位变化可观测",
+      "status": "ready",
+      "parent_ids": [
+        "O-SEAM-11"
+      ],
+      "design_ids": [
+        "H-C-03",
+        "L-VM-1",
+        "L-VM-3",
+        "R-POWER-01",
+        "R-POWER-02"
+      ],
+      "trigger": "档位按 active → background → screen-off → background → active 变化",
+      "observe": "`vpn_power_stage_changed` 诊断事件；`vpn-power-stage.json` 的内容；写失败时的 `vpn_power_stage_write_failed`",
+      "expected": [
+        "正常：每次档位变化写一条 `vpn_power_stage_changed`，含 from 与 to",
+        "边界：同一档位重复采样不写事件",
+        "失败与恢复：档位文件写失败记 `vpn_power_stage_write_failed`，下一次采样重试",
+        "安全与质量：事件只含档位名，不含屏幕内容、前台应用或用户活动。判定在宿主侧桩边界下成立"
+      ],
+      "failure_message": "期望「档位变化可查」，实际「降频发生了但诊断里没有任何记录，无法解释耗电与恢复延迟」",
+      "sources": [
+        "entry/src/main/ets/services/VpnPowerPolicy.ets",
+        "scripts/test-vpn-power-policy.mjs",
+        "docs/oracles/points/P6-power.md"
+      ],
+      "oracle_state": "pending-test",
+      "uncertainty": "none",
+      "owner": "owner=项目维护者 接收批次=vpn-endurance",
+      "seam_not_applicable": ""
     }
   ],
   "tests": [
     {
-      "id": "T-O-SETUP-01",
+      "id": "T-O-SETUP-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-01"
       ],
-      "evidence": "未建：scripts/e2e/first-run.mjs::首次启动展示欢迎与更新日志且确认后不再打扰"
+      "evidence": "scripts/e2e/first-run.mjs 跑过：通过 1、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-02",
+      "id": "T-O-SETUP-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-02"
       ],
-      "evidence": "未建：scripts/e2e/control-server.mjs::配置控制服务器含明文 HTTP 风险确认与非法地址拒绝"
+      "evidence": "scripts/e2e/control-server.mjs 跑过：通过 0、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-03",
+      "id": "T-O-SETUP-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-03"
       ],
-      "evidence": "未建：scripts/e2e/browser-login.mjs::经系统浏览器登录并回落到未登录态"
+      "evidence": "scripts/e2e/browser-login.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-SETUP-04",
+      "id": "T-O-SETUP-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-SETUP-04"
       ],
-      "evidence": "未建：scripts/e2e/logout.mjs::连接中先提示断开且退出后清理账户状态"
+      "evidence": "scripts/e2e/logout.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-01",
+      "id": "T-O-CONN-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-CONN-01"
       ],
-      "evidence": "未建：scripts/e2e/connect-journey.mjs::从首页连接后进入可用隧道"
+      "evidence": "scripts/e2e/connect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-02",
+      "id": "T-O-CONN-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-CONN-02"
       ],
-      "evidence": "未建：scripts/e2e/disconnect-journey.mjs::从首页断开后回到未连接并释放长时任务"
+      "evidence": "scripts/e2e/disconnect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-03",
+      "id": "T-O-CONN-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-03"
       ],
-      "evidence": "未建：scripts/e2e/connect-window-background.mjs::连接窗口期切到其它应用仍建成隧道"
+      "evidence": "scripts/e2e/connect-window-background.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-04",
+      "id": "T-O-CONN-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-04"
       ],
-      "evidence": "未建：scripts/e2e/background-reconnect.mjs::后台非主动掉线自动恢复且不撤销主动断开"
+      "evidence": "scripts/e2e/background-reconnect.mjs 跑过：通过 2、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-CONN-05",
+      "id": "T-O-CONN-08",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-08"
+      ],
+      "evidence": "未建：scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录"
+    },
+    {
+      "id": "T-O-CONN-09",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-09"
+      ],
+      "evidence": "未建：scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连"
+    },
+    {
+      "id": "T-O-CONN-05-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-05"
       ],
-      "evidence": "未建：scripts/e2e/vpn-conflict.mjs::存在另一个系统 VPN 时给出冲突提示"
+      "evidence": "scripts/e2e/vpn-conflict.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-CONN-06",
@@ -6570,31 +7379,48 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-01（源文档实测，本批未复跑）；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-02（源文档实测，本批未复跑）"
     },
     {
+      "id": "T-O-CONN-07-e2e",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CONN-07"
+      ],
+      "evidence": "scripts/e2e/headless-connect.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
       "id": "T-O-CONN-07",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-CONN-07"
       ],
-      "evidence": "未建：scripts/e2e/headless-connect.mjs::无界面入口独立完成连接并应答后端交接；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-13（源文档实测，本批未复跑）"
+      "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-13（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-NET-01",
+      "id": "T-O-NET-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-NET-01"
       ],
-      "evidence": "未建：scripts/e2e/network-settings.mjs::连接前选择出口节点并在已连接时被拒改"
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-NET-02",
+      "id": "T-O-NET-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-NET-02"
       ],
-      "evidence": "未建：scripts/e2e/network-settings.mjs::切换子网路由与出口节点局域网开关"
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-NET-03",
@@ -6606,67 +7432,101 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-03（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-DEV-01",
+      "id": "T-O-NET-04",
       "level": "e2e",
       "status": "not_evaluated",
+      "oracle_ids": [
+        "O-NET-04"
+      ],
+      "evidence": "未建：scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连"
+    },
+    {
+      "id": "T-O-DEV-01-e2e",
+      "level": "e2e",
+      "status": "pass",
       "oracle_ids": [
         "O-DEV-01"
       ],
-      "evidence": "未建：scripts/e2e/devices-journey.mjs::设备列表在未登录与加载态下不显示空列表"
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-DEV-02",
+      "id": "T-O-DEV-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "pass",
       "oracle_ids": [
         "O-DEV-02"
       ],
-      "evidence": "未建：scripts/e2e/devices-journey.mjs::打开设备详情读取服务与路径并在离线时降级"
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-01",
+      "id": "T-O-XFER-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-01"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-send.mjs::从传输页向在线目标发送文件"
+      "evidence": "scripts/e2e/taildrop-send.mjs 跑过：通过 1、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-02",
+      "id": "T-O-XFER-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-XFER-02"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-text.mjs::发送文字并在接收端预览"
+      "evidence": "scripts/e2e/taildrop-text.mjs 跑过：通过 0、跳过 4、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-03",
+      "id": "T-O-XFER-03-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-03"
       ],
-      "evidence": "未建：scripts/e2e/meshsend-dual-channel.mjs::双通道目标让用户显式选择传输方式"
+      "evidence": "scripts/e2e/meshsend-dual-channel.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-04",
+      "id": "T-O-XFER-04-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-04"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-receive.mjs::接收文件按类型落地并只在成功后删除等待文件"
+      "evidence": "scripts/e2e/taildrop-receive.mjs 跑过：通过 1、跳过 7、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-XFER-05",
+      "id": "T-O-XFER-05-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-05"
       ],
-      "evidence": "未建：scripts/e2e/taildrop-history.mjs::取消重试与历史上限"
+      "evidence": "scripts/e2e/taildrop-history.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
+      "id": "T-O-DRIVE-01-e2e",
+      "level": "e2e",
+      "status": "fail",
+      "oracle_ids": [
+        "O-DRIVE-01"
+      ],
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-DRIVE-01",
@@ -6675,7 +7535,20 @@
       "oracle_ids": [
         "O-DRIVE-01"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::浏览共享目录并完成上传与下载；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+    },
+    {
+      "id": "T-O-DRIVE-02-e2e",
+      "level": "e2e",
+      "status": "fail",
+      "oracle_ids": [
+        "O-DRIVE-02"
+      ],
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-DRIVE-02",
@@ -6684,7 +7557,7 @@
       "oracle_ids": [
         "O-DRIVE-02"
       ],
-      "evidence": "未建：scripts/e2e/taildrive-browser.mjs::从设备详情跳转到该设备共享目录；未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-15（Taildrive 真机共享节点）"
     },
     {
       "id": "T-O-MEDIA-01",
@@ -6696,58 +7569,88 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-09（源文档实测，本批未复跑）"
     },
     {
-      "id": "T-O-MEDIA-02",
+      "id": "T-O-MEDIA-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-MEDIA-02"
       ],
-      "evidence": "未建：scripts/e2e/media-launch.mjs::经 Sunshine/Moonlight 串流"
+      "evidence": "scripts/e2e/media-launch.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-PRIV-01",
+      "id": "T-O-PRIV-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-PRIV-01"
       ],
-      "evidence": "未建：scripts/e2e/security-locks.mjs::应用锁开启与回前台锁定"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 1、跳过 3、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-PRIV-02",
+      "id": "T-O-PRIV-02-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-PRIV-02"
       ],
-      "evidence": "未建：scripts/e2e/security-locks.mjs::Taildrive 文件夹锁"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 1、跳过 3、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-DIAG-01",
+      "id": "T-O-DIAG-01-e2e",
       "level": "e2e",
-      "status": "not_evaluated",
+      "status": "fail",
       "oracle_ids": [
         "O-DIAG-01"
       ],
-      "evidence": "未建：scripts/e2e/diagnostics-report.mjs::解锁诊断并导出脱敏报告"
+      "evidence": "scripts/e2e/diagnostics-report.mjs 跑过：通过 5、跳过 1、失败 1；运行 2026-10-13T19:28:37+11:00",
+      "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
+      "baseline": "ec64476",
+      "environment": "HarmonyOS 设备 56T0225330000021，hdc",
+      "executed_at": "2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-UI-01",
+      "id": "T-O-DIAG-02",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-DIAG-02"
+      ],
+      "evidence": "未建：scripts/test-session-ledger.mjs::the ledger never stores addresses or identity fields、scripts/e2e/endurance-recovery.mjs::扩展被杀后自动恢复并留下原因记录"
+    },
+    {
+      "id": "T-O-UI-01-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-UI-01"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::页签导航与显隐排序"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
-      "id": "T-O-UI-02",
+      "id": "T-O-UI-02-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-UI-02"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::中英双语与深浅主题"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
+    },
+    {
+      "id": "T-O-CARD-01-e2e",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-CARD-01"
+      ],
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-CARD-01",
@@ -6756,16 +7659,16 @@
       "oracle_ids": [
         "O-CARD-01"
       ],
-      "evidence": "未建：scripts/e2e/navigation-shell.mjs::桌面卡片开关 VPN；未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
+      "evidence": "未建：真机走查 a01-baseline/manual-checks.md#M-14（桌面卡片开关）"
     },
     {
-      "id": "T-O-BUILD-00",
+      "id": "T-O-BUILD-00-e2e",
       "level": "e2e",
       "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-00"
       ],
-      "evidence": "未建：scripts/e2e/build-journey.mjs::开发者从仓库根运行构建脚本得到可装配的 AArch64 产物"
+      "evidence": "scripts/e2e/build-journey.mjs 跑过：通过 2、跳过 1、失败 0（有跳过，跳过不算通过）；运行 2026-10-13T19:28:37+11:00"
     },
     {
       "id": "T-O-SEAM-01",
@@ -6797,15 +7700,11 @@
     {
       "id": "T-O-SEAM-03-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line"
     },
     {
       "id": "T-O-SEAM-04",
@@ -6889,6 +7788,15 @@
       "evidence": "已有走查记录：真机走查 a01-baseline/manual-checks.md#M-03（源文档实测，本批未复跑）；已有走查记录：真机走查 a01-baseline/manual-checks.md#M-04（源文档实测，本批未复跑）"
     },
     {
+      "id": "T-O-SEAM-19",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SEAM-19"
+      ],
+      "evidence": "未建：scripts/integration/session-ledger-seam.mjs::two writers append to one ledger with the same reason vocabulary"
+    },
+    {
       "id": "T-O-SEAM-13",
       "level": "e2e",
       "status": "not_evaluated",
@@ -6900,15 +7808,11 @@
     {
       "id": "T-O-SEAM-14-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-14"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认"
     },
     {
       "id": "T-O-SEAM-17",
@@ -6922,15 +7826,11 @@
     {
       "id": "T-O-SEAM-15-int",
       "level": "integration",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-15"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧"
     },
     {
       "id": "T-O-SEAM-16",
@@ -6944,15 +7844,11 @@
     {
       "id": "T-O-SEAM-16-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SEAM-16"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch"
     },
     {
       "id": "T-O-SEAM-18",
@@ -6975,158 +7871,119 @@
     {
       "id": "T-O-BGTASK-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::acquires protection in foreground and updates the same system live view with real traffic"
     },
     {
-      "id": "T-O-BGTASK-02-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-BGTASK-02",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::stale heartbeat and read errors retain acquired protection for a bounded grace period",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-background-task.mjs::protection follows intent, not a single uncertain status read"
     },
     {
       "id": "T-O-BGTASK-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::never starts from stale, future, missing heartbeat or missing TUN evidence",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::never starts from stale, future, missing heartbeat or missing TUN evidence"
     },
     {
-      "id": "T-O-BGTASK-04-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-BGTASK-04",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::explicit disconnect promptly releases the task",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-background-task.mjs::a stopped intent releases protection promptly；未建：scripts/test-vpn-background-task.mjs::a disconnect while the intent is connected keeps protection"
     },
     {
       "id": "T-O-BGTASK-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::snapshot failure is uncertain and does not immediately revoke protection",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::snapshot failure is uncertain and does not immediately revoke protection"
     },
     {
-      "id": "T-O-BGTASK-06-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-BGTASK-06",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::user cancellation stays suppressed across stale telemetry and foreground until confirmed disconnect",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-background-task.mjs::user dismissed notification keeps the vpn and re-arms on foreground"
     },
     {
       "id": "T-O-BGTASK-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::system cancellation retries with exponential backoff",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::system cancellation retries with exponential backoff"
     },
     {
       "id": "T-O-BGTASK-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::unrelated cancellation does not discard the VPN task",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::unrelated cancellation does not discard the VPN task"
     },
     {
       "id": "T-O-BGTASK-09-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-09"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a failed start is throttled instead of retried every second",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::a failed start is throttled instead of retried every second"
+    },
+    {
+      "id": "T-O-BGTASK-10",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-BGTASK-10"
+      ],
+      "evidence": "未建：scripts/test-vpn-background-task.mjs::a stopped intent during start cleans up the late task without publishing"
     },
     {
       "id": "T-O-BGTASK-10-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-10"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::cancellation received during start cannot be overwritten by its late result"
     },
     {
       "id": "T-O-BGTASK-11-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-11"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::destroy during notification update serializes cleanup after publish",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::destroy during notification update serializes cleanup after publish"
     },
     {
       "id": "T-O-BGTASK-12-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-12"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::reconnect waits for in-flight stop before starting the next task",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::reconnect waits for in-flight stop before starting the next task"
     },
     {
       "id": "T-O-BGTASK-13",
@@ -7140,782 +7997,641 @@
     {
       "id": "T-O-BGTASK-13-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-13"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::holds protection through the connect window so the handoff can be answered"
     },
     {
       "id": "T-O-BGTASK-14-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-14"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::the connect window needs interface evidence, not just an unrecognised status",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-background-task.mjs::the connect window needs interface evidence, not just an unrecognised status"
     },
     {
-      "id": "T-O-BGTASK-15-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-BGTASK-15",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BGTASK-15"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-background-task.mjs::a stalled connect window still releases protection",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-background-task.mjs::a stalled connect window keeps protection while the intent stands"
     },
     {
       "id": "T-O-STATUS-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a missing status file is unknown, not disconnected"
     },
     {
       "id": "T-O-STATUS-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a running tunnel reports connected with real traffic"
     },
     {
       "id": "T-O-STATUS-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a heartbeat older than the freshness window is unknown, not healthy"
     },
     {
       "id": "T-O-STATUS-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::extension teardown reports disconnected"
     },
     {
       "id": "T-O-STATUS-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a failed snapshot read is not treated as a stopped tunnel"
     },
     {
       "id": "T-O-STATUS-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a pending sign-in reports needs_login"
     },
     {
       "id": "T-O-STATUS-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::a working tunnel wins over a stale sign-in marker"
     },
     {
       "id": "T-O-STATUS-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::running without a TUN is not connected",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::running without a TUN is not connected"
     },
     {
       "id": "T-O-STATUS-09-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-STATUS-09"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-status-reader.mjs::the connect window reports connecting",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-status-reader.mjs::the connect window reports connecting"
     },
     {
       "id": "T-O-NETMON-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data"
     },
     {
       "id": "T-O-NETMON-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::uses the current default network, coalesces duplicates, never logs address data"
     },
     {
       "id": "T-O-NETMON-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::discards a stale read when default net changes before properties return",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::discards a stale read when default net changes before properties return"
     },
     {
       "id": "T-O-NETMON-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::same interface on a new Wi-Fi network and address renewal both trigger refresh",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::same interface on a new Wi-Fi network and address renewal both trigger refresh"
     },
     {
       "id": "T-O-NETMON-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::clears the route hint when offline and applies the restored bearer",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::clears the route hint when offline and applies the restored bearer"
     },
     {
       "id": "T-O-NETMON-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::failed native refresh retries without another platform callback",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::failed native refresh retries without another platform callback"
     },
     {
       "id": "T-O-NETMON-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind"
     },
     {
       "id": "T-O-NETMON-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop"
     },
     {
       "id": "T-O-NETMON-09-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-09"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::registration failures retry and do not leak a listener after stop"
     },
     {
       "id": "T-O-NETMON-10-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-NETMON-10"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-network-monitor.mjs::stop during native work cancels replay and releases the registered listener",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-network-monitor.mjs::stop during native work cancels replay and releases the registered listener"
     },
     {
       "id": "T-O-RECONN-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::a tunnel that drops well after backgrounding is brought back"
     },
     {
-      "id": "T-O-RECONN-02-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-RECONN-02",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop moments after backgrounding is left alone",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-reconnect-supervisor.mjs::a foreground drop is recovered without the ten second settle"
     },
     {
       "id": "T-O-RECONN-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::a drop after the user asked to disconnect is not undone"
     },
     {
       "id": "T-O-RECONN-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a deliberate reconnect re-arms recovery",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::a deliberate reconnect re-arms recovery"
     },
     {
-      "id": "T-O-RECONN-05-uni",
-      "level": "unit",
-      "status": "pass",
+      "id": "T-O-RECONN-05",
+      "level": "e2e",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::recovery gives up instead of retrying forever",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "未建：scripts/test-vpn-reconnect-supervisor.mjs::recovery never exhausts while the user keeps the intent"
     },
     {
       "id": "T-O-RECONN-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::retries back off instead of firing on every sample",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::retries back off instead of firing on every sample"
     },
     {
       "id": "T-O-RECONN-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::an unknown state is not treated as a drop",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::an unknown state is not treated as a drop"
     },
     {
       "id": "T-O-RECONN-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::returning to the foreground clears the retry ladder",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::returning to the foreground clears the retry ladder"
     },
     {
       "id": "T-O-RECONN-09-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-09"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::a connection held past the stability window clears the retry ladder"
     },
     {
       "id": "T-O-RECONN-10-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-RECONN-10"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-reconnect-supervisor.mjs::a stop requested while a reconnect is in flight undoes the connect"
+    },
+    {
+      "id": "T-O-RECONN-11",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-RECONN-11"
+      ],
+      "evidence": "未建：scripts/test-vpn-reconnect-supervisor.mjs::network loss defers recovery until the network returns"
+    },
+    {
+      "id": "T-O-RECONN-12",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-RECONN-12"
+      ],
+      "evidence": "未建：scripts/test-vpn-reconnect-supervisor.mjs::sustained unknown after a connection is a drop"
     },
     {
       "id": "T-O-SESSION-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::a connect that is already up never starts or stops anything"
     },
     {
       "id": "T-O-SESSION-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff"
     },
     {
       "id": "T-O-SESSION-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer keeps polling while no request has arrived",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::the handoff answer keeps polling while no request has arrived"
     },
     {
       "id": "T-O-SESSION-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::a headless connect answers the extension backend handoff"
     },
     {
       "id": "T-O-SESSION-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a backend that cannot be stopped still releases the extension",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::a backend that cannot be stopped still releases the extension"
     },
     {
       "id": "T-O-SESSION-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::a malformed handoff request is cleared, not answered",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::a malformed handoff request is cleared, not answered"
     },
     {
       "id": "T-O-SESSION-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-session-controller.mjs::the handoff answer window covers the extension wait budget",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-session-controller.mjs::the handoff answer window covers the extension wait budget"
     },
     {
       "id": "T-O-SESSION-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-SESSION-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-vpn-command-state-machine.mjs::a destroyed lifecycle does not keep reporting the command it superseded"
+    },
+    {
+      "id": "T-O-SESSION-09",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SESSION-09"
+      ],
+      "evidence": "未建：scripts/test-vpn-session-intent.mjs::intent is the only writer that changes the desired state"
+    },
+    {
+      "id": "T-O-SESSION-10",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SESSION-10"
+      ],
+      "evidence": "未建：scripts/test-session-ledger.mjs::every non-user end is recorded with a controlled reason"
+    },
+    {
+      "id": "T-O-SESSION-11",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SESSION-11"
+      ],
+      "evidence": "未建：scripts/test-session-ledger.mjs::the ledger survives probe noise and bounds itself"
+    },
+    {
+      "id": "T-O-SESSION-12",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SESSION-12"
+      ],
+      "evidence": "未建：scripts/test-session-ledger.mjs::duplicate end records are written once"
+    },
+    {
+      "id": "T-O-SESSION-13",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-SESSION-13"
+      ],
+      "evidence": "未建：scripts/test-vpn-session-controller.mjs::a recovered session refreshes the snapshot and clears stale traffic"
     },
     {
       "id": "T-O-PEER-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it"
     },
     {
       "id": "T-O-PEER-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-path-cache.mjs::a transient relay cache expires so a later direct response can replace it"
     },
     {
       "id": "T-O-PEER-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-path-cache.mjs::disconnect overrides a previously cached direct path",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-path-cache.mjs::disconnect overrides a previously cached direct path"
     },
     {
       "id": "T-O-PEER-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery"
     },
     {
       "id": "T-O-PEER-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::an online peer with a failed old probe stays in the online group and shows recovery"
     },
     {
       "id": "T-O-PEER-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services"
     },
     {
       "id": "T-O-PEER-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::offline then online invalidates pending results and lets the same VPN session rediscover services"
     },
     {
       "id": "T-O-PEER-08-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-08"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a busy old service request does not consume the reconnect discovery attempt",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::a busy old service request does not consume the reconnect discovery attempt"
     },
     {
       "id": "T-O-PEER-09-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-09"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::a slow service response cannot overwrite a more recent recovered path",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::a slow service response cannot overwrite a more recent recovered path"
     },
     {
       "id": "T-O-PEER-10-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-10"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::home polling retries an online peer despite an old unreachable path",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::home polling retries an online peer despite an old unreachable path"
     },
     {
       "id": "T-O-PEER-11-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-PEER-11"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after offline",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-peer-reconnect.mjs::an obsolete home probe cannot reintroduce a path after offline"
     },
     {
       "id": "T-O-LOCALSEND-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-LOCALSEND-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::a mounted detail sheet reads a fresh LocalSend result despite its captured old peer",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-localsend-status.mjs::a mounted detail sheet reads a fresh LocalSend result despite its captured old peer"
     },
     {
       "id": "T-O-LOCALSEND-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-LOCALSEND-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-localsend-status.mjs::current peer presence and VPN connection override an old available service",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-localsend-status.mjs::current peer presence and VPN connection override an old available service"
     },
     {
       "id": "T-O-BUILD-01-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-01"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs"
     },
     {
       "id": "T-O-BUILD-02-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-02"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs"
     },
     {
       "id": "T-O-BUILD-03-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-03"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::fresh and already-patched checkouts build and copy both outputs"
     },
     {
       "id": "T-O-BUILD-04-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-04"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::unrelated dirty files do not suppress the required Tailscale patch",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::unrelated dirty files do not suppress the required Tailscale patch"
     },
     {
       "id": "T-O-BUILD-05-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-05"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::conflicting patch stops before compiling and preserves the source",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::conflicting patch stops before compiling and preserves the source"
     },
     {
       "id": "T-O-BUILD-06-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-06"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Release and unknown products are rejected before any build or signing",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::Release and unknown products are rejected before any build or signing"
     },
     {
       "id": "T-O-BUILD-07-uni",
       "level": "unit",
-      "status": "pass",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-BUILD-07"
       ],
-      "evidence": "run-checks.sh 全绿；锚点 scripts/test-macos-build.mjs::Debug uses the project directory, wrapper, and explicit debug flags",
-      "command": "scripts/run-checks.sh",
-      "baseline": "51e680d",
-      "environment": "Linux, Node v22.23.2; 127 tests, pass 127, fail 0",
-      "executed_at": "2026-10-13T18:15:36+11:00"
+      "evidence": "scripts/test-macos-build.mjs::Debug uses the project directory, wrapper, and explicit debug flags"
+    },
+    {
+      "id": "T-O-POWER-01",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-POWER-01"
+      ],
+      "evidence": "未建：scripts/test-vpn-power-policy.mjs::background stops UI probes but keeps the recovery watchdog"
+    },
+    {
+      "id": "T-O-POWER-02",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-POWER-02"
+      ],
+      "evidence": "未建：scripts/test-vpn-power-policy.mjs::screen off slows the extension cadence without breaking freshness"
+    },
+    {
+      "id": "T-O-POWER-03",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-POWER-03"
+      ],
+      "evidence": "未建：scripts/test-vpn-power-policy.mjs::a missing or corrupt stage file falls back to active"
+    },
+    {
+      "id": "T-O-POWER-04",
+      "level": "e2e",
+      "status": "not_evaluated",
+      "oracle_ids": [
+        "O-POWER-04"
+      ],
+      "evidence": "未建：scripts/test-vpn-power-policy.mjs::stage changes are observable"
     }
   ],
   "open_questions": [

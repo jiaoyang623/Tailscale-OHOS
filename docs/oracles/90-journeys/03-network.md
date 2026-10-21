@@ -50,3 +50,20 @@
 - 不确定特征：none
 - 归属：—
 - 复核：待复核
+
+### O-NET-04 网络不通时等待回调，网络恢复后自动恢复连接
+- 层级：旅程
+- 父判据：无（旅程层没有父判据）
+- 强度：强
+- 设计依据：需求 R-NET-05「网络不通时监听系统网络变化。网络恢复后自动恢复连接，不盲等固定间隔」、R-CONN-13；架构 §2.6；HLD 契约 C-11、C-12
+- 触发与前置条件：意图为 `connected`，隧道不可用，`connection.getDefaultNet()` 返回 `netId=0`。之后 Wi-Fi 或蜂窝恢复。
+- 可观测点：`vpn_session_recovery_deferred` 与 `vpn_session_recovery_attempt` 的写入顺序与时间；`connect` 的调用时刻；`vpn_session_recovered`；界面的连接状态文案
+- 期望：正常：离线期间只写一次 `vpn_session_recovery_deferred`，不按固定间隔盲目调用 `connect`。收到 `netAvailable` 后立即尝试一次，不等退避到期。恢复成功后写 `vpn_session_recovered`，界面回到已连接。边界：离线期间多次采样不写重复记录，也不消耗退避。网络在恢复在途时再次变化，恢复由新的网络事件重新驱动。失败与恢复：恢复失败按退避继续。网络再次离线时回到等待。安全与质量：只读 `netId` 与承载类别，不记录地址、接口名或 DNS。判定在真机走查下成立
+- 失败信息：期望「离线等待、网络恢复后自动重连」，实际「离线期间重试耗尽，网络恢复后仍保持断开」
+- 来源：entry/src/main/ets/services/VpnReconnectSupervisor.ets；entry/src/main/ets/entryability/EntryAbility.ets 的网络回调；entry/src/main/ets/services/VpnSessionIntent.ets
+- 上游：R-NET-05、R-CONN-13
+- 待接线测试：[E2E] scripts/e2e/network-recovery.mjs::断网后恢复网络自动重连（设备未连接，待执行）
+- 状态：pending-test
+- 不确定特征：none
+- 归属：owner=项目维护者 接收批次=vpn-endurance（设备未连接，E2E 待执行）
+- 复核：待复核

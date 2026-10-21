@@ -29,7 +29,13 @@ import {
   VpnCommandStateMachine,
   VpnCoreCommand
 } from '../services/VpnCommandGateway';
-import { VPN_STATUS_FRESH_MS } from '../services/VpnStatusReader';
+import {
+  VPN_STATUS_FRESH_MS,
+  VpnLinkSnapshot,
+  VpnSnapshotChange,
+  VpnSnapshotTracker,
+  VpnStatusReader
+} from '../services/VpnStatusReader';
 import {
   NetworkSettingKey,
   NetworkSettingsGateway,
@@ -50,7 +56,9 @@ import {
   TaildropReceiveRequest,
   TaildropReceiveResult
 } from '../services/TaildropReceiveGateway';
-import { APP_FOREGROUND_EVENT } from '../services/AppLifecycleEvents';
+import { APP_BACKGROUND_EVENT, APP_FOREGROUND_EVENT } from '../services/AppLifecycleEvents';
+import { SessionEndReason, SessionLedger } from '../services/SessionLedger';
+import { VpnIntentDesired, VpnSessionIntent } from '../services/VpnSessionIntent';
 import { SunshineProbeService } from '../services/SunshineProbeService';
 import { PeerPathService } from '../services/PeerPathService';
 import { MoonlightLauncher } from '../services/MoonlightLauncher';
@@ -192,6 +200,10 @@ const TAILDROP_MAX_MEDIA_SELECTION: number = 100;
 const TAILDROP_RECEIVE_BACKEND_TIMEOUT_MS: number = 45000;
 const TAILDROP_SAVE_TIMEOUT_MS: number = 60000;
 const TAILDROP_PENDING_DELETE_RETRY_MS: number = 5000;
+// The extension writes the peer snapshot every 1 s active, 2 s in the
+// background and 15 s screen-off. A 5 s acceptance window rejected most
+// screen-off snapshots, so the lists stayed stale after the screen woke.
+const SNAPSHOT_ACCEPT_MAX_AGE_MS: number = 16000;
 const TAILDROP_MEDIA_MIN_TIMESTAMP_MS: number = 946684800000;
 const TAILDROP_MEDIA_MAX_FUTURE_MS: number = 24 * 60 * 60 * 1000;
 const TAILDROP_MEDIA_MAX_DURATION_MS: number = 24 * 60 * 60 * 1000;
@@ -692,6 +704,10 @@ export struct BridgeStatus {
   private connectionCompletionTimer: number = -1;
   private connectionStartedAtMs: number = 0;
   private connectionDurationTimer: number = -1;
+  // True between the app background and foreground events. Automatic peer,
+  // Sunshine and media probes skip this interval. The health poll and the
+  // tunnel stay on, because they decide whether the connection survives.
+  private lifecycleBackgrounded: boolean = false;
   @State connectionDurationNowMs: number = 0;
   private backendReadinessPollTimer: number = -1;
   private backendRestartDeferred: boolean = false;
@@ -834,6 +850,8 @@ export struct BridgeStatus {
   private autoMediaFailureCounts: Map<string, number> = new Map();
   private autoProbedPeerSessions: Map<string, number> = new Map();
   private appForegroundListener: () => void = () => this.handleAppForeground();
+  private appBackgroundListener: () => void = () => this.handleAppBackground();
+  private readonly vpnSnapshotTracker: VpnSnapshotTracker = new VpnSnapshotTracker();
 
   private mergePeerLocalSend(incoming: PeerSummary, current: PeerSummary | undefined): PeerSummary {
     const incomingStatus: LocalSendStatus | undefined = incoming.localSend;
@@ -965,6 +983,7 @@ export struct BridgeStatus {
     this.vpnHeartbeatConfirmed = false;
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     context.eventHub.on(APP_FOREGROUND_EVENT, this.appForegroundListener);
+    context.eventHub.on(APP_BACKGROUND_EVENT, this.appBackgroundListener);
     this.loadGlowLevel();
     this.loadAppearancePreferences();
     this.fakeMediaServiceOnline = false;
@@ -1038,6 +1057,7 @@ export struct BridgeStatus {
     this.vpnCommandStateMachine.invalidateLifecycle();
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     context.eventHub.off(APP_FOREGROUND_EVENT, this.appForegroundListener);
+    context.eventHub.off(APP_BACKGROUND_EVENT, this.appBackgroundListener);
     this.vpnConflictDialogVisible = false;
     this.welcomeDialogVisible = false;
     this.connectionDetailsVisible = false;
@@ -1077,8 +1097,35 @@ export struct BridgeStatus {
     this.resetDiagnosticsMode();
   }
 
+  /**
+   * Stops the timers that exist only to keep an on-screen view fresh. The
+   * health poll, the tunnel and its recovery watchdog keep running, because
+   * they decide whether the connection survives.
+   */
+  private handleAppBackground(): void {
+    this.lifecycleBackgrounded = true;
+    this.stopServiceRefreshPolling();
+    this.stopHomeLatencyRefreshPolling();
+    this.stopDeviceDetailRefreshPolling();
+    this.stopTransferProtocolRefreshPolling();
+    this.stopOfflinePeerStatusRefreshPolling();
+    // These two exist only for an on-screen view: cache sizes in Settings and
+    // the connection duration in the details sheet.
+    this.stopCacheSizePolling();
+    this.stopConnectionDurationPolling();
+    this.recordDiagnosticEvent('ui_probes_paused', 'power');
+  }
+
   private handleAppForeground(): void {
+    this.lifecycleBackgrounded = false;
     this.requireAppAuthentication();
+    // The timers stopped on background are restarted from the same entry
+    // points that start them on first appearance.
+    this.startServiceRefreshPolling();
+    this.syncHomeLatencyRefreshPolling();
+    if (this.deviceDetailVisible) {
+      this.startDeviceDetailRefreshPolling();
+    }
     const generation: number = this.lifecycleGeneration;
     const vpnIsLive: boolean = this.refreshVpnProbeStatus();
     this.maybeExpireTaildropCache();
@@ -1086,6 +1133,9 @@ export struct BridgeStatus {
     this.syncTransferProtocolRefreshPolling();
     if (this.activeNavigationId === 'settings') {
       this.startCacheSizePolling();
+    }
+    if (this.connectionDetailsVisible) {
+      this.startConnectionDurationPolling();
     }
     if (!this.controlServerConfirmed) {
       return;
@@ -2369,6 +2419,10 @@ export struct BridgeStatus {
     if (this.connectCommandId === 0) {
       return;
     }
+    // Record the user's wish before any command file, so a reader in the
+    // other process never sees the command without the intent.
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    VpnSessionIntent.write(context.filesDir, VpnIntentDesired.CONNECTED, 'ui');
     this.setConnectInProgress(true);
     void this.beginVpnConnectionAfterExitNodeUpdate();
   }
@@ -2522,11 +2576,17 @@ export struct BridgeStatus {
     if (this.disconnectCommandId === 0) {
       return;
     }
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    // The user stop is a controlled end reason. Write it before the intent, so
+    // a recovery that reads the intent later cannot undo the tunnel unseen.
+    const current: VpnLinkSnapshot = VpnStatusReader.read(context.filesDir);
+    SessionLedger.recordEnd(context.filesDir, 'ui', current.sessionId,
+      SessionEndReason.USER_STOP, 'user_stop', 0, Date.now());
+    VpnSessionIntent.write(context.filesDir, VpnIntentDesired.STOPPED, 'ui');
     this.disconnectInProgress = true;
     this.recordDiagnosticEvent('disconnect_requested', 'user');
     this.stopVpnStopPolling();
     this.vpnStopRequestId = Date.now();
-    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.vpnCommandGateway.writeCommandFile(context.filesDir, VPN_STOP_RESPONSE_FILE_NAME, '');
     const request: VpnStopRequest = { requestId: this.vpnStopRequestId };
     if (!this.vpnCommandGateway.writeCommandFile(context.filesDir, VPN_STOP_REQUEST_FILE_NAME,
@@ -3320,7 +3380,9 @@ export struct BridgeStatus {
       const heartbeatAgeMs: number = Date.now() - heartbeatMs;
       const heartbeatIsFresh: boolean = heartbeatMs > 0 && heartbeatAgeMs >= 0 &&
         heartbeatAgeMs <= VPN_STATUS_FRESH_MS;
-      const visibleStatus: string = persistedStatus.replace(/\s*\|\s*heartbeatMs=\d+/, '');
+      const visibleStatus: string = persistedStatus
+        .replace(/\s*\|\s*heartbeatMs=\d+/, '')
+        .replace(/\s*\|\s*sessionId=[A-Za-z0-9_-]+/, '');
       this.processVpnBackendHandoffRequest(context.filesDir, visibleStatus);
       let extensionIsLive: boolean = heartbeatIsFresh && !visibleStatus.includes('destroyed');
       if (extensionIsLive && !this.vpnHeartbeatConfirmed) {
@@ -3354,6 +3416,18 @@ export struct BridgeStatus {
         return true;
       }
       if (extensionIsLive) {
+        const snapshot: VpnLinkSnapshot = VpnStatusReader.readText(persistedStatus, Date.now());
+        const change: VpnSnapshotChange = this.vpnSnapshotTracker.observe(snapshot);
+        if (change.trafficReset) {
+          // A recovery built a new tunnel. Traffic from the old session must
+          // not be added to the new one.
+          this.resetTrafficMetrics();
+        }
+        if (change.refreshDue && this.appShellReady) {
+          // A new session or a state change makes the cached peer snapshot
+          // stale; read it once now instead of waiting for the next timer.
+          this.refreshPeerSnapshot();
+        }
         this.updateTrafficMetrics(visibleStatus, heartbeatMs);
         this.checkTaildropReceiveTimeout();
         this.processTaildropReceiveResponse();
@@ -3612,7 +3686,7 @@ export struct BridgeStatus {
       const snapshot: PersistedPeerSnapshot = JSON.parse(
         fileIo.readTextSync(path)) as PersistedPeerSnapshot;
       const ageMs: number = Date.now() - snapshot.updatedAtMs;
-      if (snapshot.updatedAtMs <= 0 || ageMs < 0 || ageMs > 5000) {
+      if (snapshot.updatedAtMs <= 0 || ageMs < 0 || ageMs > SNAPSHOT_ACCEPT_MAX_AGE_MS) {
         return;
       }
       const validPeers: PeerSummary[] = snapshot.peers.filter(
@@ -3884,7 +3958,7 @@ export struct BridgeStatus {
       const snapshot: TaildropSnapshot = JSON.parse(fileIo.readTextSync(path)) as TaildropSnapshot;
       const updatedAtMs: number = snapshot.updatedAtMs === undefined ? 0 : snapshot.updatedAtMs;
       const ageMs: number = Date.now() - updatedAtMs;
-      if (updatedAtMs <= 0 || ageMs < 0 || ageMs > 5000) {
+      if (updatedAtMs <= 0 || ageMs < 0 || ageMs > SNAPSHOT_ACCEPT_MAX_AGE_MS) {
         this.taildropState = 'loading';
         return;
       }
@@ -5968,7 +6042,7 @@ export struct BridgeStatus {
   }
 
   private autoProbeConnectedPeerServices(force: boolean = false): void {
-    if (!this.isConnected()) {
+    if (this.lifecycleBackgrounded || !this.isConnected()) {
       return;
     }
     const session: number = Math.max(1, this.trafficSession);
