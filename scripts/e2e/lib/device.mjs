@@ -608,11 +608,16 @@ export function screenshot(name) {
 }
 
 // 设备日志。用 hdc hilog 持续读，按包名就地过滤。
+// 长跑时 hdc 连接可能断开。断开后自动重连。重连会把设备缓冲区的旧行再回放一次，
+// 所以按整行去重。整行带毫秒时间戳，重放行完全相同，新行不会误伤。
 export class LogStream {
   constructor() {
     this.lines = [];
+    this.seen = new Set();
     this.child = null;
     this.buffer = '';
+    this.stopped = false;
+    this.restartTimer = null;
   }
 
   start() {
@@ -623,25 +628,55 @@ export class LogStream {
     } catch (_error) {
       // 清不掉不致命，只是断言可能偏松。
     }
-    this.child = spawn(HDC, ['-t', serial(), 'shell', 'hilog'], {
+    this.stopped = false;
+    this.seen = new Set();
+    this.spawnStream();
+    return this;
+  }
+
+  spawnStream() {
+    const child = spawn(HDC, ['-t', serial(), 'shell', 'hilog'], {
       stdio: ['ignore', 'pipe', 'pipe']
     });
+    this.child = child;
     const take = (chunk) => {
       this.buffer += chunk.toString();
       const parts = this.buffer.split('\n');
       this.buffer = parts.pop();
       for (const line of parts) {
-        if (line.includes(BUNDLE)) {
-          this.lines.push(line);
+        if (!line.includes(BUNDLE) || this.seen.has(line)) {
+          continue;
         }
+        this.seen.add(line);
+        this.lines.push(line);
       }
     };
-    this.child.stdout.on('data', take);
-    this.child.stderr.on('data', take);
-    return this;
+    child.stdout.on('data', take);
+    child.stderr.on('data', take);
+    child.on('error', () => {});
+    child.on('exit', () => {
+      if (this.child !== child) {
+        return;
+      }
+      this.child = null;
+      this.buffer = '';
+      if (this.stopped) {
+        return;
+      }
+      this.restartTimer = setTimeout(() => {
+        if (!this.stopped) {
+          this.spawnStream();
+        }
+      }, 2000);
+    });
   }
 
   stop() {
+    this.stopped = true;
+    if (this.restartTimer) {
+      clearTimeout(this.restartTimer);
+      this.restartTimer = null;
+    }
     if (this.child) {
       this.child.kill('SIGTERM');
       this.child = null;
