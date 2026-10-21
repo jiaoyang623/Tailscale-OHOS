@@ -16,7 +16,8 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BUNDLE, HDC, LogStream, readAppFile, readLedgerEntries, serial, startApp
+  BUNDLE, HDC, LogStream, clickBottomTab, clickId, layoutTexts, readAppFile,
+  readLedgerEntries, serial, startApp
 } from './lib/device.mjs';
 import { createRun, deviceEnvironment } from './lib/steps.mjs';
 
@@ -80,6 +81,24 @@ test('安装重启后按意图恢复隧道', { timeout: 240000 }, async (t) => {
     return;
   }
   const record = steps.case(caseId, title, oracleIds);
+
+  // A full-suite run reaches this file after other tests disconnected the
+  // tunnel. Build the precondition here instead of skipping.
+  if (!/state=Running/.test(statusText()) ||
+    !readAppFile('vpn-intent.json').includes('"desired":"connected"')) {
+    startApp();
+    await log.waitFor(/MeshArcDiag: ui ui_opened/, 40000);
+    await pause(6000);
+    if (!layoutTexts().some((line) => line.includes('已连接'))) {
+      clickBottomTab('设备');
+      await pause(2500);
+      if (!layoutTexts().some((line) => line.includes('已连接'))) {
+        clickId('vpn-connect');
+      }
+      await log.waitFor(/vpn_connected/, 90000);
+      await pause(3000);
+    }
+  }
 
   const pre = record.step({
     id: 'S1', name: '确认安装前状态', operation: '读取状态文件与意图文件',
