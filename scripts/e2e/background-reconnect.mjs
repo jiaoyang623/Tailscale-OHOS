@@ -142,6 +142,10 @@ test('重连监督：前台主动断开记为用户停止且不重连', async (t
     expected: ['不出现 vpn_session_recovery_attempt', '不出现 vpn_session_recovery_started']
   });
   try {
+    // Only events after the stop count. The connect step above can itself
+    // emit a recovery (a force-stop leaves the old session to expire), and
+    // that recovery says nothing about the user's stop.
+    const quietFrom = log.mark();
     clickId('vpn-stop');
     const stopped = await log.waitFor(/MeshArcDiag: ui vpn_drop_after_requested_stop/, 25000);
     const shot = run.shot('background-reconnect-foreground-drop', '结果');
@@ -162,8 +166,8 @@ test('重连监督：前台主动断开记为用户停止且不重连', async (t
       record.fail(message);
       assert.fail(message);
     }
-    const recovered = /vpn_session_recovery_attempt|vpn_session_recovery_started/
-      .test(log.lines.join('\n'));
+    const recovered = log.countAfter(quietFrom,
+      /vpn_session_recovery_attempt|vpn_session_recovery_started/);
     if (recovered) {
       const message = '主动断开之后监督器仍发起了重连，用户的断开被撤销';
       quiet.fail(message, { kind: 'log', output: message });
