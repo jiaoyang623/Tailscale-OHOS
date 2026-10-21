@@ -228,3 +228,40 @@
 - 证据：`/home/w2h/mesharc-e2e/screen-off-survival-2026-10-20T16-24-13-336Z.log`（16,713 行）、
   `checks/screen-off-12h-steps.json`、设备上的 `diagnostic-ui-events.ndjson` 与
   `diagnostic-vpn-events.ndjson`。
+
+## 12 小时复跑首次起跑失败（2026-10-21 22:00）
+
+- 命令：`systemd-run --on-calendar='2026-10-21 22:00:00'` 起跑同一用例。
+- 结果：3 条用例全部失败。前两条失败点在 `layoutTexts`，报
+  `Empty dumpLayout response from device`。第三条因前置步骤失败连带失败。
+- 原因：锁屏界面不接受布局转储。起跑时设备处于 AWAKE，但屏幕锁定。
+  应用的 `ui_opened` 正常出现，随后 `aa start` 不能把应用带到前台。
+- 处置：用例前的设备条件检查改为「电源为 AWAKE，且焦点窗口属于应用」。
+  条件不足时等待，不启动计时。见「运行前条件」。
+- 证据：`/home/w2h/mesharc-e2e/screen-off-12h-2026-10-21.log`。
+
+## 运行前条件（2026-10-21 23:41 起）
+
+- 条件一：`PowerManagerService` 的 `Current State` 以 `AWAKE` 开头。
+- 条件二：`WindowManagerService` 的 `Focus window` 等于应用窗口 `mesharc0` 的 WinId。
+- 条件不足时脚本等待并重试，最多 7 次。条件满足才起跑，计时从起跑开始。
+- 脚本：`/home/w2h/mesharc-e2e/run-12h.sh`。日志：
+  `/home/w2h/mesharc-e2e/screen-off-12h-attempts.log`。
+- 屏幕超时：起跑前覆盖为 43,200,000 ms，脚本退出时恢复。
+  目的是让设备在起跑前保持唤醒。用例用 `power-shell suspend` 自己熄屏。
+  这是主机侧设置，与应用行为无关。
+
+## 12 小时复跑第二次起跑作废（2026-10-21 23:41 至 2026-10-22 04:52）
+
+- 起跑：23:41:16。连接用例 34 秒通过。隧道 `state=Running`，意图 `connected`。
+- 结果：5 小时 06 分后由人工停止。本次不作数为证据。
+- 原因：另一会话在同一设备上跑真机门禁。屏幕多次被点亮，锁屏条件不成立。
+  电源档位事件显示下列区间为 `background`，即屏幕点亮：
+  23:47–02:17、02:54–03:04、03:17–03:56、04:22–04:33。
+  只有 23:41–23:47 与若干短区间处于 `screen-off`。
+- 期间隧道没有断连。没有 `user_stop`，没有 `vpn_session_end`，扩展没有销毁。
+  这只能说明「有人操作时隧道仍在」，不能说明「12 小时锁屏存活」。
+- 处置：停止 `run-12h.sh`、`node --test` 与 `hdc hilog` 全部进程。
+  恢复默认熄屏超时 600,000 ms。设备交给另一会话。
+- O-CONN-06 仍为未通过。需要一次独占设备、全程无人操作的 12 小时运行。
+
