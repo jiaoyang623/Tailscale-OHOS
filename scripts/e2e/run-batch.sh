@@ -36,6 +36,13 @@ for name in "$@"; do
   fi
   log="$OUT/e2e-$name-$STAMP.log"
   started="$(date +%s)"
+  # 界面读不到通常表示锁屏。锁屏后应用起不到前台，后续每条都会失败，
+  # 整批结果变成噪声。这里直接停批，不把锁屏算成用例失败。
+  if ! devecocli ui layout --device "$DEVICE" --format json --mode full >/dev/null 2>&1; then
+    printf '%-28s %s\n' "$name" "未跑：设备界面读不到，可能已锁屏" | tee -a "$SUMMARY"
+    rc=1
+    break
+  fi
   if node --test "$file" > "$log" 2>&1; then
     status=0
   else
