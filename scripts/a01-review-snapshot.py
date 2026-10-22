@@ -198,13 +198,16 @@ def e2e_outcome(token):
         return None
     meta = json.loads(E2E_RESULTS.read_text(encoding="utf-8"))
     ran_at = meta.get("ran_at", "")
+    # 每个文件带自己那一批的基线。跨批累积时，旧批的结果不能借用新批的基线：
+    # review.py 会核对测试条目的基线与快照基线一致，借用就是把旧结论当成本基线的结论。
+    ran_baseline = result.get("baseline") or meta.get("baseline", "")
     evidence = (f"{match.group(1)}.mjs 跑过：通过 {result.get('pass', 0)}、"
                 f"跳过 {result.get('skip', 0)}、失败 {result.get('fail', 0)}")
     if status == "not_evaluated":
         evidence += "（有跳过，跳过不算通过）"
     return {"status": status, "evidence": f"{evidence}；运行 {ran_at}",
             "run": {"command": meta.get("command", ""),
-                    "baseline": meta.get("baseline", ""),
+                    "baseline": ran_baseline,
                     "environment": f"HarmonyOS 设备 {meta.get('device', '')}，hdc",
                     "executed_at": ran_at}}
 

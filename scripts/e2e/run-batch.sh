@@ -112,6 +112,9 @@ for line in pathlib.Path(tsv).read_text(encoding="utf-8").splitlines():
     files[name] = {
         "pass": int(passed), "fail": int(failed), "skip": int(skipped),
         "verdict": verdict, "log": log,
+        # 每个文件带上它自己那一批的基线。只记批次级基线时，
+        # 跨批累积的文件会借用别的批次的基线，快照就会把旧结论当成本基线的结论。
+        "baseline": baseline,
     }
 record = {
     "ran_at": stamp,
@@ -133,6 +136,8 @@ try:
     merged["ran_at"] = stamp
     merged["device"] = record["device"]
     merged["baseline"] = baseline
+    # 命令也要跟着这一批走。留着旧值会让报告说明一条没跑过的命令。
+    merged["command"] = record["command"]
     REPO.write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"已并入 docs/changes/a01-baseline/e2e-results.json（累计 {len(merged['files'])} 个文件）")
 except OSError as error:
