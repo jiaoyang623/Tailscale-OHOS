@@ -541,6 +541,38 @@ export function setFieldText(id, text) {
   return true;
 }
 
+// 用应用自带的诊断动作停掉扩展。只停扩展，不写用户停止意图。
+// 设备 shell 没有向应用进程发信号的权限时，这是制造非主动断连的通道。
+// 前置：应用在前台。诊断区要先解锁（设置 > 关于与帮助，连点版本号 5 次）。
+export async function cutExtensionFromDiagnostics() {
+  if (nodeState('tab-settings') === null) {
+    return false;
+  }
+  clickId('tab-settings');
+  await settle(2500);
+  const about = await scrollToId('settings-about-entry', 4);
+  if (!about) {
+    return false;
+  }
+  clickAt(about);
+  await settle(3000);
+  const version = await scrollToId('app-version-action', 3);
+  if (!version) {
+    return false;
+  }
+  fastTap(version[0], version[1], 5);
+  await settle(2500);
+  if (nodeState('diagnostics-disclosure') === null) {
+    return false;
+  }
+  const cut = await scrollToId('diagnostic-force-vpn-stop', 12);
+  if (!cut) {
+    return false;
+  }
+  clickAt(cut);
+  return true;
+}
+
 // 把应用切到后台再切回来。测回前台这类行为用。
 export async function cycleForeground() {
   sendHome();

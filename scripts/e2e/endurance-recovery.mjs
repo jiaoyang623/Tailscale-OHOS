@@ -16,8 +16,9 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BUNDLE, HDC, LogStream, clickAt, clickBottomTab, clickId, fastTap, forceStop, layoutTexts,
-  nodeState, readAppFile, readLedgerEntries, scrollToId, serial, startApp
+  BUNDLE, HDC, LogStream, clickBottomTab, clickId, cutExtensionFromDiagnostics, forceStop,
+  layoutTexts,
+  readAppFile, readLedgerEntries, serial, startApp
 } from './lib/device.mjs';
 import { createRun, deviceEnvironment } from './lib/steps.mjs';
 
@@ -105,38 +106,6 @@ function processGone(pid) {
     return false;
   }
   return !text.split('\n').some((line) => new RegExp(`\\s${pid}\\s`).test(line));
-}
-
-// 设备 shell 没有向应用进程发信号的权限时，用应用自带的诊断动作造同一次断连。
-// 「手动切断系统 VPN 连接」调用 stopVpnExtensionAbility，只停扩展，不写用户停止意图。
-// 扩展的 onDestroy 记 EXTENSION_DESTROYED，监督器按意图重新拉起扩展。
-async function cutExtensionFromDiagnostics() {
-  if (nodeState('tab-settings') === null) {
-    return false;
-  }
-  clickId('tab-settings');
-  await pause(2500);
-  const about = await scrollToId('settings-about-entry', 4);
-  if (!about) {
-    return false;
-  }
-  clickAt(about);
-  await pause(3000);
-  const version = await scrollToId('app-version-action', 3);
-  if (!version) {
-    return false;
-  }
-  fastTap(version[0], version[1], 5);
-  await pause(2500);
-  if (nodeState('diagnostics-disclosure') === null) {
-    return false;
-  }
-  const cut = await scrollToId('diagnostic-force-vpn-stop', 12);
-  if (!cut) {
-    return false;
-  }
-  clickAt(cut);
-  return true;
 }
 
 before(async () => {
