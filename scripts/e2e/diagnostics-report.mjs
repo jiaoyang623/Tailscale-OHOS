@@ -182,7 +182,7 @@ test('O-DIAG-01 解锁诊断并导出脱敏报告：连点 5 次解锁，折叠�
   assert.ok(await log.waitFor(/MeshArcDiag: ui feature_diagnostics_unlocked/, 10000),
     '解锁了却没有留下 feature_diagnostics_unlocked 事件');
   screenshot('diagnostics-unlocked');
-  const generate = await scrollToId('diagnostic-report-generate', 8);
+  const generate = await scrollToId('diagnostic-report-generate', 12);
   assert.ok(generate, '解锁后的诊断区里找不到生成报告按钮');
 });
 
@@ -236,7 +236,7 @@ test('O-DIAG-01 解锁诊断并导出脱敏报告：落盘事件只含安全字�
 test('O-DIAG-01 解锁诊断并导出脱敏报告：生成报告得到 zip，并打开系统分享', async () => {
   // 上一条切到了首页，解锁标志随生命周期清回 false，这里重新解锁。
   assert.ok(await openDiagnostics(), '重新解锁诊断失败');
-  const generate = await scrollToId('diagnostic-report-generate', 8);
+  const generate = await scrollToId('diagnostic-report-generate', 12);
   assert.ok(generate, '找不到生成报告按钮');
   clickAt(generate);
 
@@ -248,10 +248,9 @@ test('O-DIAG-01 解锁诊断并导出脱敏报告：生成报告得到 zip，并
     '报告生成失败，设备日志里有 diagnostic_report_failed');
 
   // 状态文字是 diagnosticReportStatus。应用在记 diagnostic_report_generated 之前
-  // 就把它改成文件名（BridgeStatus.ets:4303），所以事件到了，状态就该是文件名。
-  // 2026-10-13 两次实测主机都读到旧值「正在生成诊断报告…」，原因未定。
-  // 疑似系统分享面板持有焦点时，布局导出不反映应用窗口的新一帧。
-  // 这里先等分享事件，再关面板，再读状态行。
+  // 就把它改成文件名（BridgeStatus.ets:4377），所以事件到了，状态就该是文件名。
+  // 2026-10-22 实测：旧值一直不刷新。原因是状态行经 @Builder 按值传参。
+  // 应用已改成直接读状态变量。这里仍先等分享事件，再关面板，再读状态行。
   assert.ok(await log.waitFor(/MeshArcDiag: ui diagnostic_share_opened/, 30000),
     '报告生成了，但没有走到系统分享：设备日志里没有 diagnostic_share_opened');
   pressBack();

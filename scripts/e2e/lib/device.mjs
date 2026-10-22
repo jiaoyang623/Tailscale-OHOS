@@ -327,13 +327,30 @@ function clickLimitOf(all) {
 
 // 往下滚到某个 id 出现，**并且在可点区域内**。设置页比一屏长，直接找会找不到。
 // 页签栏不在布局树里时（二级页盖住它），可点区域到窗口底边为止。
+// 每次滑动后都复查一次，最后一次滑动也算数。滑动不生效时节点位置不变，
+// 连续三次读到同一位置就判到底，不再空滑。2026-10-22 实测生成报告按钮
+// 第 8 次滑动后才进入树里，第 9 次才升到页签栏上方。
 export async function scrollToId(id, maxSwipes = 6) {
+  let lastTop = null;
+  let still = 0;
   for (let i = 0; i <= maxSwipes; i++) {
     const all = nodes();
     const limit = clickLimitOf(all);
     const hit = all.find((node) => node.id === id && node.center !== null);
     if (hit && hit.center[1] < limit) {
       return hit.center;
+    }
+    if (hit && hit.bounds[1] === lastTop) {
+      still += 1;
+      if (still >= 2) {
+        return null;
+      }
+    } else {
+      still = 0;
+    }
+    lastTop = hit ? hit.bounds[1] : null;
+    if (i === maxSwipes) {
+      break;
     }
     swipeUp();
     await new Promise((resolve) => setTimeout(resolve, 900));
