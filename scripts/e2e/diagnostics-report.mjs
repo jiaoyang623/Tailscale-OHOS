@@ -81,6 +81,14 @@ async function openAbout() {
   if (layoutNode('app-version-action') !== null) {
     return true;
   }
+  // 二级页面盖住了页签栏。按返回退到设置根页，最多 3 次。
+  for (let attempt = 0; attempt < 3 && layoutNode('tab-settings') === null; attempt++) {
+    pressBack();
+    await pause(1500);
+  }
+  if (layoutNode('tab-settings') === null) {
+    return false;
+  }
   clickId('tab-settings');
   await pause(2500);
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -91,8 +99,11 @@ async function openAbout() {
       return true;
     }
     // 可能停在别的设置详情页。按返回键回到设置根页再试。
-    pressBack();
-    await pause(1500);
+    // 页签栏还在时不要按返回：根页按返回会把应用切到后台。
+    if (layoutNode('tab-home') === null) {
+      pressBack();
+      await pause(1500);
+    }
   }
   return false;
 }

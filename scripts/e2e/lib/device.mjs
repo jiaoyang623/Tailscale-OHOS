@@ -307,16 +307,33 @@ export function centerOfId(id) {
   return hit;
 }
 
-// 底部页签栏盖住的区域。落在这里的坐标会被页签截走，
-// 而 devecocli 的 --id 点击就是按节点中心点，所以「找得到」不等于「点得到」。
-const TAB_BAR_TOP = 1840;
+// 可点区域的下边界。页签栏顶边是硬边界；窗口底边之外的点也点不到。
+// 页签栏与窗口节点都从当前布局树里取，不写死像素。
+function clickLimitOf(all) {
+  let limit = Number.POSITIVE_INFINITY;
+  for (const node of all) {
+    if (node.bounds === null) {
+      continue;
+    }
+    if (node.id.startsWith('tab-')) {
+      limit = Math.min(limit, node.bounds[1]);
+    }
+    if (node.id === 'shell-window-host') {
+      limit = Math.min(limit, node.bounds[3] - 4);
+    }
+  }
+  return limit;
+}
 
-// 往下滚到某个 id 出现，**并且在页签栏之上**。设置页比一屏长，直接找会找不到。
+// 往下滚到某个 id 出现，**并且在可点区域内**。设置页比一屏长，直接找会找不到。
+// 页签栏不在布局树里时（二级页盖住它），可点区域到窗口底边为止。
 export async function scrollToId(id, maxSwipes = 6) {
   for (let i = 0; i <= maxSwipes; i++) {
-    const point = centerOfId(id);
-    if (point && point[1] < TAB_BAR_TOP) {
-      return point;
+    const all = nodes();
+    const limit = clickLimitOf(all);
+    const hit = all.find((node) => node.id === id && node.center !== null);
+    if (hit && hit.center[1] < limit) {
+      return hit.center;
     }
     swipeUp();
     await new Promise((resolve) => setTimeout(resolve, 900));
@@ -347,6 +364,7 @@ export function nodes() {
     found.push({
       id: node.id || '',
       text: (node.text || node.content || node.description || '').trim(),
+      bounds: Array.isArray(bounds) ? bounds : null,
       center: Array.isArray(bounds)
         ? [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
         : null

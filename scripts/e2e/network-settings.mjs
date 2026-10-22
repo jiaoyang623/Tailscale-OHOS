@@ -27,8 +27,8 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  LogStream, clickAt, clickId, forceStop, layoutTexts, screenshot, scrollToId,
-  startApp, textOfId
+  LogStream, clickAt, clickId, forceStop, layoutTexts, pressBack, readAppFile,
+  screenshot, scrollToId, startApp, textOfId
 } from './lib/device.mjs';
 
 const OUT = process.env.E2E_OUT || join(homedir(), 'mesharc-e2e');
@@ -41,25 +41,63 @@ let configured = false;
 
 // 切到别的页签再切回设置，清空二级页面栈，回到设置首页（BridgeStatus.ets:1561）。
 async function resetToSettingsHome() {
-  clickId('tab-home');
-  await pause(1500);
-  clickId('tab-settings');
-  await pause(2500);
+  // 二级页面会盖住页签栏，此时页签不在布局树里。先按返回退出。
+  for (let attempt = 0; attempt < 3 && textOfId('tab-home') === null; attempt++) {
+    pressBack();
+    await pause(1500);
+  }
+  if (textOfId('tab-home') !== null) {
+    clickId('tab-home');
+    await pause(1500);
+  }
+  if (textOfId('tab-settings') !== null) {
+    clickId('tab-settings');
+    await pause(2500);
+  }
 }
 
 async function goHome() {
-  clickId('tab-home');
-  await pause(1500);
+  if (textOfId('tab-home') !== null) {
+    clickId('tab-home');
+    await pause(1500);
+  }
 }
 
+function intentDesired() {
+  try {
+    return JSON.parse(readAppFile('vpn-intent.json')).desired || 'stopped';
+  } catch (_error) {
+    // 文件缺失或读不到时，应用按 stopped 处理（VpnSessionIntent.ets:44）。
+    return 'stopped';
+  }
+}
+
+// 冷启动后应用会按意图恢复上一次会话。恢复比界面晚，可能晚几十秒。
+// 所以「界面没有停止按钮」不等于已断开：意图仍是 connected 时，恢复还在路上。
 async function ensureDisconnected() {
   await goHome();
-  if (textOfId('vpn-stop') === null) {
-    return true;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (textOfId('vpn-stop') !== null) {
+      const mark = log.mark();
+      clickId('vpn-stop');
+      await log.waitForAfter(mark, /vpn_extension_destroyed/, 90000);
+      await pause(2000);
+      continue;
+    }
+    if (intentDesired() !== 'connected') {
+      // 意图已停止。再等一拍确认界面没有出现停止按钮。
+      await pause(3000);
+      if (textOfId('vpn-stop') === null && intentDesired() !== 'connected') {
+        return true;
+      }
+      continue;
+    }
+    // 意图仍是连接：等恢复落地，再点停止。
+    const mark = log.mark();
+    await log.waitForAfter(mark, /vpn_connected/, 60000);
+    await pause(2000);
   }
-  const mark = log.mark();
-  clickId('vpn-stop');
-  return await log.waitForAfter(mark, /vpn_extension_destroyed/, 90000) !== null;
+  return textOfId('vpn-stop') === null && intentDesired() !== 'connected';
 }
 
 async function ensureConnected() {
