@@ -1,1071 +1,1071 @@
 == 宿主侧用例（单元 + 集成）==
 TAP version 13
-# (node:908709) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893948) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: 两进程落盘文本共用脱敏边界且超限淘汰最旧
 ok 1 - 两进程落盘文本共用脱敏边界且超限淘汰最旧
   ---
-  duration_ms: 24.38849
+  duration_ms: 35.133324
   type: 'test'
   ...
 # Subtest: every recorded event also reaches the device log, redacted
 ok 2 - every recorded event also reaches the device log, redacted
   ---
-  duration_ms: 0.577099
+  duration_ms: 0.818505
   type: 'test'
   ...
-# (node:908711) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893949) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: 半写配置回落未配置态且偏好缺键取默认
 ok 3 - 半写配置回落未配置态且偏好缺键取默认
   ---
-  duration_ms: 4.608593
+  duration_ms: 4.431117
   type: 'test'
   ...
-# (node:908717) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893955) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: the extension runs at the stage the app wrote, active when it cannot tell
 ok 4 - the extension runs at the stage the app wrote, active when it cannot tell
   ---
-  duration_ms: 47.473128
+  duration_ms: 45.795823
   type: 'test'
   ...
-# (node:908718) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893956) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: two writers append to one ledger and neither rewrite drops the other record
 ok 5 - two writers append to one ledger and neither rewrite drops the other record
   ---
-  duration_ms: 42.045786
+  duration_ms: 45.782452
   type: 'test'
   ...
-# (node:908724) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893957) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: both readers give the same answer for every status line
 ok 6 - both readers give the same answer for every status line
   ---
-  duration_ms: 70.344889
+  duration_ms: 70.777488
   type: 'test'
   ...
 # Subtest: a terminal marker wins over a running tunnel in both readers
 ok 7 - a terminal marker wins over a running tunnel in both readers
   ---
-  duration_ms: 2.421413
+  duration_ms: 1.709885
   type: 'test'
   ...
 # Subtest: a stale heartbeat is unknown in both readers
 ok 8 - a stale heartbeat is unknown in both readers
   ---
-  duration_ms: 2.467497
+  duration_ms: 2.403852
   type: 'test'
   ...
 # Subtest: a missing file is unknown in both readers
 ok 9 - a missing file is unknown in both readers
   ---
-  duration_ms: 2.738916
+  duration_ms: 1.954906
   type: 'test'
   ...
 # Subtest: one freshness window serves every reader, and the UI reads it from here
 ok 10 - one freshness window serves every reader, and the UI reads it from here
   ---
-  duration_ms: 4.080062
+  duration_ms: 4.204835
   type: 'test'
   ...
 # Subtest: the analyzer only watches names the registry still carries
 ok 11 - the analyzer only watches names the registry still carries
   ---
-  duration_ms: 1.926134
+  duration_ms: 2.096269
   type: 'test'
   ...
 # Subtest: the keyword list stays separate from the watched event names
 ok 12 - the keyword list stays separate from the watched event names
   ---
-  duration_ms: 1.746023
+  duration_ms: 1.612003
   type: 'test'
   ...
 # Subtest: every source name is in the registry
 ok 13 - every source name is in the registry
   ---
-  duration_ms: 1.797574
+  duration_ms: 1.870258
   type: 'test'
   ...
 # Subtest: a source name that is not in the registry is unknown
 ok 14 - a source name that is not in the registry is unknown
   ---
-  duration_ms: 0.253321
+  duration_ms: 0.272741
   type: 'test'
   ...
 # Subtest: a registry row that is not in the source is unused
 ok 15 - a registry row that is not in the source is unused
   ---
-  duration_ms: 0.227143
+  duration_ms: 0.265559
   type: 'test'
   ...
 # Subtest: empty input reports no difference
 ok 16 - empty input reports no difference
   ---
-  duration_ms: 0.161645
+  duration_ms: 0.176029
   type: 'test'
   ...
 # Subtest: one unknown name and one unused row are reported together
 ok 17 - one unknown name and one unused row are reported together
   ---
-  duration_ms: 0.24713
+  duration_ms: 0.262982
   type: 'test'
   ...
 # Subtest: private record method: event in first position is read
 ok 18 - private record method: event in first position is read
   ---
-  duration_ms: 1.35586
+  duration_ms: 1.368577
   type: 'test'
   ...
 # Subtest: private record method with filesDir first: event in second position is read
 ok 19 - private record method with filesDir first: event in second position is read
   ---
-  duration_ms: 0.429519
+  duration_ms: 0.410729
   type: 'test'
   ...
 # Subtest: callback field: event position comes from the field type
 ok 20 - callback field: event position comes from the field type
   ---
-  duration_ms: 0.468078
+  duration_ms: 0.472842
   type: 'test'
   ...
 # Subtest: recordEvent method: event in second position is read
 ok 21 - recordEvent method: event in second position is read
   ---
-  duration_ms: 0.58443
+  duration_ms: 0.609321
   type: 'test'
   ...
 # Subtest: the static store writer is not an event-name entry point
 ok 22 - the static store writer is not an event-name entry point
   ---
-  duration_ms: 0.550158
+  duration_ms: 0.482012
   type: 'test'
   ...
 # Subtest: extractEventNames returns file and line for every name
 ok 23 - extractEventNames returns file and line for every name
   ---
-  duration_ms: 0.344793
+  duration_ms: 0.345377
   type: 'test'
   ...
 # Subtest: checkEventNamesWithPositions passes when positions match
 ok 24 - checkEventNamesWithPositions passes when positions match
   ---
-  duration_ms: 0.298108
+  duration_ms: 0.289161
   type: 'test'
   ...
 # Subtest: checkEventNamesWithPositions reports wrong line
 ok 25 - checkEventNamesWithPositions reports wrong line
   ---
-  duration_ms: 0.167638
+  duration_ms: 0.167794
   type: 'test'
   ...
 # Subtest: checkEventNamesWithPositions reports wrong file
 ok 26 - checkEventNamesWithPositions reports wrong file
   ---
-  duration_ms: 0.141502
+  duration_ms: 0.148739
   type: 'test'
   ...
 # Subtest: checkEventNamesWithPositions keeps first occurrence when name repeats
 ok 27 - checkEventNamesWithPositions keeps first occurrence when name repeats
   ---
-  duration_ms: 0.121176
+  duration_ms: 0.132273
   type: 'test'
   ...
-# (node:908742) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893980) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a mounted detail sheet reads a fresh LocalSend result despite its captured old peer
 ok 28 - a mounted detail sheet reads a fresh LocalSend result despite its captured old peer
   ---
-  duration_ms: 1.058138
+  duration_ms: 1.002993
   type: 'test'
   ...
 # Subtest: current peer presence and VPN connection override an old available service
 ok 29 - current peer presence and VPN connection override an old available service
   ---
-  duration_ms: 0.247677
+  duration_ms: 0.298262
   type: 'test'
   ...
 # Subtest: fresh and already-patched checkouts build and copy both outputs
 ok 30 - fresh and already-patched checkouts build and copy both outputs
   ---
-  duration_ms: 65.891667
+  duration_ms: 65.384027
   type: 'test'
   ...
 # Subtest: unrelated dirty files do not suppress the required Tailscale patch
 ok 31 - unrelated dirty files do not suppress the required Tailscale patch
   ---
-  duration_ms: 41.360064
+  duration_ms: 53.133359
   type: 'test'
   ...
 # Subtest: conflicting patch stops before compiling and preserves the source
 ok 32 - conflicting patch stops before compiling and preserves the source
   ---
-  duration_ms: 29.241711
+  duration_ms: 25.148435
   type: 'test'
   ...
 # Subtest: Release and unknown products are rejected before any build or signing
 ok 33 - Release and unknown products are rejected before any build or signing
   ---
-  duration_ms: 22.997604
+  duration_ms: 23.327183
   type: 'test'
   ...
 # Subtest: Debug uses the project directory, wrapper, and explicit debug flags
 ok 34 - Debug uses the project directory, wrapper, and explicit debug flags
   ---
-  duration_ms: 27.784739
+  duration_ms: 27.68644
   type: 'test'
   ...
-# (node:908749) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893987) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a transient relay cache expires so a later direct response can replace it
 ok 35 - a transient relay cache expires so a later direct response can replace it
   ---
-  duration_ms: 1.924885
+  duration_ms: 3.479073
   type: 'test'
   ...
 # Subtest: disconnect overrides a previously cached direct path
 ok 36 - disconnect overrides a previously cached direct path
   ---
-  duration_ms: 0.900599
+  duration_ms: 1.284637
   type: 'test'
   ...
-# (node:908760) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1893993) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: an online peer with a failed old probe stays in the online group and shows recovery
 ok 37 - an online peer with a failed old probe stays in the online group and shows recovery
   ---
-  duration_ms: 2.654883
+  duration_ms: 2.586909
   type: 'test'
   ...
 # Subtest: offline then online invalidates pending results and lets the same VPN session rediscover services
 ok 38 - offline then online invalidates pending results and lets the same VPN session rediscover services
   ---
-  duration_ms: 1.192731
+  duration_ms: 1.150146
   type: 'test'
   ...
 # Subtest: a busy old service request does not consume the reconnect discovery attempt
 ok 39 - a busy old service request does not consume the reconnect discovery attempt
   ---
-  duration_ms: 0.948947
+  duration_ms: 0.879466
   type: 'test'
   ...
 # Subtest: a slow service response cannot overwrite a more recent recovered path
 ok 40 - a slow service response cannot overwrite a more recent recovered path
   ---
-  duration_ms: 0.897118
+  duration_ms: 0.907902
   type: 'test'
   ...
 # Subtest: an obsolete home probe cannot reintroduce a path after offline
 ok 41 - an obsolete home probe cannot reintroduce a path after offline
   ---
-  duration_ms: 1.257859
+  duration_ms: 1.263321
   type: 'test'
   ...
 # Subtest: an obsolete home probe cannot reintroduce a path after new_session
 ok 42 - an obsolete home probe cannot reintroduce a path after new_session
   ---
-  duration_ms: 2.35044
+  duration_ms: 2.489624
   type: 'test'
   ...
 # Subtest: an obsolete home probe cannot reintroduce a path after new_lifecycle
 ok 43 - an obsolete home probe cannot reintroduce a path after new_lifecycle
   ---
-  duration_ms: 0.8878
+  duration_ms: 0.893553
   type: 'test'
   ...
 # Subtest: an obsolete home probe cannot reintroduce a path after cancelled
 ok 44 - an obsolete home probe cannot reintroduce a path after cancelled
   ---
-  duration_ms: 0.877614
+  duration_ms: 0.867739
   type: 'test'
   ...
 # Subtest: an obsolete home probe cannot reintroduce a path after removed
 ok 45 - an obsolete home probe cannot reintroduce a path after removed
   ---
-  duration_ms: 1.02218
+  duration_ms: 1.089974
   type: 'test'
   ...
 # Subtest: home polling retries an online peer despite an old unreachable path
 ok 46 - home polling retries an online peer despite an old unreachable path
   ---
-  duration_ms: 1.128754
+  duration_ms: 1.38795
   type: 'test'
   ...
 # Subtest: equal key sets report no difference
 ok 47 - equal key sets report no difference
   ---
-  duration_ms: 1.239272
+  duration_ms: 1.495469
   type: 'test'
   ...
 # Subtest: a key only in base is reported as only in base
 ok 48 - a key only in base is reported as only in base
   ---
-  duration_ms: 0.332336
+  duration_ms: 0.377244
   type: 'test'
   ...
 # Subtest: a key only in zh_CN is reported as only in zh_CN
 ok 49 - a key only in zh_CN is reported as only in zh_CN
   ---
-  duration_ms: 0.204687
+  duration_ms: 0.232981
   type: 'test'
   ...
 # Subtest: a key on each side reports one difference per side
 ok 50 - a key on each side reports one difference per side
   ---
-  duration_ms: 0.215463
+  duration_ms: 0.247658
   type: 'test'
   ...
 # Subtest: empty documents report no crash and no difference
 ok 51 - empty documents report no crash and no difference
   ---
-  duration_ms: 0.187857
+  duration_ms: 0.235688
   type: 'test'
   ...
 # Subtest: an empty string member reports no difference
 ok 52 - an empty string member reports no difference
   ---
-  duration_ms: 0.124923
+  duration_ms: 0.147331
   type: 'test'
   ...
 # Subtest: an entry without a name is ignored
 ok 53 - an entry without a name is ignored
   ---
-  duration_ms: 0.177137
+  duration_ms: 0.237155
   type: 'test'
   ...
-# (node:908773) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894012) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: every non-user end is recorded with a controlled reason
 ok 54 - every non-user end is recorded with a controlled reason
   ---
-  duration_ms: 61.316195
+  duration_ms: 57.921635
   type: 'test'
   ...
 # Subtest: the ledger survives probe noise and bounds itself
 ok 55 - the ledger survives probe noise and bounds itself
   ---
-  duration_ms: 719.535262
+  duration_ms: 716.436963
   type: 'test'
   ...
 # Subtest: a writer compacts only its own file
 ok 56 - a writer compacts only its own file
   ---
-  duration_ms: 380.067597
+  duration_ms: 406.584948
   type: 'test'
   ...
 # Subtest: duplicate end records are written once
 ok 57 - duplicate end records are written once
   ---
-  duration_ms: 2.554881
+  duration_ms: 2.647805
   type: 'test'
   ...
 # Subtest: the ledger never stores addresses or identity fields
 ok 58 - the ledger never stores addresses or identity fields
   ---
-  duration_ms: 1.299082
+  duration_ms: 1.311077
   type: 'test'
   ...
-# (node:908785) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894019) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: acquires protection in foreground and updates the same system live view with real traffic
 ok 59 - acquires protection in foreground and updates the same system live view with real traffic
   ---
-  duration_ms: 40.025124
+  duration_ms: 51.219076
   type: 'test'
   ...
 # Subtest: protection follows intent, not a single uncertain status read
 ok 60 - protection follows intent, not a single uncertain status read
   ---
-  duration_ms: 3.579807
+  duration_ms: 4.965055
   type: 'test'
   ...
 # Subtest: a disconnect while the intent is connected keeps protection
 ok 61 - a disconnect while the intent is connected keeps protection
   ---
-  duration_ms: 3.761278
+  duration_ms: 3.454836
   type: 'test'
   ...
 # Subtest: a stopped intent releases protection promptly
 ok 62 - a stopped intent releases protection promptly
   ---
-  duration_ms: 2.293525
+  duration_ms: 4.841309
   type: 'test'
   ...
 # Subtest: never starts from stale, future, missing heartbeat or missing TUN evidence
 ok 63 - never starts from stale, future, missing heartbeat or missing TUN evidence
   ---
-  duration_ms: 9.301707
+  duration_ms: 11.808135
   type: 'test'
   ...
 # Subtest: snapshot failure is uncertain and does not immediately revoke protection
 ok 64 - snapshot failure is uncertain and does not immediately revoke protection
   ---
-  duration_ms: 4.273075
+  duration_ms: 3.633225
   type: 'test'
   ...
 # Subtest: user dismissed notification keeps the vpn and re-arms on foreground
 ok 65 - user dismissed notification keeps the vpn and re-arms on foreground
   ---
-  duration_ms: 3.848341
+  duration_ms: 3.16521
   type: 'test'
   ...
 # Subtest: system cancellation retries with exponential backoff
 ok 66 - system cancellation retries with exponential backoff
   ---
-  duration_ms: 4.319628
+  duration_ms: 3.518922
   type: 'test'
   ...
 # Subtest: unrelated cancellation does not discard the VPN task
 ok 67 - unrelated cancellation does not discard the VPN task
   ---
-  duration_ms: 3.876092
+  duration_ms: 3.765551
   type: 'test'
   ...
 # Subtest: a failed start is throttled instead of retried every second
 ok 68 - a failed start is throttled instead of retried every second
   ---
-  duration_ms: 6.352763
+  duration_ms: 5.602084
   type: 'test'
   ...
 # Subtest: cancellation received during start cannot be overwritten by its late result
 ok 69 - cancellation received during start cannot be overwritten by its late result
   ---
-  duration_ms: 2.222455
+  duration_ms: 1.863965
   type: 'test'
   ...
 # Subtest: a stopped intent during start cleans up the late task without publishing
 ok 70 - a stopped intent during start cleans up the late task without publishing
   ---
-  duration_ms: 2.161724
+  duration_ms: 1.704813
   type: 'test'
   ...
 # Subtest: destroy during start cleans up the late successful task
 ok 71 - destroy during start cleans up the late successful task
   ---
-  duration_ms: 1.833733
+  duration_ms: 2.022257
   type: 'test'
   ...
 # Subtest: destroy during notification update serializes cleanup after publish
 ok 72 - destroy during notification update serializes cleanup after publish
   ---
-  duration_ms: 2.224667
+  duration_ms: 2.694507
   type: 'test'
   ...
 # Subtest: reconnect waits for in-flight stop before starting the next task
 ok 73 - reconnect waits for in-flight stop before starting the next task
   ---
-  duration_ms: 1.675621
+  duration_ms: 1.835321
   type: 'test'
   ...
 # Subtest: holds protection through the connect window so the handoff can be answered
 ok 74 - holds protection through the connect window so the handoff can be answered
   ---
-  duration_ms: 1.673917
+  duration_ms: 1.913936
   type: 'test'
   ...
 # Subtest: the connect window needs interface evidence, not just an unrecognised status
 ok 75 - the connect window needs interface evidence, not just an unrecognised status
   ---
-  duration_ms: 3.897594
+  duration_ms: 4.224189
   type: 'test'
   ...
 # Subtest: a fresh connected intent holds protection before any interface evidence
 ok 76 - a fresh connected intent holds protection before any interface evidence
   ---
-  duration_ms: 1.840301
+  duration_ms: 1.976434
   type: 'test'
   ...
 # Subtest: an old connected intent does not start protection on its own
 ok 77 - an old connected intent does not start protection on its own
   ---
-  duration_ms: 1.325696
+  duration_ms: 1.392275
   type: 'test'
   ...
 # Subtest: dismissing the notification in the foreground re-arms protection at once
 ok 78 - dismissing the notification in the foreground re-arms protection at once
   ---
-  duration_ms: 1.644514
+  duration_ms: 1.780718
   type: 'test'
   ...
 # Subtest: a stalled connect window keeps protection while the intent stands
 ok 79 - a stalled connect window keeps protection while the intent stands
   ---
-  duration_ms: 1.617167
+  duration_ms: 1.633825
   type: 'test'
   ...
-# (node:908786) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894028) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a destroyed lifecycle does not keep reporting the command it superseded
 ok 80 - a destroyed lifecycle does not keep reporting the command it superseded
   ---
-  duration_ms: 45.828447
+  duration_ms: 45.855256
   type: 'test'
   ...
 # Subtest: a destroyed lifecycle does not keep reporting a timeout
 ok 81 - a destroyed lifecycle does not keep reporting a timeout
   ---
-  duration_ms: 1.769766
+  duration_ms: 1.67121
   type: 'test'
   ...
 # Subtest: a late completion cannot move the state after a destroyed lifecycle
 ok 82 - a late completion cannot move the state after a destroyed lifecycle
   ---
-  duration_ms: 1.765722
+  duration_ms: 1.685515
   type: 'test'
   ...
 # Subtest: a late timeout cannot move the state after a destroyed lifecycle
 ok 83 - a late timeout cannot move the state after a destroyed lifecycle
   ---
-  duration_ms: 1.61013
+  duration_ms: 1.547952
   type: 'test'
   ...
 # Subtest: a destroyed lifecycle lets the next command start clean
 ok 84 - a destroyed lifecycle lets the next command start clean
   ---
-  duration_ms: 4.936772
+  duration_ms: 1.721922
   type: 'test'
   ...
 # Subtest: invalidation advances the lifecycle generation
 ok 85 - invalidation advances the lifecycle generation
   ---
-  duration_ms: 5.289046
+  duration_ms: 2.949974
   type: 'test'
   ...
 # Subtest: the extension has no approval file and no replacement branch
 ok 86 - the extension has no approval file and no replacement branch
   ---
-  duration_ms: 1.074235
+  duration_ms: 1.381564
   type: 'test'
   ...
 # Subtest: the extension republishes the conflict while it waits for the app
 ok 87 - the extension republishes the conflict while it waits for the app
   ---
-  duration_ms: 0.458496
+  duration_ms: 0.516125
   type: 'test'
   ...
 # Subtest: the app tells the user to disconnect the other VPN
 ok 88 - the app tells the user to disconnect the other VPN
   ---
-  duration_ms: 2.524208
+  duration_ms: 2.663342
   type: 'test'
   ...
 # Subtest: the heartbeat writer mirrors its timestamp to the device log
 ok 89 - the heartbeat writer mirrors its timestamp to the device log
   ---
-  duration_ms: 1.212859
+  duration_ms: 1.154597
   type: 'test'
   ...
 # Subtest: the heartbeat mirror does not widen what the device log discloses
 ok 90 - the heartbeat mirror does not widen what the device log discloses
   ---
-  duration_ms: 0.508349
+  duration_ms: 0.530687
   type: 'test'
   ...
-# (node:908802) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894048) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: uses the current default network, coalesces duplicates, never logs address data
 ok 91 - uses the current default network, coalesces duplicates, never logs address data
   ---
-  duration_ms: 3.457889
+  duration_ms: 5.210305
   type: 'test'
   ...
 # Subtest: replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind
 ok 92 - replays a cellular transition whose timer fires during an in-flight Wi-Fi rebind
   ---
-  duration_ms: 2.798598
+  duration_ms: 3.155918
   type: 'test'
   ...
 # Subtest: discards a stale read when default net changes before properties return
 ok 93 - discards a stale read when default net changes before properties return
   ---
-  duration_ms: 2.491373
+  duration_ms: 1.933673
   type: 'test'
   ...
 # Subtest: same interface on a new Wi-Fi network and address renewal both trigger refresh
 ok 94 - same interface on a new Wi-Fi network and address renewal both trigger refresh
   ---
-  duration_ms: 1.272682
+  duration_ms: 1.774068
   type: 'test'
   ...
 # Subtest: clears the route hint when offline and applies the restored bearer
 ok 95 - clears the route hint when offline and applies the restored bearer
   ---
-  duration_ms: 2.197132
+  duration_ms: 2.601491
   type: 'test'
   ...
 # Subtest: failed native refresh retries without another platform callback
 ok 96 - failed native refresh retries without another platform callback
   ---
-  duration_ms: 1.770591
+  duration_ms: 3.531525
   type: 'test'
   ...
 # Subtest: registration failures retry and do not leak a listener after stop
 ok 97 - registration failures retry and do not leak a listener after stop
   ---
-  duration_ms: 1.785598
+  duration_ms: 3.352952
   type: 'test'
   ...
 # Subtest: stop during native work cancels replay and releases the registered listener
 ok 98 - stop during native work cancels replay and releases the registered listener
   ---
-  duration_ms: 1.167096
+  duration_ms: 1.446126
   type: 'test'
   ...
-# (node:908816) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894051) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: background stops UI probes but keeps the recovery watchdog
 ok 99 - background stops UI probes but keeps the recovery watchdog
   ---
-  duration_ms: 32.49793
+  duration_ms: 48.006561
   type: 'test'
   ...
 # Subtest: screen off slows the extension cadence without breaking freshness
 ok 100 - screen off slows the extension cadence without breaking freshness
   ---
-  duration_ms: 3.693127
+  duration_ms: 8.581353
   type: 'test'
   ...
 # Subtest: a missing or corrupt stage file falls back to active
 ok 101 - a missing or corrupt stage file falls back to active
   ---
-  duration_ms: 11.548726
+  duration_ms: 13.126908
   type: 'test'
   ...
 # Subtest: stage changes are observable
 ok 102 - stage changes are observable
   ---
-  duration_ms: 2.099321
+  duration_ms: 3.495786
   type: 'test'
   ...
 # Subtest: the desktop card refresh slows with the power stage
 ok 103 - the desktop card refresh slows with the power stage
   ---
-  duration_ms: 1.554532
+  duration_ms: 1.640861
   type: 'test'
   ...
-# (node:908824) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894063) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a tunnel that drops well after backgrounding is brought back
 ok 104 - a tunnel that drops well after backgrounding is brought back
   ---
-  duration_ms: 5.084034
+  duration_ms: 3.098106
   type: 'test'
   ...
 # Subtest: a foreground drop is recovered without the ten second settle
 ok 105 - a foreground drop is recovered without the ten second settle
   ---
-  duration_ms: 1.714263
+  duration_ms: 1.721765
   type: 'test'
   ...
 # Subtest: a drop moments after backgrounding is recovered
 ok 106 - a drop moments after backgrounding is recovered
   ---
-  duration_ms: 0.972527
+  duration_ms: 0.833786
   type: 'test'
   ...
 # Subtest: a drop after the user asked to disconnect is not undone
 ok 107 - a drop after the user asked to disconnect is not undone
   ---
-  duration_ms: 0.874711
+  duration_ms: 0.83985
   type: 'test'
   ...
 # Subtest: a deliberate reconnect re-arms recovery
 ok 108 - a deliberate reconnect re-arms recovery
   ---
-  duration_ms: 1.056678
+  duration_ms: 1.395965
   type: 'test'
   ...
 # Subtest: recovery never exhausts while the user keeps the intent
 ok 109 - recovery never exhausts while the user keeps the intent
   ---
-  duration_ms: 1.317634
+  duration_ms: 1.172909
   type: 'test'
   ...
 # Subtest: retries back off instead of firing on every sample
 ok 110 - retries back off instead of firing on every sample
   ---
-  duration_ms: 1.109078
+  duration_ms: 0.996997
   type: 'test'
   ...
 # Subtest: an unknown state is not treated as a drop
 ok 111 - an unknown state is not treated as a drop
   ---
-  duration_ms: 1.052081
+  duration_ms: 0.902304
   type: 'test'
   ...
 # Subtest: sustained unknown after a connection is a drop
 ok 112 - sustained unknown after a connection is a drop
   ---
-  duration_ms: 1.914402
+  duration_ms: 0.953641
   type: 'test'
   ...
 # Subtest: a fresh connect intent is not a missing-heartbeat drop
 ok 113 - a fresh connect intent is not a missing-heartbeat drop
   ---
-  duration_ms: 1.236318
+  duration_ms: 3.099523
   type: 'test'
   ...
 # Subtest: a stale user-stop record does not label the next session drop
 ok 114 - a stale user-stop record does not label the next session drop
   ---
-  duration_ms: 1.027661
+  duration_ms: 0.822019
   type: 'test'
   ...
 # Subtest: a stale end record still leaves the heartbeat evidence
 ok 115 - a stale end record still leaves the heartbeat evidence
   ---
-  duration_ms: 0.88521
+  duration_ms: 0.767659
   type: 'test'
   ...
 # Subtest: returning to the foreground clears the retry ladder
 ok 116 - returning to the foreground clears the retry ladder
   ---
-  duration_ms: 0.900172
+  duration_ms: 0.781553
   type: 'test'
   ...
 # Subtest: a connection held past the stability window records a recovery
 ok 117 - a connection held past the stability window records a recovery
   ---
-  duration_ms: 0.809464
+  duration_ms: 0.709294
   type: 'test'
   ...
 # Subtest: a stop requested while a reconnect is in flight undoes the connect
 ok 118 - a stop requested while a reconnect is in flight undoes the connect
   ---
-  duration_ms: 1.057238
+  duration_ms: 0.912901
   type: 'test'
   ...
 # Subtest: a sign-in prompt stops retries until the user acts
 ok 119 - a sign-in prompt stops retries until the user acts
   ---
-  duration_ms: 0.812644
+  duration_ms: 0.729831
   type: 'test'
   ...
 # Subtest: a connect from the page clears the sign-in wait
 ok 120 - a connect from the page clears the sign-in wait
   ---
-  duration_ms: 0.833091
+  duration_ms: 0.76888
   type: 'test'
   ...
 # Subtest: a stop written only to the intent supersedes an in-flight reconnect
 ok 121 - a stop written only to the intent supersedes an in-flight reconnect
   ---
-  duration_ms: 1.13866
+  duration_ms: 1.734035
   type: 'test'
   ...
 # Subtest: a card reconnect supersedes an in-flight recovery without stopping the tunnel
 ok 122 - a card reconnect supersedes an in-flight recovery without stopping the tunnel
   ---
-  duration_ms: 1.648901
+  duration_ms: 0.726087
   type: 'test'
   ...
 # Subtest: a connect that cancelled itself is not undone
 ok 123 - a connect that cancelled itself is not undone
   ---
-  duration_ms: 1.012541
+  duration_ms: 0.699358
   type: 'test'
   ...
 # Subtest: a reconnect that finishes with no stop is left alone
 ok 124 - a reconnect that finishes with no stop is left alone
   ---
-  duration_ms: 1.125799
+  duration_ms: 0.748836
   type: 'test'
   ...
 # Subtest: the supervisor hands the controller a positive authority token
 ok 125 - the supervisor hands the controller a positive authority token
   ---
-  duration_ms: 0.929779
+  duration_ms: 0.738405
   type: 'test'
   ...
 # Subtest: network loss defers recovery until the network returns
 ok 126 - network loss defers recovery until the network returns
   ---
-  duration_ms: 1.139287
+  duration_ms: 0.946561
   type: 'test'
   ...
 # Subtest: a VPN conflict is recorded as a system stop and does not retry
 ok 127 - a VPN conflict is recorded as a system stop and does not retry
   ---
-  duration_ms: 0.961474
+  duration_ms: 0.781913
   type: 'test'
   ...
 # Subtest: an intent that is stopped never recovers on a network callback
 ok 128 - an intent that is stopped never recovers on a network callback
   ---
-  duration_ms: 0.857016
+  duration_ms: 0.763683
   type: 'test'
   ...
-# (node:908828) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894070) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a headless connect answers the extension backend handoff
 ok 129 - a headless connect answers the extension backend handoff
   ---
-  duration_ms: 4.266256
+  duration_ms: 5.442907
   type: 'test'
   ...
 # Subtest: the handoff answer keeps polling while no request has arrived
 ok 130 - the handoff answer keeps polling while no request has arrived
   ---
-  duration_ms: 0.958719
+  duration_ms: 1.143461
   type: 'test'
   ...
 # Subtest: a backend that cannot be stopped still releases the extension
 ok 131 - a backend that cannot be stopped still releases the extension
   ---
-  duration_ms: 0.973461
+  duration_ms: 1.217436
   type: 'test'
   ...
 # Subtest: a malformed handoff request is cleared, not answered
 ok 132 - a malformed handoff request is cleared, not answered
   ---
-  duration_ms: 0.879707
+  duration_ms: 1.109968
   type: 'test'
   ...
 # Subtest: a stale request id is refused instead of confirming the handoff
 ok 133 - a stale request id is refused instead of confirming the handoff
   ---
-  duration_ms: 0.836975
+  duration_ms: 1.017539
   type: 'test'
   ...
 # Subtest: a connect that is already up never starts or stops anything
 ok 134 - a connect that is already up never starts or stops anything
   ---
-  duration_ms: 0.767892
+  duration_ms: 0.861228
   type: 'test'
   ...
 # Subtest: a connect that lost its authority never starts the extension
 ok 135 - a connect that lost its authority never starts the extension
   ---
-  duration_ms: 0.683406
+  duration_ms: 0.930703
   type: 'test'
   ...
 # Subtest: a connect that lost its authority leaves the user intent alone
 ok 136 - a connect that lost its authority leaves the user intent alone
   ---
-  duration_ms: 0.493112
+  duration_ms: 0.819732
   type: 'test'
   ...
 # Subtest: a connect that keeps its authority still starts the extension
 ok 137 - a connect that keeps its authority still starts the extension
   ---
-  duration_ms: 1.243465
+  duration_ms: 2.239058
   type: 'test'
   ...
 # Subtest: a stop after the backend wait cancels the connect
 ok 138 - a stop after the backend wait cancels the connect
   ---
-  duration_ms: 0.928601
+  duration_ms: 2.315023
   type: 'test'
   ...
 # Subtest: a headless connect records the user intent before the command
 ok 139 - a headless connect records the user intent before the command
   ---
-  duration_ms: 0.933423
+  duration_ms: 3.26942
   type: 'test'
   ...
 # Subtest: a recovery connect leaves the user intent untouched
 ok 140 - a recovery connect leaves the user intent untouched
   ---
-  duration_ms: 0.526267
+  duration_ms: 0.874144
   type: 'test'
   ...
 # Subtest: a connect during the connect window does not start a second extension
 ok 141 - a connect during the connect window does not start a second extension
   ---
-  duration_ms: 0.703063
+  duration_ms: 0.866564
   type: 'test'
   ...
 # Subtest: a second connect during an uncertain status does not start again
 ok 142 - a second connect during an uncertain status does not start again
   ---
-  duration_ms: 0.663125
+  duration_ms: 0.748679
   type: 'test'
   ...
 # Subtest: an old connected intent does not block a connect during an uncertain status
 ok 143 - an old connected intent does not block a connect during an uncertain status
   ---
-  duration_ms: 0.900413
+  duration_ms: 1.064146
   type: 'test'
   ...
 # Subtest: a user connect cancels when its intent write fails
 ok 144 - a user connect cancels when its intent write fails
   ---
-  duration_ms: 0.684449
+  duration_ms: 0.74109
   type: 'test'
   ...
 # Subtest: a recovery undo leaves the user intent and the stop ledger alone
 ok 145 - a recovery undo leaves the user intent and the stop ledger alone
   ---
-  duration_ms: 0.74603
+  duration_ms: 0.838481
   type: 'test'
   ...
 # Subtest: a user stop writes the intent and one user stop record
 ok 146 - a user stop writes the intent and one user stop record
   ---
-  duration_ms: 0.739375
+  duration_ms: 0.871523
   type: 'test'
   ...
 # Subtest: a recovered session refreshes the snapshot and clears stale traffic
 ok 147 - a recovered session refreshes the snapshot and clears stale traffic
   ---
-  duration_ms: 2.373946
+  duration_ms: 2.986607
   type: 'test'
   ...
 # Subtest: the handoff answer window covers the extension wait budget
 ok 148 - the handoff answer window covers the extension wait budget
   ---
-  duration_ms: 1.009608
+  duration_ms: 0.796067
   type: 'test'
   ...
-# (node:908838) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894073) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: intent is the only writer that changes the desired state
 ok 149 - intent is the only writer that changes the desired state
   ---
-  duration_ms: 57.559576
+  duration_ms: 53.893331
   type: 'test'
   ...
-# (node:908851) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894080) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: 出厂常量下不起 special-scenario，记下原因并回落到 DATA_TRANSFER
 ok 150 - 出厂常量下不起 special-scenario，记下原因并回落到 DATA_TRANSFER
   ---
-  duration_ms: 41.797077
+  duration_ms: 55.48693
   type: 'test'
   ...
 # Subtest: 设备不支持该模式时记 unsupported 并回落
 ok 151 - 设备不支持该模式时记 unsupported 并回落
   ---
-  duration_ms: 4.781394
+  duration_ms: 3.901609
   type: 'test'
   ...
 # Subtest: 授权被拒时记 denied，并把原始 UserAuthResult 带出来
 ok 152 - 授权被拒时记 denied，并把原始 UserAuthResult 带出来
   ---
-  duration_ms: 4.294985
+  duration_ms: 3.743729
   type: 'test'
   ...
 # Subtest: 已授权时起 special-scenario，不再起 DATA_TRANSFER
 ok 153 - 已授权时起 special-scenario，不再起 DATA_TRANSFER
   ---
-  duration_ms: 3.326324
+  duration_ms: 4.947324
   type: 'test'
   ...
 # Subtest: 起任务抛错时记 failed，并把 BusinessError.code 带出来
 ok 154 - 起任务抛错时记 failed，并把 BusinessError.code 带出来
   ---
-  duration_ms: 3.773008
+  duration_ms: 3.941913
   type: 'test'
   ...
 # Subtest: 四条原因记录都写在登记表里，走查读得到
 ok 155 - 四条原因记录都写在登记表里，走查读得到
   ---
-  duration_ms: 0.22171
+  duration_ms: 0.217004
   type: 'test'
   ...
-# (node:908889) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (node:1894124) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: a missing status file is unknown, not disconnected
 ok 156 - a missing status file is unknown, not disconnected
   ---
-  duration_ms: 33.397417
+  duration_ms: 43.914587
   type: 'test'
   ...
 # Subtest: an unreadable status file is unknown
 ok 157 - an unreadable status file is unknown
   ---
-  duration_ms: 1.098771
+  duration_ms: 1.943258
   type: 'test'
   ...
 # Subtest: a running tunnel reports connected with real traffic
 ok 158 - a running tunnel reports connected with real traffic
   ---
-  duration_ms: 1.527691
+  duration_ms: 2.340889
   type: 'test'
   ...
 # Subtest: a heartbeat older than the freshness window is unknown, not healthy
 ok 159 - a heartbeat older than the freshness window is unknown, not healthy
   ---
-  duration_ms: 2.432201
+  duration_ms: 2.705795
   type: 'test'
   ...
 # Subtest: a heartbeat from the future is unknown
 ok 160 - a heartbeat from the future is unknown
   ---
-  duration_ms: 1.532471
+  duration_ms: 1.380181
   type: 'test'
   ...
 # Subtest: a heartbeat without a value is unknown
 ok 161 - a heartbeat without a value is unknown
   ---
-  duration_ms: 1.272792
+  duration_ms: 1.308762
   type: 'test'
   ...
 # Subtest: extension teardown reports disconnected
 ok 162 - extension teardown reports disconnected
   ---
-  duration_ms: 1.383561
+  duration_ms: 1.381375
   type: 'test'
   ...
 # Subtest: an explicit stop reports disconnected
 ok 163 - an explicit stop reports disconnected
   ---
-  duration_ms: 1.287507
+  duration_ms: 1.300331
   type: 'test'
   ...
 # Subtest: a failed extension reports disconnected
 ok 164 - a failed extension reports disconnected
   ---
-  duration_ms: 1.711818
+  duration_ms: 1.831879
   type: 'test'
   ...
 # Subtest: a VPN conflict is flagged on the snapshot
 ok 165 - a VPN conflict is flagged on the snapshot
   ---
-  duration_ms: 1.616077
+  duration_ms: 1.737247
   type: 'test'
   ...
 # Subtest: a failed snapshot read is not treated as a stopped tunnel
 ok 166 - a failed snapshot read is not treated as a stopped tunnel
   ---
-  duration_ms: 1.238681
+  duration_ms: 1.40927
   type: 'test'
   ...
 # Subtest: a pending sign-in reports needs_login
 ok 167 - a pending sign-in reports needs_login
   ---
-  duration_ms: 1.066651
+  duration_ms: 1.222302
   type: 'test'
   ...
 # Subtest: a working tunnel wins over a stale sign-in marker
 ok 168 - a working tunnel wins over a stale sign-in marker
   ---
-  duration_ms: 1.775991
+  duration_ms: 1.979933
   type: 'test'
   ...
 # Subtest: running without a TUN is not connected
 ok 169 - running without a TUN is not connected
   ---
-  duration_ms: 0.842149
+  duration_ms: 1.082673
   type: 'test'
   ...
 # Subtest: the connect window reports connecting
 ok 170 - the connect window reports connecting
   ---
-  duration_ms: 0.674634
+  duration_ms: 0.721713
   type: 'test'
   ...
 # Subtest: a terminal marker wins over a running tunnel
 ok 171 - a terminal marker wins over a running tunnel
   ---
-  duration_ms: 0.637977
+  duration_ms: 0.680505
   type: 'test'
   ...
 # Subtest: the freshness window is the one shared value
 ok 172 - the freshness window is the one shared value
   ---
-  duration_ms: 0.617418
+  duration_ms: 0.666725
   type: 'test'
   ...
 1..172
@@ -1076,7 +1076,7 @@ ok 172 - the freshness window is the one shared value
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1243.925402
+# duration_ms 1278.137253
 
 == 判据检查 ==
 判据检查总账（docs/oracles）
@@ -1099,19 +1099,7 @@ docs/oracles/_ref-index.md 是最新的。
 string keys match: base=657 zh_CN=657
 
 == 诊断事件名登记表 ==
-诊断事件名检查失败。
-未登记的名字（0）：
-已失效的登记行（0）：
-行号不一致的登记行（9）：
-  - diagnostic_crash_simulation_failed: 登记 entry/src/main/ets/components/BridgeStatus.ets:14937，实际 entry/src/main/ets/components/BridgeStatus.ets:14954
-  - diagnostic_crash_simulation_requested: 登记 entry/src/main/ets/components/BridgeStatus.ets:14912，实际 entry/src/main/ets/components/BridgeStatus.ets:14929
-  - diagnostic_crash_simulation_staged: 登记 entry/src/main/ets/components/BridgeStatus.ets:14929，实际 entry/src/main/ets/components/BridgeStatus.ets:14946
-  - diagnostic_first_run_reset_completed: 登记 entry/src/main/ets/components/BridgeStatus.ets:14827，实际 entry/src/main/ets/components/BridgeStatus.ets:14844
-  - diagnostic_first_run_reset_failed: 登记 entry/src/main/ets/components/BridgeStatus.ets:14837，实际 entry/src/main/ets/components/BridgeStatus.ets:14854
-  - diagnostic_first_run_reset_requested: 登记 entry/src/main/ets/components/BridgeStatus.ets:14777，实际 entry/src/main/ets/components/BridgeStatus.ets:14794
-  - diagnostic_vpn_cut_completed: 登记 entry/src/main/ets/components/BridgeStatus.ets:14866，实际 entry/src/main/ets/components/BridgeStatus.ets:14883
-  - diagnostic_vpn_cut_failed: 登记 entry/src/main/ets/components/BridgeStatus.ets:14880，实际 entry/src/main/ets/components/BridgeStatus.ets:14897
-  - diagnostic_vpn_cut_requested: 登记 entry/src/main/ets/components/BridgeStatus.ets:14851，实际 entry/src/main/ets/components/BridgeStatus.ets:14868
+诊断事件名检查通过：235 个名字。
 
 == 审核快照是否跟得上判据 ==
 （调用方要求跳过：它在重建快照本身）

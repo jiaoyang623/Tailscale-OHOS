@@ -353,7 +353,9 @@ E2E 结构化运行日志（`checks/e2e-steps.json`）、报告（`checks/e2e/in
 - 修正：`DiagnosticsReportPanel` 直接读 `diagnosticReportStatus`。样式与 `DiagnosticStatus` 一致。
 - 提交：`11f8b44 fix(ui): refresh the report status line after generation`。
 - 同类风险：其余约 20 处状态行仍按值传参。记 O-6。
-- 宿主检查：172 条通过，0 失败，0 跳过。
+- 附带修正：补丁使文件下移 17 行，9 条诊断事件登记行号失真。
+  `docs/diagnostics/event-names.md` 已更新，235 个名字校验通过。
+- 宿主检查：172 条通过，0 失败，0 跳过。判据 P0 为 0。
 
 ### 最终判定
 

@@ -63,20 +63,20 @@
 | `device_list_scroll_verification_changed` | `enabled ? 'enabled' : 'disabled'` | `entry/src/main/ets/components/BridgeStatus.ets:5348` | UI |
 | `device_list_scroll_verification_clicked` | `peer.key` | `entry/src/main/ets/components/BridgeStatus.ets:5364` | UI |
 | `device_list_scroll_verification_opened` | home | `entry/src/main/ets/components/BridgeStatus.ets:5358` | UI |
-| `diagnostic_crash_simulation_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14937` |
-| `diagnostic_crash_simulation_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14912` |
-| `diagnostic_crash_simulation_staged` | abort | `entry/src/main/ets/components/BridgeStatus.ets:14929` |
-| `diagnostic_first_run_reset_completed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14827` |
-| `diagnostic_first_run_reset_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14837` |
-| `diagnostic_first_run_reset_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14777` |
+| `diagnostic_crash_simulation_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14954` |
+| `diagnostic_crash_simulation_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14929` |
+| `diagnostic_crash_simulation_staged` | abort | `entry/src/main/ets/components/BridgeStatus.ets:14946` |
+| `diagnostic_first_run_reset_completed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14844` |
+| `diagnostic_first_run_reset_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14854` |
+| `diagnostic_first_run_reset_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14794` |
 | `diagnostic_module_changed` | `${feature}_${enabled ? 'enabled' : 'disabled'}` | `entry/src/main/ets/components/BridgeStatus.ets:11244` | UI |
 | `diagnostic_report_failed` | generate | `entry/src/main/ets/components/BridgeStatus.ets:4389` |
 | `diagnostic_report_generated` | share | `entry/src/main/ets/components/BridgeStatus.ets:4378` |
 | `diagnostic_report_requested` | generate | `entry/src/main/ets/components/BridgeStatus.ets:4319` |
 | `diagnostic_share_opened` | system | `entry/src/main/ets/components/BridgeStatus.ets:4383` |
-| `diagnostic_vpn_cut_completed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14866` |
-| `diagnostic_vpn_cut_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14880` |
-| `diagnostic_vpn_cut_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14851` |
+| `diagnostic_vpn_cut_completed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14883` |
+| `diagnostic_vpn_cut_failed` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14897` |
+| `diagnostic_vpn_cut_requested` | diagnostics | `entry/src/main/ets/components/BridgeStatus.ets:14868` |
 | `disconnect_completed` | system | `entry/src/main/ets/components/BridgeStatus.ets:2648` |
 | `disconnect_failed` | system | `entry/src/main/ets/components/BridgeStatus.ets:2665` |
 | `disconnect_requested` | user | `entry/src/main/ets/components/BridgeStatus.ets:2587` |
