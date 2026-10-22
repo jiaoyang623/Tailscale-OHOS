@@ -2,7 +2,7 @@
   "skill_version": "a01",
   "title": "MeshArc 需求层审核 · 用户旅程与判据",
   "scope": "覆盖六个功能区（连接、设备、传输、文件、媒体、隐私设置）的用户旅程、范围与非目标、质量目标与未决项。后续架构/HLD/LLD 层在同一判据库上继续细化。",
-  "baseline": "d681465",
+  "baseline": "7b816f7",
   "stage": "architecture",
   "design": [
     {
@@ -3889,7 +3889,7 @@
       "oracle_ids": [
         "O-SETUP-01"
       ],
-      "evidence": "scripts/e2e/first-run.mjs 跑过：通过 1、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/first-run.mjs 跑过：通过 1、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-SETUP-02-e2e",
@@ -3898,7 +3898,7 @@
       "oracle_ids": [
         "O-SETUP-02"
       ],
-      "evidence": "scripts/e2e/control-server.mjs 跑过：通过 0、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/control-server.mjs 跑过：通过 0、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-SETUP-03-e2e",
@@ -3907,7 +3907,7 @@
       "oracle_ids": [
         "O-SETUP-03"
       ],
-      "evidence": "scripts/e2e/browser-login.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/browser-login.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-SETUP-04-e2e",
@@ -3916,7 +3916,7 @@
       "oracle_ids": [
         "O-SETUP-04"
       ],
-      "evidence": "scripts/e2e/logout.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/logout.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-01-e2e",
@@ -3925,11 +3925,11 @@
       "oracle_ids": [
         "O-CONN-01"
       ],
-      "evidence": "scripts/e2e/connect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/connect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-CONN-02-e2e",
@@ -3938,11 +3938,11 @@
       "oracle_ids": [
         "O-CONN-02"
       ],
-      "evidence": "scripts/e2e/disconnect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/disconnect-journey.mjs 跑过：通过 5、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-CONN-03-e2e",
@@ -3951,7 +3951,7 @@
       "oracle_ids": [
         "O-CONN-03"
       ],
-      "evidence": "scripts/e2e/connect-window-background.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/connect-window-background.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-04-e2e",
@@ -3960,7 +3960,7 @@
       "oracle_ids": [
         "O-CONN-04"
       ],
-      "evidence": "scripts/e2e/background-reconnect.mjs 跑过：通过 2、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/background-reconnect.mjs 跑过：通过 2、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-08-e2e",
@@ -3969,11 +3969,11 @@
       "oracle_ids": [
         "O-CONN-08"
       ],
-      "evidence": "scripts/e2e/endurance-recovery.mjs 跑过：通过 1、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/endurance-recovery.mjs 跑过：通过 1、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-CONN-09-e2e",
@@ -3982,7 +3982,7 @@
       "oracle_ids": [
         "O-CONN-09"
       ],
-      "evidence": "scripts/e2e/network-recovery.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/network-recovery.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-05-e2e",
@@ -3991,7 +3991,7 @@
       "oracle_ids": [
         "O-CONN-05"
       ],
-      "evidence": "scripts/e2e/vpn-conflict.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/vpn-conflict.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-06",
@@ -4009,7 +4009,7 @@
       "oracle_ids": [
         "O-CONN-07"
       ],
-      "evidence": "scripts/e2e/headless-connect.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/headless-connect.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CONN-07",
@@ -4027,11 +4027,11 @@
       "oracle_ids": [
         "O-NET-01"
       ],
-      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-NET-02-e2e",
@@ -4040,11 +4040,11 @@
       "oracle_ids": [
         "O-NET-02"
       ],
-      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/network-settings.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-NET-03",
@@ -4062,7 +4062,7 @@
       "oracle_ids": [
         "O-NET-04"
       ],
-      "evidence": "scripts/e2e/network-recovery.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/network-recovery.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-DEV-01-e2e",
@@ -4071,11 +4071,11 @@
       "oracle_ids": [
         "O-DEV-01"
       ],
-      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-DEV-02-e2e",
@@ -4084,37 +4084,29 @@
       "oracle_ids": [
         "O-DEV-02"
       ],
-      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/devices-journey.mjs 跑过：通过 2、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-XFER-01-e2e",
       "level": "e2e",
-      "status": "fail",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-01"
       ],
-      "evidence": "scripts/e2e/taildrop-send.mjs 跑过：通过 1、跳过 2、失败 1；运行 20261022T142520",
-      "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
-      "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "evidence": "scripts/e2e/taildrop-send.mjs 跑过：通过 2、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-XFER-02-e2e",
       "level": "e2e",
-      "status": "fail",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-XFER-02"
       ],
-      "evidence": "scripts/e2e/taildrop-text.mjs 跑过：通过 0、跳过 4、失败 1；运行 20261022T142520",
-      "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
-      "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "evidence": "scripts/e2e/taildrop-text.mjs 跑过：通过 1、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-XFER-03-e2e",
@@ -4123,7 +4115,7 @@
       "oracle_ids": [
         "O-XFER-03"
       ],
-      "evidence": "scripts/e2e/meshsend-dual-channel.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/meshsend-dual-channel.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-XFER-04-e2e",
@@ -4132,7 +4124,7 @@
       "oracle_ids": [
         "O-XFER-04"
       ],
-      "evidence": "scripts/e2e/taildrop-receive.mjs 跑过：通过 1、跳过 7、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/taildrop-receive.mjs 跑过：通过 1、跳过 7、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-XFER-05-e2e",
@@ -4141,20 +4133,16 @@
       "oracle_ids": [
         "O-XFER-05"
       ],
-      "evidence": "scripts/e2e/taildrop-history.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/taildrop-history.mjs 跑过：通过 0、跳过 4、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-DRIVE-01-e2e",
       "level": "e2e",
-      "status": "fail",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-DRIVE-01"
       ],
-      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 20261022T142520",
-      "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
-      "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-DRIVE-01",
@@ -4168,15 +4156,11 @@
     {
       "id": "T-O-DRIVE-02-e2e",
       "level": "e2e",
-      "status": "fail",
+      "status": "not_evaluated",
       "oracle_ids": [
         "O-DRIVE-02"
       ],
-      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 1、失败 1；运行 20261022T142520",
-      "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
-      "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "evidence": "scripts/e2e/taildrive-browser.mjs 跑过：通过 0、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-DRIVE-02",
@@ -4203,7 +4187,7 @@
       "oracle_ids": [
         "O-MEDIA-02"
       ],
-      "evidence": "scripts/e2e/media-launch.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/media-launch.mjs 跑过：通过 0、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-PRIV-01-e2e",
@@ -4212,7 +4196,7 @@
       "oracle_ids": [
         "O-PRIV-01"
       ],
-      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 3、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 3、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-PRIV-02-e2e",
@@ -4221,7 +4205,7 @@
       "oracle_ids": [
         "O-PRIV-02"
       ],
-      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 3、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/security-locks.mjs 跑过：通过 3、跳过 2、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-DIAG-01-e2e",
@@ -4230,11 +4214,11 @@
       "oracle_ids": [
         "O-DIAG-01"
       ],
-      "evidence": "scripts/e2e/diagnostics-report.mjs 跑过：通过 7、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/diagnostics-report.mjs 跑过：通过 7、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-DIAG-02-e2e",
@@ -4243,11 +4227,11 @@
       "oracle_ids": [
         "O-DIAG-02"
       ],
-      "evidence": "scripts/e2e/endurance-recovery.mjs 跑过：通过 1、跳过 0、失败 0；运行 20261022T142520",
+      "evidence": "scripts/e2e/endurance-recovery.mjs 跑过：通过 1、跳过 0、失败 0；运行 20261022T181634",
       "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "HarmonyOS 设备 2LQGK24828000076，hdc",
-      "executed_at": "20261022T142520"
+      "executed_at": "20261022T181634"
     },
     {
       "id": "T-O-DIAG-02-uni",
@@ -4258,9 +4242,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-session-ledger.mjs::the ledger never stores addresses or identity fields",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-UI-01-e2e",
@@ -4269,7 +4253,7 @@
       "oracle_ids": [
         "O-UI-01"
       ],
-      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-UI-02-e2e",
@@ -4278,7 +4262,7 @@
       "oracle_ids": [
         "O-UI-02"
       ],
-      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CARD-01-e2e",
@@ -4287,7 +4271,7 @@
       "oracle_ids": [
         "O-CARD-01"
       ],
-      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/navigation-shell.mjs 跑过：通过 9、跳过 3、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-CARD-01",
@@ -4305,7 +4289,7 @@
       "oracle_ids": [
         "O-BUILD-00"
       ],
-      "evidence": "scripts/e2e/build-journey.mjs 跑过：通过 2、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T142520"
+      "evidence": "scripts/e2e/build-journey.mjs 跑过：通过 2、跳过 1、失败 0（有跳过，跳过不算通过）；运行 20261022T181634"
     },
     {
       "id": "T-O-SEAM-01",
@@ -4343,9 +4327,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/status-vocabulary.mjs::both readers give the same answer for every status line",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-SEAM-04",
@@ -4437,9 +4421,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 [集成] scripts/integration/session-ledger-seam.mjs::two writers append to one ledger and neither rewrite drops the other record",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-SEAM-13",
@@ -4459,9 +4443,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/persistence-ownership.mjs::半写配置回落未配置态且偏好缺键取默认",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-SEAM-17",
@@ -4481,9 +4465,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/integration/diagnostic-redaction.mjs::两进程落盘文本共用脱敏边界且超限淘汰最旧",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-SEAM-16",
@@ -4503,9 +4487,9 @@
       ],
       "evidence": "run-checks.sh 全绿；锚点 scripts/test-vpn-conflict-contract.mjs::the extension has no approval file and no replacement branch",
       "command": "scripts/run-checks.sh",
-      "baseline": "d681465",
+      "baseline": "7b816f7",
       "environment": "Linux, Node v22.23.2; 172 tests, pass 172, fail 0",
-      "executed_at": "2026-10-22T15:36:34+11:00"
+      "executed_at": "2026-10-22T19:10:40+11:00"
     },
     {
       "id": "T-O-SEAM-18",
