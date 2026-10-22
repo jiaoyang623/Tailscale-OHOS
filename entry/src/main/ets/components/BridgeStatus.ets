@@ -12365,8 +12365,25 @@ export struct BridgeStatus {
       this.DiagnosticSectionHeader($r('app.string.diagnostic_report_title'),
         $r('app.string.diagnostic_report_description'))
       if (this.diagnosticReportStatus.length > 0) {
-        this.DiagnosticStatus($r('app.string.diagnostic_report_title'),
-          this.diagnosticReportStatus, 'diagnostic-report-status')
+        // 状态行直接读状态变量。DiagnosticStatus 按值传参，第二次赋值不刷新 UI。
+        Column({ space: 2 }) {
+          Text($r('app.string.diagnostic_report_title'))
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_secondary'))
+            .width('100%')
+          Text(this.diagnosticReportStatus)
+            .id('diagnostic-report-status')
+            .fontSize(14)
+            .fontColor(this.diagnosticReportStatus.startsWith('FAILED') ?
+              $r('app.color.status_error') : $r('sys.color.font_primary'))
+            .maxLines(3)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .lineHeight(20)
+            .width('100%')
+        }
+        .width('100%')
+        .padding({ top: 7, bottom: 7 })
       }
       this.StandardActionButton($r('app.string.diagnostic_report_action'),
         'diagnostic-report-generate', true, !this.diagnosticReportInProgress,
