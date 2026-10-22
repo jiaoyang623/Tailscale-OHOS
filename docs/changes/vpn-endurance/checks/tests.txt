@@ -1,12 +1,12 @@
 # 测试报告（宿主侧）
 
-- 命令：SKIP_REVIEW_FRESHNESS=1 scripts/run-checks.sh
-- 时间：2026-10-22T13:56:37+1100
-- 基线：73a46ff
+- 命令：scripts/run-checks.sh（全量，不跳过新鲜度检查）
+- 时间：2026-10-22T15:36:49+1100
+- 基线：d681465
 - 用例数：172
 - 通过：172
 - 失败：0
-- 日志：`checks/run-checks-73a46ff.log`
+- 日志：`checks/run-checks-final.log`
 
 ```text
 1..172
@@ -17,8 +17,17 @@
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1278.137253
+# duration_ms 1247.671585
 ```
+
+同一次运行的判据检查：
+
+- 判据 140 条，closed 95 条，闭环率 67.9%，P0 合计 0 条。
+- 资源键一致：base=657，zh_CN=657。
+- 诊断事件名 235 个通过。
+- 审核快照与判据一致。
+- E2E 计划与实际一致，公共件来源 28 个文件通过。
+- 退出码 0。
 
 ## 本次新增
 
