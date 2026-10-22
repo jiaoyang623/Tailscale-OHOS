@@ -188,14 +188,20 @@ async function ensureConnected() {
 }
 
 // 扩展写快照要等它跑完一轮。轮询到能解析为止。
-async function waitForSnapshot(timeoutMs = 60000) {
+// 快照文件一出现就读到 loading。等 ready 再返回：扩展重启后要几十秒才就绪。
+// 超时仍未就绪时返回最后一次读到的快照，让断言带上真实状态。
+async function waitForSnapshot(timeoutMs = 90000) {
   const deadline = Date.now() + timeoutMs;
+  let last;
   while (Date.now() < deadline) {
     const data = snapshot();
-    if (data !== undefined && Array.isArray(data.targets)) { return data; }
+    if (data !== undefined && Array.isArray(data.targets)) {
+      last = data;
+      if (String(data.state || '') === 'ready') { return data; }
+    }
     await pause(2000);
   }
-  return undefined;
+  return last;
 }
 
 function countOf(pattern) {
