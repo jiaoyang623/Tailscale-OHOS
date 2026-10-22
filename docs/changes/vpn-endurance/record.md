@@ -126,7 +126,7 @@
 | 需求、架构、HLD、LLD 的修订 | 各自既有文档的修订节 |
 | 判据增量 | `docs/oracles/` 既有文件的修订节与新增条目 |
 | 审核快照与网页 | `docs/review/<层>/` |
-| E2E 与真机证据 | `docs/changes/vpn-endurance/e2e-results.json`、`device-runs/` |
+| E2E 与真机证据 | `docs/changes/vpn-endurance/checks/e2e-steps.json`、`checks/e2e/`、`checks/device-run.txt`、`docs/changes/a01-baseline/e2e-results.json` |
 
 ## 层进度
 
