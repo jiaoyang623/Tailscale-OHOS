@@ -357,6 +357,23 @@ E2E 结构化运行日志（`checks/e2e-steps.json`）、报告（`checks/e2e/in
   `docs/diagnostics/event-names.md` 已更新，235 个名字校验通过。
 - 宿主检查：172 条通过，0 失败，0 跳过。判据 P0 为 0。
 
+### 全量设备批次（2026-10-22 14:25）
+
+- 设备：2LQGK24828000076 / ALN-AL00 / API 26。HAP 35934430 字节，14:12 构建。
+- 命令：`scripts/e2e/run-batch.sh` 28 个文件。基线 d681465。
+- 报告：10 条用例通过 7、失败 0、跳过 3。基线 d681465。HTTP 200。
+- diagnostics-report：7 条通过，0 失败，0 跳过。上一批为 4 通过、2 失败、1 跳过。
+  两条失败都已修：生成按钮不可达、状态行不刷新。
+- endurance-recovery：1 条通过，0 失败，0 跳过。上一批为跳过。
+  通道是应用诊断动作「手动切断系统 VPN 连接」。旧会话记 extension_destroyed，
+  新会话 state=Running，没有 user_stop。
+- 跳过 3 条：后台非主动掉线、卡片点击、断网恢复。原因见 O-2。
+- 批次内 24 个文件无失败。复跑 endurance-recovery 后为 25 个。
+  环境受限的失败：taildrive-browser、taildrop-text。
+- taildrop-send：前置检查读到 taildrop=loading，40 秒未到 ready。
+  设备日志显示扩展在检查窗口内重启，随后 taildrop 回到 ready。
+  用例已改为等 ready 再判定，复跑结果见 `checks/device-run.txt`。
+
 ### 最终判定
 
 最终代码状态修复了两个用户报告的缺陷。按 a01 完成条件，本批次判 `incomplete`。
