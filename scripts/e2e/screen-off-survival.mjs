@@ -34,7 +34,7 @@ let beforeSuspendEvidence = null;
 
 const run = createRun({
   suite: 'screen-off-survival',
-  title: '锁屏 720 秒后台存活',
+  title: `锁屏 ${DURATION_MS / 1000} 秒后台存活`,
   command: `DEVICE=${process.env.DEVICE || '<序列号>'} node --test scripts/e2e/screen-off-survival.mjs`,
   environment: deviceEnvironment(),
   notice: '本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。'
@@ -114,13 +114,13 @@ test('锁屏存活：先连上隧道', async (t) => {
   }
 });
 
-test('锁屏存活：720 秒静置期间心跳不断', { timeout: DURATION_MS + 180000 }, async (t) => {
+test(`锁屏存活：${DURATION_MS / 1000} 秒静置期间心跳不断`, { timeout: DURATION_MS + 180000 }, async (t) => {
   if (!configured) {
-    run.case('SURV-SCREEN-OFF', '锁屏 720 秒静置期间心跳不断', ['O-CONN-06']).skip('未登录，跳过');
+    run.case('SURV-SCREEN-OFF', `锁屏 ${DURATION_MS / 1000} 秒静置期间心跳不断`, ['O-CONN-06']).skip('未登录，跳过');
     t.skip('未登录，跳过');
     return;
   }
-  const record = run.case('SURV-SCREEN-OFF', '锁屏 720 秒静置期间心跳不断', ['O-CONN-06']);
+  const record = run.case('SURV-SCREEN-OFF', `锁屏 ${DURATION_MS / 1000} 秒静置期间心跳不断`, ['O-CONN-06']);
   const wait = record.step({
     id: 'S1', name: '锁屏静置', operation: `power-shell suspend 后等待 ${DURATION_MS / 1000} 秒并唤醒`,
     expected: ['设备进入锁屏', '到点后唤醒成功']
