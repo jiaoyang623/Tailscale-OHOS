@@ -1,13 +1,24 @@
 # Debug 构建记录
 
 - 命令：sudo -n -u w2h bash .build/compile.sh
-- 时间：2026-10-20T22:45:44+1100
-- 基线：ec64476（工作树有本批次未提交改动）
+- 时间：2026-10-22T13:20:15+1100
+- 基线：73a46ff
 - 结果：BUILD SUCCESSFUL
-- 产物：entry/build/default/outputs/default/entry-default-signed.hap（35928034 字节）
+- 产物：entry/build/default/outputs/default/entry-default-signed.hap（35934424 字节）
+- 日志：`checks/build-73a46ff.log`
 
 ```text
-> hvigor BUILD SUCCESSFUL in 7 s 48 ms
--rw-rw-r-- 1 w2h users 35928034 Oct 20 22:45 entry-default-signed.hap
+> hvigor BUILD SUCCESSFUL in 7 s 167 ms
+-rw-rw-r-- 1 w2h users 35934424 Oct 22 13:20 entry-default-signed.hap
 exit=0
 ```
+
+## 本次改动
+
+- `components/BridgeStatus.ets`：诊断报告状态行直接读状态变量。
+- `scripts/e2e/lib/device.mjs`：`scrollToId` 每次滑动后复查。
+- `scripts/e2e/lib/merge-steps.mjs`：合并日志写明覆盖范围。
+
+## 构建警告
+
+- 全部为既有 ArkTS 警告，本次改动未新增警告类别。

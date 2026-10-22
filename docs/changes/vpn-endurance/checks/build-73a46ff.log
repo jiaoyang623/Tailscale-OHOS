@@ -1,0 +1,402 @@
+### stage 1/2: Go bridge -> libtailscale_go.so
+Patch already applied: /opt/git/github/mesharc/patches/ohos-go-interface-resources.patch
+Patch already applied: /opt/git/github/mesharc/patches/tailscale-ohos.patch
+Built: /opt/git/github/mesharc/native/go_bridge/dist/arm64-v8a/libtailscale_go.so
+### stage 2/2: hvigor assembleHap
+> hvigor [32mUP-TO-DATE :entry:default@PreBuild...  [39m
+> hvigor [32mUP-TO-DATE :common:default@PreBuild...  [39m
+> hvigor [32mFinished :entry:default@CreateModuleInfo... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@GenerateMetadata...  [39m
+> hvigor [32mFinished :entry:default@PreCheckSyscap... after 1 ms [39m
+> hvigor [32mFinished :entry:default@GeneratePkgSdkInfo... after 1 ms [39m
+> hvigor [32mFinished :entry:default@ProcessIntegratedHsp... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :common:default@CreateHarBuildProfile...  [39m
+> hvigor [32mFinished :common:default@ConfigureCmake... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :common:default@MergeProfile...  [39m
+> hvigor [32mFinished :entry:default@SyscapTransform... after 5 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@CreateBuildProfile...  [39m
+> hvigor [32mFinished :common:default@BuildNativeWithCmake... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@MergeProfile...  [39m
+> hvigor [32mFinished :entry:default@ConfigureCmake... after 25 ms [39m
+> hvigor [32mFinished :common:default@BuildNativeWithNinja... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@MakePackInfo...  [39m
+> hvigor [32mFinished :entry:default@BuildNativeWithCmake... after 5 ms [39m
+> hvigor [32mUP-TO-DATE :common:default@ProcessLibs...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@GeneratePkgContextInfo...  [39m
+> hvigor [32mUP-TO-DATE :common:default@DoNativeStrip...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@ProcessProfile...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@ProcessRouterMap...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@ProcessShareConfig...  [39m
+> hvigor [32mFinished :entry:default@ProcessStartupConfig... after 1 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@ProcessResource...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@GenerateLoaderJson...  [39m
+> hvigor [32mUP-TO-DATE :entry:default@CompileResource...  [39m
+> hvigor [32mFinished :entry:default@BuildJS... after 1 ms [39m
+> hvigor [32mFinished :entry:default@BuildNativeWithNinja... after 411 ms [39m
+> hvigor [32mFinished :entry:default@ProcessLibs... after 138 ms [39m
+> hvigor [32mFinished :entry:default@DoNativeStrip... after 70 ms [39m
+> hvigor [32mFinished :entry:default@CacheNativeLibs... after 2 ms [39m
+> hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:124:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:127:38
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:128:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:129:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:132:15
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:135:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/ControlServerConfig.ets:138:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets:311:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/SessionLedger.ets:314:19
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnCommandGateway.ets:1:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnCommandGateway.ets:126:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnCommandGateway.ets:130:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnBackgroundTaskManager.ets:278:46
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnBackgroundTaskManager.ets:293:35
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnBackgroundTaskManager.ets:396:51
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/entryability/EntryAbility.ets:45:21
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/entryability/EntryAbility.ets:50:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/entryability/EntryAbility.ets:95:18
+ This API is unavailable to 2in1.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/entryability/EntryAbility.ets:101:16
+ This API is unavailable to 2in1.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildropNotificationService.ets:130:26
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnNetworkMonitor.ets:3:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnNetworkMonitor.ets:125:56
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnNetworkMonitor.ets:129:69
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnNetworkMonitor.ets:130:71
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/VpnNetworkMonitor.ets:131:60
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/vpnextensionability/TailscaleVpnExtensionAbility.ets:6:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/DiagnosticReportService.ets:264:22
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/DiagnosticReportService.ets:636:21
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/DiagnosticReportService.ets:638:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/DiagnosticReportService.ets:641:16
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/HomeReadOnlyGateway.ets:1:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AccountDiagnosticsGateway.ets:4:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NetworkSettingsGateway.ets:1:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildropSendGateway.ets:12:16
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildropSendGateway.ets:15:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:28:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:29:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:30:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:49:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:50:33
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:54:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/FileTransferPreferences.ets:55:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildriveGateway.ets:267:16
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildriveGateway.ets:270:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildriveGateway.ets:377:21
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildrivePreviewGateway.ets:135:19
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildrivePreviewGateway.ets:136:16
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildrivePreviewGateway.ets:235:25
+ The system capacity of this api 'media' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/TaildrivePreviewGateway.ets:254:9
+ The system capacity of this api 'media' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityAuthenticator.ets:44:55
+ The system capacity of this api 'createRandom' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityAuthenticator.ets:45:12
+ The system capacity of this api 'generateRandomSync' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:32:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:33:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:34:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:38:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:39:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:40:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:44:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:45:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AppSecurityPreferences.ets:46:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:68:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:69:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:70:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:71:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:72:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/AnimationPreferences.ets:73:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/TaildriveBrowser.ets:714:60
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/MoonlightLauncher.ets:49:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/HosPlayerLauncher.ets:36:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:534:41
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:535:41
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:536:41
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:554:47
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:574:47
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:621:16
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/NativeSettingsNavigation.ets:940:10
+ The 'fill' API is supported since SDK version 26.0.0. However, the current compatible SDK version is 6.1.0(23).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/HomeLayoutPreferences.ets:27:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/HomeLayoutPreferences.ets:28:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/HomeLayoutPreferences.ets:29:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NavigationPreferences.ets:47:37
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NavigationPreferences.ets:48:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NavigationPreferences.ets:49:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NavigationPreferences.ets:50:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/services/NavigationPreferences.ets:51:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:1:26
+ Currently module for 'libtailscale_ohos.so' is not verified. If you're importing napi, its verification will be enabled in later SDK version. Please make sure the corresponding .d.ts file is provided and the napis are correctly declared.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:1289:60
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:1353:51
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2227:19
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2812:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2815:38
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2816:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2819:15
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2823:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2894:17
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:2898:12
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:4317:59
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:4390:61
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:7311:19
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:7322:16
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:7323:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:7447:25
+ The system capacity of this api 'media' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:7466:9
+ The system capacity of this api 'media' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:8011:77
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:8047:21
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:8049:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:8050:14
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:9119:25
+ The system capacity of this api 'media' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:9178:15
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:9338:21
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:11356:51
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:14852:61
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:14895:61
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /opt/git/github/mesharc/entry/src/main/ets/components/BridgeStatus.ets:14952:61
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[39m
+> hvigor [32mFinished :entry:default@CompileArkTS... after 4 s 383 ms [39m
+> hvigor [32mUP-TO-DATE :entry:default@GeneratePkgModuleJson...  [39m
+> hvigor [32mFinished :entry:default@ProcessCompiledResources... after 1 ms [39m
+> hvigor [32mFinished :entry:default@PackageHap... after 250 ms [39m
+> hvigor [32mFinished :entry:default@PackingCheck... after 3 ms [39m
+> hvigor [32mFinished :entry:default@SignHap... after 918 ms [39m
+> hvigor [32mFinished :entry:default@CollectDebugSymbol... after 1 ms [39m
+> hvigor [32mFinished :entry:assembleHap... after 1 ms [39m
+> hvigor [32mBUILD SUCCESSFUL in 7 s 167 ms [39m
+### done
+total 69912
+drwxr-sr-x 3 w2h users     4096 Oct 22 13:20 .
+drwxr-sr-x 3 w2h users     4096 Oct 11 13:59 ..
+-rw-rw-r-- 1 w2h users 35934424 Oct 22 13:20 entry-default-signed.hap
+-rw-r--r-- 1 w2h users 35628493 Oct 22 13:20 entry-default-unsigned.hap
+drwxr-sr-x 2 w2h users     4096 Oct 11 13:59 mapping
+-rw-r--r-- 1 w2h users      798 Oct 12 16:28 pack.info
