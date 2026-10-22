@@ -17,7 +17,7 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  HDC, LogStream, clickBottomTab, clickId, forceStop, layoutTexts, startApp, unlockScreen
+  HDC, LogStream, clickBottomTab, clickId, forceStop, layoutTexts, startApp, textOfId, unlockScreen
 } from './lib/device.mjs';
 import { createRun, deviceEnvironment } from './lib/steps.mjs';
 
@@ -96,15 +96,16 @@ test('锁屏存活：先连上隧道', async (t) => {
     id: 'S2', name: '建立隧道', operation: '界面处于未连接时点击连接按钮',
     expected: ['设备日志出现 vpn_connected']
   });
-  const already = layoutTexts().some((line) => line.includes('已连接'));
+  const already = () => layoutTexts().some((line) => line.includes('已连接'));
   try {
-    if (!already) {
+    // 连接状态可能在 before() 之后、这条用例之前改变：上一批留下的恢复会自己连上。
+    // 所以点之前再看一次按钮在不在，不在就按已连接处理，不硬点。
+    if (!already() && textOfId('vpn-connect') !== null) {
       clickId('vpn-connect');
     }
     assert.ok(await log.waitFor(/vpn_connected/, 90000), '连不上，后面的存活测试没有意义');
     connectedEvidence = run.shot('survival-connected', '结果');
-    const line = log.lines.filter((entry) => /vpn_connected/.test(entry)).slice(-1)[0] || '';
-    connect.pass(already ? '应用已处于已连接状态' : '点击连接后出现 vpn_connected',
+    connect.pass(already() ? '应用已处于已连接状态' : '点击连接后出现 vpn_connected',
       { kind: 'ui', screenshots: [connectedEvidence] });
   } catch (error) {
     const evidence = { kind: 'log', output: String((error && error.message) || error) };
