@@ -34,7 +34,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BUNDLE, HDC, LogStream, click, clickId, clickText, forceStop, layout, layoutTexts,
+  BUNDLE, HDC, LogStream, boundsOfId, click, clickId, clickText, forceStop, layout, layoutTexts,
   pressBack, readAppFile, screenshot, serial, startApp, textOfId
 } from './lib/device.mjs';
 
@@ -61,7 +61,6 @@ const SKIP_NO_OPERATOR = '文字编辑器要真人输入。脚本没有输入文
 
 // 界面语言可能是中文或英文。两种都接受。
 const ONLINE_BADGE = /Taildrop 在线|Taildrop online/;
-const TEXT_PLACEHOLDER = /请输入要发送的文字|Enter the text to send/;
 // 暂存成功但读不出内容时给出的失败文案（BridgeStatus.ets:8144 与 :8108）。
 const PREVIEW_FAILED = /无法保存收到的文件|Could not save the received file/;
 
@@ -113,6 +112,20 @@ function nodeOfId(id) {
     if (Array.isArray(node)) { node.forEach(walk); return; }
     if (!node || typeof node !== 'object') { return; }
     if (node.id === id) { hit = node; return; }
+    walk(node.children || []);
+  };
+  walk(layout());
+  return hit;
+}
+
+// 编辑器有没有打开。输入框是 TextArea，没有节点 id；实测布局树里也不带
+// placeholder 文本，所以按节点类型判定，不按占位文字判定。
+function textEditorOpen() {
+  let hit = false;
+  const walk = (node) => {
+    if (Array.isArray(node)) { node.forEach(walk); return; }
+    if (!node || typeof node !== 'object') { return; }
+    if (node.type === 'TextArea') { hit = true; return; }
     walk(node.children || []);
   };
   walk(layout());
@@ -278,23 +291,32 @@ function startWithNotificationSave(file) {
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
-// 点击界面上最后一个文本与给定字符串完全相同的节点。编辑器的发送键排在
-// 目标行的胶囊按钮之后，所以要取最后一个。
-function clickLastExact(text) {
-  let hit;
+// 编辑器的发送键是图标按钮，没有节点 id，也没有文本。
+// 按结构定位：编辑器是包含 TextArea 的 Stack；它的 Row 里有两个 Button，
+// 最后一个是发送键（前一个是关闭）。2026-10-22 实测布局：
+//   Stack [78,1118,1182,1678] → TextArea [117,1131,1143,1639]
+//                            → Row → Button 关闭 [851,1490,968,1607]
+//                                   → Button 发送 [994,1490,1111,1607]
+function clickEditorSend() {
+  let stack = null;
   const walk = (node) => {
     if (Array.isArray(node)) { node.forEach(walk); return; }
     if (!node || typeof node !== 'object') { return; }
-    for (const key of ['text', 'content', 'description']) {
-      if (node[key] === text && Array.isArray(node.bounds)) {
-        hit = [(node.bounds[0] + node.bounds[2]) / 2, (node.bounds[1] + node.bounds[3]) / 2];
-      }
+    if (Array.isArray(node.children) && node.children.some((child) => child && child.type === 'TextArea')) {
+      stack = node;
+      return;
     }
     walk(node.children || []);
   };
   walk(layout());
-  if (hit === undefined) { return false; }
-  click(hit[0], hit[1]);
+  if (stack === null) { return false; }
+  const row = (stack.children || []).find((child) => child && child.type === 'Row');
+  const buttons = row ? (row.children || []).filter((child) => child && child.type === 'Button') : [];
+  if (buttons.length === 0) { return false; }
+  const send = buttons[buttons.length - 1];
+  const bounds = send.bounds;
+  if (!Array.isArray(bounds)) { return false; }
+  click((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
   return true;
 }
 
@@ -404,6 +426,12 @@ test('O-XFER-02 预览可以复制到剪贴板并完成接收', async (t) => {
 
 test('O-XFER-02 空白输入不发送', async (t) => {
   if (skipGroup(t)) { return; }
+  // 编辑器开着时再点同一个目标的「文本」是关闭动作（BridgeStatus.ets:7936）。
+  // 上一轮没关干净时，这里的点击会把编辑器关掉，看起来像入口点不开。
+  if (textEditorOpen()) {
+    pressBack();
+    await pause(1500);
+  }
   // 前面的用例会离开传输页（预览、剪贴板那几条）。这一条按当前布局断言会扑空，
   // 所以先回到传输页，再等入口渲染出来。入口只在目标在线且可发送时出现。
   clickId('tab-transfer');
@@ -415,26 +443,27 @@ test('O-XFER-02 空白输入不发送', async (t) => {
     entry = idsInLayout().has(actionId);
   }
   assert.ok(entry, `在线目标上没有「文本」入口（${actionId}），发送文字不可达`);
-  // 入口会随对端在线状态重绘。布局读到它之后到点击之间它可能已经被换掉，
-  // 所以点击失败时按布局重试，不当成入口不存在。
+  // 入口会随对端在线状态重绘。按 id 点击时，devecocli 自己重新读一次布局，
+  // 读到点击之间节点可能已经被换掉，于是抛「节点不存在」。
+  // 这里先取坐标再点，点完直接看编辑器有没有出现，失败就重新取坐标再试。
   let opened = false;
-  for (let attempt = 0; attempt < 3 && !opened; attempt++) {
-    try {
-      clickId(actionId);
-      opened = true;
-    } catch (_error) {
-      await pause(2500);
+  for (let attempt = 0; attempt < 4 && !opened; attempt++) {
+    const bounds = boundsOfId(actionId);
+    if (bounds === null) {
+      await pause(2000);
+      continue;
     }
+    click((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
+    await pause(2500);
+    opened = textEditorOpen();
+    if (!opened) { await pause(1500); }
   }
   assert.ok(opened, '「文本」入口点不到，编辑器没有打开');
-  await pause(2000);
-  assert.ok(layoutTexts().some((line) => TEXT_PLACEHOLDER.test(line)),
-    '点了「文本」之后编辑器的输入框没有出现');
 
   const baseline = lastIndex();
-  // 发送键只有无障碍文本，没有节点 id（BridgeStatus.ets:13049）。
-  if (!(clickLastExact('发送') || clickLastExact('Send'))) {
-    t.skip('编辑器的发送键既没有节点 id，也没有可点的文本，空白输入无法验证。'
+  // 发送键只有图标，没有节点 id，也没有无障碍文本。按结构定位。
+  if (!clickEditorSend()) {
+    t.skip('编辑器的发送键按结构也定位不到，空白输入无法验证。'
       + '要覆盖这一条，需要给 TaildropTextEditorAction 补一个 id（BridgeStatus.ets:13049）。');
     return;
   }
@@ -459,7 +488,7 @@ test('O-XFER-02 输入非空文字后发送', async (t) => {
   }
   clickId(actionId);
   await pause(2000);
-  assert.ok(layoutTexts().some((line) => TEXT_PLACEHOLDER.test(line)), '文字编辑器没有打开');
+  assert.ok(textEditorOpen(), '文字编辑器没有打开');
   const baseline = lastIndex();
   console.log('  请在编辑器里输入任意文字，然后点发送键。');
   const queued = await waitForNew(UI('taildrop_send_queued'), baseline, 180000);

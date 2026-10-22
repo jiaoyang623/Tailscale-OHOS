@@ -23,7 +23,7 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BUNDLE, HDC, LogStream, clickId, forceStop, layoutTexts, screenshot, serial, startApp
+  BUNDLE, HDC, LogStream, clickId, forceStop, layoutTexts, screenshot, sendHome, serial, startApp
 } from './lib/device.mjs';
 
 const OUT = process.env.E2E_OUT || join(homedir(), 'mesharc-e2e');
@@ -48,11 +48,9 @@ function readAppFile(name) {
   }
 }
 
-// 把应用切到后台。uitest 走设备侧输入，不经过应用自己的控件。
-function sendHome() {
-  return execFileSync(HDC, ['-t', serial(), 'shell', 'uitest', 'uiInput', 'keyEvent', 'HOME'],
-    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-}
+// 把应用切到后台。切后台走设备侧 uitest 的 HOME 键。
+// 键名是 `Home`，全大写 `HOME` 会让 uitest 返回 Invalid parameters，命令不生效也不报错。
+// 共用 lib/device.mjs 的实现，避免两份写法再次走偏。
 
 function shows(text) {
   try {
