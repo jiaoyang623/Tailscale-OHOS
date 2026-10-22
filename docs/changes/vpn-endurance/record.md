@@ -372,7 +372,9 @@ E2E 结构化运行日志（`checks/e2e-steps.json`）、报告（`checks/e2e/in
   环境受限的失败：taildrive-browser、taildrop-text。
 - taildrop-send：前置检查读到 taildrop=loading，40 秒未到 ready。
   设备日志显示扩展在检查窗口内重启，随后 taildrop 回到 ready。
-  用例已改为等 ready 再判定，复跑结果见 `checks/device-run.txt`。
+  用例已改为等 ready 再判定（提交 `4d6c1b2`）。
+  独立复跑会把该条目的基线抬到 d681465 之后，与批次内其余条目不一致。
+  因此不单独复跑。该条并入 12 小时存活之后的全量批次，在同一基线上复跑。
 
 ### 审核快照重建（2026-10-22 15:36）
 

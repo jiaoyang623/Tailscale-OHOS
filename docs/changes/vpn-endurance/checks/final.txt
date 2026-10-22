@@ -26,6 +26,7 @@
 - 环境受限的失败：`taildrive-browser`（对端没有共享目录）、`taildrop-text`（入口点不到）。
 - `taildrop-send` 前置检查读到 `taildrop=loading`，40 秒内未到 `ready`。
   设备日志显示扩展在检查窗口内重启，随后 `taildrop` 回到 `ready`。该用例与本次改动无交集。
+  用例已改为等 `ready` 再判定。该条并入 12 小时存活之后的全量批次，在同一基线上复跑。
 
 跳过 3 条与原因写在 `checks/e2e-steps.json` 的 `actual` 字段。跳过不算通过。
 
