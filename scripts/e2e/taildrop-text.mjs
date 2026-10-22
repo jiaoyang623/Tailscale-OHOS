@@ -35,7 +35,7 @@ import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   BUNDLE, HDC, LogStream, click, clickId, clickText, forceStop, layout, layoutTexts,
-  readAppFile, screenshot, serial, startApp, textOfId
+  pressBack, readAppFile, screenshot, serial, startApp, textOfId
 } from './lib/device.mjs';
 
 const log = new LogStream();
@@ -415,7 +415,18 @@ test('O-XFER-02 空白输入不发送', async (t) => {
     entry = idsInLayout().has(actionId);
   }
   assert.ok(entry, `在线目标上没有「文本」入口（${actionId}），发送文字不可达`);
-  clickId(actionId);
+  // 入口会随对端在线状态重绘。布局读到它之后到点击之间它可能已经被换掉，
+  // 所以点击失败时按布局重试，不当成入口不存在。
+  let opened = false;
+  for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+    try {
+      clickId(actionId);
+      opened = true;
+    } catch (_error) {
+      await pause(2500);
+    }
+  }
+  assert.ok(opened, '「文本」入口点不到，编辑器没有打开');
   await pause(2000);
   assert.ok(layoutTexts().some((line) => TEXT_PLACEHOLDER.test(line)),
     '点了「文本」之后编辑器的输入框没有出现');
@@ -430,8 +441,12 @@ test('O-XFER-02 空白输入不发送', async (t) => {
   await pause(5000);
   assert.equal(firstIndexAfter(UI('taildrop_send_queued'), baseline), -1,
     '输入为空时点了发送键却发起了传输，空白输入没有被拦住');
-  clickId(actionId);
-  await pause(1500);
+  // 收尾关掉编辑器。编辑器开着时列表上的入口不在布局树里，
+  // 点它会抛「节点不存在」。按返回键关掉这一层就够。
+  if (!idsInLayout().has(actionId)) {
+    pressBack();
+    await pause(1500);
+  }
 });
 
 test('O-XFER-02 输入非空文字后发送', async (t) => {

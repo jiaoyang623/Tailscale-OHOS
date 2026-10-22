@@ -172,8 +172,11 @@ function taildriveEntryIds() {
 }
 
 // 回到 Taildrive 根目录。返回按钮 id 是 taildrive-back（TaildriveBrowser.ets:3756）。
+// 根目录不渲染这个按钮（TaildriveBrowser.ets:3742），所以以按钮在不在判定，
+// 不能以面包屑深度判定：面包屑的根节点 id 也带 taildrive-breadcrumb- 前缀，
+// 根目录下深度永远是 1。
 async function resetTaildriveToRoot() {
-  for (let i = 0; i < 8 && breadcrumbDepth() > 0; i++) {
+  for (let i = 0; i < 8 && centerOfId('taildrive-back') !== null; i++) {
     clickId('taildrive-back');
     await pause(2500);
   }
