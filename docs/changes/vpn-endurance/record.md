@@ -333,6 +333,28 @@ E2E 结构化运行日志（`checks/e2e-steps.json`）、报告（`checks/e2e/in
   平台也不提供应用进程死亡后让扩展自行恢复的回调。见 HLD C-11 与 O-CONN-08 的不确定特征。
 - 报告：http://100.111.99.60/proj/mesharc-hlr/e2e/vpn-endurance/index.html
 
+### 生成报告按钮不可达修正（2026-10-22 13:11）
+
+- 现象：`diagnostics-report` 第 2 条与第 5 条找不到 `diagnostic-report-generate`。
+- 实测：按钮在第 8 次上滑后进入布局树，位置在页签栏下方。第 9 次上滑后升到页签栏上方。
+  页面已到底。旧循环滑完最后一次不再复查，差一步返回 null。
+- 修正：每次滑动后复查。节点位置连续三次不变即判到底。调用点上限从 8 改 12。
+- 提交：`17bd461 fix(e2e): check the scroll position after the last swipe`。
+- 设备复跑：diagnostics-report 5 条通过，1 条失败，1 条跳过。失败项是状态行。
+  状态行的应用修正见下一节。
+
+### 报告状态行修正（2026-10-22 13:20）
+
+- 现象：诊断报告生成完成并打开系统分享后，状态行仍显示「正在生成诊断报告…」。
+- 实测：设备日志有 `diagnostic_report_generated` 与 `diagnostic_share_opened`。
+  状态行文字在 15 秒内不变化。
+- 原因：状态行把状态字符串按值传给 `@Builder`。`@Builder` 保留第一次的值。
+  第二次赋值不更新已建的 `Text`。
+- 修正：`DiagnosticsReportPanel` 直接读 `diagnosticReportStatus`。样式与 `DiagnosticStatus` 一致。
+- 提交：`11f8b44 fix(ui): refresh the report status line after generation`。
+- 同类风险：其余约 20 处状态行仍按值传参。记 O-6。
+- 宿主检查：172 条通过，0 失败，0 跳过。
+
 ### 最终判定
 
 最终代码状态修复了两个用户报告的缺陷。按 a01 完成条件，本批次判 `incomplete`。

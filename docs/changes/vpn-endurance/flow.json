@@ -204,6 +204,14 @@
    "owner": "项目维护者",
    "receive": "vpn-endurance",
    "question": "P1 冻结或死亡时的恢复责任空洞，是补平台入口，还是接受残余风险？"
+  },
+  {
+   "id": "O-6",
+   "item": "诊断状态行按值传参不刷新",
+   "detail": "DiagnosticStatus 以 @Builder 按值接收状态字符串。面板展开时取值正确，可见期间的状态变化不刷新。报告状态行已改为直接读状态变量。其余约 20 处调用未改",
+   "owner": "项目维护者",
+   "receive": "backlog-diagnostics-live-status",
+   "question": "其余诊断状态行是否统一改为按引用传参？"
   }
  ],
  "next": {
