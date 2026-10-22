@@ -1,8 +1,8 @@
 # 最终验证记录（I-07）
 
-- 命令：`SKIP_REVIEW_FRESHNESS=1 scripts/run-checks.sh`，`scripts/e2e/run-batch.sh` 28 个文件
-- 时间：2026-10-22T15:26:13+1100
-- 基线：d681465（工作树有本批次未提交改动，最终 HAP 35934430 字节）
+- 命令：`scripts/run-checks.sh`（全量），`scripts/e2e/run-batch.sh` 28 个文件
+- 时间：2026-10-22T15:36:49+1100
+- 基线：d681465（设备批次）；证据提交 ae61dcc
 - 用例数：172 条宿主用例，10 条设备报告用例，28 个 E2E 文件
 - 通过：172 条宿主用例；设备报告通过 7 条、跳过 3 条、失败 0
 - 失败：0（设备报告）
@@ -11,7 +11,8 @@
 
 | 层 | 命令 | 结果 | 记录 |
 | --- | --- | --- | --- |
-| 集成 + 单元 | `SKIP_REVIEW_FRESHNESS=1 scripts/run-checks.sh` | 172 条全部通过，0 失败，判据 P0 为 0 | `checks/tests.txt` |
+| 集成 + 单元 | `scripts/run-checks.sh` | 172 条全部通过，0 失败，判据 P0 为 0 | `checks/tests.txt` |
+| 审核快照 | `scripts/a01-review-pages.sh --baseline d681465` | 四层重建，结构检查通过，新鲜度检查一致 | `docs/review/<层>/snapshot.json` |
 | 设备 E2E | `scripts/e2e/run-batch.sh` 28 个文件 | 报告通过 7，跳过 3，失败 0。28 个文件中 24 个无失败 | `checks/e2e-steps.json`、`checks/e2e-published.txt` |
 | 构建 | `sudo -n -u w2h bash .build/compile.sh` | BUILD SUCCESSFUL，35934430 字节 | `checks/build.txt` |
 
@@ -67,6 +68,5 @@
 2. 四层人工审核结论缺失。
 3. 3 条设备用例因主机通道不足跳过。跳过不算通过。
 4. 12 小时锁屏存活未取得。第三次尝试排在 2026-10-22 22:00。
-5. 审核快照待本批证据提交后重建。
 
 交接见 `completion.md`。

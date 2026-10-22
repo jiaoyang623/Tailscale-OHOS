@@ -146,8 +146,8 @@
     "docs/changes/vpn-endurance/checks/device-run.txt",
     "docs/changes/vpn-endurance/checks/run-checks.txt"
    ],
-   "summary": "新设备 2LQGK24828000076（ALN-AL00 / API 26）设备批次：10 条用例通过 6、跳过 4、失败 0；步骤 21 条通过 15、跳过 6。锁屏 720 秒通过。E2E 报告与发布记录已更新",
-   "at": "2026-10-21T00:15:00+11:00"
+   "summary": "28 个 E2E 文件；报告 10 条用例通过 7、跳过 3、失败 0；diagnostics-report 7/0/0；endurance-recovery 1/0/0；锁屏 720 秒通过；报告已发布",
+   "at": "2026-10-22T15:26:13+11:00"
   },
   {
    "step": "I-07",
@@ -158,8 +158,8 @@
     "docs/changes/vpn-endurance/checks/high-level-review-published.txt",
     "docs/changes/vpn-endurance/checks/high-level-review-gate.json"
    ],
-   "summary": "最终基线重跑 172 条宿主用例全绿。新设备批次 6 通过 4 跳过。高层次复查 49 条漏项、8 项覆盖、1 条强项未处置，门禁 blocking",
-   "at": "2026-10-21T00:15:00+11:00"
+   "summary": "最终基线重跑 172 条宿主用例全绿，P0 为 0，审核快照重建后一致。高层次复查 49 条漏项、8 项覆盖、1 条强项未处置，门禁 blocking",
+   "at": "2026-10-22T15:36:49+11:00"
   }
  ],
  "gates": [],
@@ -175,11 +175,11 @@
   },
   {
    "id": "O-2",
-   "item": "设备侧 E2E 有 4 条跳过",
-   "detail": "最终 HAP 批次 10 条用例通过 6 条、跳过 4 条、失败 0。跳过原因：设备 shell 无信号权限；关闭 Wi-Fi 后仍有蜂窝通道；缺后台非主动掉线通道；缺卡片点击通道。跳过不算通过",
+   "item": "设备侧 E2E 有 3 条跳过",
+   "detail": "最终 HAP 批次 10 条用例通过 7 条、跳过 3 条、失败 0。跳过原因：缺后台非主动掉线通道、缺卡片点击通道、关闭 Wi-Fi 后仍有其它数据通道。跳过不算通过",
    "owner": "项目维护者",
    "receive": "vpn-endurance",
-   "question": "设备侧 4 条跳过用例如何补主机通道？"
+   "question": "设备侧 3 条跳过用例如何补主机通道？"
   },
   {
    "id": "O-3",
@@ -188,14 +188,6 @@
    "owner": "项目维护者",
    "receive": "vpn-endurance",
    "question": "12 小时锁屏存活何时复跑？复跑期间不要解锁或操作手机。"
-  },
-  {
-   "id": "O-4",
-   "item": "审核快照已过期",
-   "detail": "判据文档在本轮实现后再次修改，docs/review/<层>/snapshot.json 与当前文档不一致。重新生成要求工作树干净或新提交，用户未授权提交",
-   "owner": "项目维护者",
-   "receive": "vpn-endurance",
-   "question": "审核快照在哪个提交上重建？"
   },
   {
    "id": "O-5",

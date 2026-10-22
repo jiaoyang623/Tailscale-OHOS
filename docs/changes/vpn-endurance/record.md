@@ -374,11 +374,21 @@ E2E 结构化运行日志（`checks/e2e-steps.json`）、报告（`checks/e2e/in
   设备日志显示扩展在检查窗口内重启，随后 taildrop 回到 ready。
   用例已改为等 ready 再判定，复跑结果见 `checks/device-run.txt`。
 
+### 审核快照重建（2026-10-22 15:36）
+
+- 命令：`scripts/a01-review-pages.sh --baseline d681465`。
+- 四层快照重新生成：需求 121 条、架构 156 条、HLD 260 条、LLD 269 条。
+  每层 `review.py --check` 通过，退出码 0。
+- 全量 `scripts/run-checks.sh` 退出码 0。172 条用例通过，P0 合计 0 条。
+  新鲜度检查输出「审核快照与判据一致」。
+- 提交：`ae61dcc docs(a01): rebuild the review snapshots at d681465`。
+- 证据：`checks/tests.txt`、`checks/run-checks-final.log`。O-4 关闭。
+
 ### 最终判定
 
 最终代码状态修复了两个用户报告的缺陷。按 a01 完成条件，本批次判 `incomplete`。
-原因：高层次复查门禁 blocking（1 条强项）、四层人工结论缺失、4 条设备用例缺主机通道、
-12 小时锁屏存活未取得（尝试被用户停止）、审核快照过期。
+原因：高层次复查门禁 blocking（1 条强项）、四层人工结论缺失、3 条设备用例跳过、
+12 小时锁屏存活未取得。审核快照已重建。
 交接见 `completion.md`。
 
 ## 改动清单

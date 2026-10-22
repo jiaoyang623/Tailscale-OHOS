@@ -24,7 +24,7 @@
 | UI 还原核对 | 不适用 | 见 `checks/ui-restoration.json` 的结构性理由，待人工复审 |
 | 高层次复查门禁 | 不满足 | blocking，1 条强漏项未处置，见 `checks/high-level-review-gate.json` |
 | 12 小时锁屏存活 | 不满足 | 前两次尝试均不成立。第三次已排到 2026-10-22 22:00，见 O-3 |
-| 审核快照与判据一致 | 不满足 | 快照重建待证据提交，见 O-4 |
+| 审核快照与判据一致 | 满足 | 四层快照在 `d681465` 重建，全量检查退出 0，见 O-4 |
 
 ## 已交付并验证的部分
 
@@ -47,14 +47,16 @@
 | O-1 | 四层人工审核结论 | 审查者从决策页导出 `a01-review-decisions/2` | 项目维护者 | vpn-endurance-r2 |
 | O-2 | 设备侧 3 条用例跳过 | 补主机通道：断网、后台掉线、卡片点击 | 项目维护者 | vpn-endurance-r2 |
 | O-3 | 12 小时锁屏存活 | 前两次尝试均不成立。第三次排在 2026-10-22 22:00，设备独占窗口 22:00 至次日 10:00，另一会话已确认不占用 | 项目维护者 | vpn-endurance-r2 |
-| O-4 | 审核快照过期 | 工作树干净或新提交后重建 | 项目维护者 | vpn-endurance-r2 |
 | O-5 | 高层次复查 1 条强漏项 | P1 冻结或死亡时无人恢复；需平台恢复入口或人工接受残余风险 | 项目维护者 | vpn-endurance-r2 |
 | O-6 | 诊断状态行按值传参不刷新 | 报告状态行已改为直接读状态变量。其余约 20 处状态行未改，展开时取值正确，可见期间不刷新 | 项目维护者 | backlog-diagnostics-live-status |
+
+O-4 已关闭。2026-10-22 15:36 在 `d681465` 重建四层快照。提交 `ae61dcc`。
+全量 `scripts/run-checks.sh` 退出 0，输出「审核快照与判据一致」。
 
 ## 下一批次开工必读
 
 - `checks/high-level-review.json` 中 `severity=strong` 且 `disposition=open` 的 1 条条目。
-- 本文件上表的 O-1 到 O-6。
+- 本文件上表的 O-1 到 O-6。O-4 已关闭，其余仍开放。
 - 设备解锁方法：指纹或锁屏密码。`power-shell`、`uitest` 与 `uinput` 都不能绕过安全锁屏。
   每条 `screen-off-survival` 结束后设备会再次锁屏。
 - 与本批次改动面相交的旧缺口：O-SEAM-11 责任空洞、LLD §1.4 的两项真机缺口。
@@ -99,9 +101,8 @@ python3 /home/red/.claude/skills/a01/scripts/e2e-publish.py \
 | 门禁 | 动作 |
 | --- | --- |
 | O-1 四层人工结论 | 打开 `docs/review/requirements/index.html`、`architecture/index.html`、`hld/index.html`、`lld/index.html`，逐层审查并从页面导出 `a01-review-decisions/2` 记录 |
-| O-2 四条跳过 | 补主机通道：只结束扩展进程、造出无网状态、后台非主动掉线、卡片点击 |
+| O-2 三条跳过 | 补主机通道：造出无网状态、后台非主动掉线、卡片点击 |
 | O-3 12 小时存活 | 解锁并连接后运行 `SURVIVAL_MS=43200000 node --test scripts/e2e/screen-off-survival.mjs`。运行期间不要解锁、不要点通知里的停止 |
-| O-4 审核快照 | 提交当前工作树，然后在干净树上运行 `scripts/a01-review-pages.sh` |
 | O-5 强漏项 | 为 P2 增加启动连接的恢复入口，或在 `checks/high-level-review.json` 中签字接受残余风险 |
 
 四项人工结论与强漏项接受都不能由自动检查代替。未签字时门禁保持阻塞。
