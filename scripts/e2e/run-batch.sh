@@ -89,9 +89,9 @@ echo "汇总：$SUMMARY" | tee -a "$SUMMARY"
 echo "结果数据：$RESULTS" | tee -a "$SUMMARY"
 
 # 结构化运行日志。报告生成器只读这一份。
-if ! node scripts/e2e/lib/merge-steps.mjs; then
-  rc=1
-fi
+# 报告的 command 字段要与真实批次一致：合并脚本拿不到参数，从环境变量读。
+E2E_BATCH_COMMAND="scripts/e2e/run-batch.sh $*" \
+  node scripts/e2e/lib/merge-steps.mjs || rc=1
 
 # 汇总成一份 JSON。回填脚本读它，不读上面那张给人看的表。
 python3 - "$RESULTS_TSV" "$RESULTS" "$STAMP" "$*" <<'PY'

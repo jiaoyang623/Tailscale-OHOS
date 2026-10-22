@@ -36,8 +36,11 @@ const merged = {
   change_id: 'vpn-endurance',
   baseline: runs[0].baseline,
   environment: runs[0].environment,
-  command: 'scripts/e2e/run-batch.sh endurance-recovery network-recovery background-reconnect '
-    + 'install-restart-recovery screen-off-survival',
+  // 实际执行的命令由跑批脚本传进来。写死一份会与真实批次不符：
+  // 全量批次跑 28 个文件，只跑五条恢复用例的批次跑 5 个文件。
+  command: process.env.E2E_BATCH_COMMAND ||
+    'scripts/e2e/run-batch.sh endurance-recovery network-recovery background-reconnect '
+      + 'install-restart-recovery screen-off-survival',
   executed_at: started,
   target: 'mobile',
   notice: '本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。'
