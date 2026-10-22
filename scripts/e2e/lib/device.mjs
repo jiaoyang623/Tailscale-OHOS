@@ -541,6 +541,17 @@ export function setFieldText(id, text) {
   return true;
 }
 
+// 诊断动作发出的请求次数。点没点到位以事件为准，不看按钮状态：
+// 同一个动作可能先清状态文字，读界面分不出「点了没反应」和「正在执行」。
+function cutRequestCount() {
+  try {
+    return readAppFile('diagnostic-ui-events.ndjson').split('\n')
+      .filter((line) => line.includes('"event":"diagnostic_vpn_cut_requested"')).length;
+  } catch (_error) {
+    return -1;
+  }
+}
+
 // 用应用自带的诊断动作停掉扩展。只停扩展，不写用户停止意图。
 // 设备 shell 没有向应用进程发信号的权限时，这是制造非主动断连的通道。
 // 前置：应用在前台。诊断区要先解锁（设置 > 关于与帮助，连点版本号 5 次）。
@@ -569,8 +580,31 @@ export async function cutExtensionFromDiagnostics() {
   if (!cut) {
     return false;
   }
-  clickAt(cut);
-  return true;
+  // 页面有弹性滑动，读到的位置可能还在动。点之前等两次读数一致。
+  const before = cutRequestCount();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let point = cut;
+    for (let i = 0; i < 3; i++) {
+      const first = boundsOfId('diagnostic-force-vpn-stop');
+      await settle(600);
+      const second = boundsOfId('diagnostic-force-vpn-stop');
+      if (!second) {
+        break;
+      }
+      point = [(second[0] + second[2]) / 2, (second[1] + second[3]) / 2];
+      if (first && first[1] === second[1] && first[3] === second[3]) {
+        break;
+      }
+    }
+    clickAt(point);
+    for (let i = 0; i < 8; i++) {
+      await settle(600);
+      if (cutRequestCount() > before) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // 把应用切到后台再切回来。测回前台这类行为用。

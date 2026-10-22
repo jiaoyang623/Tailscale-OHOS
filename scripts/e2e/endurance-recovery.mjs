@@ -188,7 +188,7 @@ test('扩展被杀后自动恢复并留下原因记录', { timeout: 240000 }, as
   if (!killed) {
     // 没有信号权限。用应用自己的诊断动作停扩展：不写 user_stop，扩展走 onDestroy。
     if (!(await cutExtensionFromDiagnostics())) {
-      const reason = '结束扩展进程被拒绝：设备 shell 没有发信号的权限，诊断动作也打不开。';
+      const reason = '结束扩展进程被拒绝：设备 shell 没有发信号的权限，诊断动作也没有触发。';
       kill.skip(reason, run.output(reason));
       record.skip(reason);
       t.skip(reason);
