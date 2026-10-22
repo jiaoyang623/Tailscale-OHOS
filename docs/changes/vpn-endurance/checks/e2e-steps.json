@@ -1,477 +1,505 @@
 {
- "skill_version": "a01",
- "title": "设备侧 E2E：断连恢复与省电",
- "change_id": "vpn-endurance",
- "baseline": "ec64476（工作树有本批次未提交改动）",
- "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
- "command": "scripts/e2e/run-batch.sh endurance-recovery network-recovery background-reconnect install-restart-recovery screen-off-survival",
- "executed_at": "2026-10-20T13:02:57.916Z",
- "target": "mobile",
- "notice": "本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。跳过项写明缺少的主机通道。",
- "cases": [
-  {
-   "id": "BG-CONNECT",
-   "title": "重连监督：先连上隧道",
-   "oracle_ids": [
-    "O-CONN-04"
-   ],
-   "status": "pass",
-   "steps": [
+  "skill_version": "a01",
+  "title": "设备侧 E2E：断连恢复与省电",
+  "change_id": "vpn-endurance",
+  "baseline": "d681465（工作树有本批次未提交改动）",
+  "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
+  "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
+  "executed_at": "2026-10-22T03:25:22.594Z",
+  "target": "mobile",
+  "notice": "本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。跳过项写明缺少的主机通道。本报告只含其中 5 个写步骤日志的文件。同批次其余文件的结果写入 docs/changes/a01-baseline/e2e-results.json，供判据快照使用。",
+  "cases": [
     {
-     "id": "S1",
-     "name": "冷启动应用",
-     "operation": "aa force-stop 后 aa start",
-     "expected": [
-      "设备日志出现 ui_opened",
-      "界面显示连接状态"
-     ],
-     "actual": "应用冷启动完成，界面显示连接状态",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/01-background-reconnect-launch.png",
-        "label": "操作后"
-       }
+      "id": "BG-CONNECT",
+      "title": "重连监督：先连上隧道",
+      "oracle_ids": [
+        "O-CONN-04"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "冷启动应用",
+          "operation": "aa force-stop 后 aa start",
+          "expected": [
+            "设备日志出现 ui_opened",
+            "界面显示连接状态"
+          ],
+          "actual": "应用冷启动完成，界面显示连接状态",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/01-background-reconnect-launch.png",
+                "label": "操作后"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S2",
+          "name": "建立隧道",
+          "operation": "界面处于未连接时点击连接按钮",
+          "expected": [
+            "设备日志出现 vpn_connected",
+            "监督器记录一轮 connected 采样"
+          ],
+          "actual": "应用已处于已连接状态",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/02-background-reconnect-connected.png",
+                "label": "结果"
+              }
+            ]
+          }
+        }
       ]
-     }
     },
     {
-     "id": "S2",
-     "name": "建立隧道",
-     "operation": "界面处于未连接时点击连接按钮",
-     "expected": [
-      "设备日志出现 vpn_connected",
-      "监督器记录一轮 connected 采样"
-     ],
-     "actual": "点击连接后出现 vpn_connected，监督器已采样",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/02-background-reconnect-connected.png",
-        "label": "结果"
-       }
+      "id": "BG-USER-STOP",
+      "title": "重连监督：前台主动断开记为用户停止且不重连",
+      "oracle_ids": [
+        "O-RECONN-10",
+        "O-SEAM-11"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "前台点击断开",
+          "operation": "点击界面的断开按钮",
+          "expected": [
+            "设备日志出现 vpn_drop_after_requested_stop",
+            "界面回到未连接"
+          ],
+          "actual": "出现 vpn_drop_after_requested_stop，界面回到未连接",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/03-background-reconnect-foreground-drop.png",
+                "label": "结果"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S2",
+          "name": "确认没有自动重连",
+          "operation": "检索本次日志中的恢复事件",
+          "expected": [
+            "不出现 vpn_session_recovery_attempt",
+            "不出现 vpn_session_recovery_started"
+          ],
+          "actual": "日志中没有恢复事件",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "vpn_session_recovery_attempt 0 次，vpn_session_recovery_started 0 次"
+          }
+        }
       ]
-     }
-    }
-   ]
-  },
-  {
-   "id": "BG-USER-STOP",
-   "title": "重连监督：前台主动断开记为用户停止且不重连",
-   "oracle_ids": [
-    "O-RECONN-10",
-    "O-SEAM-11"
-   ],
-   "status": "pass",
-   "steps": [
+    },
     {
-     "id": "S1",
-     "name": "前台点击断开",
-     "operation": "点击界面的断开按钮",
-     "expected": [
-      "设备日志出现 vpn_drop_after_requested_stop",
-      "界面回到未连接"
-     ],
-     "actual": "出现 vpn_drop_after_requested_stop，界面回到未连接",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/03-background-reconnect-foreground-drop.png",
-        "label": "结果"
-       }
+      "id": "BG-BACKGROUND-DROP",
+      "title": "重连监督：后台非主动掉线自动重连",
+      "oracle_ids": [
+        "O-CONN-04"
+      ],
+      "status": "skip",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "用例适用性",
+          "operation": "检查前置条件",
+          "expected": [
+            "前置条件满足"
+          ],
+          "actual": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。",
+          "status": "skip",
+          "evidence": {
+            "kind": "log",
+            "output": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。"
+          }
+        }
       ]
-     }
     },
     {
-     "id": "S2",
-     "name": "确认没有自动重连",
-     "operation": "检索本次日志中的恢复事件",
-     "expected": [
-      "不出现 vpn_session_recovery_attempt",
-      "不出现 vpn_session_recovery_started"
-     ],
-     "actual": "日志中没有恢复事件",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "vpn_session_recovery_attempt 0 次，vpn_session_recovery_started 0 次"
-     }
-    }
-   ]
-  },
-  {
-   "id": "BG-BACKGROUND-DROP",
-   "title": "重连监督：后台非主动掉线自动重连",
-   "oracle_ids": [
-    "O-CONN-04"
-   ],
-   "status": "skip",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "用例适用性",
-     "operation": "检查前置条件",
-     "expected": [
-      "前置条件满足"
-     ],
-     "actual": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "缺制造非主动掉线的能力：需要人工在系统设置里断开 VPN，或一条只停扩展、不杀 UI 进程的通道。届时再补真机证据。"
-     }
-    }
-   ]
-  },
-  {
-   "id": "BG-CARD-STOP",
-   "title": "重连监督：受控入口的主动断开",
-   "oracle_ids": [
-    "O-RECONN-10"
-   ],
-   "status": "skip",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "用例适用性",
-     "operation": "检查前置条件",
-     "expected": [
-      "前置条件满足"
-     ],
-     "actual": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。"
-     }
-    }
-   ]
-  },
-  {
-   "id": "ENDURANCE-RECOVERY",
-   "title": "扩展被杀后自动恢复并留下原因记录",
-   "oracle_ids": [
-    "O-DIAG-02",
-    "O-CONN-08"
-   ],
-   "status": "skip",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "定位扩展进程",
-     "operation": "hdc shell ps -ef 并筛选带 vpn 的应用进程",
-     "expected": [
-      "只有一个带 vpn 的应用进程",
-      "状态文件带 sessionId"
-     ],
-     "actual": "扩展进程 29317，会话 1792501447047",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "20020205      29317    583 0 03:11:52 ?     00:00:06 ren.w2h.mesharc:vpn"
-     }
-    },
-    {
-     "id": "S2",
-     "name": "结束扩展进程",
-     "operation": "以应用身份 kill -9 29317",
-     "expected": [
-      "kill 返回 rc=0",
-      "该 PID 从进程表消失"
-     ],
-     "actual": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。"
-     }
-    },
-    {
-     "id": "S3",
-     "name": "跳过原因",
-     "operation": "检查前置条件",
-     "expected": [
-      "前置条件满足"
-     ],
-     "actual": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。"
-     }
-    }
-   ]
-  },
-  {
-   "id": "INSTALL-RESTART",
-   "title": "安装重启后按意图恢复隧道",
-   "oracle_ids": [
-    "O-CONN-08",
-    "O-DIAG-02",
-    "O-RECONN-02"
-   ],
-   "status": "pass",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "确认安装前状态",
-     "operation": "读取状态文件与意图文件",
-     "expected": [
-      "状态为 Running",
-      "意图为 connected",
-      "状态文件带 sessionId"
-     ],
-     "actual": "会话 1792501348074，state=Running，意图 connected",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=9 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792501348253 | txBytes=632 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792501380370 | sessionId=1792501348074\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792501344314,\"by\":\"ui\"}"
-     }
-    },
-    {
-     "id": "S2",
-     "name": "安装新 HAP",
-     "operation": "hdc install -r /opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap",
-     "expected": [
-      "安装成功",
-      "应用与扩展进程被结束"
-     ],
-     "actual": "安装成功，应用数据保留",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "[Info]App install path:/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap msg:install bundle successfully. \nAppMod finish"
-     }
-    },
-    {
-     "id": "S3",
-     "name": "启动应用",
-     "operation": "aa start -a EntryAbility",
-     "expected": [
-      "启动成功",
-      "设备日志出现 ui_opened"
-     ],
-     "actual": "应用启动并显示界面",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/01-install-restart-launched.png",
-        "label": "操作后"
-       }
+      "id": "BG-CARD-STOP",
+      "title": "重连监督：受控入口的主动断开",
+      "oracle_ids": [
+        "O-RECONN-10"
+      ],
+      "status": "skip",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "用例适用性",
+          "operation": "检查前置条件",
+          "expected": [
+            "前置条件满足"
+          ],
+          "actual": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。",
+          "status": "skip",
+          "evidence": {
+            "kind": "log",
+            "output": "缺桌面卡片通道：卡片不在应用窗口树里（manual-checks M-12/M-14 未执行），需要人工点卡片或补一条发送卡片 call 的命令。"
+          }
+        }
       ]
-     }
     },
     {
-     "id": "S4",
-     "name": "等待记录与恢复",
-     "operation": "等待结束观测、恢复事件与新扩展",
-     "expected": [
-      "出现 vpn_session_end_observed",
-      "出现 vpn_session_recovery_attempt",
-      "出现 vpn_session_recovery_started",
-      "状态回到 Running 且 sessionId 改变"
-     ],
-     "actual": "新会话 1792501414003，state=Running",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/02-install-restart-recovered.png",
-        "label": "结果"
-       }
+      "id": "ENDURANCE-RECOVERY",
+      "title": "扩展被杀后自动恢复并留下原因记录",
+      "oracle_ids": [
+        "O-DIAG-02",
+        "O-CONN-08"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "定位扩展进程",
+          "operation": "hdc shell ps -ef 并筛选带 vpn 的应用进程",
+          "expected": [
+            "只有一个带 vpn 的应用进程",
+            "状态文件带 sessionId"
+          ],
+          "actual": "扩展进程 17733，会话 1792642996297",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "20020205      17733    583 0 18:34:39 ?     00:00:07 ren.w2h.mesharc:vpn"
+          }
+        },
+        {
+          "id": "S2",
+          "name": "结束扩展进程",
+          "operation": "诊断动作「手动切断系统 VPN 连接」",
+          "expected": [
+            "扩展进程结束",
+            "该 PID 从进程表消失",
+            "不是经用户停止入口断开"
+          ],
+          "actual": "进程 17733 已结束（诊断动作「手动切断系统 VPN 连接」）",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "诊断动作「手动切断系统 VPN 连接」\nPID 已从 ps 输出消失"
+          }
+        },
+        {
+          "id": "S3",
+          "name": "等待自动恢复",
+          "operation": "等待设备日志出现恢复事件与新扩展",
+          "expected": [
+            "出现 vpn_session_recovery_attempt",
+            "出现 vpn_extension_created",
+            "状态回到 Running"
+          ],
+          "actual": "新会话 1792643091071，state=Running，tun=true",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/01-endurance-recovery-killed.png",
+                "label": "操作后"
+              },
+              {
+                "path": "e2e-run/shots/02-endurance-recovery-restored.png",
+                "label": "结果"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S4",
+          "name": "校验原因账本",
+          "operation": "读取会话账本（按写者分文件）的新增行",
+          "expected": [
+            "旧会话有 end 或 observed 记录",
+            "原因属于 extension_crash / extension_destroyed",
+            "没有 user_stop"
+          ],
+          "actual": "旧会话 1792642996297 记录 extension_destroyed，没有 user_stop",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "[\n  {\n    \"timestampMs\": 1792643086085,\n    \"writer\": \"vpn\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"end\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  },\n  {\n    \"timestampMs\": 1792643090798,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  }\n]"
+          }
+        }
       ]
-     }
     },
     {
-     "id": "S5",
-     "name": "校验原因账本",
-     "operation": "读取会话账本（按写者分文件）",
-     "expected": [
-      "旧会话有 observed 或 end 记录",
-      "本次运行没有 user_stop"
-     ],
-     "actual": "旧会话 1792501348074 已记录结束原因，本次没有 user_stop",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "[\n  {\n    \"timestampMs\": 1792501413780,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792501348074\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired\",\n    \"code\": 0\n  }\n]"
-     }
-    }
-   ]
-  },
-  {
-   "id": "NET-RECOVERY",
-   "title": "断网后恢复网络自动重连",
-   "oracle_ids": [
-    "O-NET-04",
-    "O-CONN-09",
-    "O-RECONN-11"
-   ],
-   "status": "skip",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "断开网络",
-     "operation": "hdc shell svc wifi disable 并等待 ping 失败",
-     "expected": [
-      "命令成功",
-      "设备不再能访问 1.1.1.1"
-     ],
-     "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
-     }
-    },
-    {
-     "id": "S2",
-     "name": "跳过原因",
-     "operation": "检查前置条件",
-     "expected": [
-      "前置条件满足"
-     ],
-     "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
-     "status": "skip",
-     "evidence": {
-      "kind": "log",
-      "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
-     }
-    }
-   ]
-  },
-  {
-   "id": "SURV-CONNECT",
-   "title": "锁屏存活：先连上隧道",
-   "oracle_ids": [
-    "O-CONN-06"
-   ],
-   "status": "pass",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "冷启动应用",
-     "operation": "aa force-stop 后 aa start",
-     "expected": [
-      "设备日志出现 ui_opened",
-      "界面显示未连接或已连接"
-     ],
-     "actual": "应用冷启动完成，界面显示连接状态",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/01-survival-launch.png",
-        "label": "操作后"
-       }
+      "id": "INSTALL-RESTART",
+      "title": "安装重启后按意图恢复隧道",
+      "oracle_ids": [
+        "O-CONN-08",
+        "O-DIAG-02",
+        "O-RECONN-02"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "确认安装前状态",
+          "operation": "读取状态文件与意图文件",
+          "expected": [
+            "状态为 Running",
+            "意图为 connected",
+            "状态文件带 sessionId"
+          ],
+          "actual": "会话 1792640335565，state=Running，意图 connected",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=8 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792640335750 | txBytes=592 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792640346635 | sessionId=1792640335565\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792640335370,\"by\":\"ui\"}"
+          }
+        },
+        {
+          "id": "S2",
+          "name": "安装新 HAP",
+          "operation": "hdc install -r /opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap",
+          "expected": [
+            "安装成功",
+            "应用与扩展进程被结束"
+          ],
+          "actual": "安装成功，应用数据保留",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "[Info]App install path:/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap msg:install bundle successfully. \nAppMod finish"
+          }
+        },
+        {
+          "id": "S3",
+          "name": "启动应用",
+          "operation": "aa start -a EntryAbility",
+          "expected": [
+            "启动成功",
+            "设备日志出现 ui_opened"
+          ],
+          "actual": "应用启动并显示界面",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/01-install-restart-launched.png",
+                "label": "操作后"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S4",
+          "name": "等待记录与恢复",
+          "operation": "等待结束观测、恢复事件与新扩展",
+          "expected": [
+            "出现 vpn_session_end_observed",
+            "出现 vpn_session_recovery_attempt",
+            "出现 vpn_session_recovery_started",
+            "状态回到 Running 且 sessionId 改变"
+          ],
+          "actual": "新会话 1792640380755，state=Running",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/02-install-restart-recovered.png",
+                "label": "结果"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S5",
+          "name": "校验原因账本",
+          "operation": "读取会话账本（按写者分文件）",
+          "expected": [
+            "旧会话有 observed 或 end 记录",
+            "本次运行没有 user_stop"
+          ],
+          "actual": "旧会话 1792640335565 已记录结束原因，本次没有 user_stop",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "[\n  {\n    \"timestampMs\": 1792640380365,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792640335565\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired_stale_end\",\n    \"code\": 0\n  }\n]"
+          }
+        }
       ]
-     }
     },
     {
-     "id": "S2",
-     "name": "建立隧道",
-     "operation": "界面处于未连接时点击连接按钮",
-     "expected": [
-      "设备日志出现 vpn_connected"
-     ],
-     "actual": "点击连接后出现 vpn_connected",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/02-survival-connected.png",
-        "label": "结果"
-       }
+      "id": "NET-RECOVERY",
+      "title": "断网后恢复网络自动重连",
+      "oracle_ids": [
+        "O-NET-04",
+        "O-CONN-09",
+        "O-RECONN-11"
+      ],
+      "status": "skip",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "断开网络",
+          "operation": "hdc shell svc wifi disable 并等待 ping 失败",
+          "expected": [
+            "命令成功",
+            "设备不再能访问 1.1.1.1"
+          ],
+          "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
+          "status": "skip",
+          "evidence": {
+            "kind": "log",
+            "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
+          }
+        },
+        {
+          "id": "S2",
+          "name": "跳过原因",
+          "operation": "检查前置条件",
+          "expected": [
+            "前置条件满足"
+          ],
+          "actual": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。",
+          "status": "skip",
+          "evidence": {
+            "kind": "log",
+            "output": "`svc wifi disable` 执行了但设备仍在线（可能还有蜂窝通道），无法造出断网。"
+          }
+        }
       ]
-     }
-    }
-   ]
-  },
-  {
-   "id": "SURV-SCREEN-OFF",
-   "title": "锁屏 720 秒静置期间心跳不断",
-   "oracle_ids": [
-    "O-CONN-06"
-   ],
-   "status": "pass",
-   "steps": [
-    {
-     "id": "S1",
-     "name": "锁屏静置",
-     "operation": "power-shell suspend 后等待 720 秒并唤醒",
-     "expected": [
-      "设备进入锁屏",
-      "到点后唤醒成功"
-     ],
-     "actual": "锁屏 720 秒后唤醒",
-     "status": "pass",
-     "evidence": {
-      "kind": "ui",
-      "screenshots": [
-       {
-        "path": "e2e-run/shots/03-survival-before-suspend.png",
-        "label": "操作前"
-       },
-       {
-        "path": "e2e-run/shots/04-survival-after-wakeup.png",
-        "label": "操作后"
-       }
-      ]
-     }
     },
     {
-     "id": "S2",
-     "name": "校验心跳",
-     "operation": "统计锁屏期间扩展写入的心跳",
-     "expected": [
-      "心跳数量达到下限",
-      "心跳跨度达到 720 秒",
-      "最大间隔不超过 15 秒"
-     ],
-     "actual": "心跳 221 个，跨度 740 s，最大间隔 6.9 s",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "心跳 221 个，跨度 740 s，最大间隔 6.9 s"
-     }
-    }
-   ]
-  },
-  {
-   "id": "SURV-ONE-PROCESS",
-   "title": "锁屏存活：全程只有一个扩展进程",
-   "oracle_ids": [
-    "O-CONN-06"
-   ],
-   "status": "pass",
-   "steps": [
+      "id": "SURV-CONNECT",
+      "title": "锁屏存活：先连上隧道",
+      "oracle_ids": [
+        "O-CONN-06"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "冷启动应用",
+          "operation": "aa force-stop 后 aa start",
+          "expected": [
+            "设备日志出现 ui_opened",
+            "界面显示未连接或已连接"
+          ],
+          "actual": "应用冷启动完成，界面显示连接状态",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/01-survival-launch.png",
+                "label": "操作后"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S2",
+          "name": "建立隧道",
+          "operation": "界面处于未连接时点击连接按钮",
+          "expected": [
+            "设备日志出现 vpn_connected"
+          ],
+          "actual": "应用已处于已连接状态",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/02-survival-connected.png",
+                "label": "结果"
+              }
+            ]
+          }
+        }
+      ]
+    },
     {
-     "id": "S1",
-     "name": "统计扩展进程",
-     "operation": "检索设备日志中的扩展创建与销毁事件",
-     "expected": [
-      "vpn_extension_created 出现 1 次",
-      "vpn_extension_destroyed 出现 0 次"
-     ],
-     "actual": "vpn_extension_created 1 次，vpn_extension_destroyed 0 次",
-     "status": "pass",
-     "evidence": {
-      "kind": "log",
-      "output": "vpn_extension_created 1 次，vpn_extension_destroyed 0 次"
-     }
+      "id": "SURV-SCREEN-OFF",
+      "title": "锁屏 720 秒静置期间心跳不断",
+      "oracle_ids": [
+        "O-CONN-06"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "锁屏静置",
+          "operation": "power-shell suspend 后等待 720 秒并唤醒",
+          "expected": [
+            "设备进入锁屏",
+            "到点后唤醒成功"
+          ],
+          "actual": "锁屏 720 秒后唤醒",
+          "status": "pass",
+          "evidence": {
+            "kind": "ui",
+            "screenshots": [
+              {
+                "path": "e2e-run/shots/03-survival-before-suspend.png",
+                "label": "操作前"
+              },
+              {
+                "path": "e2e-run/shots/04-survival-after-wakeup.png",
+                "label": "操作后"
+              }
+            ]
+          }
+        },
+        {
+          "id": "S2",
+          "name": "校验心跳",
+          "operation": "统计锁屏期间扩展写入的心跳",
+          "expected": [
+            "心跳数量达到下限",
+            "心跳跨度达到 720 秒",
+            "最大间隔不超过 15 秒"
+          ],
+          "actual": "心跳 223 个，跨度 745 s，最大间隔 6.9 s",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "心跳 223 个，跨度 745 s，最大间隔 6.9 s"
+          }
+        }
+      ]
+    },
+    {
+      "id": "SURV-ONE-PROCESS",
+      "title": "锁屏存活：全程只有一个扩展进程",
+      "oracle_ids": [
+        "O-CONN-06"
+      ],
+      "status": "pass",
+      "steps": [
+        {
+          "id": "S1",
+          "name": "统计扩展进程",
+          "operation": "检索设备日志中的扩展创建与销毁事件",
+          "expected": [
+            "vpn_extension_created 出现 1 次",
+            "vpn_extension_destroyed 出现 0 次"
+          ],
+          "actual": "vpn_extension_created 1 次，vpn_extension_destroyed 0 次",
+          "status": "pass",
+          "evidence": {
+            "kind": "log",
+            "output": "vpn_extension_created 1 次，vpn_extension_destroyed 0 次"
+          }
+        }
+      ]
     }
-   ]
-  }
- ]
+  ]
 }

@@ -1,197 +1,235 @@
 {
-  "ran_at": "20261021T000257",
+  "ran_at": "20261022T142520",
   "device": "2LQGK24828000076",
-  "command": "scripts/e2e/run-all.sh（分批跑，逐文件一个进程）",
-  "baseline": "ec64476",
+  "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
+  "baseline": "d681465",
   "files": {
     "headless-connect": {
       "pass": 0,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch3.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-headless-connect-20261022T142520.log",
+      "baseline": "d681465"
     },
     "navigation-shell": {
       "pass": 9,
       "fail": 0,
       "skip": 3,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch3.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-navigation-shell-20261022T142520.log",
+      "baseline": "d681465"
     },
     "security-locks": {
-      "pass": 1,
-      "fail": 1,
-      "skip": 3,
-      "verdict": "fail",
-      "log": "~/mesharc-e2e/batch4.log"
+      "pass": 3,
+      "fail": 0,
+      "skip": 2,
+      "verdict": "partial",
+      "log": "/home/w2h/mesharc-e2e/e2e-security-locks-20261022T142520.log",
+      "baseline": "d681465"
     },
     "diagnostics-report": {
-      "pass": 5,
-      "fail": 1,
-      "skip": 1,
-      "verdict": "fail",
-      "log": "~/mesharc-e2e/batch4.log"
+      "pass": 7,
+      "fail": 0,
+      "skip": 0,
+      "verdict": "pass",
+      "log": "/home/w2h/mesharc-e2e/e2e-diagnostics-report-20261022T142520.log",
+      "baseline": "d681465"
     },
     "taildrop-send": {
       "pass": 1,
-      "fail": 0,
-      "skip": 3,
-      "verdict": "partial",
-      "log": "~/mesharc-e2e/batch3.log"
+      "fail": 1,
+      "skip": 2,
+      "verdict": "fail",
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-send-20261022T142520.log",
+      "baseline": "d681465"
     },
     "taildrop-receive": {
       "pass": 1,
       "fail": 0,
       "skip": 7,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch4.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-receive-20261022T142520.log",
+      "baseline": "d681465"
     },
     "taildrop-text": {
       "pass": 0,
       "fail": 1,
       "skip": 4,
       "verdict": "fail",
-      "log": "~/mesharc-e2e/batch4.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-text-20261022T142520.log",
+      "baseline": "d681465"
     },
     "taildrive-browser": {
       "pass": 0,
       "fail": 1,
       "skip": 1,
       "verdict": "fail",
-      "log": "~/mesharc-e2e/batch4.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrive-browser-20261022T142520.log",
+      "baseline": "d681465"
     },
     "connect-journey": {
       "pass": 5,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "~/mesharc-e2e/batch1.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-connect-journey-20261022T142520.log",
+      "baseline": "d681465"
     },
     "disconnect-journey": {
       "pass": 5,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "~/mesharc-e2e/batch1.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-disconnect-journey-20261022T142520.log",
+      "baseline": "d681465"
     },
     "devices-journey": {
       "pass": 2,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-devices-journey-20261022T142520.log",
+      "baseline": "d681465"
     },
     "first-run": {
       "pass": 1,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch1.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-first-run-20261022T142520.log",
+      "baseline": "d681465"
     },
     "build-journey": {
       "pass": 2,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch1.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-build-journey-20261022T142520.log",
+      "baseline": "d681465"
     },
     "background-reconnect": {
       "pass": 2,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-background-reconnect-20261021T000257.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-background-reconnect-20261022T142520.log",
+      "baseline": "d681465"
     },
     "connect-window-background": {
       "pass": 0,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-connect-window-background-20261022T142520.log",
+      "baseline": "d681465"
     },
     "control-server": {
       "pass": 0,
       "fail": 0,
       "skip": 3,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-control-server-20261022T142520.log",
+      "baseline": "d681465"
     },
     "logout": {
       "pass": 0,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-logout-20261022T142520.log",
+      "baseline": "d681465"
     },
     "browser-login": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-browser-login-20261022T142520.log",
+      "baseline": "d681465"
     },
     "media-launch": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-media-launch-20261022T142520.log",
+      "baseline": "d681465"
     },
     "meshsend-dual-channel": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-meshsend-dual-channel-20261022T142520.log",
+      "baseline": "d681465"
     },
     "network-settings": {
       "pass": 2,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-network-settings-20261022T142520.log",
+      "baseline": "d681465"
     },
     "taildrop-history": {
       "pass": 0,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-history-20261022T142520.log",
+      "baseline": "d681465"
     },
     "vpn-conflict": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "~/mesharc-e2e/batch2.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-vpn-conflict-20261022T142520.log",
+      "baseline": "d681465"
     },
     "install-restart-recovery": {
       "pass": 1,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-install-restart-recovery-20261021T000257.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-install-restart-recovery-20261022T142520.log",
+      "baseline": "d681465"
     },
     "endurance-recovery": {
-      "pass": 0,
+      "pass": 1,
       "fail": 0,
-      "skip": 1,
-      "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-endurance-recovery-20261021T000257.log"
+      "skip": 0,
+      "verdict": "pass",
+      "log": "/home/w2h/mesharc-e2e/e2e-endurance-recovery-20261022T152251.log",
+      "baseline": "d681465"
     },
     "network-recovery": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-network-recovery-20261021T000257.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-network-recovery-20261022T142520.log",
+      "baseline": "d681465"
     },
     "screen-off-survival": {
       "pass": 3,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-screen-off-survival-20261021T000257.log"
+      "log": "/home/w2h/mesharc-e2e/e2e-screen-off-survival-20261022T142520.log",
+      "baseline": "d681465"
+    },
+    "engine-runtimes": {
+      "pass": 4,
+      "fail": 0,
+      "skip": 0,
+      "verdict": "pass",
+      "log": "/home/w2h/mesharc-e2e/e2e-engine-runtimes-20261022T142520.log",
+      "baseline": "d681465"
     }
+  },
+  "reruns": {
+    "endurance-recovery": "20261022T152251"
   }
 }
