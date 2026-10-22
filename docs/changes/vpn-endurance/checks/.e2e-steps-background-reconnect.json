@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "后台重连与用户主动断开",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/background-reconnect.mjs",
-  "executed_at": "2026-10-22T03:25:22.594Z",
+  "executed_at": "2026-10-22T07:16:37.215Z",
   "target": "mobile",
   "notice": "用户主动断开在前台验证。后台非主动掉线缺制造通道，用例按原因跳过。",
   "cases": [
@@ -45,7 +45,7 @@
             "设备日志出现 vpn_connected",
             "监督器记录一轮 connected 采样"
           ],
-          "actual": "应用已处于已连接状态",
+          "actual": "点击连接后出现 vpn_connected，监督器已采样",
           "status": "pass",
           "evidence": {
             "kind": "ui",

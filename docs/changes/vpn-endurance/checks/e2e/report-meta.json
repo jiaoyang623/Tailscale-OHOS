@@ -3,12 +3,12 @@
   "report_version": 1,
   "title": "设备侧 E2E：断连恢复与省电",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-  "executed_at": "2026-10-22T03:25:22.594Z",
+  "executed_at": "2026-10-22T07:16:37.215Z",
   "target": "mobile",
-  "generated_at": "2026-10-22T15:26:13+11:00",
+  "generated_at": "2026-10-22T19:09:28+11:00",
   "case_count": 10,
   "passed": 7,
   "failed": 0,
@@ -28,8 +28,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/BG-CONNECT__S1__1.png",
-      "size": 229272,
-      "sha256": "207e1843c06c307e82c3908239420e3fbf488e721077d36dfb4ed518f941cc57"
+      "size": 317251,
+      "sha256": "f2e5a9089e90595d8a09f2e9cd000d91a132a845ff0b799debdd695d307143df"
     },
     {
       "case_id": "BG-CONNECT",
@@ -37,8 +37,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/BG-CONNECT__S2__1.png",
-      "size": 304359,
-      "sha256": "ee8f54c645cd4bc3e814baa358fd28363a95b18836e11f222b5e4db6c19e10db"
+      "size": 299733,
+      "sha256": "6c4f747c14fa3024eef07a0d8adb05c7dc68429a02543a75db395efd5adfd9db"
     },
     {
       "case_id": "BG-USER-STOP",
@@ -46,8 +46,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/BG-USER-STOP__S1__1.png",
-      "size": 321815,
-      "sha256": "8b28563001469332db236f4f2f6c5cc432926249110232b25ae02784fc1e496f"
+      "size": 316837,
+      "sha256": "946b6255efb657e8f96cc39a93b9712ba952cd594d4b7a366db3c9bf4a44c117"
     },
     {
       "case_id": "BG-USER-STOP",
@@ -65,7 +65,7 @@
       "label": "log",
       "file": "",
       "size": 72,
-      "sha256": "2899495cb109d3ef4aaf41fd68698823ad7efbb860f20e86510f03dda0e82080"
+      "sha256": "6dfcfb376da3de5f5c8dcd656f92548aaf07bec8d86bde31f2902d3cc663512c"
     },
     {
       "case_id": "ENDURANCE-RECOVERY",
@@ -82,8 +82,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/ENDURANCE-RECOVERY__S3__1.png",
-      "size": 464198,
-      "sha256": "59418aae3c03e654f4e5e1ff75a053c38b6faa39d1d29aa2adc903af093ab29e"
+      "size": 465009,
+      "sha256": "8bd6ef68433e6e80df67a43d540127f38e0bddfa52f50ac424959890993024a8"
     },
     {
       "case_id": "ENDURANCE-RECOVERY",
@@ -91,8 +91,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/ENDURANCE-RECOVERY__S3__2.png",
-      "size": 464198,
-      "sha256": "59418aae3c03e654f4e5e1ff75a053c38b6faa39d1d29aa2adc903af093ab29e"
+      "size": 465009,
+      "sha256": "8bd6ef68433e6e80df67a43d540127f38e0bddfa52f50ac424959890993024a8"
     },
     {
       "case_id": "ENDURANCE-RECOVERY",
@@ -101,7 +101,7 @@
       "label": "log",
       "file": "",
       "size": 396,
-      "sha256": "a4924b1b700e3a3324bd9570fa4ab05019581e848d3b8511979c4392460bbeca"
+      "sha256": "3e0cc764a0f82529b758fa1240e1d8066539aebb668add78f7203821234c9208"
     },
     {
       "case_id": "INSTALL-RESTART",
@@ -110,7 +110,7 @@
       "label": "log",
       "file": "",
       "size": 534,
-      "sha256": "418ec52029427479c7e929487429663a3dc3ad163698a6cfb48542d0f2c7f8b4"
+      "sha256": "4c161141f12618df4c043256a376ea579856a63bbf8d483e37968db8ba6a13d9"
     },
     {
       "case_id": "INSTALL-RESTART",
@@ -127,8 +127,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/INSTALL-RESTART__S3__1.png",
-      "size": 319116,
-      "sha256": "f0181e558d630a013458b52296bfcc6f739a590c9d73eb74ad157ff30b61979d"
+      "size": 320010,
+      "sha256": "475c1a461247f7bafa2957e3e191850d0d6d9b4b69a35078898737dc34ba6838"
     },
     {
       "case_id": "INSTALL-RESTART",
@@ -136,8 +136,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/INSTALL-RESTART__S4__1.png",
-      "size": 304113,
-      "sha256": "795f97c271d11d3806ec396d840bb270740215aebf1926a981446c5656b975c7"
+      "size": 217050,
+      "sha256": "526479b55da1c8c9e86f55cf138513ee1de0f2c19515a1c8111203d140aae732"
     },
     {
       "case_id": "INSTALL-RESTART",
@@ -145,8 +145,8 @@
       "type": "output",
       "label": "log",
       "file": "",
-      "size": 214,
-      "sha256": "a02b9ae5c4f68310c126ef996ae961e9c29559624143c24bde81355624e20a46"
+      "size": 204,
+      "sha256": "5fe4fbd46f02507be71fda6e2401dcf049560e2700e7372ee49f4ec7b8ccd2bf"
     },
     {
       "case_id": "SURV-CONNECT",
@@ -154,8 +154,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/SURV-CONNECT__S1__1.png",
-      "size": 228404,
-      "sha256": "6736dc7294cd0890ef756d0f001624f88468814143540112ebe9e99b3d307d6f"
+      "size": 216757,
+      "sha256": "20a3947efca0cfd98c8736e14cffd9ce3864a869de93e2ce4ed902808759cd02"
     },
     {
       "case_id": "SURV-CONNECT",
@@ -163,8 +163,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/SURV-CONNECT__S2__1.png",
-      "size": 298915,
-      "sha256": "25869afaa0a09e3321d47a506ff739afbcd5606c79681486d8dc4bbf8ed747dc"
+      "size": 298755,
+      "sha256": "8fdcb2a48ea357c3a6e3c1ac2e041848057437ad628cf4807ecb941f65708995"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -172,8 +172,8 @@
       "type": "screenshot",
       "label": "操作前",
       "file": "shots/SURV-SCREEN-OFF__S1__1.png",
-      "size": 297832,
-      "sha256": "7dddcc9d90bd71a58fd18becd78e6569945948a113946eba52f3b4f9e6b5a28c"
+      "size": 298338,
+      "sha256": "50e1858db767b9daf0c07706174204463653624d65265280e4befce95849108d"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -181,8 +181,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/SURV-SCREEN-OFF__S1__2.png",
-      "size": 2630852,
-      "sha256": "d4173da3f918aab079f32f60358dc5d9506b268e1836183d91f02332353ba0b4"
+      "size": 2598892,
+      "sha256": "57083c2266757afd3f1420ddc5679609380ffc85486c46a6240ce1315efbe18c"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -191,7 +191,7 @@
       "label": "log",
       "file": "",
       "size": 28,
-      "sha256": "b22b7ebbc672e6d386b9007dd8d63640aba67ec3168b940a832187efd1306e78"
+      "sha256": "8545c86c2ee0ee56632ae6d2e32dea304a87795775c3e893aabf55976e49f7a6"
     },
     {
       "case_id": "SURV-ONE-PROCESS",

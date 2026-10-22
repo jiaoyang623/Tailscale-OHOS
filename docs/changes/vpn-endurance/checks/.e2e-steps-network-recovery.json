@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "断网再恢复后的自动重连",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/network-recovery.mjs",
-  "executed_at": "2026-10-22T03:49:49.928Z",
+  "executed_at": "2026-10-22T07:41:18.074Z",
   "target": "mobile",
   "notice": "Wi-Fi 是唯一数据通道时才能造出断网。设备仍有其它通道时用例按原因跳过。",
   "cases": [

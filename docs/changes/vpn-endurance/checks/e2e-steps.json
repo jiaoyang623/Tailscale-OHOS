@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "设备侧 E2E：断连恢复与省电",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-  "executed_at": "2026-10-22T03:25:22.594Z",
+  "executed_at": "2026-10-22T07:16:37.215Z",
   "target": "mobile",
   "notice": "本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。跳过项写明缺少的主机通道。本报告只含其中 5 个写步骤日志的文件。同批次其余文件的结果写入 docs/changes/a01-baseline/e2e-results.json，供判据快照使用。",
   "cases": [
@@ -45,7 +45,7 @@
             "设备日志出现 vpn_connected",
             "监督器记录一轮 connected 采样"
           ],
-          "actual": "应用已处于已连接状态",
+          "actual": "点击连接后出现 vpn_connected，监督器已采样",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -170,11 +170,11 @@
             "只有一个带 vpn 的应用进程",
             "状态文件带 sessionId"
           ],
-          "actual": "扩展进程 17733，会话 1792642996297",
+          "actual": "扩展进程 37379，会话 1792653942945",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "20020205      17733    583 0 18:34:39 ?     00:00:07 ren.w2h.mesharc:vpn"
+            "output": "20020205      37379    583 0 21:37:06 ?     00:00:06 ren.w2h.mesharc:vpn"
           }
         },
         {
@@ -186,7 +186,7 @@
             "该 PID 从进程表消失",
             "不是经用户停止入口断开"
           ],
-          "actual": "进程 17733 已结束（诊断动作「手动切断系统 VPN 连接」）",
+          "actual": "进程 37379 已结束（诊断动作「手动切断系统 VPN 连接」）",
           "status": "pass",
           "evidence": {
             "kind": "log",
@@ -202,7 +202,7 @@
             "出现 vpn_extension_created",
             "状态回到 Running"
           ],
-          "actual": "新会话 1792643091071，state=Running，tun=true",
+          "actual": "新会话 1792654037929，state=Running，tun=true",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -227,11 +227,11 @@
             "原因属于 extension_crash / extension_destroyed",
             "没有 user_stop"
           ],
-          "actual": "旧会话 1792642996297 记录 extension_destroyed，没有 user_stop",
+          "actual": "旧会话 1792653942945 记录 extension_destroyed，没有 user_stop",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "[\n  {\n    \"timestampMs\": 1792643086085,\n    \"writer\": \"vpn\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"end\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  },\n  {\n    \"timestampMs\": 1792643090798,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  }\n]"
+            "output": "[\n  {\n    \"timestampMs\": 1792654032755,\n    \"writer\": \"vpn\",\n    \"sessionId\": \"1792653942945\",\n    \"kind\": \"end\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  },\n  {\n    \"timestampMs\": 1792654037582,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792653942945\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  }\n]"
           }
         }
       ]
@@ -255,11 +255,11 @@
             "意图为 connected",
             "状态文件带 sessionId"
           ],
-          "actual": "会话 1792640335565，state=Running，意图 connected",
+          "actual": "会话 1792654221980，state=Running，意图 connected",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=8 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792640335750 | txBytes=592 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792640346635 | sessionId=1792640335565\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792640335370,\"by\":\"ui\"}"
+            "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=8 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792654222164 | txBytes=592 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792654233585 | sessionId=1792654221980\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792654221789,\"by\":\"ui\"}"
           }
         },
         {
@@ -307,7 +307,7 @@
             "出现 vpn_session_recovery_started",
             "状态回到 Running 且 sessionId 改变"
           ],
-          "actual": "新会话 1792640380755，state=Running",
+          "actual": "新会话 1792654267605，state=Running",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -327,11 +327,11 @@
             "旧会话有 observed 或 end 记录",
             "本次运行没有 user_stop"
           ],
-          "actual": "旧会话 1792640335565 已记录结束原因，本次没有 user_stop",
+          "actual": "旧会话 1792654221980 已记录结束原因，本次没有 user_stop",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "[\n  {\n    \"timestampMs\": 1792640380365,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792640335565\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired_stale_end\",\n    \"code\": 0\n  }\n]"
+            "output": "[\n  {\n    \"timestampMs\": 1792654267213,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792654221980\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired\",\n    \"code\": 0\n  }\n]"
           }
         }
       ]
@@ -467,11 +467,11 @@
             "心跳跨度达到 720 秒",
             "最大间隔不超过 15 秒"
           ],
-          "actual": "心跳 223 个，跨度 745 s，最大间隔 6.9 s",
+          "actual": "心跳 225 个，跨度 742 s，最大间隔 6.9 s",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "心跳 223 个，跨度 745 s，最大间隔 6.9 s"
+            "output": "心跳 225 个，跨度 742 s，最大间隔 6.9 s"
           }
         }
       ]

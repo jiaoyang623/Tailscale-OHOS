@@ -1,232 +1,232 @@
 {
-  "ran_at": "20261022T142520",
+  "ran_at": "20261022T181634",
   "device": "2LQGK24828000076",
   "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
-  "baseline": "d681465",
+  "baseline": "7b816f7",
   "files": {
     "headless-connect": {
       "pass": 0,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-headless-connect-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-headless-connect-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "navigation-shell": {
       "pass": 9,
       "fail": 0,
       "skip": 3,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-navigation-shell-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-navigation-shell-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "security-locks": {
       "pass": 3,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-security-locks-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-security-locks-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "diagnostics-report": {
       "pass": 7,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-diagnostics-report-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-diagnostics-report-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "taildrop-send": {
-      "pass": 1,
-      "fail": 1,
+      "pass": 2,
+      "fail": 0,
       "skip": 2,
-      "verdict": "fail",
-      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-send-20261022T142520.log",
-      "baseline": "d681465"
+      "verdict": "partial",
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-send-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "taildrop-receive": {
       "pass": 1,
       "fail": 0,
       "skip": 7,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-receive-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-receive-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "taildrop-text": {
-      "pass": 0,
-      "fail": 1,
+      "pass": 1,
+      "fail": 0,
       "skip": 4,
-      "verdict": "fail",
-      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-text-20261022T142520.log",
-      "baseline": "d681465"
+      "verdict": "partial",
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-text-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "taildrive-browser": {
       "pass": 0,
-      "fail": 1,
-      "skip": 1,
-      "verdict": "fail",
-      "log": "/home/w2h/mesharc-e2e/e2e-taildrive-browser-20261022T142520.log",
-      "baseline": "d681465"
+      "fail": 0,
+      "skip": 2,
+      "verdict": "partial",
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrive-browser-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "connect-journey": {
       "pass": 5,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-connect-journey-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-connect-journey-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "disconnect-journey": {
       "pass": 5,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-disconnect-journey-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-disconnect-journey-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "devices-journey": {
       "pass": 2,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-devices-journey-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-devices-journey-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "first-run": {
       "pass": 1,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-first-run-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-first-run-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "build-journey": {
       "pass": 2,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-build-journey-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-build-journey-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "background-reconnect": {
       "pass": 2,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-background-reconnect-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-background-reconnect-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "connect-window-background": {
       "pass": 0,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-connect-window-background-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-connect-window-background-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "control-server": {
       "pass": 0,
       "fail": 0,
       "skip": 3,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-control-server-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-control-server-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "logout": {
       "pass": 0,
       "fail": 0,
       "skip": 2,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-logout-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-logout-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "browser-login": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-browser-login-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-browser-login-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "media-launch": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-media-launch-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-media-launch-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "meshsend-dual-channel": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-meshsend-dual-channel-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-meshsend-dual-channel-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "network-settings": {
       "pass": 2,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-network-settings-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-network-settings-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "taildrop-history": {
       "pass": 0,
       "fail": 0,
       "skip": 4,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-history-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-taildrop-history-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "vpn-conflict": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-vpn-conflict-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-vpn-conflict-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "install-restart-recovery": {
       "pass": 1,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-install-restart-recovery-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-install-restart-recovery-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "endurance-recovery": {
       "pass": 1,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-endurance-recovery-20261022T152251.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-endurance-recovery-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "network-recovery": {
       "pass": 0,
       "fail": 0,
       "skip": 1,
       "verdict": "partial",
-      "log": "/home/w2h/mesharc-e2e/e2e-network-recovery-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-network-recovery-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "screen-off-survival": {
       "pass": 3,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-screen-off-survival-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-screen-off-survival-20261022T181634.log",
+      "baseline": "7b816f7"
     },
     "engine-runtimes": {
       "pass": 4,
       "fail": 0,
       "skip": 0,
       "verdict": "pass",
-      "log": "/home/w2h/mesharc-e2e/e2e-engine-runtimes-20261022T142520.log",
-      "baseline": "d681465"
+      "log": "/home/w2h/mesharc-e2e/e2e-engine-runtimes-20261022T181634.log",
+      "baseline": "7b816f7"
     }
   },
   "reruns": {

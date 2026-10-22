@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "锁屏 720 秒后台存活",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/screen-off-survival.mjs",
-  "executed_at": "2026-10-22T04:01:25.847Z",
+  "executed_at": "2026-10-22T07:53:20.870Z",
   "target": "mobile",
   "notice": "本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。",
   "cases": [
@@ -99,11 +99,11 @@
             "心跳跨度达到 720 秒",
             "最大间隔不超过 15 秒"
           ],
-          "actual": "心跳 223 个，跨度 745 s，最大间隔 6.9 s",
+          "actual": "心跳 225 个，跨度 742 s，最大间隔 6.9 s",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "心跳 223 个，跨度 745 s，最大间隔 6.9 s"
+            "output": "心跳 225 个，跨度 742 s，最大间隔 6.9 s"
           }
         }
       ]

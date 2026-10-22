@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "扩展被杀后的记录与恢复",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/endurance-recovery.mjs",
-  "executed_at": "2026-10-22T04:22:53.508Z",
+  "executed_at": "2026-10-22T07:25:20.215Z",
   "target": "mobile",
   "notice": "优先用设备 shell 结束扩展进程。没有信号权限时，改用应用诊断动作「手动切断系统 VPN 连接」。",
   "cases": [
@@ -26,11 +26,11 @@
             "只有一个带 vpn 的应用进程",
             "状态文件带 sessionId"
           ],
-          "actual": "扩展进程 17733，会话 1792642996297",
+          "actual": "扩展进程 37379，会话 1792653942945",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "20020205      17733    583 0 18:34:39 ?     00:00:07 ren.w2h.mesharc:vpn"
+            "output": "20020205      37379    583 0 21:37:06 ?     00:00:06 ren.w2h.mesharc:vpn"
           }
         },
         {
@@ -42,7 +42,7 @@
             "该 PID 从进程表消失",
             "不是经用户停止入口断开"
           ],
-          "actual": "进程 17733 已结束（诊断动作「手动切断系统 VPN 连接」）",
+          "actual": "进程 37379 已结束（诊断动作「手动切断系统 VPN 连接」）",
           "status": "pass",
           "evidence": {
             "kind": "log",
@@ -58,7 +58,7 @@
             "出现 vpn_extension_created",
             "状态回到 Running"
           ],
-          "actual": "新会话 1792643091071，state=Running，tun=true",
+          "actual": "新会话 1792654037929，state=Running，tun=true",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -83,11 +83,11 @@
             "原因属于 extension_crash / extension_destroyed",
             "没有 user_stop"
           ],
-          "actual": "旧会话 1792642996297 记录 extension_destroyed，没有 user_stop",
+          "actual": "旧会话 1792653942945 记录 extension_destroyed，没有 user_stop",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "[\n  {\n    \"timestampMs\": 1792643086085,\n    \"writer\": \"vpn\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"end\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  },\n  {\n    \"timestampMs\": 1792643090798,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792642996297\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  }\n]"
+            "output": "[\n  {\n    \"timestampMs\": 1792654032755,\n    \"writer\": \"vpn\",\n    \"sessionId\": \"1792653942945\",\n    \"kind\": \"end\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  },\n  {\n    \"timestampMs\": 1792654037582,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792653942945\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_destroyed\",\n    \"phase\": \"on_destroy\",\n    \"code\": 0\n  }\n]"
           }
         }
       ]

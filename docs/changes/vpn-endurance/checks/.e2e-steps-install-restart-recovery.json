@@ -2,10 +2,10 @@
   "skill_version": "a01",
   "title": "安装重启后的意图恢复",
   "change_id": "vpn-endurance",
-  "baseline": "d681465（工作树有本批次未提交改动）",
+  "baseline": "7b816f7（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 HAP=/opt/git/github/mesharc/entry/build/default/outputs/default/entry-default-signed.hap node --test scripts/e2e/install-restart-recovery.mjs",
-  "executed_at": "2026-10-22T03:37:57.907Z",
+  "executed_at": "2026-10-22T07:29:24.172Z",
   "target": "mobile",
   "notice": "安装由本用例执行。安装会结束应用进程，应用数据保留。",
   "cases": [
@@ -28,11 +28,11 @@
             "意图为 connected",
             "状态文件带 sessionId"
           ],
-          "actual": "会话 1792640335565，state=Running，意图 connected",
+          "actual": "会话 1792654221980，state=Running，意图 connected",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=8 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792640335750 | txBytes=592 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792640346635 | sessionId=1792640335565\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792640335370,\"by\":\"ui\"}"
+            "output": "状态：OK | state=Running | loginURLReady=false | tailscaleIPs=2 | tun=true | exitNode=false | routeAll=true | exitNodeLAN=false | subnetRoutes=0 | tunRead=8 | tunWrite=0 | tunReadErrors=0 | tunWriteErrors=0 | trafficSession=1792654222164 | txBytes=592 | rxBytes=0 | dnsQ=0 | dnsR=0 | dnsA=0 | netUp=unknown | netUDP=true | netIPv4=true | netIPv6=false | netMappingVaries=true | netPort=41641 | phase=auth-loop-finished | heartbeatMs=1792654233585 | sessionId=1792654221980\n意图：{\"desired\":\"connected\",\"changedAtMs\":1792654221789,\"by\":\"ui\"}"
           }
         },
         {
@@ -80,7 +80,7 @@
             "出现 vpn_session_recovery_started",
             "状态回到 Running 且 sessionId 改变"
           ],
-          "actual": "新会话 1792640380755，state=Running",
+          "actual": "新会话 1792654267605，state=Running",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -100,11 +100,11 @@
             "旧会话有 observed 或 end 记录",
             "本次运行没有 user_stop"
           ],
-          "actual": "旧会话 1792640335565 已记录结束原因，本次没有 user_stop",
+          "actual": "旧会话 1792654221980 已记录结束原因，本次没有 user_stop",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "[\n  {\n    \"timestampMs\": 1792640380365,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792640335565\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired_stale_end\",\n    \"code\": 0\n  }\n]"
+            "output": "[\n  {\n    \"timestampMs\": 1792654267213,\n    \"writer\": \"ui\",\n    \"sessionId\": \"1792654221980\",\n    \"kind\": \"observed\",\n    \"reason\": \"extension_crash\",\n    \"phase\": \"heartbeat_expired\",\n    \"code\": 0\n  }\n]"
           }
         }
       ]
