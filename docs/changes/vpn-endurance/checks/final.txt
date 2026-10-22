@@ -1,19 +1,19 @@
 # 最终验证记录（I-07）
 
 - 命令：`scripts/run-checks.sh`（全量），`scripts/e2e/run-batch.sh` 28 个文件
-- 时间：2026-10-22T15:36:49+1100
-- 基线：d681465（设备批次）；证据提交 ae61dcc
+- 时间：2026-10-22T19:11:06+1100
+- 基线：`7b816f7`（设备批次与宿主检查）；宿主检查在 `846473e` 复跑
 - 用例数：172 条宿主用例，10 条设备报告用例，28 个 E2E 文件
 - 通过：172 条宿主用例；设备报告通过 7 条、跳过 3 条、失败 0
-- 失败：0（设备报告）
+- 失败：0（设备批次退出码 0，全部文件无失败）
 
 ## I-07-a 在最终基线上重跑全部适用测试
 
 | 层 | 命令 | 结果 | 记录 |
 | --- | --- | --- | --- |
 | 集成 + 单元 | `scripts/run-checks.sh` | 172 条全部通过，0 失败，判据 P0 为 0 | `checks/tests.txt` |
-| 审核快照 | `scripts/a01-review-pages.sh --baseline d681465` | 四层重建，结构检查通过，新鲜度检查一致 | `docs/review/<层>/snapshot.json` |
-| 设备 E2E | `scripts/e2e/run-batch.sh` 28 个文件 | 报告通过 7，跳过 3，失败 0。28 个文件中 24 个无失败 | `checks/e2e-steps.json`、`checks/e2e-published.txt` |
+| 审核快照 | `scripts/a01-review-pages.sh --baseline 7b816f7` | 四层重建，结构检查通过，新鲜度检查一致 | `docs/review/<层>/snapshot.json` |
+| 设备 E2E | `scripts/e2e/run-batch.sh` 28 个文件 | 退出码 0。报告通过 7，跳过 3，失败 0。28 个文件全部无失败 | `checks/e2e-steps.json`、`checks/e2e-published.txt` |
 | 构建 | `sudo -n -u w2h bash .build/compile.sh` | BUILD SUCCESSFUL，35934430 字节 | `checks/build.txt` |
 
 设备为 HUAWEI ALN-AL00（API 26），2LQGK24828000076。用户完成 Tailscale 登录。
@@ -21,12 +21,12 @@
 - 诊断报告：7 条通过，0 失败，0 跳过。生成按钮可达，状态行显示文件名与大小。
 - 扩展非主动断连：1 条通过，0 失败，0 跳过。旧会话记 `extension_destroyed`，
   新会话 `state=Running`，没有 `user_stop`。
-- 锁屏存活 720 秒：心跳 223 个，跨度 745 秒，最大间隔 6.9 秒。
+- 锁屏存活 720 秒：心跳 225 个，跨度 742 秒，最大间隔 6.9 秒。扩展创建 1 次、销毁 0 次。
 - 安装重启恢复：通过。
-- 环境受限的失败：`taildrive-browser`（对端没有共享目录）、`taildrop-text`（入口点不到）。
-- `taildrop-send` 前置检查读到 `taildrop=loading`，40 秒内未到 `ready`。
-  设备日志显示扩展在检查窗口内重启，随后 `taildrop` 回到 `ready`。该用例与本次改动无交集。
-  用例已改为等 `ready` 再判定。该条并入 12 小时存活之后的全量批次，在同一基线上复跑。
+- 桌面窗口切后台：4 条全部通过。本轮先修了键名（`HOME` 改为 `Home`）。
+- 文字发送：2 条通过、2 条跳过、0 失败。本轮先修了编辑器判定与发送键定位。
+- `taildrive-browser`：2 条跳过。整个 tailnet 没有共享目录，应用按设计退回全部共享。
+- 19 个文件的结论是 partial，原因是它们带跳过。没有文件判 fail。
 
 跳过 3 条与原因写在 `checks/e2e-steps.json` 的 `actual` 字段。跳过不算通过。
 
@@ -34,7 +34,7 @@
 
 | 报告 | 链接 | HTTP | 基线 | 记录 |
 | --- | --- | --- | --- | --- |
-| E2E | http://100.111.99.60/proj/mesharc/e2e/vpn-endurance/index.html | 200 | d681465（含工作树改动，HAP 35934430） | `checks/e2e-published.txt` |
+| E2E | http://100.111.99.60/proj/mesharc/e2e/vpn-endurance/index.html | 200 | 7b816f7（HAP 35934430） | `checks/e2e-published.txt` |
 | UI 还原 | http://100.111.99.60/proj/mesharc-ui/e2e/vpn-endurance/index.html | 200 | ec64476（本批未改布局） | `checks/ui-restoration-published.txt` |
 | 高层次复查 | http://100.111.99.60/proj/mesharc-hlr/e2e/vpn-endurance/index.html | 200 | ec64476（本批未改设计） | `checks/high-level-review-published.txt` |
 
