@@ -16,8 +16,8 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BUNDLE, HDC, LogStream, clickBottomTab, clickId, forceStop, layoutTexts, readAppFile,
-  readLedgerEntries, serial, startApp
+  BUNDLE, HDC, LogStream, clickAt, clickBottomTab, clickId, fastTap, forceStop, layoutTexts,
+  nodeState, readAppFile, readLedgerEntries, scrollToId, serial, startApp
 } from './lib/device.mjs';
 import { createRun, deviceEnvironment } from './lib/steps.mjs';
 
@@ -33,7 +33,7 @@ const run = createRun({
   title: '扩展被杀后的记录与恢复',
   command: `DEVICE=${process.env.DEVICE || '<序列号>'} node --test scripts/e2e/endurance-recovery.mjs`,
   environment: deviceEnvironment(),
-  notice: '结束进程需要设备 shell 向应用进程发信号的权限。没有该权限时用例按原因跳过。'
+  notice: '优先用设备 shell 结束扩展进程。没有信号权限时，改用应用诊断动作「手动切断系统 VPN 连接」。'
 });
 // The ledger persists across runs. Only entries appended by this run can judge
 // this run; an old user stop from an earlier session must not fail the case.
@@ -105,6 +105,38 @@ function processGone(pid) {
     return false;
   }
   return !text.split('\n').some((line) => new RegExp(`\\s${pid}\\s`).test(line));
+}
+
+// 设备 shell 没有向应用进程发信号的权限时，用应用自带的诊断动作造同一次断连。
+// 「手动切断系统 VPN 连接」调用 stopVpnExtensionAbility，只停扩展，不写用户停止意图。
+// 扩展的 onDestroy 记 EXTENSION_DESTROYED，监督器按意图重新拉起扩展。
+async function cutExtensionFromDiagnostics() {
+  if (nodeState('tab-settings') === null) {
+    return false;
+  }
+  clickId('tab-settings');
+  await pause(2500);
+  const about = await scrollToId('settings-about-entry', 4);
+  if (!about) {
+    return false;
+  }
+  clickAt(about);
+  await pause(3000);
+  const version = await scrollToId('app-version-action', 3);
+  if (!version) {
+    return false;
+  }
+  fastTap(version[0], version[1], 5);
+  await pause(2500);
+  if (nodeState('diagnostics-disclosure') === null) {
+    return false;
+  }
+  const cut = await scrollToId('diagnostic-force-vpn-stop', 12);
+  if (!cut) {
+    return false;
+  }
+  clickAt(cut);
+  return true;
 }
 
 before(async () => {
@@ -179,26 +211,39 @@ test('扩展被杀后自动恢复并留下原因记录', { timeout: 240000 }, as
 
   const kill = record.step({
     id: 'S2', name: '结束扩展进程', operation: `以应用身份 kill -9 ${pids[0].pid}`,
-    expected: ['kill 返回 rc=0', '该 PID 从进程表消失']
+    expected: ['扩展进程结束', '该 PID 从进程表消失', '不是经用户停止入口断开']
   });
   const mark = log.mark();
-  const killed = killAsApp(pids[0].pid);
+  let killed = killAsApp(pids[0].pid);
+  let channel = `kill -9 ${pids[0].pid}`;
   if (!killed) {
-    const reason = '结束扩展进程被拒绝：设备 shell 没有向应用进程发信号的权限。';
-    kill.skip(reason, run.output(reason));
-    record.skip(reason);
-    t.skip(reason);
-    return;
+    // 没有信号权限。用应用自己的诊断动作停扩展：不写 user_stop，扩展走 onDestroy。
+    if (!(await cutExtensionFromDiagnostics())) {
+      const reason = '结束扩展进程被拒绝：设备 shell 没有发信号的权限，诊断动作也打不开。';
+      kill.skip(reason, run.output(reason));
+      record.skip(reason);
+      t.skip(reason);
+      return;
+    }
+    assert.ok(await log.waitForAfter(mark, /diagnostic_vpn_cut_completed/, 30000),
+      '诊断动作没有留下 diagnostic_vpn_cut_completed');
+    channel = '诊断动作「手动切断系统 VPN 连接」';
+    killed = true;
+    for (let i = 0; i < 10 && !processGone(pids[0].pid); i++) {
+      await pause(1000);
+    }
   }
   await pause(2000);
+  kill.operation = channel;
   if (!processGone(pids[0].pid)) {
-    const reason = `kill 报告成功，但进程 ${pids[0].pid} 仍在运行。`;
+    const reason = `${channel} 之后进程 ${pids[0].pid} 仍在运行。`;
     kill.skip(reason, run.output(reason));
     record.skip(reason);
     t.skip(reason);
     return;
   }
-  kill.pass(`进程 ${pids[0].pid} 已结束`, run.output(`kill -9 ${pids[0].pid} → rc=0\nPID 已从 ps 输出消失`));
+  kill.pass(`进程 ${pids[0].pid} 已结束（${channel}）`,
+    run.output(`${channel}\nPID 已从 ps 输出消失`));
 
   const recover = record.step({
     id: 'S3', name: '等待自动恢复', operation: '等待设备日志出现恢复事件与新扩展',
