@@ -11,6 +11,9 @@ if [ -z "${DEVICE:-}" ]; then
 fi
 export DEVICE
 
+# 设备侧的 shell。守卫脚本用它读电源状态、把应用拉回前台。
+HDC="${HDC:-/opt/harmony/sdk/sdk/default/openharmony/toolchains/hdc}"
+
 OUT="${E2E_OUT:-$HOME/mesharc-e2e}"
 mkdir -p "$OUT"
 # 每次批次从空的结构化日志开始，避免上一批的跳过项混进来。
@@ -36,12 +39,22 @@ for name in "$@"; do
   fi
   log="$OUT/e2e-$name-$STAMP.log"
   started="$(date +%s)"
-  # 界面读不到通常表示锁屏。锁屏后应用起不到前台，后续每条都会失败，
-  # 整批结果变成噪声。这里直接停批，不把锁屏算成用例失败。
+  # 界面读不到有两种原因：锁屏，或前台被别的应用占着。
+  # 锁屏后应用起不到前台，后续每条都会失败，整批结果变成噪声，这里直接停批。
+  # 前台被占时把应用拉回前台再试一次，不停批：屏幕亮着说明设备有人用。
   if ! devecocli ui layout --device "$DEVICE" --format json --mode full >/dev/null 2>&1; then
-    printf '%-28s %s\n' "$name" "未跑：设备界面读不到，可能已锁屏" | tee -a "$SUMMARY"
-    rc=1
-    break
+    state=$($HDC -t "$DEVICE" shell "hidumper -s PowerManagerService -a '-a'" 2>/dev/null | awk -F': ' '/Current State:/{print $2; exit}')
+    case "$state" in
+      AWAKE*)
+        $HDC -t "$DEVICE" shell "aa start -a EntryAbility -b ren.w2h.mesharc" >/dev/null 2>&1
+        sleep 5
+        ;;
+    esac
+    if ! devecocli ui layout --device "$DEVICE" --format json --mode full >/dev/null 2>&1; then
+      printf '%-28s %s\n' "$name" "未跑：设备界面读不到，可能已锁屏" | tee -a "$SUMMARY"
+      rc=1
+      break
+    fi
   fi
   if node --test "$file" > "$log" 2>&1; then
     status=0
