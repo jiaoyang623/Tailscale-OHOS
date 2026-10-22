@@ -316,6 +316,18 @@ test('浏览共享目录并完成上传与下载', async (t) => {
     clickId(ids[0]);
     await pause(3500);
   }
+  // 与上一条同样的环境分支：整个 tailnet 没有共享目录时停在设备层。
+  // 2026-10-22 实测：选中的设备返回「未找到该设备的 Taildrive 共享」，
+  // 列表显示「这里没有共享文件或文件夹」。这是缺对端数据，不是实现缺陷。
+  if (breadcrumbDepth() < 3) {
+    const noShare = ['未找到该设备的 Taildrive 共享', 'No Taildrive shares',
+      '这里没有共享文件或文件夹', 'No shared files or folders'];
+    if (layoutTexts().some((line) => noShare.some((text) => line.includes(text)))) {
+      t.skip('整个 tailnet 没有共享目录：选中的设备也没有共享文件夹，上传与下载无法验证。'
+        + '要覆盖这一条，需要一台共享了目录的对端设备。');
+      return;
+    }
+  }
   assert.ok(breadcrumbDepth() >= 3,
     `没有下钻到共享目录，面包屑深度 ${breadcrumbDepth()}。` +
     `界面文本：${JSON.stringify(layoutTexts().slice(0, 20))}`);
