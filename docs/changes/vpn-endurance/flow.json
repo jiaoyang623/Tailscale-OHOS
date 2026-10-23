@@ -204,6 +204,14 @@
    "owner": "项目维护者",
    "receive": "backlog-diagnostics-live-status",
    "question": "其余诊断状态行是否统一改为按引用传参？"
+  },
+  {
+   "id": "O-7",
+   "item": "需求层缺需求模型",
+   "detail": "审核工具要求需求层提供 a01-requirements-model/1 模型。现有 review-brief.json 没有 model 字段，门禁判 model-required incomplete，退出码 3。模型要覆盖参与者、目标、范围、流程、规则、状态、实体、界面与视图，并由模型生成四张核心图。属设计层工作，不在本批实现面内。其余三层不受影响",
+   "owner": "项目维护者",
+   "receive": "backlog-requirements-model",
+   "question": "需求层何时补 a01-requirements-model/1 模型并重生成四张核心图？"
   }
  ],
  "next": {

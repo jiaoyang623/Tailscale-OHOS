@@ -177,6 +177,18 @@
 - `checks/design-check.txt`：`scripts/run-checks.sh` 全量输出。
 - `checks/review-check.txt`：快照检查、决策说明检查与门禁结果。
 
+### 审核页恢复与需求模型缺口（2026-10-23）
+
+- 现象：`docs/review/<层>/index.html` 在 2026-10-22 的重建后变成逐项页。
+  人读决策页丢失，审查者没有页面可看。
+- 原因：`scripts/a01-review-pages.sh` 把 `review.py` 的逐项页写到 `index.html`。
+  快照重建覆盖了决策页。
+- 修正：脚本改写 `oracles.html`。四份决策页从 `review-brief.json` 重新渲染。
+  提交 `a875140`。四层 `review-brief.mjs --check` 通过。
+- 新缺口 O-7：审核工具要求需求层提供 `a01-requirements-model/1` 模型。
+  现有说明没有 `model` 字段，需求层门禁判 incomplete，退出码 3。
+  其余三层的门禁只缺人工结论。
+
 ## 实现与验证（2026-10-20）
 
 | 步骤 | 结果 | 证据 |
