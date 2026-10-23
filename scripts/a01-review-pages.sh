@@ -55,7 +55,7 @@ for layer in requirements architecture hld lld; do
     --ran-environment "$RAN_ENV" --ran-at "$RAN_AT"
   # --check 与 --output 一起用：结构不通过时不写出网页，也不把失败藏起来。
   python3 "$A01/scripts/review.py" "docs/review/$layer/snapshot.json" \
-    --check --output "docs/review/$layer/index.html" || exit 2
+    --check --output "docs/review/$layer/oracles.html" || exit 2
 done
 
 echo
