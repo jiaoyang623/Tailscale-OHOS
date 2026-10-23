@@ -1,11 +1,11 @@
 {
   "skill_version": "a01",
-  "title": "锁屏 720 秒后台存活",
+  "title": "锁屏 43200 秒后台存活",
   "change_id": "vpn-endurance",
-  "baseline": "7b816f7（工作树有本批次未提交改动）",
+  "baseline": "d85888c（工作树有本批次未提交改动）",
   "environment": "2LQGK24828000076 · ALN-AL00 · API 26 · USB 连接 · Wi-Fi · 充电中",
   "command": "DEVICE=2LQGK24828000076 node --test scripts/e2e/screen-off-survival.mjs",
-  "executed_at": "2026-10-22T07:53:20.870Z",
+  "executed_at": "2026-10-23T11:05:38.071Z",
   "target": "mobile",
   "notice": "本次在 Wi-Fi 下运行，手机通过 USB 连接并充电。通过一次不代表电池深度休眠或拔线后仍成立。",
   "cases": [
@@ -60,7 +60,7 @@
     },
     {
       "id": "SURV-SCREEN-OFF",
-      "title": "锁屏 720 秒静置期间心跳不断",
+      "title": "锁屏 43200 秒静置期间心跳不断",
       "oracle_ids": [
         "O-CONN-06"
       ],
@@ -69,12 +69,12 @@
         {
           "id": "S1",
           "name": "锁屏静置",
-          "operation": "power-shell suspend 后等待 720 秒并唤醒",
+          "operation": "power-shell suspend 后等待 43200 秒并唤醒",
           "expected": [
             "设备进入锁屏",
             "到点后唤醒成功"
           ],
-          "actual": "锁屏 720 秒后唤醒",
+          "actual": "锁屏 43200 秒后唤醒",
           "status": "pass",
           "evidence": {
             "kind": "ui",
@@ -96,14 +96,14 @@
           "operation": "统计锁屏期间扩展写入的心跳",
           "expected": [
             "心跳数量达到下限",
-            "心跳跨度达到 720 秒",
+            "心跳跨度达到 43200 秒",
             "最大间隔不超过 15 秒"
           ],
-          "actual": "心跳 225 个，跨度 742 s，最大间隔 6.9 s",
+          "actual": "心跳 27054 个，跨度 43223 s，最大间隔 7.0 s",
           "status": "pass",
           "evidence": {
             "kind": "log",
-            "output": "心跳 225 个，跨度 742 s，最大间隔 6.9 s"
+            "output": "心跳 27054 个，跨度 43223 s，最大间隔 7.0 s"
           }
         }
       ]

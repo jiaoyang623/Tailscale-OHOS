@@ -8,7 +8,7 @@
   "command": "scripts/e2e/run-batch.sh background-reconnect browser-login build-journey connect-journey connect-window-background control-server devices-journey diagnostics-report disconnect-journey endurance-recovery engine-runtimes first-run headless-connect install-restart-recovery logout media-launch meshsend-dual-channel navigation-shell network-recovery network-settings security-locks taildrive-browser taildrop-history taildrop-receive taildrop-send taildrop-text vpn-conflict screen-off-survival",
   "executed_at": "2026-10-22T07:16:37.215Z",
   "target": "mobile",
-  "generated_at": "2026-10-22T19:09:28+11:00",
+  "generated_at": "2026-10-24T10:12:44+11:00",
   "case_count": 10,
   "passed": 7,
   "failed": 0,
@@ -154,8 +154,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/SURV-CONNECT__S1__1.png",
-      "size": 216757,
-      "sha256": "20a3947efca0cfd98c8736e14cffd9ce3864a869de93e2ce4ed902808759cd02"
+      "size": 317432,
+      "sha256": "c1b333bb24985ce4aedff9dbca4f30a784d7fcb19889cee96e8b57eae66ae654"
     },
     {
       "case_id": "SURV-CONNECT",
@@ -163,8 +163,8 @@
       "type": "screenshot",
       "label": "结果",
       "file": "shots/SURV-CONNECT__S2__1.png",
-      "size": 298755,
-      "sha256": "8fdcb2a48ea357c3a6e3c1ac2e041848057437ad628cf4807ecb941f65708995"
+      "size": 299525,
+      "sha256": "948a27f309fac22175235d72545d82aa9bca28cf7bc5e5c746a029975bbcf40f"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -172,8 +172,8 @@
       "type": "screenshot",
       "label": "操作前",
       "file": "shots/SURV-SCREEN-OFF__S1__1.png",
-      "size": 298338,
-      "sha256": "50e1858db767b9daf0c07706174204463653624d65265280e4befce95849108d"
+      "size": 299406,
+      "sha256": "3f64ca7fb2c8673c14b674e76240b6bb150cd32d3090445befedbaa282e9573d"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -181,8 +181,8 @@
       "type": "screenshot",
       "label": "操作后",
       "file": "shots/SURV-SCREEN-OFF__S1__2.png",
-      "size": 2598892,
-      "sha256": "57083c2266757afd3f1420ddc5679609380ffc85486c46a6240ce1315efbe18c"
+      "size": 2600819,
+      "sha256": "fd0879f8c1261c02a11354661cbb2f1bba6f268da20b3eb2cb65046aff6041bd"
     },
     {
       "case_id": "SURV-SCREEN-OFF",
@@ -190,8 +190,8 @@
       "type": "output",
       "label": "log",
       "file": "",
-      "size": 28,
-      "sha256": "8545c86c2ee0ee56632ae6d2e32dea304a87795775c3e893aabf55976e49f7a6"
+      "size": 32,
+      "sha256": "08ec537ac58d906233e48436b23f4da54c8aa1136992886de0f1c8a83dd07281"
     },
     {
       "case_id": "SURV-ONE-PROCESS",
